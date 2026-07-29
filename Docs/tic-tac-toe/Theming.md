@@ -40,7 +40,7 @@ prove the theme system actually works and nothing is hardcoded.
 
 ### Where theme selection lives
 **On the main menu.** Themes up front — a nice big button, the same size and treatment
-as the New Game button. Not buried in a settings screen.
+as the Play Game button. Not buried in a settings screen.
 
 ### Does the theme persist between sessions
 **Yes.** Once a player selects a theme, it stays active. Close the app, open it again,

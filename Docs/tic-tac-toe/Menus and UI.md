@@ -6,13 +6,15 @@
 The game needs a main menu.
 
 **Buttons:**
-- **New Game** — starts a two-player same-phone game. Large.
-- **Theme** — opens theme selection. Large, same weight as New Game.
+- **Play Game** — if there are no existing games, takes the player straight into a new
+  two-player same-phone game. If there are existing games, takes the player to a screen
+  listing all open games. Large.
+- **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
 - **Settings** — opens the settings menu.
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
-same visual weight as New Game.
+same visual weight as Play Game.
 
 **The main menu has a title and a logo.** Both, not just buttons.
 
@@ -29,7 +31,7 @@ same visual weight as New Game.
 │                         │
 │   ┌─────────────────┐   │
 │   │                 │   │
-│   │    NEW GAME     │   │
+│   │    PLAY GAME    │   │
 │   │                 │   │
 │   └─────────────────┘   │
 │                         │
@@ -47,7 +49,41 @@ same visual weight as New Game.
 The entire main menu is itself theme-driven — background, button styling, title. No
 hardcoded styling here either.
 
-## New Game → What It Starts
+## Play Game → Where It Takes You
+Play Game branches on whether there are existing open games.
+
+- **No open games** — straight into a new game, no intermediate screen.
+- **Open games exist** — a new screen listing all open games, with **New Game** as an
+  option at the **top of the list**.
+- **Each open game is titled with its opponent's name** — that's what a row shows.
+- **Selecting New Game prompts for the opponent's name**, with a default of
+  **ItSaMeMaRiO**.
+
+```
+┌─────────────────────────┐
+│      OPEN GAMES         │
+│                         │
+│   ┌─────────────────┐   │
+│   │    NEW GAME     │   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │  OPPONENT NAME  │   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │   ItSaMeMaRiO   │   │
+│   └─────────────────┘   │
+│                         │
+└─────────────────────────┘
+```
+Each open game is titled with its opponent's name. ItSaMeMaRiO is the default.
+
+Undecided: whether the empty-state path (no open games → straight into a new game) also
+shows the opponent-name prompt, or skips it. "No intermediate screen" and the prompt
+can't both be true on that path.
+
+## A New Game → What It Starts
 - A **two player game on the same exact phone**. One device, passed back and forth.
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
@@ -61,12 +97,16 @@ hardcoded styling here either.
   don't peek" screen between turns. The handoff can be instant.
 
 ## Screens (so far)
-1. **Main Menu** — New Game + Theme + Settings buttons.
-2. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
-3. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
+1. **Main Menu** — Play Game + Theme + Settings buttons.
+2. **Open Games List** — lists all open games, with New Game at the top of the list;
+   reached from Play Game when open games exist.
+3. **New Game Name Prompt** — asks for the opponent's name when New Game is picked, with
+   **ItSaMeMaRiO** as the default. Undecided whether it's its own screen or an overlay.
+4. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
+5. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
    the Theme button. Two themes at launch, **Neon** and **Classic Red vs Blue**
    (see [Theming](./Theming.md)).
-4. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
+6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
 
 ## Settings Menu
@@ -163,19 +203,18 @@ button.)
 | **Sound effects toggle** | ✅ Remembered in whatever state it was left |
 | **Vibrate on touch toggle** | ✅ Remembered in whatever state it was left |
 | **Animations toggle** | ✅ Remembered in whatever state it was left |
-| **Scoreboard** | ❌ Resets when you leave to the main menu |
-| **Game in progress** | ❌ Not saved |
+| **Scoreboard** | ✅ Per game — each open game carries its own scoreboard, saved with that game |
+| **Game in progress** | ✅ Saved to device storage — resumable from the open-games list |
 
-So there are four persisted values, all of them player preferences: theme, sound,
-vibration, and animations. Nothing about game state is saved.
-
-> The scoreboard non-persistence is flagged as a possible future change — build it so
-> persistence can be added later without a rewrite.
+So there are four persisted preferences — theme, sound, vibration, and animations — plus
+game state: every open game is saved, each with its own scoreboard. How that gets stored
+is a [Tech Design](./Tech%20Design.md) question.
 
 ### Leaving a game mid-play
-Since the scoreboard resets at the main menu, going back to the menu discards the running
-series. Whether that needs a confirmation prompt ("Leave game? Your score will be lost")
-is undecided.
+Since a game in progress is saved, going back to the main menu doesn't discard anything —
+the game stays in the open-games list with its own scoreboard, and you can pick it up
+again. Whether leaving still needs a confirmation prompt is undecided; the original
+reason for one ("Leave game? Your score will be lost") no longer applies.
 
 ## Decisions
 
@@ -199,5 +238,30 @@ scoreboard.
 ### Is theme selection its own screen or an overlay?
 **An overlay** on the main menu.
 
+### Is the main menu button "New Game" or "Play Game"?
+**Play Game.** It branches on whether there are existing open games — no open games goes
+straight into a new game, open games goes to the open-games list screen. New Game moves to
+the top of that open-games list.
+
+### Does a game in progress have to be saved to device storage?
+**Yes — a game in progress is saved to device storage.** The open-games list only works
+if open games survive leaving the app. How it is stored is a Tech Design question — see
+[Tech Design](./Tech%20Design.md).
+
+### What does each row in the open-games list show?
+**The list shows New Game plus any open games, and each open game is titled with the
+opponent's name.** When the user selects New Game, they get a prompt to input the name
+of their opponent, with the default name **ItSaMeMaRiO**.
+
+### Does the opponent name replace "Player Two" in game?
+**No — not at this moment.** The opponent name titles the game in the open-games list and
+nothing else. In game, the players are still **Player One** and **Player Two**.
+
+That might change in the future, so don't build it in a way that makes the swap hard to
+make later. See [Game Overview](./Game%20Overview.md) → Decisions → Player names.
+
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
+
+<!-- Resolved: each open game carries its own scoreboard. See Game Overview →
+     Decisions → Scoreboard lifetime. -->

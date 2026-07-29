@@ -26,6 +26,29 @@ build-target, not a design constraint.
 ### Language — Dart
 Comes with Flutter.
 
+### Theme representation — data, not code
+**Themes are data — a JSON or YAML object loaded at runtime**, not a Dart class compiled
+into the app. A universal, theme-like object that can be loaded in.
+
+### Fallback to Neon — merge, not resolve
+**Merge over Neon.** Each theme is materialized into a complete theme by merging it over
+Neon, rather than a resolver checking the active theme and then Neon on every lookup.
+
+### Flutter's ThemeData vs our own theme object
+**Use Flutter's `ThemeData`/`ThemeExtension` as far as possible**, filled out from our
+theme JSON/YAML file. The remaining parts, not supported by the Flutter theme, we
+implement ourselves.
+
+Sounds and animations live in the **same theme object** — not a parallel structure. We
+give Flutter's `ThemeData` what we can and handle the rest ourselves, all from the same
+file.
+
+### Orientation — portrait only
+**Portrait only.** No landscape. Portrait-locked is simpler and the board is square-ish.
+
+### Minimum iOS version
+**iOS 13.**
+
 ---
 
 ## What the Design Docs Already Imply
@@ -35,8 +58,8 @@ here so they don't get re-litigated:
 | Requirement | Comes from |
 |---|---|
 | **Fully offline.** No backend, no network, no accounts. | Two players, one phone |
-| **Local persistence** for 4 values: theme, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
-| **No game-state persistence.** Games aren't saved. | Same |
+| **Local persistence** for 4 preference values: theme, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
+| **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence, Decisions |
 | **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
 | **Haptics** on every valid click | [Game Board Design](./Game%20Board%20Design.md) → Haptic Rule |
 | **A theme system with fallback** — every visual/audio/motion value resolves through the active theme, falling back to Neon | [Theming](./Theming.md) |
@@ -60,24 +83,10 @@ These are the things I think we need to hammer out. Grouped roughly by how much 
 block other work.
 
 ### 1. Theme system — how is a theme actually represented?
-The design says Neon is a complete base and other themes are partial overrides that
-inherit anything they don't define ([Theming](./Theming.md)). Concretely:
+Settled in Decisions above — themes are data loaded at runtime, merged over Neon, using
+Flutter's `ThemeData`/`ThemeExtension` where it fits. One part is still open:
 
-- Is a theme a **Dart class/object** compiled into the app, or **data** (JSON/YAML)
-  loaded at runtime? (Themes are "contained within the codebase" for now either way.)
-  Answer: Json or Yaml would be a good universal theam like object that can be loaded in.
-- How does fallback-to-Neon work — a resolver that checks the active theme then Neon,
-  or does each theme get *materialized* into a complete theme at startup by merging over
-  Neon?
-  Answer: Merge over neon
-- Do we use Flutter's own `ThemeData`/`ThemeExtension`, or roll our own theme object?
-  Flutter's system is built for exactly this and gives us `Theme.of(context)` everywhere,
-  but it's designed around Material's vocabulary, not ours (quadrant highlights, mark
-  art, sound sets, animation specs).
-  Answer: User the TeameData/ThemeExtensions from flutter as possilbe filled out from our theam Json/Yaml file. The remaining parts not  suppoerted in the Flutter theme. Will need to be implamented on our own.
-- Sounds and animations aren't things Flutter's theming handles at all. Do those live in
-  the same theme object, or in a parallel structure? 
-  Answer: All live in the same theme object And we give what we can to the flutter themeData and handel the rest our selves all from the same doc. 
+- **JSON or YAML?** The answer was "JSON or YAML" without picking between them.
 
 ### 2. State management
 What holds game state and settings? Options in rough order of ceremony:
@@ -108,9 +117,11 @@ imports**, and let the UI layer read from it.
   or the other. Any instinct here?
 
 ### 5. Persistence package
-Four small key-value preferences. `shared_preferences` is the obvious default. Any
-reason to prefer something else (`hive`, `flutter_secure_storage`)? Nothing here is
-sensitive.
+Four small key-value preferences **plus saved games** — every open game is persisted,
+with its own board state and scoreboard (see [Menus and UI](./Menus%20and%20UI.md) →
+Persistence). `shared_preferences` was the obvious default back when this was preferences
+only; that assumption no longer holds now that whole games are stored. Any reason to
+prefer something else (`hive`, `flutter_secure_storage`)? Nothing here is sensitive.
 
 ### 6. Audio package
 One-shot sound effects, with background music as a possible later addition.
@@ -127,12 +138,11 @@ Classic splat)? That's a content dependency, not just a code one.
   [Theming](./Theming.md).
 - Fonts — does a theme pick its own font? (Not currently stated anywhere.)
 
-### 8. Orientation and device support
-- **Portrait only**, or does landscape need to work? Portrait-locked is simpler and the
-  board is square-ish, but two people sharing a phone on a table might turn it.
-- Minimum iOS version?
+### 8. Device support
+Orientation (portrait only) and minimum iOS version (13) are settled in Decisions above.
+Still open:
+
 - Do we care about iPad, or phone only? The docs say "phone" throughout.
-Answer: Prtrait only, minimum IOS 13
 
 ### 9. Project structure
 Rough folder layout — where do rules, theme definitions, widgets, and assets live? Worth

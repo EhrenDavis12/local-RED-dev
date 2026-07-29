@@ -62,7 +62,7 @@ mis-taps harmless on a board with 81 small targets. Detail in
 ## Modes
 **Current scope — one mode only:**
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
-  Player One → Player Two. Started from the single "New Game" button on the main menu.
+  Player One → Player Two. Started from the **Play Game** button on the main menu.
 
 See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 
@@ -80,14 +80,19 @@ See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 nesting. ("For now," but this is the game we're building.)
 
 ### Scoreboard lifetime
-**Resets when you leave to the main menu.** The score is scoped to one continuous
-session at the board. Walk away to the menu and the series starts over.
+**Each open game carries its own scoreboard.** The score belongs to that game, not to a
+session at the board — leave to the main menu, pick the same game back up from the
+open-games list, and its running series is still there.
 
-Leaving the door open for **persisting the scoreboard in a future version** — so don't
-build it in a way that makes persistence hard to add later.
+The scoreboard is saved along with the game. See
+[Menus and UI](./Menus%20and%20UI.md) → Persistence and Decisions.
 
 ### Player names
-**Always "Player One" and "Player Two"** — no custom names, no name entry.
+**Always "Player One" and "Player Two"** — no custom names for the players themselves.
+
+The opponent name entered at New Game does **not** replace "Player Two" on the in-game
+scoreboard. It titles the game in the open-games list, and nothing else. See
+[Menus and UI](./Menus%20and%20UI.md) → Decisions.
 
 With the option to change that later. Same note as above: don't hardcode the strings in
 a way that fights adding real names down the road.
