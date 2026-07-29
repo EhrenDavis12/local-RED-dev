@@ -91,6 +91,7 @@ Menu structure, screen flow, settings, and persistence across the app.
 - A New Game → What It Starts
 - Pass-and-Play Turn Handoff
 - Screens (so far)
+- Theme Selection
 - Settings Menu
 - Vibrate on Touch
 - How you reach settings from gameplay
@@ -110,6 +111,8 @@ Menu structure, screen flow, settings, and persistence across the app.
 - Does a game in progress have to be saved to device storage?
 - What does each row in the open-games list show?
 - Does the opponent name replace "Player Two" in game?
+- Which theme is active by default?
+- How does theme selection show which theme is in use?
 
 ## [Theming](./Theming.md)
 The theme system — what a theme is, the Neon-base inheritance model, the theme catalog, and

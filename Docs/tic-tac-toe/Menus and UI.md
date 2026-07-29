@@ -105,9 +105,44 @@ can't both be true on that path.
 4. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
 5. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
    the Theme button. Two themes at launch, **Neon** and **Classic Red vs Blue**
-   (see [Theming](./Theming.md)).
+   (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
 6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
+
+## Theme Selection
+Opened by the **Theme** button on the main menu. As already decided (see Decisions below and
+[Theming](./Theming.md)), this is an **overlay on the main menu**, not its own screen.
+
+**Two options at launch:**
+- **Neon** — black background, electric neon colors. The base theme.
+- **Classic Red vs Blue** — the plain, familiar look. Red player vs blue player.
+
+See [Theming](./Theming.md) → Theme Catalog for the full look of each.
+
+**The currently active theme is highlighted** in the list, so it's obvious which one is in
+use before you change anything.
+
+**Neon is the default** — what's active before a player has ever opened theme selection.
+
+Selecting a theme applies it, and it persists between sessions — see
+[Theming](./Theming.md) → Decisions.
+
+```
+┌─────────────────────────┐
+│      THEME SELECT       │
+│                         │
+│   ┌─────────────────┐   │
+│   │▓▓▓▓▓ NEON ▓▓▓▓▓▓│   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │  CLASSIC RED VS │   │
+│   │      BLUE       │   │
+│   └─────────────────┘   │
+│                         │
+└─────────────────────────┘
+```
+Neon is shown highlighted because it's the currently active theme.
 
 ## Settings Menu
 **Reachable from two places:**
@@ -259,6 +294,14 @@ nothing else. In game, the players are still **Player One** and **Player Two**.
 
 That might change in the future, so don't build it in a way that makes the swap hard to
 make later. See [Game Overview](./Game%20Overview.md) → Decisions → Player names.
+
+### Which theme is active by default?
+**Neon.** It's what a player sees before they've ever opened theme selection, and it's the
+base theme every other theme falls back to. See [Theming](./Theming.md).
+
+### How does theme selection show which theme is in use?
+**The currently active theme is highlighted** in the list. Two options at launch, Neon and
+Classic Red vs Blue, and the highlight is what tells you which one you're on.
 
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
