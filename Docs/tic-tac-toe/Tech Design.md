@@ -132,6 +132,7 @@ Classic splat)? That's a content dependency, not just a code one.
   board is square-ish, but two people sharing a phone on a table might turn it.
 - Minimum iOS version?
 - Do we care about iPad, or phone only? The docs say "phone" throughout.
+Answer: Prtrait only, minimum IOS 13
 
 ### 9. Project structure
 Rough folder layout — where do rules, theme definitions, widgets, and assets live? Worth

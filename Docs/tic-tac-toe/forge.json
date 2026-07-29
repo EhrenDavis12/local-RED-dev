@@ -1,0 +1,15 @@
+{
+  "name": "tic-tac-toe",
+  "title": "Tic-Tac-Toe-Extreme",
+  "summary": "Recursive tic-tac-toe — a 3x3 big board where each quadrant holds its own 3x3 board.",
+  "docsRoot": "Docs/tic-tac-toe",
+  "prds": "Docs/tic-tac-toe/PRDs",
+  "roadmap": "Docs/tic-tac-toe/roadmap.md",
+  "srcRoots": [
+    "src/Tic-Tac-Toe-Extreme"
+  ],
+  "stack": "Flutter / Dart",
+  "parkingLotDocs": [
+    "Alternative Game Styles.md"
+  ]
+}
