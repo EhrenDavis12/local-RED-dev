@@ -3,16 +3,25 @@
 The local development mono repo for RED. It holds several projects: hand-written design docs
 under `Docs/<project>/`, and their source under `src/<repo>/` as git submodules.
 
-**One project is active at a time.** Every `forge-*` agent resolves its paths from that
-project's manifest rather than from anything hardcoded — see **The active project** below.
+**One project is active at a time**, and **one agent system is active at a time.** The project
+decides *what* gets worked on; the system decides *how*. This file holds only what is true
+regardless of which system is running — the system's own rules arrive through the import line at
+the bottom, and swapping systems means swapping that line. See `.claude/systems/README.md`.
 
-Today the only project is `tic-tac-toe` (Tic-Tac-Toe-Extreme, a recursive tic-tac-toe game —
-a 3x3 big board where each quadrant holds its own 3x3 board). It has **no application code
-yet**; it is design documentation only, and the game is still being specified.
+Today the only project is `tic-tac-toe` (Tic-Tac-Toe-Extreme, a recursive tic-tac-toe game — a
+3x3 big board where each quadrant holds its own 3x3 board). It has **no application code yet**;
+it is design documentation only, and the game is still being specified.
+
+## `srcRoots` are git submodules
+
+A `git diff` from the repo root shows only a **changed submodule pointer**, never the code
+change inside it. Anything that scopes itself by diff must use `git -C <srcRoot> diff`. Getting
+this wrong produces an empty diff and a confident "nothing to do" — a bug this repo has already
+shipped once.
 
 ## The active project
 
-Two files carry the scope, and every forge agent reads them before doing anything:
+Two files carry the scope, and every agent reads them before doing anything:
 
 | File | Holds |
 |---|---|
@@ -27,22 +36,23 @@ Switch or register a project with **`/set-project`**. It validates the manifest 
 activating it and echoes the resolved scope, which matters because hooks load at session start:
 without that echo a mid-session switch would be invisible until restart.
 
-A manifest may declare `aliases` — short forms that also activate it, so
-`/set-project ttt` works as well as `/set-project tic-tac-toe`. **Aliases are
-resolved only by that command and are never written to the pointer**, which always holds the
-canonical `name`. Everything downstream matches on `name` alone and never sees an alias; that
-is what keeps the abbreviation a typing convenience rather than a second identity to keep in
-sync.
+A manifest may declare `aliases` — short forms that also activate it, so `/set-project ttt`
+works as well as `/set-project tic-tac-toe`. **Aliases are resolved only by that command and are
+never written to the pointer**, which always holds the canonical `name`. Everything downstream
+matches on `name` alone and never sees an alias; that is what keeps the abbreviation a typing
+convenience rather than a second identity to keep in sync.
 
-An agent that cannot find the pointer or manifest **stops and says to run
-`/set-project`** rather than guessing a path. That is deliberate — a silent fallback is
-how this pipeline previously came to point at a directory that did not exist.
+An agent that cannot find the pointer or manifest **stops and says to run `/set-project`**
+rather than guessing a path. That is deliberate — a silent fallback is how this pipeline
+previously came to point at a directory that did not exist.
 
-`project.json` is configuration, not a design doc. It belongs to `/set-project`;
-`forge-doc-writer` and `forge-doc-planner` both leave it alone.
+`project.json` is configuration, not a design doc. It belongs to `/set-project`; nothing that
+edits docs touches it.
 
-When you dispatch a forge agent, state the resolved paths in the prompt. The agent reads the
-manifest itself and that read is authoritative — passing them just saves it a round trip.
+`.claude/hooks/repo-context.sh` (`SessionStart`) injects the active project and its resolved
+paths, or says plainly that none is set. It is repo-level and **never gated on the active
+system** — every system needs to know which project it is pointed at. It also checks that the
+import line and `settings.json` still agree.
 
 ## Documentation conventions
 
@@ -65,117 +75,52 @@ Other standing rules for these docs:
 - Contradictions between docs are expected and OK — flag them, don't resolve them.
 - Prose wraps around column 90. Preserve existing wrapping.
 
+These are properties of the docs, not of whichever system happens to be editing them. They hold
+whether an agent writes the doc or you do. Never edit docs belonging to a project that is not
+active; if they need work, switch with `/set-project` first.
+
 ## Agents
 
-The roster lives at `.claude/agents/README.md` — read it before proposing any new agent.
+The cross-system doctrine lives at `.claude/agents/README.md` — positions, naming, wiring tiers,
+and the overlap rules. Read it before proposing any new agent. Which agents exist *right now* is
+a property of the active system: see its `SYSTEM.md`.
 
 Every new or changed agent goes through the `/agent-creator` skill
 (`.claude/skills/agent-creator/`). It gates on overlap with existing agents, a justified
 model/effort tier, and one job per agent, and it handles installation.
 
-An agent that is neither named in this file nor backed by a hook will not reliably run — so
-adding the agent file is not the same as installing it. There are two `SessionStart` hooks:
-
-- `.claude/hooks/repo-context.sh` — injects the active project and its resolved paths,
-  or says plainly that none is set.
-- `.claude/hooks/docs-pending.sh` — flags uncommitted design-doc changes in the active
-  project's `docsRoot`. It skips `PRDs/`, `roadmap.md`, and `project.json`, which are not
-  `forge-doc-planner`'s territory.
-
-### Pure delegation — you coordinate, agents produce
-
-**You never produce or modify a project artifact.** Every change to source, tests, design
-docs, or PRDs goes through the agent that owns that territory. You coordinate and hold the end
-goal — the one thing no subagent can do, and the thing that degrades as your context fills
-with implementation detail.
-
-The line is **produce/modify vs. read/decide**. You decide what happens next, dispatch agents,
-read their reports, research answers to their questions, and talk to the user. Read whatever
-you need. Just don't write.
-
-Three carve-outs, because they aren't project artifacts:
-
-- **`.claude/**` and `CLAUDE.md`** — the agent system itself, via `/agent-creator`. Delegating
-  it would need an agent to build agents.
-- **Git operations** — commits and branches are coordination, not authorship.
-- **Anything the user explicitly asks you to do inline** — their call overrides this.
-
-Neither ambiguity nor tight iteration is a reason to keep work inline anymore: the first is
-handled by batch-and-resume below, the second by `SendMessage` resuming an agent with its
-context rather than restarting it.
-
-**The trivial change is the trap.** Delegating a one-line fix costs one dispatch; doing it
-inline costs the boundary. "I'll just do this one" is how you drift back into being an
-forge-code-writer, and you won't notice until your context is already full.
+An agent that is neither named in the active system's `SYSTEM.md` nor backed by a hook will not
+reliably run — so adding the agent file is not the same as installing it.
 
 ### Batch and resume
 
-Agents are instructed to finish what they can, settle anything the spec or code already
-answers, and return their genuine questions in one batch rather than guessing. When one comes
-back blocked:
+This is a harness property, true of any agent including the built-in `Explore` and `Plan`.
 
-1. **Answer what you can yourself** — from the PRD, the design docs, or the code. Most
-   returned "questions" are research, and doing that research is your job, not the user's.
+A subagent cannot ask a question mid-run. So agents are instructed to finish what they can,
+settle anything the spec or the code already answers, and return their genuine questions in one
+batch rather than guessing. When one comes back blocked:
+
+1. **Answer what you can yourself** — from the spec, the docs, or the code. Most returned
+   "questions" are research, and doing that research is your job, not the user's.
 2. **Batch the rest into one ask.** Only questions needing the user's intent or preference
    reach them.
 3. **Resume the same agent with `SendMessage`** — refer to it by name. This restores its
    transcript, so it keeps its partial work and its reasoning.
 
 ```
-SendMessage(to: "forge-code-writer", message: "<the answers>")
+SendMessage(to: "<agent-name>", message: "<the answers>")
 ```
 
-**Never re-dispatch with `Agent` to continue blocked work.** A fresh agent re-reads the PRD,
-re-reads the code, and throws away everything the first run figured out — you pay full price
-twice and lose the partial result.
+**Never re-dispatch with `Agent` to continue blocked work.** A fresh agent re-reads everything
+and throws away what the first run figured out — you pay full price twice and lose the partial
+result.
 
 If an agent returns questions it could have answered by reading, say so when you resume it.
 Over-asking is the failure mode that makes this loop expensive.
 
-### The write boundary
+## The active system
 
-Judgment and write access are held by different agents on purpose. One writer per territory:
+Everything below this line comes from the system named here. Swapping systems means changing
+this one line — and running `/set-system`, which also rewrites the `settings.json` half.
 
-Paths below are manifest keys, resolved per active project.
-
-| Territory | Only writer |
-|---|---|
-| Design docs — `.md` directly under `docsRoot` | `forge-doc-writer` |
-| `prds` | `forge-prd-author` |
-| `roadmap` (the doc map) | `forge-doc-writer` |
-| Source code under `srcRoots` | `forge-code-writer`, then `forge-code-cleaner` |
-| Tests under `srcRoots` | `forge-test-author` |
-| `project.json` | `/set-project` (configuration, not a doc) |
-
-Five agents are read-only and report instead. When adding an agent, default to read-only —
-write access has to be argued for.
-
-Two separations are load-bearing and must not be collapsed for convenience: `forge-code-writer`
-never writes tests (an author's own tests assert what was built, not what was specified), and
-`forge-test-author` never edits source (fixing the code to pass your own test destroys the signal).
-
-### The feature pipeline
-
-```
-forge-prd-author → forge-prd-reviewer → forge-code-writer → forge-code-cleaner → forge-code-reviewer
-                                ↕                        forge-prd-alignment
-                          forge-test-author → forge-test-auditor
-```
-
-Don't skip `forge-prd-reviewer`. Everything downstream treats the PRD as its specification, so an
-ambiguity there gets copied into every agent that reads it — and none of them can ask you
-about it.
-
-## Tidying the docs
-
-**Run the `forge-tidy-docs` skill whenever a design doc is added or edited** — after your own
-edits, when the user says a question has been answered, or when they've finished a brain-dump
-session. It runs `forge-doc-planner` (decides, cannot edit) and then `forge-doc-writer`
-(edits, decides nothing), and explains what to expect from each.
-
-## Docs conventions and the active project
-
-The house style above applies to the design docs of whichever project is active. `roadmap.md`
-is generated by `forge-doc-writer` and does not follow it — it is an index of where things
-live, not a doc to hand-edit. Never edit docs belonging to a project that is not active; if
-they need work, switch with `/set-project` first.
+@.claude/systems/forge/SYSTEM.md
