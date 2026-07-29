@@ -1,0 +1,3 @@
+[submodule "src/Tic-Tac-Toe-Extreme"]
+	path = src/Tic-Tac-Toe-Extreme
+	url = git@github.com:EhrenDavis12/Tic-Tac-Toe-Extreme.git
