@@ -10,38 +10,35 @@ Today the only project is `tic-tac-toe` (Tic-Tac-Toe-Extreme, a recursive tic-ta
 a 3x3 big board where each quadrant holds its own 3x3 board). It has **no application code
 yet**; it is design documentation only, and the game is still being specified.
 
-## Repo layout
-
-- `Docs/<project>/` — that project's hand-written design docs (the real content of this repo),
-  plus `PRDs/`, a generated `roadmap.md`, and `forge.json`
-- `src/<repo>/` — source, as git submodules
-- `README.md` — one-line description
-- `.claude/agents/` — subagent definitions, plus `README.md` (the agent roster)
-- `.claude/skills/` — project skills
-- `.claude/forge/active-project.json` — which project is active
-
 ## The active project
 
 Two files carry the scope, and every forge agent reads them before doing anything:
 
 | File | Holds |
 |---|---|
-| `.claude/forge/active-project.json` | `{ "project": "<slug>" }` — the pointer, nothing else |
-| `Docs/<project>/forge.json` | the manifest: `name`, `title`, `summary`, `docsRoot`, `prds`, `roadmap`, `srcRoots` (array), and optional `stack` and `parkingLotDocs` |
+| `.claude/project/active.json` | `{ "project": "<slug>" }` — the pointer, nothing else |
+| `Docs/<project>/project.json` | the manifest: `name`, `title`, `summary`, `docsRoot`, `prds`, `roadmap`, `srcRoots` (array), and optional `aliases`, `stack` and `parkingLotDocs` |
 
 Every manifest path is repo-relative and already joined, so nothing downstream constructs a
 path. **Design docs are every `.md` directly under `docsRoot`**, excluding `PRDs/`,
-`roadmap.md`, and `forge.json` — docs are flat there by convention.
+`roadmap.md`, and `project.json` — docs are flat there by convention.
 
-Switch or register a project with **`/forge-set-project`**. It validates the manifest before
+Switch or register a project with **`/set-project`**. It validates the manifest before
 activating it and echoes the resolved scope, which matters because hooks load at session start:
 without that echo a mid-session switch would be invisible until restart.
 
+A manifest may declare `aliases` — short forms that also activate it, so
+`/set-project ttt` works as well as `/set-project tic-tac-toe`. **Aliases are
+resolved only by that command and are never written to the pointer**, which always holds the
+canonical `name`. Everything downstream matches on `name` alone and never sees an alias; that
+is what keeps the abbreviation a typing convenience rather than a second identity to keep in
+sync.
+
 An agent that cannot find the pointer or manifest **stops and says to run
-`/forge-set-project`** rather than guessing a path. That is deliberate — a silent fallback is
+`/set-project`** rather than guessing a path. That is deliberate — a silent fallback is
 how this pipeline previously came to point at a directory that did not exist.
 
-`forge.json` is configuration, not a design doc. It belongs to `/forge-set-project`;
+`project.json` is configuration, not a design doc. It belongs to `/set-project`;
 `forge-doc-writer` and `forge-doc-planner` both leave it alone.
 
 When you dispatch a forge agent, state the resolved paths in the prompt. The agent reads the
@@ -79,10 +76,10 @@ model/effort tier, and one job per agent, and it handles installation.
 An agent that is neither named in this file nor backed by a hook will not reliably run — so
 adding the agent file is not the same as installing it. There are two `SessionStart` hooks:
 
-- `.claude/hooks/forge-active-project.sh` — injects the active project and its resolved paths,
+- `.claude/hooks/repo-context.sh` — injects the active project and its resolved paths,
   or says plainly that none is set.
 - `.claude/hooks/docs-pending.sh` — flags uncommitted design-doc changes in the active
-  project's `docsRoot`. It skips `PRDs/`, `roadmap.md`, and `forge.json`, which are not
+  project's `docsRoot`. It skips `PRDs/`, `roadmap.md`, and `project.json`, which are not
   `forge-doc-planner`'s territory.
 
 ### Pure delegation — you coordinate, agents produce
@@ -148,7 +145,7 @@ Paths below are manifest keys, resolved per active project.
 | `roadmap` (the doc map) | `forge-doc-writer` |
 | Source code under `srcRoots` | `forge-code-writer`, then `forge-code-cleaner` |
 | Tests under `srcRoots` | `forge-test-author` |
-| `forge.json` | `/forge-set-project` (configuration, not a doc) |
+| `project.json` | `/set-project` (configuration, not a doc) |
 
 Five agents are read-only and report instead. When adding an agent, default to read-only —
 write access has to be argued for.
@@ -169,51 +166,16 @@ Don't skip `forge-prd-reviewer`. Everything downstream treats the PRD as its spe
 ambiguity there gets copied into every agent that reads it — and none of them can ask you
 about it.
 
-## Tidying the docs: `forge-doc-planner` → `forge-doc-writer`
+## Tidying the docs
 
-Doc cleanup is two steps, deliberately. `forge-doc-planner` decides what should change but
-**cannot edit anything**; `forge-doc-writer` edits but decides nothing. The expensive, destructive
-judgment — "is this question really answered?" — therefore never holds a write tool.
-
-**Run this whenever a design doc is added or edited** — after your own edits, when the
-user says a question has been answered, or when they've finished a brain-dump session.
-
-```
-Agent(subagent_type: "forge-doc-planner", prompt: "Design docs under <docsRoot> were edited — plan what needs tidying.")
-```
-
-Then hand its report, verbatim, to the forge-doc-writer:
-
-```
-Agent(subagent_type: "forge-doc-writer", prompt: "<the forge-doc-planner plan>")
-```
-
-How they behave, so you know what to expect:
-
-- `forge-doc-planner` finds changed docs itself via `git status`/`git diff -- <docsRoot>` — you
-  don't need to list files. It reads *every* design doc in the active project for context,
-  because a question in one doc is often answered by an edit in another.
-- Its report is a numbered list tagged **MOVE** / **PROMOTE** / **REMOVE** / **FORMAT**, plus
-  a **Needs your call** section. Pass the whole thing through unedited — `forge-doc-writer` applies the
-  tagged findings literally and is instructed to ignore **Needs your call**.
-- Answered questions get promoted into `## Decisions` rather than deleted, so the answer
-  survives even though the question stops cluttering Open Questions. If the decision belongs
-  in a different doc, it goes there with a `<!-- Resolved: ... See <Doc> → Decisions. -->`
-  breadcrumb.
-- Neither ever invents an answer. Anything uncertain comes back under **Needs your call**.
-
-**Relay the Needs your call items to the user** — those are questions only they can settle.
-
-`forge-doc-planner` runs on Opus at xhigh effort on purpose: deciding whether a question is
-*really* answered, and spotting contradictions across docs, is judgment work where a wrong
-call silently destroys a design decision. Don't downgrade it, and don't skip the pair to tidy
-docs inline "because it's just moving a section around." `forge-doc-writer` runs on Sonnet precisely
-because the thinking already happened — if you find yourself wanting it to be smarter, the
-report wasn't specific enough.
+**Run the `forge-tidy-docs` skill whenever a design doc is added or edited** — after your own
+edits, when the user says a question has been answered, or when they've finished a brain-dump
+session. It runs `forge-doc-planner` (decides, cannot edit) and then `forge-doc-writer`
+(edits, decides nothing), and explains what to expect from each.
 
 ## Docs conventions and the active project
 
 The house style above applies to the design docs of whichever project is active. `roadmap.md`
 is generated by `forge-doc-writer` and does not follow it — it is an index of where things
 live, not a doc to hand-edit. Never edit docs belonging to a project that is not active; if
-they need work, switch with `/forge-set-project` first.
+they need work, switch with `/set-project` first.
