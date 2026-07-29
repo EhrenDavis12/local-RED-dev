@@ -36,6 +36,13 @@ Switch or register a project with **`/set-project`**. It validates the manifest 
 activating it and echoes the resolved scope, which matters because hooks load at session start:
 without that echo a mid-session switch would be invisible until restart.
 
+**`/set-project` and `/set-system` are commands, not skills — you cannot run either.** Both
+switches belong to the user alone. If one needs to change, say so and stop; do not switch, and
+do not reach around the command by editing `.claude/project/active.json` or the import line
+yourself. The reason is context integrity: a switch you initiated would leave the user
+reasoning about one project or rule set while you work under another, and the mismatch is
+invisible to them. Being told to wait is cheap; a session spent under false context is not.
+
 A manifest may declare `aliases` — short forms that also activate it, so `/set-project ttt`
 works as well as `/set-project tic-tac-toe`. **Aliases are resolved only by that command and are
 never written to the pointer**, which always holds the canonical `name`. Everything downstream

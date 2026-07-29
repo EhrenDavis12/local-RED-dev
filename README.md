@@ -17,6 +17,11 @@ at a time.
 /set-system direct        no pipeline — Claude works inline
 ```
 
+**Only you can flip these.** Both are commands, not skills — Claude cannot run them, and is
+told not to edit the underlying files instead. If it thinks a switch is needed it asks and
+stops. Changing the active project also triggers a permission prompt, so nothing moves without
+you seeing it.
+
 **Restart Claude Code after `/set-system`.** Agents, skills, and hooks load at session start.
 `/set-project` takes effect immediately.
 
