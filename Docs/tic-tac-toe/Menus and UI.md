@@ -195,6 +195,8 @@ scoreboard.
 
 ### Does the main menu need a title/logo?
 **Yes — both a title and a logo.**
+<!-- Resolved: the logo will be generated with Replicate when needed, not now.
+     See Tech Design → Decisions → Where do sound and art assets come from. -->
 
 ### Is theme selection its own screen or an overlay?
 **An overlay** on the main menu.

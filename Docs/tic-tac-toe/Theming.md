@@ -61,6 +61,17 @@ Later on we might get into paid/purchasable themes, but **that is not the curren
 Worth knowing the direction exists so we don't build something that makes it impossible,
 but no monetization work now.
 
+### Marks beyond X and O
+**Marks are not locked to X and O — a theme supplies its own mark art, as an image or an
+icon.** From [Tech Design](./Tech%20Design.md) → Decisions: *"Due to themes im thinking
+the marks can be an image or an icon. For example neon just needs icons of X and O while
+the dinosaur theme might use a T-Rex as an Icon."*
+
+Since themes are aimed at being fun for kids, the marks aren't locked to X and O — a
+theme might swap them for icons, emoji, animals, shapes, etc. The theme system must be
+built so that's possible. Neon still uses X and O icons; that's Neon's choice of art,
+not a constraint on the system.
+
 ---
 
 ## What Is a Theme?
@@ -176,7 +187,7 @@ Everything visual and audible. Rough list, not exhaustive:
 **Visual**
 - Board background / page background — "really cool backgrounds"
 - Big board and small board grid lines (colors, thickness, style)
-- The player marks themselves — see below
+- The player marks themselves — see **Marks beyond X and O** under Decisions
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
@@ -203,10 +214,8 @@ Everything visual and audible. Rough list, not exhaustive:
 - The animation set applied to the player's marker — grow/shrink, glow/backlight,
   shadowbox, jiggle, dance. See [Animations](./Animations.md) for the full vocabulary.
 
-## Marks Beyond X and O
-Since themes are aimed at being fun for kids, the marks probably shouldn't be locked to
-X and O — a theme might swap them for icons, emoji, animals, shapes, etc. Not decided,
-but the theme system should probably be built so it's *possible*.
+<!-- Resolved: marks are theme-supplied image or icon, not locked to X and O.
+     See Decisions → Marks beyond X and O. -->
 
 ## Sound Decisions
 
