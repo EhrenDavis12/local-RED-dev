@@ -112,5 +112,3 @@ the winner; after a tie → whoever went first in the tied game.
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->
-
-<!-- Resolved: recursion depth is fixed at 2 levels. See Game Overview → Decisions. -->

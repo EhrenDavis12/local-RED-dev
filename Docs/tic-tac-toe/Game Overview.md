@@ -62,7 +62,7 @@ mis-taps harmless on a board with 81 small targets. Detail in
 ## Modes
 **Current scope — one mode only:**
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
-  Player One → Player Two. Started from the single "New Game" button on the main menu.
+  Player One → Player Two. Started from the **Play Game** button on the main menu.
 
 See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 
@@ -80,23 +80,19 @@ See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 nesting. ("For now," but this is the game we're building.)
 
 ### Scoreboard lifetime
-**The scoreboard persists with the game.** A saved game carries its scoreboard, so
-resuming a game resumes the running series rather than starting the score over.
+**Each open game carries its own scoreboard.** The score belongs to that game, not to a
+session at the board — leave to the main menu, pick the same game back up from the
+open-games list, and its running series is still there.
 
-The unit that implies is recorded in [Menus and UI](./Menus%20and%20UI.md) → Decisions →
-What does a save slot hold? — a slot holds the series, so a rematch continues the same
-slot rather than starting a second saved game.
-
-<!-- Superseded: this decision previously read "Resets when you leave to the main menu.
-     The score is scoped to one continuous session at the board. Walk away to the menu
-     and the series starts over." and added "Leaving the door open for persisting the
-     scoreboard in a future version — so don't build it in a way that makes persistence
-     hard to add later." That future version is the current design: game state persists,
-     and the scoreboard persists with it. See Menus and UI → Persistence and Tech Design
-     → Decisions → Game state storage — Hive. -->
+The scoreboard is saved along with the game. See
+[Menus and UI](./Menus%20and%20UI.md) → Persistence and Decisions.
 
 ### Player names
-**Always "Player One" and "Player Two"** — no custom names, no name entry.
+**Always "Player One" and "Player Two"** — no custom names for the players themselves.
+
+The opponent name entered at New Game does **not** replace "Player Two" on the in-game
+scoreboard. It titles the game in the open-games list, and nothing else. See
+[Menus and UI](./Menus%20and%20UI.md) → Decisions.
 
 With the option to change that later. Don't hardcode the strings in a way that fights
 adding real names down the road.
@@ -106,6 +102,3 @@ adding real names down the road.
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->
-<!-- Resolved: dead quadrants → free choice; big-board tie → straight draw; turn order
-     across games including ties. See Rules → Edge Cases, Turn Order Across Games,
-     and Decisions. -->

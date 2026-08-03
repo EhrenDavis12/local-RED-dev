@@ -39,12 +39,11 @@ This is a day-one constraint because retrofitting it later means touching every 
 ## Decisions
 
 ### How many themes ship at launch
-**Two — Neon and Classic Red vs Blue.** See the Theme Catalog below. Two is enough to
-prove the theme system actually works and nothing is hardcoded.
+**Two — Neon and Classic Red vs Blue.** See the Theme Catalog below.
 
 ### Where theme selection lives
 **On the main menu.** Themes up front — a nice big button, the same size and treatment
-as the New Game button. Not buried in a settings screen.
+as the Play Game button. Not buried in a settings screen.
 
 ### Does the theme persist between sessions
 **Yes.** Once a player selects a theme, it stays active. Close the app, open it again,
@@ -74,20 +73,16 @@ icon.** From [Tech Design](./Tech%20Design.md) → Decisions: *"Due to themes im
 the marks can be an image or an icon. For example neon just needs icons of X and O while
 the dinosaur theme might use a T-Rex as an Icon."*
 
-Since themes are aimed at being fun for kids, the marks aren't locked to X and O — a
-theme might swap them for icons, emoji, animals, shapes, etc. The theme system must be
-built so that's possible. Neon still uses X and O icons; that's Neon's choice of art,
-not a constraint on the system.
+The marks aren't locked to X and O — a theme might swap them for icons, emoji, animals,
+shapes, etc. The theme system must be built so that's possible. Neon still uses X and O
+icons; that's Neon's choice of art, not a constraint on the system.
 
 ### What happens if a theme fails to load
 **A modal on the Theme screen saying the theme is unavailable, then fall back to Neon.**
 As stated: *"From the Theme screen if a theme fails to load put up a modal with sorry this
 theme is unavailable please try another theme. Then fallback to neon."*
 
-So the failure is surfaced to the player rather than swallowed — they are told the theme
-they picked is unavailable and asked to pick another — and the game continues on Neon
-rather than on a broken theme. Neon is the one theme with nothing to fall back to, per
-**Neon Is the Base Theme** below.
+Neon is the one theme with nothing to fall back to, per **Neon Is the Base Theme** below.
 
 Theme selection is an overlay on the main menu rather than its own screen — see
 [Menus and UI](./Menus%20and%20UI.md) → Decisions → Is theme selection its own screen or
@@ -164,11 +159,8 @@ This applies to **everything**, not just sound:
   later.
 - **Fallback happens once, not per lookup.** Each theme is materialized into a complete
   theme at startup by merging over Neon, so at runtime every lookup hits a complete theme
-  and there is no fallback step. See [Tech Design](./Tech%20Design.md) → Decisions → How
-  does fallback-to-Neon work?
-<!-- Superseded: this bullet previously read "Build the theme lookup as: ask the active
-     theme → if undefined, ask Neon." Per-lookup fallback lost to merge-over-Neon.
-     See Tech Design → Decisions → How does fallback-to-Neon work? -->
+  and there is no fallback step. See [Tech Design](./Tech%20Design.md) → Decisions →
+  Fallback to Neon — merge, not resolve.
 
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
@@ -213,8 +205,6 @@ genuinely different looks, which is a real test that nothing is hardcoded.
   nothing like Neon's electric buzz.
 
 **What it inherits from Neon:** everything else — animations included.
-<!-- Resolved: animations inherit from Neon, and a theme's own animations merge over it.
-     See Animations → Decisions → Do themes inherit Neon's animations? -->
 
 The two themes now have distinct sonic identities: Neon **buzzes** like a light,
 Classic **splats** like a water balloon.
@@ -253,9 +243,6 @@ Everything visual and audible. Rough list, not exhaustive:
 **Animation**
 - The animation set applied to the player's marker — grow/shrink, glow/backlight,
   shadowbox, jiggle, dance. See [Animations](./Animations.md) for the full vocabulary.
-
-<!-- Resolved: marks are theme-supplied image or icon, not locked to X and O.
-     See Decisions → Marks beyond X and O. -->
 
 ## Sound Decisions
 

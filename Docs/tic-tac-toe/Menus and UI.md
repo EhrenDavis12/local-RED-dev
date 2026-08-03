@@ -6,13 +6,15 @@
 The game needs a main menu.
 
 **Buttons:**
-- **New Game** — starts a two-player same-phone game. Large.
-- **Theme** — opens theme selection. Large, same weight as New Game.
+- **Play Game** — if there are no existing games, takes the player straight into a new
+  two-player same-phone game. If there are existing games, takes the player to a screen
+  listing all open games. Large.
+- **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
 - **Settings** — opens the settings menu.
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
-same visual weight as New Game.
+same visual weight as Play Game.
 
 **The main menu has a title and a logo.** Both, not just buttons.
 
@@ -29,7 +31,7 @@ same visual weight as New Game.
 │                         │
 │   ┌─────────────────┐   │
 │   │                 │   │
-│   │    NEW GAME     │   │
+│   │    PLAY GAME    │   │
 │   │                 │   │
 │   └─────────────────┘   │
 │                         │
@@ -47,7 +49,41 @@ same visual weight as New Game.
 The entire main menu is itself theme-driven — background, button styling, title. No
 hardcoded styling here either.
 
-## New Game → What It Starts
+## Play Game → Where It Takes You
+Play Game branches on whether there are existing open games.
+
+- **No open games** — straight into a new game, no intermediate screen.
+- **Open games exist** — a new screen listing all open games, with **New Game** as an
+  option at the **top of the list**.
+- **Each open game is titled with its opponent's name** — that's what a row shows.
+- **Selecting New Game prompts for the opponent's name**, with a default of
+  **ItSaMeMaRiO**.
+
+```
+┌─────────────────────────┐
+│      OPEN GAMES         │
+│                         │
+│   ┌─────────────────┐   │
+│   │    NEW GAME     │   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │  OPPONENT NAME  │   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │   ItSaMeMaRiO   │   │
+│   └─────────────────┘   │
+│                         │
+└─────────────────────────┘
+```
+Each open game is titled with its opponent's name. ItSaMeMaRiO is the default.
+
+Undecided: whether the empty-state path (no open games → straight into a new game) also
+shows the opponent-name prompt, or skips it. "No intermediate screen" and the prompt
+can't both be true on that path.
+
+## A New Game → What It Starts
 - A **two player game on the same exact phone**. One device, passed back and forth.
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
@@ -61,13 +97,52 @@ hardcoded styling here either.
   don't peek" screen between turns. The handoff can be instant.
 
 ## Screens (so far)
-1. **Main Menu** — New Game + Theme + Settings buttons.
-2. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
-3. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
+1. **Main Menu** — Play Game + Theme + Settings buttons.
+2. **Open Games List** — lists all open games, with New Game at the top of the list;
+   reached from Play Game when open games exist.
+3. **New Game Name Prompt** — asks for the opponent's name when New Game is picked, with
+   **ItSaMeMaRiO** as the default. Undecided whether it's its own screen or an overlay.
+4. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
+5. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
    the Theme button. Two themes at launch, **Neon** and **Classic Red vs Blue**
-   (see [Theming](./Theming.md)).
-4. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
+   (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
+6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
+
+## Theme Selection
+Opened by the **Theme** button on the main menu. As already decided (see Decisions below and
+[Theming](./Theming.md)), this is an **overlay on the main menu**, not its own screen.
+
+**Two options at launch:**
+- **Neon** — black background, electric neon colors. The base theme.
+- **Classic Red vs Blue** — the plain, familiar look. Red player vs blue player.
+
+See [Theming](./Theming.md) → Theme Catalog for the full look of each.
+
+**The currently active theme is highlighted** in the list, so it's obvious which one is in
+use before you change anything.
+
+**Neon is the default** — what's active before a player has ever opened theme selection.
+
+Selecting a theme applies it, and it persists between sessions — see
+[Theming](./Theming.md) → Decisions.
+
+```
+┌─────────────────────────┐
+│      THEME SELECT       │
+│                         │
+│   ┌─────────────────┐   │
+│   │▓▓▓▓▓ NEON ▓▓▓▓▓▓│   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │  CLASSIC RED VS │   │
+│   │      BLUE       │   │
+│   └─────────────────┘   │
+│                         │
+└─────────────────────────┘
+```
+Neon is shown highlighted because it's the currently active theme.
 
 ## Settings Menu
 **Reachable from two places:**
@@ -148,8 +223,8 @@ When a game is won or tied, a **rematch button is available as an option**. Taki
 resets the board and increments the scoreboard (winner's column, or Ties). See
 [Game Overview](./Game%20Overview.md) → Session Structure.
 
-The rematch continues in the **same save slot** — same series, scoreboard intact. It does
-not start a second saved game. See Decisions → What does a save slot hold? below.
+The rematch continues in the **same open game** — same series, scoreboard intact. It does
+not start a second open game. See Decisions → What does an open game hold? below.
 
 The winner of that game goes first in the rematch — or on a tie, whoever went first last
 time (see [Rules](./Rules.md) → Turn Order Across Games).
@@ -166,31 +241,19 @@ button.)
 | **Sound effects toggle** | ✅ Remembered in whatever state it was left |
 | **Vibrate on touch toggle** | ✅ Remembered in whatever state it was left |
 | **Animations toggle** | ✅ Remembered in whatever state it was left |
-| **Scoreboard** | ✅ Saved with the game — resumes when the game resumes |
-| **Game in progress** | ✅ Saved — leave and come back to it later |
+| **Scoreboard** | ✅ Per game — each open game carries its own scoreboard, saved with that game |
+| **Game in progress** | ✅ Saved to device storage — resumable from the open-games list |
 
-So four player preferences persist — theme, sound, vibration, and animations — and so
-does game state: a game in progress and its scoreboard. The two are stored differently;
-see [Tech Design](./Tech%20Design.md) → Decisions → Persistence package and Game state
-storage — Hive.
-
-<!-- Superseded: this previously read "The scoreboard non-persistence is flagged as a
-     possible future change — build it so persistence can be added later without a
-     rewrite." That future change has happened — the scoreboard now persists with the
-     saved game. See Game Overview → Decisions → Scoreboard lifetime. -->
+So there are four persisted preferences — theme, sound, vibration, and animations — plus
+game state: every open game is saved, each with its own scoreboard. How that gets stored
+is settled in [Tech Design](./Tech%20Design.md) → Decisions — preferences in
+`shared_preferences`, game state in Hive.
 
 ### Leaving a game mid-play
-Going back to the main menu no longer discards anything — the game and its scoreboard are
-saved, and the game can be picked up again from the game selection screen.
-
-Undecided: whether leaving still warrants a confirmation prompt at all, and if so what it
-says now that nothing is lost.
-
-<!-- Superseded: this previously read "Since the scoreboard resets at the main menu,
-     going back to the menu discards the running series. Whether that needs a
-     confirmation prompt ('Leave game? Your score will be lost') is undecided." The
-     premise no longer holds — game state and the scoreboard both persist. See
-     Decisions → Does a game in progress persist? -->
+Since a game in progress is saved, going back to the main menu doesn't discard anything —
+the game stays in the open-games list with its own scoreboard, and you can pick it up
+again. Whether leaving still needs a confirmation prompt is undecided; the original
+reason for one ("Leave game? Your score will be lost") no longer applies.
 
 ## Decisions
 
@@ -208,63 +271,62 @@ which include exiting the game. You don't have to finish a game to leave it.
 **A rematch button is available as an option.** It resets the board and increments the
 scoreboard.
 
-The rematch continues in the same save slot, with the scoreboard intact — see **What does
-a save slot hold?** below.
+The rematch continues in the same open game, with the scoreboard intact — see **What does
+an open game hold?** below.
 
 ### Does the main menu need a title/logo?
 **Yes — both a title and a logo.**
-<!-- Resolved: the logo will be generated with Replicate when needed, not now.
-     See Tech Design → Decisions → Where do sound and art assets come from. -->
 
 ### Is theme selection its own screen or an overlay?
 **An overlay** on the main menu.
 
-### Does a game in progress persist?
-**Yes — game data is persistent, so you can reload and come back to the game at any
-time.** As stated:
+### Is the main menu button "New Game" or "Play Game"?
+**Play Game.** It branches on whether there are existing open games — no open games goes
+straight into a new game, open games goes to the open-games list screen. New Game moves to
+the top of that open-games list.
 
-> *"We need to have the game data persistent. So we can reload and come back to the game
-> at any time. I do believe this should have been called out already. Main Menu screen ->
-> Play Game button -> Game selection screen. In the Game selection screen the user should
-> be able to reselect the last game played. Refer to the documents for more details about
-> this part. If you don't see this then we might have uncommitted changes from our other
-> developer."*
-
-So the flow is **Main Menu → Play Game → Game selection screen**, and the game selection
-screen is where you reselect the last game played.
-
-**The game selection screen is not designed yet, and neither is the main-menu rewording.**
-The design docs describing it are believed to exist but are not in this repo. Until they
-land, the **Main Menu**, **Screens (so far)** and the ASCII mockup above still describe the
-old three-button menu with a New Game button — that contradiction is known, not an
-oversight.
-
-The scoreboard persists with the game — see [Game Overview](./Game%20Overview.md) →
-Decisions → Scoreboard lifetime. Where it is stored is
+### Does a game in progress have to be saved to device storage?
+**Yes — a game in progress is saved to device storage.** How it is stored is answered in
 [Tech Design](./Tech%20Design.md) → Decisions → Game state storage — Hive.
 
-### What does a save slot hold?
-**A save slot holds a whole series — the board plus the running score.** A rematch
-continues in the same slot with the scoreboard intact, and "the last game played" on the
-game selection screen means the last *series*, not the last individual board.
+### What does each row in the open-games list show?
+**The list shows New Game plus any open games, and each open game is titled with the
+opponent's name.** When the user selects New Game, they get a prompt to input the name
+of their opponent, with the default name **ItSaMeMaRiO**.
 
-This confirms what the **Persistence** table above and
-[Game Overview](./Game%20Overview.md) → Decisions → Scoreboard lifetime already assume,
-rather than changing them. What it adds is the *unit*: finishing a game and taking the
-rematch continues one slot, it does not consume a second one.
+### Does the opponent name replace "Player Two" in game?
+**No — not at this moment.** The opponent name titles the game in the open-games list and
+nothing else. In game, the players are still **Player One** and **Player Two**.
 
-It also fixes what the count in **Open Questions** below is counting — however many saved
-games we keep, they are series.
+That might change in the future, so don't build it in a way that makes the swap hard to
+make later. See [Game Overview](./Game%20Overview.md) → Decisions → Player names.
+
+### Which theme is active by default?
+**Neon.** It's what a player sees before they've ever opened theme selection, and it's the
+base theme every other theme falls back to. See [Theming](./Theming.md).
+
+### How does theme selection show which theme is in use?
+**The currently active theme is highlighted** in the list. Two options at launch, Neon and
+Classic Red vs Blue, and the highlight is what tells you which one you're on.
+
+### What does an open game hold?
+**An open game holds a whole series — the board plus the running score.** A rematch
+continues in the same open game with the scoreboard intact, and resuming a game from the
+open-games list resumes the *series*, not just the last individual board.
+
+It also fixes what the count below is counting — the three open games we keep are three
+series.
+
+### How many open games do we keep?
+**A maximum of 3 open games, no more.**
+
+What each of those 3 holds is a whole series — see **What does an open game hold?**
+above.
 
 ### Do we support Dynamic Type?
 **Not for now.** *"Lets not do this as of yet."*
 
-The app does not scale its text to the iOS Dynamic Type setting in this version. Recorded
-as a deliberate deferral rather than an oversight, so it can be revisited later.
+The app does not scale its text to the iOS Dynamic Type setting in this version.
 
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
-- How many saved games do we keep? **3 is the likely number** — the not-yet-submitted
-  design docs are believed to say 3. Confirm once those land. Not settled.
-  - What a saved game *is* is settled — a whole series, board plus running score (see
-    Decisions → What does a save slot hold?). Only the count is open.

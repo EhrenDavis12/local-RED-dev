@@ -40,7 +40,7 @@ A **scoreboard sits at the top of the game screen**, above the board. Three coun
 
 ```
 ┌─────────────────────────────────┐
-│  PLAYER 1     TIES     PLAYER 2 │
+│▓PLAYER 1▓     TIES     PLAYER 2 │
 │     2          1          0     │
 ├─────────────────────────────────┤
 │                                 │
@@ -48,6 +48,7 @@ A **scoreboard sits at the top of the game screen**, above the board. Three coun
 │                                 │
 └─────────────────────────────────┘
 ```
+PLAYER 1 highlighted above — their turn to play.
 
 - Tracks results across multiple games played back to back.
 - A **settings button sits at the top right**, alongside the scoreboard — the mid-game
@@ -57,6 +58,16 @@ A **scoreboard sits at the top of the game screen**, above the board. Three coun
 - Styling is theme-driven like everything else.
 - Takes vertical space away from the board — worth noting given the board already has
   81 cells to fit on a phone.
+
+### Turn Indicator
+The active player's name in the scoreboard is **highlighted** to show whose turn it is.
+
+This is the mechanism for the "whose turn it is" affordance in
+[Player Feedback / Affordances](#player-feedback--affordances) below — it matters because
+both players share one phone, so the screen is the only thing telling them who's up.
+
+Like everything else, what the highlight looks like is theme-driven — see
+[Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
 
 ## Visual Layout
 - Nesting needs to stay readable at a glance: heavy borders for the big board,
@@ -177,7 +188,8 @@ Things the board needs to communicate (driven by the rules so far):
 - **Cat-game quadrants** — must look visually distinct from claimed *and* from
   in-play. It's permanently dead and neither player can ever have it.
 - **Whose turn it is** — extra important here: both players share one phone, so the
-  screen is the only thing telling them who's up. Needs to be unmissable.
+  screen is the only thing telling them who's up. Needs to be unmissable. See dedicated
+  section above (Turn Indicator).
 
 > These treatments all need to coexist on one screen without turning into visual noise —
 > and every one of them is theme-driven, so **each theme has to solve this, not just the

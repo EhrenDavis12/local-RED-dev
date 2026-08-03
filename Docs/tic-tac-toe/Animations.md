@@ -90,13 +90,7 @@ Neon theme.**
 
 Same model as every other theme value: a theme starts from Neon's complete animation set
 and its own definitions merge over the top, overriding only what it names. See
-[Tech Design](./Tech%20Design.md) → Decisions → How does fallback-to-Neon work?
-
-This supersedes the from-scratch position previously recorded above, and it resolved the
-way the ⚠️ tension block guessed it would: a theme authors its own animations rather than
-choosing from a menu, *and* inheritance still covers whatever it doesn't define.
-[Theming](./Theming.md) → Theme Catalog → Classic Red vs Blue was already written this way
-("inherits from Neon: everything else — animations included") and stands.
+[Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
 
 ### One animation at a time
 Animations **never overlap**. Strictly one at a time.
@@ -108,10 +102,6 @@ own timing, so a theme controls its own pacing.
 ### Animations don't block input
 Animations **never block input**. You can tap through them, and the animation keeps
 playing as normal — it isn't interrupted or skipped, and the game doesn't wait on it.
-
-This matters for a two-player pass-and-play game: a player who already knows their move
-shouldn't be held up by a mark finishing its bounce. Animation is decoration on top of the
-game state, never a gate in front of it.
 
 ### Turn animations off — a global setting
 There is an **animations on/off toggle**, and it is **not theme-defined**. It's a global
@@ -137,11 +127,7 @@ Don't worry about animations at all in this mode. The game state changes and the
 shows the new state. That's it.
 
 Practical consequence: animations are a **pure layer on top**. The game has to be fully
-playable and fully readable with every animation stripped out — which is a good
-correctness test. If turning animations off makes something confusing or invisible, that
-information was living in the animation when it should have been in the board itself.
+playable and fully readable with every animation stripped out.
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->
-<!-- Resolved: a theme inherits Neon's animations and its own merge over them.
-     See Decisions → Do themes inherit Neon's animations? -->
