@@ -7,6 +7,11 @@
 > [Game Overview](./Game%20Overview.md), [Rules](./Rules.md),
 > [Game Board Design](./Game%20Board%20Design.md), [Menus and UI](./Menus%20and%20UI.md),
 > [Theming](./Theming.md), and [Animations](./Animations.md).
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Its *State* section sketches a
+> per-game data shape and its *Assets* section names concrete font and icon dependencies.
+> Reference asset — read-only.
 
 ## Decisions
 
@@ -92,6 +97,11 @@ Three consequences worth naming, because they cut across other Decisions:
 This does not change **Game state storage — Hive** above; Hive is still the store. It
 decides what gets written into it, and who is allowed to know it is Hive.
 
+<!-- A candidate shape for the persisted Game object — cells, quadrants, activeQuadrant,
+     currentPlayer, lastMove, score, firstPlayerThisGame — is sketched in Design Handoff →
+     State (Docs/tic-tac-toe/design_handoff_game_ui/README.md). It is a design sketch, not
+     a decision taken here. -->
+
 ### Unit tests for the rules engine
 **Yes — this is where the real complexity is.**
 
@@ -162,6 +172,11 @@ A **Replicate agent** may follow — *"we might need to build out a Replicate Ag
 has the skills to utilize Replicate for both audio and images when needed"* — but that
 is hedged and explicitly not now, and it would live in the agent system rather than in
 this doc.
+
+<!-- Design Handoff → Assets names two third-party dependencies this decision does not
+     cover: Inter 400/500/600 (bundled, not from a CDN) and the Phosphor icon set.
+     Neither is Replicate-generated. See
+     Docs/tic-tac-toe/design_handoff_game_ui/README.md. -->
 
 ### Do we add a test that fails on hardcoded theme values?
 **Yes — add it, covering all six categories the Architectural Rule names.** An ordinary

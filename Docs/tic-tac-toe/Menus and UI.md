@@ -1,6 +1,11 @@
 # Menus and UI
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Every screen here now has a
+> drawn counterpart — the per-screen map is in **Screens (so far)** below. Reference
+> asset — read-only.
 
 ## Main Menu
 The game needs a main menu.
@@ -108,6 +113,22 @@ can't both be true on that path.
    (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
 6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
+
+Each of these now has an approved drawing in
+[Design Handoff](./design_handoff_game_ui/README.md):
+
+| Screen above | Handoff screen |
+|---|---|
+| Main Menu | `1a — Main Menu` |
+| Open Games List | `1b — Select Game` |
+| New Game Name Prompt | `2c — New Game, opponent name prompt` |
+| Game Screen | `1d` (free choice), `1e` (forced quadrant), `2d` (pending move) |
+| Theme Selection | `2a — Theme Select (overlay, with paywall)` |
+| Settings (main menu) | `2b — Settings page (from the main menu)` |
+| Settings (in game) | `1f — Modal: in-game settings / quick actions` |
+| Game over | `1g — Modal: winner`, `1h — Modal: draw` |
+
+The handoff also draws an **About Us** screen (`1c`) that this doc does not list.
 
 ## Theme Selection
 Opened by the **Theme** button on the main menu. As already decided (see Decisions below and

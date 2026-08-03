@@ -1,6 +1,12 @@
 # Game Overview
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Approved high-fidelity mockups
+> for all 12 screens, built from these docs. It is the source of truth for what the game
+> *looks like*; these docs stay the source of truth for what it *is*. Reference asset —
+> read-only, nothing in this repo edits it.
 
 ## The Pitch
 Tic Tac Toe Extreme is a recursive board-in-a-board.
@@ -46,6 +52,9 @@ This makes the game's central mechanic visible before you commit to it — *play
 them there* — instead of something you have to work out in your head. It also makes
 mis-taps harmless on a board with 81 small targets. Detail in
 [Game Board Design](./Game%20Board%20Design.md).
+
+Drawn in [Design Handoff](./design_handoff_game_ui/README.md) → *2d — Board, pending
+move* — the provisional cell, the ghost mark, and the destination quadrant it previews.
 
 ## Player Experience
 - Fast, repeatable rounds. Win or tie, reset, go again — the scoreboard is what turns

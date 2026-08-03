@@ -1,6 +1,10 @@
 # Rules
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Game logic stays in this doc;
+> the handoff only draws the result. Reference asset — read-only.
 
 Here is a list of our game rules.
 
@@ -48,6 +52,10 @@ the quadrant within the big board.
   │ 7 │ 8 │ 9 │          │ 7 │ 8 │ 9 │
   └───┴───┴───┘          └───┴───┴───┘
 ```
+
+Made visible in [Design Handoff](./design_handoff_game_ui/README.md) → *1e — Game Board,
+forced quadrant + last move* and *2d — Board, pending move*: the cell they played and the
+quadrant it sent you to are drawn in the same 3x3 position.
 
 ## Winning a Sub-Board
 - Standard tic-tac-toe: three in a row (row, column, or diagonal) on the small board.

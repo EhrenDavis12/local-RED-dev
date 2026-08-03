@@ -3,6 +3,27 @@
 An index of where things live across the design docs. Not a summary — for what a section
 actually says, read the doc.
 
+## [Design Handoff — UI](./design_handoff_game_ui/README.md)
+**Not a design doc — an approved reference asset.** Repo-relative path:
+`Docs/tic-tac-toe/design_handoff_game_ui/README.md`. High-fidelity UI for all 12 screens,
+built from the docs below and approved. Read-only: nothing in this repo edits it.
+
+**Bundle:**
+- `README.md` — the handoff itself (tokens, board geometry, per-screen specs, state shape)
+- `neon.theme.json` — the complete Neon theme, machine-readable
+- `themes.catalog.json` — four themes plus ownership/paywall states
+- `design-files/` — HTML/JSX prototypes; references, not production code
+
+**Screens:**
+- `1a` Main Menu · `1b` Select Game · `1c` About Us · `1d` Board, free choice
+- `1e` Board, forced quadrant + last move · `1f` Modal, in-game settings
+- `1g` Modal, winner · `1h` Modal, draw
+- `2a` Theme Select (with paywall) · `2b` Settings page · `2c` New Game name prompt
+- `2d` Board, pending move
+
+**Sections worth deep-linking:** Design tokens · The board (the important part) ·
+Quadrant states · Cell states · Interactions & behavior · State · Assets · Still to design
+
 ## [Game Overview](./Game%20Overview.md)
 The pitch, core concept, and session structure for the game — what recursive tic-tac-toe is
 and how a session of many games hangs together.

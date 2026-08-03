@@ -1,6 +1,11 @@
 # Theming
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Neon now exists as a concrete,
+> machine-readable definition: `neon.theme.json` in that folder, plus the token tables in
+> the handoff's *Design tokens* section. Reference asset — read-only.
 
 ## The Idea
 A **theme button** — a place where you can change up the theme of the board. Styling,
@@ -133,6 +138,10 @@ This applies to **everything**, not just sound:
 - **Every other theme is a partial override.** Classic Red vs Blue defines only what it
   wants to be different, and **inherits the rest from Neon**.
 
+<!-- "Fully built out" now has a file behind it: neon.theme.json in
+     design_handoff_game_ui/. It covers color, marks, type, radius and board geometry;
+     its sound and animation keys are still stubs. See Design Handoff → Design tokens. -->
+
 ```
         ┌──────────────────────────┐
         │   NEON  (base theme)     │
@@ -190,6 +199,12 @@ Bonus: high contrast makes the gameplay-critical highlights (last move, active q
 easy to keep legible — neon glow *is* a highlight treatment.
 
 **Signature sound:** a **buzz**, like the buzz of a neon light. Electric, humming.
+
+**Neon as drawn:** the complete Neon definition is
+`Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` — color, marks, type, radius,
+board geometry, and stub sound/animation keys. Every screen in
+[Design Handoff](./design_handoff_game_ui/README.md) is drawn in Neon, so it doubles as
+the reference for what "fully built out" means here.
 
 ### Theme 2 — Classic Red vs Blue
 The straightforward, traditional one. Red player vs blue player. No neon, no black

@@ -3,6 +3,10 @@
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
 >
 > Animations are **part of the theme**. See [Theming](./Theming.md).
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Starting values for Neon's
+> animation set live in `neon.theme.json → animation` there. Reference asset — read-only.
 
 ## The Direction
 **Poppy.** That's the word for it. Things grow and shrink, glow, jiggle, dance. Snappy and
@@ -64,6 +68,12 @@ Not yet decided in detail, but the obvious moments:
 - The last-move highlight and active-quadrant highlight (see
   [Game Board Design](./Game%20Board%20Design.md)) — these could be animated rather than
   static, e.g. a pulsing glow on the legal quadrant.
+
+The handoff puts a starting value on each of these:
+`Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` → `animation` has `placeMark`,
+`claimQuadrant`, `catGame`, `winGame`, `activeQuadrant` and `lastMove`, each with a type
+and a duration; the last two are drawn as looping glow-pulses. Starting values, in the
+handoff's own words — not decisions.
 
 ## Animations Inherit From Neon
 Animations follow the same inheritance rule as everything else: **Neon is the base
