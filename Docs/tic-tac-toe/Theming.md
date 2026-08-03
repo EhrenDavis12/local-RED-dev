@@ -1,6 +1,11 @@
 # Theming
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Neon now exists as a concrete,
+> machine-readable definition: `neon.theme.json` in that folder, plus the token tables in
+> the handoff's *Design tokens* section. Reference asset — read-only.
 
 ## The Idea
 A **theme button** — a place where you can change up the theme of the board. Styling,
@@ -25,6 +30,10 @@ Meaning:
 
 This is a day-one constraint because retrofitting it later means touching every file.
 
+<!-- Enforced by: the hardcoded-theme-value test, which covers all six categories listed
+     above. See Tech Design → Decisions → Do we add a test that fails on hardcoded theme
+     values? -->
+
 ## Where Themes Live
 - **For now, themes are contained within the codebase.** Bundled/shipped with the app.
 - Not user-uploaded, not downloaded from a server, not user-authored. That's a possible
@@ -35,8 +44,7 @@ This is a day-one constraint because retrofitting it later means touching every 
 ## Decisions
 
 ### How many themes ship at launch
-**Two — Neon and Classic Red vs Blue.** See the Theme Catalog below. Two is enough to
-prove the theme system actually works and nothing is hardcoded.
+**Two — Neon and Classic Red vs Blue.** See the Theme Catalog below.
 
 ### Where theme selection lives
 **On the main menu.** Themes up front — a nice big button, the same size and treatment
@@ -45,6 +53,9 @@ as the Play Game button. Not buried in a settings screen.
 ### Does the theme persist between sessions
 **Yes.** Once a player selects a theme, it stays active. Close the app, open it again,
 that's still their theme. Requires persisting the selection to device storage.
+
+<!-- The persisted value is the theme's UUID, not its name, so renaming a theme does not
+     lose the selection. See Tech Design → Decisions → Theme identity — UUID. -->
 
 ### Can you change the theme mid-game
 **No — leave it out for now.** Theme changes happen from the main menu only. Possible
@@ -60,6 +71,38 @@ Sound is theme-driven exactly like visuals are — no hardcoded audio anywhere.
 Later on we might get into paid/purchasable themes, but **that is not the current goal**.
 Worth knowing the direction exists so we don't build something that makes it impossible,
 but no monetization work now.
+
+### Marks beyond X and O
+**Marks are not locked to X and O — a theme supplies its own mark art, as an image or an
+icon.** From [Tech Design](./Tech%20Design.md) → Decisions: *"Due to themes im thinking
+the marks can be an image or an icon. For example neon just needs icons of X and O while
+the dinosaur theme might use a T-Rex as an Icon."*
+
+The marks aren't locked to X and O — a theme might swap them for icons, emoji, animals,
+shapes, etc. The theme system must be built so that's possible. Neon still uses X and O
+icons; that's Neon's choice of art, not a constraint on the system.
+
+### What happens if a theme fails to load
+**A modal on the Theme screen saying the theme is unavailable, then fall back to Neon.**
+As stated: *"From the Theme screen if a theme fails to load put up a modal with sorry this
+theme is unavailable please try another theme. Then fallback to neon."*
+
+Neon is the one theme with nothing to fall back to, per **Neon Is the Base Theme** below.
+
+Theme selection is an overlay on the main menu rather than its own screen — see
+[Menus and UI](./Menus%20and%20UI.md) → Decisions → Is theme selection its own screen or
+an overlay?
+
+### Is anything distinguished by colour alone?
+**Handled per theme — a theme can add non-colour distinguishing features.** It is not a
+system-wide rule. As stated: *"Themes will be defined and other things can be added for
+this."*
+
+So this gets solved when a theme is defined, and the theme system has to allow a theme to
+distinguish things by more than colour — shape, icon, outline, pattern. It is not
+currently written as a requirement that every theme must do so; compare **What a Theme
+Controls** below, which does require every theme to keep the gameplay-critical highlights
+legible.
 
 ---
 
@@ -95,6 +138,10 @@ This applies to **everything**, not just sound:
 - **Every other theme is a partial override.** Classic Red vs Blue defines only what it
   wants to be different, and **inherits the rest from Neon**.
 
+<!-- "Fully built out" now has a file behind it: neon.theme.json in
+     design_handoff_game_ui/. It covers color, marks, type, radius and board geometry;
+     its sound and animation keys are still stubs. See Design Handoff → Design tokens. -->
+
 ```
         ┌──────────────────────────┐
         │   NEON  (base theme)     │
@@ -119,7 +166,10 @@ This applies to **everything**, not just sound:
 - **New themes become cheap.** A theme can be as small as "black → white, neon green →
   red" and still be a complete, working theme. That directly supports adding more themes
   later.
-- Build the theme lookup as: *ask the active theme → if undefined, ask Neon.*
+- **Fallback happens once, not per lookup.** Each theme is materialized into a complete
+  theme at startup by merging over Neon, so at runtime every lookup hits a complete theme
+  and there is no fallback step. See [Tech Design](./Tech%20Design.md) → Decisions →
+  Fallback to Neon — merge, not resolve.
 
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
@@ -150,6 +200,12 @@ easy to keep legible — neon glow *is* a highlight treatment.
 
 **Signature sound:** a **buzz**, like the buzz of a neon light. Electric, humming.
 
+**Neon as drawn:** the complete Neon definition is
+`Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` — color, marks, type, radius,
+board geometry, and stub sound/animation keys. Every screen in
+[Design Handoff](./design_handoff_game_ui/README.md) is drawn in Neon, so it doubles as
+the reference for what "fully built out" means here.
+
 ### Theme 2 — Classic Red vs Blue
 The straightforward, traditional one. Red player vs blue player. No neon, no black
 background — the plain, familiar look.
@@ -176,7 +232,7 @@ Everything visual and audible. Rough list, not exhaustive:
 **Visual**
 - Board background / page background — "really cool backgrounds"
 - Big board and small board grid lines (colors, thickness, style)
-- The player marks themselves — see below
+- The player marks themselves — see **Marks beyond X and O** under Decisions
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
@@ -202,11 +258,6 @@ Everything visual and audible. Rough list, not exhaustive:
 **Animation**
 - The animation set applied to the player's marker — grow/shrink, glow/backlight,
   shadowbox, jiggle, dance. See [Animations](./Animations.md) for the full vocabulary.
-
-## Marks Beyond X and O
-Since themes are aimed at being fun for kids, the marks probably shouldn't be locked to
-X and O — a theme might swap them for icons, emoji, animals, shapes, etc. Not decided,
-but the theme system should probably be built so it's *possible*.
 
 ## Sound Decisions
 

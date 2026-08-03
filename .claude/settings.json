@@ -1,4 +1,12 @@
 {
+  "permissions": {
+    "deny": [],
+    "ask": [
+      "Edit(.claude/project/active.json)",
+      "Write(.claude/project/active.json)"
+    ]
+  },
+  "skillOverrides": {},
   "hooks": {
     "SessionStart": [
       {
@@ -6,9 +14,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/forge-active-project.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/repo-context.sh",
             "timeout": 5,
-            "statusMessage": "Resolving active forge project"
+            "statusMessage": "Resolving repo context"
           }
         ]
       },

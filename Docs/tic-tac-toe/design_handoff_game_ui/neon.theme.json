@@ -1,0 +1,118 @@
+{
+  "id": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
+  "name": "Neon",
+  "isBase": true,
+  "notes": "Base theme. Every other theme is a partial override merged over this one at startup. Values below are the complete visual set used by the approved mockups; sound/animation keys are stubs for the audio + motion work.",
+
+  "color": {
+    "ground": "#161826",
+    "groundDeep": "#111320",
+    "groundLift": "#20233a",
+    "surface": "#232532",
+    "surfaceRaised": "#1e2131",
+    "surfaceSunken": "#1b1e2c",
+    "hairline": "#2b2f42",
+    "hairlineStrong": "#3f424d",
+
+    "text": "#e9e9ed",
+    "textMuted": "#b2b6ca",
+    "textSubtle": "#9397ab",
+    "textDim": "#75798c",
+    "textFaint": "#595d6c",
+
+    "boardLine": "#4fc3ff",
+    "boardLineGlow": "rgba(79,195,255,0.90)",
+    "quadrantBorder": "rgba(79,195,255,0.50)",
+    "quadrantBorderOpen": "rgba(79,195,255,0.85)",
+    "quadrantFill": "rgba(18,20,32,0.60)",
+
+    "playerOne": "#ff3d71",
+    "playerOneMark": "#ff5c85",
+    "playerOneGlow": "rgba(255,61,113,0.95)",
+    "playerOneTint": "rgba(255,61,113,0.14)",
+    "playerOneOnTint": "#ff9fb6",
+
+    "playerTwo": "#2dff9e",
+    "playerTwoMark": "#4dffb0",
+    "playerTwoGlow": "rgba(45,255,158,0.90)",
+    "playerTwoTint": "rgba(45,255,158,0.12)",
+    "playerTwoOnTint": "#a5ffd8",
+
+    "highlightForced": "#b57cff",
+    "highlightForcedGlow": "rgba(181,124,255,0.60)",
+    "highlightLastMove": "#d2cefd",
+    "highlightLastMoveGlow": "rgba(181,171,252,0.90)",
+
+    "accent": "#9184d9",
+    "accentLight": "#b5abfc",
+    "accentSoft": "#d2cefd",
+
+    "catGame": "#9aa2c2",
+    "catGameGlow": "rgba(154,162,194,0.75)",
+
+    "veilLocked": "rgba(15,16,26,0.50)",
+    "veilClaimed": "rgba(15,16,26,0.76)",
+    "veilCat": "rgba(15,16,26,0.76)",
+    "scrim": "rgba(15,16,24,0.62)",
+    "scrimHeavy": "rgba(15,16,24,0.72)"
+  },
+
+  "marks": {
+    "playerOne": { "kind": "glyph", "value": "✕", "font": "Inter", "weight": 600 },
+    "playerTwo": { "kind": "glyph", "value": "○", "font": "Inter", "weight": 600 },
+    "catGame":   { "kind": "glyph", "value": "Ø", "font": "Inter", "weight": 500 }
+  },
+
+  "type": {
+    "family": "Inter",
+    "weights": { "regular": 400, "medium": 500, "semibold": 600 },
+    "scale": {
+      "display": { "size": 44, "weight": 600, "tracking": -0.02 },
+      "title":   { "size": 34, "weight": 600, "tracking": -0.02 },
+      "heading": { "size": 28, "weight": 600, "tracking": -0.02 },
+      "subhead": { "size": 22, "weight": 600, "tracking": -0.01 },
+      "body":    { "size": 14, "weight": 400, "lineHeight": 1.65 },
+      "label":   { "size": 12, "weight": 400 },
+      "caption": { "size": 11, "weight": 400 },
+      "chipLabel": { "size": 9, "weight": 400, "tracking": 0.1, "uppercase": true },
+      "chipValue": { "size": 22, "weight": 600 },
+      "mark":      { "size": 19, "weight": 600 },
+      "markClaimX":{ "size": 56, "weight": 600 },
+      "markClaimO":{ "size": 52, "weight": 600 },
+      "markCat":   { "size": 44, "weight": 500 }
+    }
+  },
+
+  "radius": { "cell": 3, "quadrant": 9, "chip": 10, "control": 12, "button": 13, "buttonLarge": 14, "modal": 20, "pill": 999 },
+
+  "board": {
+    "outerGap": 8,
+    "quadrantPadding": 5,
+    "innerGap": 3,
+    "gridLineWidth": 1.5,
+    "gridLineInsetPercent": 9,
+    "quadrantShadow": "0 0 0 1.5px rgba(79,195,255,0.5), 0 0 14px rgba(79,195,255,0.16), inset 0 0 12px rgba(79,195,255,0.06)",
+    "quadrantShadowOpen": "0 0 0 1.5px rgba(79,195,255,0.85), 0 0 20px rgba(79,195,255,0.35)",
+    "forcedRing": "2px solid #b57cff, glow 0 0 20px 5px rgba(181,124,255,0.6), inset 0 0 16px rgba(181,124,255,0.3), offset -3px, radius 12",
+    "lastMoveRing": "2px solid #d2cefd, glow 0 0 14px 3px rgba(181,171,252,0.9), inset 0 0 8px rgba(181,171,252,0.4), offset -1px, radius 5"
+  },
+
+  "sound": {
+    "signature": "buzz",
+    "placeMark": "TODO: neon buzz one-shot",
+    "claimQuadrant": "TODO",
+    "catGame": "TODO",
+    "winGame": "TODO",
+    "buttonTap": "TODO",
+    "music": null
+  },
+
+  "animation": {
+    "placeMark":      { "type": "grow-shrink", "durationMs": 220, "easing": "cubic-bezier(.34,1.56,.64,1)" },
+    "claimQuadrant":  { "type": "grow-shrink-glow", "durationMs": 420 },
+    "catGame":        { "type": "shrink-fade", "durationMs": 300 },
+    "winGame":        { "type": "glow-pulse", "durationMs": 900 },
+    "activeQuadrant": { "type": "glow-pulse", "durationMs": 1600, "loop": true },
+    "lastMove":       { "type": "glow-pulse", "durationMs": 1600, "loop": true }
+  }
+}

@@ -3,6 +3,10 @@
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
 >
 > Animations are **part of the theme**. See [Theming](./Theming.md).
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Starting values for Neon's
+> animation set live in `neon.theme.json → animation` there. Reference asset — read-only.
 
 ## The Direction
 **Poppy.** That's the word for it. Things grow and shrink, glow, jiggle, dance. Snappy and
@@ -65,6 +69,12 @@ Not yet decided in detail, but the obvious moments:
   [Game Board Design](./Game%20Board%20Design.md)) — these could be animated rather than
   static, e.g. a pulsing glow on the legal quadrant.
 
+The handoff puts a starting value on each of these:
+`Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` → `animation` has `placeMark`,
+`claimQuadrant`, `catGame`, `winGame`, `activeQuadrant` and `lastMove`, each with a type
+and a duration; the last two are drawn as looping glow-pulses. Starting values, in the
+handoff's own words — not decisions.
+
 ## Animations Inherit From Neon
 Animations follow the same inheritance rule as everything else: **Neon is the base
 theme**, and any theme that doesn't define its own animations gets Neon's. See
@@ -75,18 +85,22 @@ Neon definition, because it's the fallback for every other theme.
 
 ## Decisions
 
-### Themes define their own animations from scratch
-There is **no shared animation library or menu to pick from**. A theme defines its own
-animations from scratch. The vocabulary above (grow/shrink, glow, jiggle, dance) is the
-*direction* — not a fixed set of options a theme selects between.
+### Themes author their own animations — no shared library
+There is **no shared animation library or menu to pick from**. The vocabulary above
+(grow/shrink, glow, jiggle, dance) is the *direction* — not a fixed set of options a theme
+selects between.
 
-> ⚠️ **Tension with the inheritance model — flagging, not resolving.**
-> [Theming](./Theming.md) says Neon is the base theme and anything a theme doesn't define
-> falls back to Neon — and Classic Red vs Blue is currently written as *inheriting* Neon's
-> animations. "Each theme defines its own from scratch" points the other way. Both are
-> recorded. The likely reconciliation is that a theme *may* author its own animations
-> rather than choosing from a menu, and inheritance still covers whatever it doesn't
-> define — but that hasn't been decided.
+This is about *authoring*, not inheritance: a theme writes its own animations rather than
+picking from a menu, and whatever it doesn't write it inherits from Neon. See **Do themes
+inherit Neon's animations?** below.
+
+### Do themes inherit Neon's animations?
+**Inherit from Neon, but it can define its own animations that will then merge over the
+Neon theme.**
+
+Same model as every other theme value: a theme starts from Neon's complete animation set
+and its own definitions merge over the top, overriding only what it names. See
+[Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
 
 ### One animation at a time
 Animations **never overlap**. Strictly one at a time.
@@ -99,16 +113,20 @@ own timing, so a theme controls its own pacing.
 Animations **never block input**. You can tap through them, and the animation keeps
 playing as normal — it isn't interrupted or skipped, and the game doesn't wait on it.
 
-This matters for a two-player pass-and-play game: a player who already knows their move
-shouldn't be held up by a mark finishing its bounce. Animation is decoration on top of the
-game state, never a gate in front of it.
-
 ### Turn animations off — a global setting
 There is an **animations on/off toggle**, and it is **not theme-defined**. It's a global
 player setting sitting **right alongside the vibration and mute toggles** in the Settings
 menu (see [Menus and UI](./Menus%20and%20UI.md)).
 
 Same shape as the other two: global, player-controlled, independent of theme.
+
+### Does iOS Reduce Motion drive the animations toggle?
+**No — the animations toggle stays a player setting.** The OS accessibility setting does
+not turn animations off on its own: *"no lets leave this as a game setting for user to
+command."*
+
+So there is exactly one control, and the player owns it. Reduce Motion being on does not
+change what the game does.
 
 ### Animations off = instant state change
 With animations turned off, the game does the thing **instantly**. The mark simply
@@ -119,13 +137,7 @@ Don't worry about animations at all in this mode. The game state changes and the
 shows the new state. That's it.
 
 Practical consequence: animations are a **pure layer on top**. The game has to be fully
-playable and fully readable with every animation stripped out — which is a good
-correctness test. If turning animations off makes something confusing or invisible, that
-information was living in the animation when it should have been in the board itself.
+playable and fully readable with every animation stripped out.
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->
-
-> The one unresolved item affecting this doc is the ⚠️ tension noted under
-> **Themes define their own animations from scratch** — whether a theme authors its own
-> animation set or inherits Neon's. See [Theming](./Theming.md).

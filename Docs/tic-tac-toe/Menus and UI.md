@@ -1,6 +1,11 @@
 # Menus and UI
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Every screen here now has a
+> drawn counterpart — the per-screen map is in **Screens (so far)** below. Reference
+> asset — read-only.
 
 ## Main Menu
 The game needs a main menu.
@@ -108,6 +113,22 @@ can't both be true on that path.
    (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
 6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
+
+Each of these now has an approved drawing in
+[Design Handoff](./design_handoff_game_ui/README.md):
+
+| Screen above | Handoff screen |
+|---|---|
+| Main Menu | `1a — Main Menu` |
+| Open Games List | `1b — Select Game` |
+| New Game Name Prompt | `2c — New Game, opponent name prompt` |
+| Game Screen | `1d` (free choice), `1e` (forced quadrant), `2d` (pending move) |
+| Theme Selection | `2a — Theme Select (overlay, with paywall)` |
+| Settings (main menu) | `2b — Settings page (from the main menu)` |
+| Settings (in game) | `1f — Modal: in-game settings / quick actions` |
+| Game over | `1g — Modal: winner`, `1h — Modal: draw` |
+
+The handoff also draws an **About Us** screen (`1c`) that this doc does not list.
 
 ## Theme Selection
 Opened by the **Theme** button on the main menu. As already decided (see Decisions below and
@@ -223,6 +244,9 @@ When a game is won or tied, a **rematch button is available as an option**. Taki
 resets the board and increments the scoreboard (winner's column, or Ties). See
 [Game Overview](./Game%20Overview.md) → Session Structure.
 
+The rematch continues in the **same open game** — same series, scoreboard intact. It does
+not start a second open game. See Decisions → What does an open game hold? below.
+
 The winner of that game goes first in the rematch — or on a tie, whoever went first last
 time (see [Rules](./Rules.md) → Turn Order Across Games).
 
@@ -243,7 +267,8 @@ button.)
 
 So there are four persisted preferences — theme, sound, vibration, and animations — plus
 game state: every open game is saved, each with its own scoreboard. How that gets stored
-is a [Tech Design](./Tech%20Design.md) question.
+is settled in [Tech Design](./Tech%20Design.md) → Decisions — preferences in
+`shared_preferences`, game state in Hive.
 
 ### Leaving a game mid-play
 Since a game in progress is saved, going back to the main menu doesn't discard anything —
@@ -267,6 +292,9 @@ which include exiting the game. You don't have to finish a game to leave it.
 **A rematch button is available as an option.** It resets the board and increments the
 scoreboard.
 
+The rematch continues in the same open game, with the scoreboard intact — see **What does
+an open game hold?** below.
+
 ### Does the main menu need a title/logo?
 **Yes — both a title and a logo.**
 
@@ -279,9 +307,8 @@ straight into a new game, open games goes to the open-games list screen. New Gam
 the top of that open-games list.
 
 ### Does a game in progress have to be saved to device storage?
-**Yes — a game in progress is saved to device storage.** The open-games list only works
-if open games survive leaving the app. How it is stored is a Tech Design question — see
-[Tech Design](./Tech%20Design.md).
+**Yes — a game in progress is saved to device storage.** How it is stored is answered in
+[Tech Design](./Tech%20Design.md) → Decisions → Game state storage — Hive.
 
 ### What does each row in the open-games list show?
 **The list shows New Game plus any open games, and each open game is titled with the
@@ -303,8 +330,24 @@ base theme every other theme falls back to. See [Theming](./Theming.md).
 **The currently active theme is highlighted** in the list. Two options at launch, Neon and
 Classic Red vs Blue, and the highlight is what tells you which one you're on.
 
+### What does an open game hold?
+**An open game holds a whole series — the board plus the running score.** A rematch
+continues in the same open game with the scoreboard intact, and resuming a game from the
+open-games list resumes the *series*, not just the last individual board.
+
+It also fixes what the count below is counting — the three open games we keep are three
+series.
+
+### How many open games do we keep?
+**A maximum of 3 open games, no more.**
+
+What each of those 3 holds is a whole series — see **What does an open game hold?**
+above.
+
+### Do we support Dynamic Type?
+**Not for now.** *"Lets not do this as of yet."*
+
+The app does not scale its text to the iOS Dynamic Type setting in this version.
+
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
-
-<!-- Resolved: each open game carries its own scoreboard. See Game Overview →
-     Decisions → Scoreboard lifetime. -->

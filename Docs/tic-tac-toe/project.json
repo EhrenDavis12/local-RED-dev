@@ -1,5 +1,8 @@
 {
   "name": "tic-tac-toe",
+  "aliases": [
+    "ttt"
+  ],
   "title": "Tic-Tac-Toe-Extreme",
   "summary": "Recursive tic-tac-toe — a 3x3 big board where each quadrant holds its own 3x3 board.",
   "docsRoot": "Docs/tic-tac-toe",

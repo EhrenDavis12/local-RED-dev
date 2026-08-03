@@ -1,6 +1,12 @@
 # Game Board Design
 
 > **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+>
+> **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
+> [Design Handoff](./design_handoff_game_ui/README.md). Most of this doc now has a drawn
+> counterpart there: board geometry, quadrant and cell state tables, and all three
+> highlights. This doc says *what must be communicated*; the handoff says *what it looks
+> like* in Neon. Reference asset — read-only.
 
 ## Board Structure
 - Outer: 3x3 grid of quadrants.
@@ -31,6 +37,12 @@
 ╚═══════════╩═══════════╩═══════════╝
 ```
 Thick lines = big board. Thin lines = small boards.
+
+Exact geometry — gaps, padding, radii, grid-line insets, line weights — is in
+[Design Handoff](./design_handoff_game_ui/README.md) → *The board (the important part)*.
+The small-board crosses are drawn lines inset inside the quadrant border, not gaps, and
+the big/small hierarchy this section asks for is carried by weight and glow, not by two
+colors.
 
 ## Scoreboard
 A **scoreboard sits at the top of the game screen**, above the board. Three counters:
@@ -177,6 +189,10 @@ one marks a **single cell** (what just happened), the other marks a **whole quad
 Between them they answer the only two questions a player has when handed the phone:
 *what changed, and what can I do?*
 
+Both are drawn together in [Design Handoff](./design_handoff_game_ui/README.md) →
+*1e — Game Board, forced quadrant + last move*; the exact ring, glow and veil values are
+in *Quadrant states* and *Cell states*.
+
 ## Player Feedback / Affordances
 Things the board needs to communicate (driven by the rules so far):
 - **The opponent's last move** — see the dedicated section above. Highest priority.
@@ -251,6 +267,10 @@ The preview is the trickiest: it marks a *cell* (your pending choice) and a *qua
 (the destination) simultaneously, and both need to read as **provisional** — clearly not
 yet committed. Distinct from the last-move highlight, which is committed and final.
 
+All three appear at once in [Design Handoff](./design_handoff_game_ui/README.md) →
+*2d — Board, pending move*, which resolves them by weight rather than color: dashed white
+for provisional, solid lavender for the last move, solid purple for the active quadrant.
+
 ## Pieces & Marks
 - Baseline is X and O, but marks are **theme-driven** — a theme may swap them for icons,
   emoji, animals, shapes. See [Theming](./Theming.md).
@@ -274,6 +294,11 @@ poppy grow/shrink, glow, jiggle, dance. Full detail in [Animations](./Animations
   at once is what lets a player reason about where their move sends the opponent.
 - The two-tap confirm carries the accuracy problem instead of zoom — a mis-tap is
   recoverable, so small targets don't cost you a move.
+
+The handoff commits numbers to this: at a 402pt frame with 16pt side padding the board is
+370pt, a quadrant ≈118pt and a cell ≈35pt — under Apple's 44pt target, accepted because
+the two-tap confirm makes a mis-tap free. See
+[Design Handoff](./design_handoff_game_ui/README.md) → *The board (the important part)*.
 
 ## Sketches & Notes
 <!-- ASCII diagrams, rough layouts -->
