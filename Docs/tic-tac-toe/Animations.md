@@ -75,18 +75,28 @@ Neon definition, because it's the fallback for every other theme.
 
 ## Decisions
 
-### Themes define their own animations from scratch
-There is **no shared animation library or menu to pick from**. A theme defines its own
-animations from scratch. The vocabulary above (grow/shrink, glow, jiggle, dance) is the
-*direction* — not a fixed set of options a theme selects between.
+### Themes author their own animations — no shared library
+There is **no shared animation library or menu to pick from**. The vocabulary above
+(grow/shrink, glow, jiggle, dance) is the *direction* — not a fixed set of options a theme
+selects between.
 
-> ⚠️ **Tension with the inheritance model — flagging, not resolving.**
-> [Theming](./Theming.md) says Neon is the base theme and anything a theme doesn't define
-> falls back to Neon — and Classic Red vs Blue is currently written as *inheriting* Neon's
-> animations. "Each theme defines its own from scratch" points the other way. Both are
-> recorded. The likely reconciliation is that a theme *may* author its own animations
-> rather than choosing from a menu, and inheritance still covers whatever it doesn't
-> define — but that hasn't been decided.
+This is about *authoring*, not inheritance: a theme writes its own animations rather than
+picking from a menu, and whatever it doesn't write it inherits from Neon. See **Do themes
+inherit Neon's animations?** below.
+
+### Do themes inherit Neon's animations?
+**Inherit from Neon, but it can define its own animations that will then merge over the
+Neon theme.**
+
+Same model as every other theme value: a theme starts from Neon's complete animation set
+and its own definitions merge over the top, overriding only what it names. See
+[Tech Design](./Tech%20Design.md) → Decisions → How does fallback-to-Neon work?
+
+This supersedes the from-scratch position previously recorded above, and it resolved the
+way the ⚠️ tension block guessed it would: a theme authors its own animations rather than
+choosing from a menu, *and* inheritance still covers whatever it doesn't define.
+[Theming](./Theming.md) → Theme Catalog → Classic Red vs Blue was already written this way
+("inherits from Neon: everything else — animations included") and stands.
 
 ### One animation at a time
 Animations **never overlap**. Strictly one at a time.
@@ -110,6 +120,14 @@ menu (see [Menus and UI](./Menus%20and%20UI.md)).
 
 Same shape as the other two: global, player-controlled, independent of theme.
 
+### Does iOS Reduce Motion drive the animations toggle?
+**No — the animations toggle stays a player setting.** The OS accessibility setting does
+not turn animations off on its own: *"no lets leave this as a game setting for user to
+command."*
+
+So there is exactly one control, and the player owns it. Reduce Motion being on does not
+change what the game does.
+
 ### Animations off = instant state change
 With animations turned off, the game does the thing **instantly**. The mark simply
 appears, the quadrant is simply claimed — no animation, no substitute effect, no fade or
@@ -125,7 +143,5 @@ information was living in the animation when it should have been in the board it
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->
-
-> The one unresolved item affecting this doc is the ⚠️ tension noted under
-> **Themes define their own animations from scratch** — whether a theme authors its own
-> animation set or inherits Neon's. See [Theming](./Theming.md).
+<!-- Resolved: a theme inherits Neon's animations and its own merge over them.
+     See Decisions → Do themes inherit Neon's animations? -->

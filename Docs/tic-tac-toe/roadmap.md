@@ -89,6 +89,9 @@ Menus, screens, settings, and persistence.
   - ### What happens when a game ends?
   - ### Does the main menu need a title/logo?
   - ### Is theme selection its own screen or an overlay?
+  - ### Does a game in progress persist?
+  - ### What does a save slot hold?
+  - ### Do we support Dynamic Type?
 - ## Open Questions
 
 ## Theming.md
@@ -105,6 +108,8 @@ The theming system — architecture, inheritance from Neon, theme catalog, and s
   - ### Do themes affect sound
   - ### Are themes unlockable/rewards
   - ### Marks beyond X and O
+  - ### What happens if a theme fails to load
+  - ### Is anything distinguished by colour alone?
 - ## What Is a Theme?
 - ## Neon Is the Base Theme (inheritance model)
   - ### How it works
@@ -137,11 +142,13 @@ Animation vocabulary and how animations tie into the theme system.
 - ## Where Animations Fire
 - ## Animations Inherit From Neon
 - ## Decisions
-  - ### Themes define their own animations from scratch
+  - ### Themes author their own animations — no shared library
+  - ### Do themes inherit Neon's animations?
   - ### One animation at a time
   - ### Duration lives in the animation
   - ### Animations don't block input
   - ### Turn animations off — a global setting
+  - ### Does iOS Reduce Motion drive the animations toggle?
   - ### Animations off = instant state change
 - ## Open Questions
 
@@ -154,6 +161,8 @@ questions.
   - ### Primary target — Apple
   - ### Language — Dart
   - ### How is a theme represented?
+  - ### What format are theme files — JSON or YAML?
+  - ### Theme identity — UUID
   - ### How does fallback-to-Neon work?
   - ### Do we use Flutter's ThemeData/ThemeExtension, or roll our own?
   - ### Do sounds and animations live in the same theme object?
@@ -161,6 +170,8 @@ questions.
   - ### Minimum iOS version
   - ### Is the game logic separate from Flutter?
   - ### Persistence package
+  - ### Game state storage — Hive
+  - ### Serialization and the storage layer
   - ### Unit tests for the rules engine
   - ### Do themes pick their own font?
   - ### How is the board rendered?
@@ -168,6 +179,17 @@ questions.
   - ### Marks — image or icon, supplied by the theme
   - ### Device support
   - ### Where do sound and art assets come from?
+  - ### Do we add a test that fails on hardcoded theme values?
+  - ### State management — Riverpod
+  - ### Game state is immutable
+  - ### Project structure — layer-first
+  - ### Widget tests for the board — no golden tests
+  - ### Fresh build, not a refactor
+  - ### Distribution — public App Store release
+  - ### Bundle identifier
+  - ### CI — local builds only
+  - ### Release tooling — fastlane
+  - ### Crash reporting — catch and build the report, don't send it
 - ## What the Design Docs Already Imply
   - ### The theme system is the main architectural risk
 - ## Open Questions

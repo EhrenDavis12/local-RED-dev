@@ -25,6 +25,10 @@ Meaning:
 
 This is a day-one constraint because retrofitting it later means touching every file.
 
+<!-- Enforced by: the hardcoded-theme-value test, which covers all six categories listed
+     above. See Tech Design → Decisions → Do we add a test that fails on hardcoded theme
+     values? -->
+
 ## Where Themes Live
 - **For now, themes are contained within the codebase.** Bundled/shipped with the app.
 - Not user-uploaded, not downloaded from a server, not user-authored. That's a possible
@@ -45,6 +49,9 @@ as the New Game button. Not buried in a settings screen.
 ### Does the theme persist between sessions
 **Yes.** Once a player selects a theme, it stays active. Close the app, open it again,
 that's still their theme. Requires persisting the selection to device storage.
+
+<!-- The persisted value is the theme's UUID, not its name, so renaming a theme does not
+     lose the selection. See Tech Design → Decisions → Theme identity — UUID. -->
 
 ### Can you change the theme mid-game
 **No — leave it out for now.** Theme changes happen from the main menu only. Possible
@@ -71,6 +78,31 @@ Since themes are aimed at being fun for kids, the marks aren't locked to X and O
 theme might swap them for icons, emoji, animals, shapes, etc. The theme system must be
 built so that's possible. Neon still uses X and O icons; that's Neon's choice of art,
 not a constraint on the system.
+
+### What happens if a theme fails to load
+**A modal on the Theme screen saying the theme is unavailable, then fall back to Neon.**
+As stated: *"From the Theme screen if a theme fails to load put up a modal with sorry this
+theme is unavailable please try another theme. Then fallback to neon."*
+
+So the failure is surfaced to the player rather than swallowed — they are told the theme
+they picked is unavailable and asked to pick another — and the game continues on Neon
+rather than on a broken theme. Neon is the one theme with nothing to fall back to, per
+**Neon Is the Base Theme** below.
+
+Theme selection is an overlay on the main menu rather than its own screen — see
+[Menus and UI](./Menus%20and%20UI.md) → Decisions → Is theme selection its own screen or
+an overlay?
+
+### Is anything distinguished by colour alone?
+**Handled per theme — a theme can add non-colour distinguishing features.** It is not a
+system-wide rule. As stated: *"Themes will be defined and other things can be added for
+this."*
+
+So this gets solved when a theme is defined, and the theme system has to allow a theme to
+distinguish things by more than colour — shape, icon, outline, pattern. It is not
+currently written as a requirement that every theme must do so; compare **What a Theme
+Controls** below, which does require every theme to keep the gameplay-critical highlights
+legible.
 
 ---
 
@@ -130,7 +162,13 @@ This applies to **everything**, not just sound:
 - **New themes become cheap.** A theme can be as small as "black → white, neon green →
   red" and still be a complete, working theme. That directly supports adding more themes
   later.
-- Build the theme lookup as: *ask the active theme → if undefined, ask Neon.*
+- **Fallback happens once, not per lookup.** Each theme is materialized into a complete
+  theme at startup by merging over Neon, so at runtime every lookup hits a complete theme
+  and there is no fallback step. See [Tech Design](./Tech%20Design.md) → Decisions → How
+  does fallback-to-Neon work?
+<!-- Superseded: this bullet previously read "Build the theme lookup as: ask the active
+     theme → if undefined, ask Neon." Per-lookup fallback lost to merge-over-Neon.
+     See Tech Design → Decisions → How does fallback-to-Neon work? -->
 
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
@@ -175,6 +213,8 @@ genuinely different looks, which is a real test that nothing is hardcoded.
   nothing like Neon's electric buzz.
 
 **What it inherits from Neon:** everything else — animations included.
+<!-- Resolved: animations inherit from Neon, and a theme's own animations merge over it.
+     See Animations → Decisions → Do themes inherit Neon's animations? -->
 
 The two themes now have distinct sonic identities: Neon **buzzes** like a light,
 Classic **splats** like a water balloon.

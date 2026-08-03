@@ -80,17 +80,26 @@ See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 nesting. ("For now," but this is the game we're building.)
 
 ### Scoreboard lifetime
-**Resets when you leave to the main menu.** The score is scoped to one continuous
-session at the board. Walk away to the menu and the series starts over.
+**The scoreboard persists with the game.** A saved game carries its scoreboard, so
+resuming a game resumes the running series rather than starting the score over.
 
-Leaving the door open for **persisting the scoreboard in a future version** — so don't
-build it in a way that makes persistence hard to add later.
+The unit that implies is recorded in [Menus and UI](./Menus%20and%20UI.md) → Decisions →
+What does a save slot hold? — a slot holds the series, so a rematch continues the same
+slot rather than starting a second saved game.
+
+<!-- Superseded: this decision previously read "Resets when you leave to the main menu.
+     The score is scoped to one continuous session at the board. Walk away to the menu
+     and the series starts over." and added "Leaving the door open for persisting the
+     scoreboard in a future version — so don't build it in a way that makes persistence
+     hard to add later." That future version is the current design: game state persists,
+     and the scoreboard persists with it. See Menus and UI → Persistence and Tech Design
+     → Decisions → Game state storage — Hive. -->
 
 ### Player names
 **Always "Player One" and "Player Two"** — no custom names, no name entry.
 
-With the option to change that later. Same note as above: don't hardcode the strings in
-a way that fights adding real names down the road.
+With the option to change that later. Don't hardcode the strings in a way that fights
+adding real names down the road.
 
 ### Single-player / AI opponent
 **No.** Two players on one phone is the only mode.

@@ -148,6 +148,9 @@ When a game is won or tied, a **rematch button is available as an option**. Taki
 resets the board and increments the scoreboard (winner's column, or Ties). See
 [Game Overview](./Game%20Overview.md) → Session Structure.
 
+The rematch continues in the **same save slot** — same series, scoreboard intact. It does
+not start a second saved game. See Decisions → What does a save slot hold? below.
+
 The winner of that game goes first in the rematch — or on a tie, whoever went first last
 time (see [Rules](./Rules.md) → Turn Order Across Games).
 
@@ -163,19 +166,31 @@ button.)
 | **Sound effects toggle** | ✅ Remembered in whatever state it was left |
 | **Vibrate on touch toggle** | ✅ Remembered in whatever state it was left |
 | **Animations toggle** | ✅ Remembered in whatever state it was left |
-| **Scoreboard** | ❌ Resets when you leave to the main menu |
-| **Game in progress** | ❌ Not saved |
+| **Scoreboard** | ✅ Saved with the game — resumes when the game resumes |
+| **Game in progress** | ✅ Saved — leave and come back to it later |
 
-So there are four persisted values, all of them player preferences: theme, sound,
-vibration, and animations. Nothing about game state is saved.
+So four player preferences persist — theme, sound, vibration, and animations — and so
+does game state: a game in progress and its scoreboard. The two are stored differently;
+see [Tech Design](./Tech%20Design.md) → Decisions → Persistence package and Game state
+storage — Hive.
 
-> The scoreboard non-persistence is flagged as a possible future change — build it so
-> persistence can be added later without a rewrite.
+<!-- Superseded: this previously read "The scoreboard non-persistence is flagged as a
+     possible future change — build it so persistence can be added later without a
+     rewrite." That future change has happened — the scoreboard now persists with the
+     saved game. See Game Overview → Decisions → Scoreboard lifetime. -->
 
 ### Leaving a game mid-play
-Since the scoreboard resets at the main menu, going back to the menu discards the running
-series. Whether that needs a confirmation prompt ("Leave game? Your score will be lost")
-is undecided.
+Going back to the main menu no longer discards anything — the game and its scoreboard are
+saved, and the game can be picked up again from the game selection screen.
+
+Undecided: whether leaving still warrants a confirmation prompt at all, and if so what it
+says now that nothing is lost.
+
+<!-- Superseded: this previously read "Since the scoreboard resets at the main menu,
+     going back to the menu discards the running series. Whether that needs a
+     confirmation prompt ('Leave game? Your score will be lost') is undecided." The
+     premise no longer holds — game state and the scoreboard both persist. See
+     Decisions → Does a game in progress persist? -->
 
 ## Decisions
 
@@ -193,6 +208,9 @@ which include exiting the game. You don't have to finish a game to leave it.
 **A rematch button is available as an option.** It resets the board and increments the
 scoreboard.
 
+The rematch continues in the same save slot, with the scoreboard intact — see **What does
+a save slot hold?** below.
+
 ### Does the main menu need a title/logo?
 **Yes — both a title and a logo.**
 <!-- Resolved: the logo will be generated with Replicate when needed, not now.
@@ -201,5 +219,52 @@ scoreboard.
 ### Is theme selection its own screen or an overlay?
 **An overlay** on the main menu.
 
+### Does a game in progress persist?
+**Yes — game data is persistent, so you can reload and come back to the game at any
+time.** As stated:
+
+> *"We need to have the game data persistent. So we can reload and come back to the game
+> at any time. I do believe this should have been called out already. Main Menu screen ->
+> Play Game button -> Game selection screen. In the Game selection screen the user should
+> be able to reselect the last game played. Refer to the documents for more details about
+> this part. If you don't see this then we might have uncommitted changes from our other
+> developer."*
+
+So the flow is **Main Menu → Play Game → Game selection screen**, and the game selection
+screen is where you reselect the last game played.
+
+**The game selection screen is not designed yet, and neither is the main-menu rewording.**
+The design docs describing it are believed to exist but are not in this repo. Until they
+land, the **Main Menu**, **Screens (so far)** and the ASCII mockup above still describe the
+old three-button menu with a New Game button — that contradiction is known, not an
+oversight.
+
+The scoreboard persists with the game — see [Game Overview](./Game%20Overview.md) →
+Decisions → Scoreboard lifetime. Where it is stored is
+[Tech Design](./Tech%20Design.md) → Decisions → Game state storage — Hive.
+
+### What does a save slot hold?
+**A save slot holds a whole series — the board plus the running score.** A rematch
+continues in the same slot with the scoreboard intact, and "the last game played" on the
+game selection screen means the last *series*, not the last individual board.
+
+This confirms what the **Persistence** table above and
+[Game Overview](./Game%20Overview.md) → Decisions → Scoreboard lifetime already assume,
+rather than changing them. What it adds is the *unit*: finishing a game and taking the
+rematch continues one slot, it does not consume a second one.
+
+It also fixes what the count in **Open Questions** below is counting — however many saved
+games we keep, they are series.
+
+### Do we support Dynamic Type?
+**Not for now.** *"Lets not do this as of yet."*
+
+The app does not scale its text to the iOS Dynamic Type setting in this version. Recorded
+as a deliberate deferral rather than an oversight, so it can be revisited later.
+
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
+- How many saved games do we keep? **3 is the likely number** — the not-yet-submitted
+  design docs are believed to say 3. Confirm once those land. Not settled.
+  - What a saved game *is* is settled — a whole series, board plus running score (see
+    Decisions → What does a save slot hold?). Only the count is open.
