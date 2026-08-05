@@ -240,8 +240,9 @@ Undecided: whether quick actions is the *same* settings screen as the main menu'
 trimmed-down in-game version with the exit option added.
 
 ## Game Over → Rematch
-When a game is won or tied, a **rematch button is available as an option**. Taking it
-resets the board and increments the scoreboard (winner's column, or Ties). See
+When a game is won or tied, the scoreboard increments **at game end** — the winner's
+column, or Ties. See Decisions → When does the scoreboard increment. A **rematch button
+is available as an option**. Taking it resets the board for the next game. See
 [Game Overview](./Game%20Overview.md) → Session Structure.
 
 The rematch continues in the **same open game** — same series, scoreboard intact. It does
@@ -289,11 +290,16 @@ Global mute.
 which include exiting the game. You don't have to finish a game to leave it.
 
 ### What happens when a game ends?
-**A rematch button is available as an option.** It resets the board and increments the
-scoreboard.
+**A rematch button is available as an option.** It resets the board for the next game.
+The scoreboard increments at game end, not when the rematch is taken — see **When does the
+scoreboard increment** below.
 
 The rematch continues in the same open game, with the scoreboard intact — see **What does
 an open game hold?** below.
+
+### When does the scoreboard increment
+**At game end.** The winner's column, or Ties, increments as soon as the game is won or
+tied — not when a rematch is taken. Taking the rematch only resets the board.
 
 ### Does the main menu need a title/logo?
 **Yes — both a title and a logo.**
@@ -339,10 +345,16 @@ It also fixes what the count below is counting — the three open games we keep 
 series.
 
 ### How many open games do we keep?
-**A maximum of 3 open games, no more.**
+**3 by default, no more.** A **$4.99 in-app purchase raises the cap to 100 open game
+slots.**
 
-What each of those 3 holds is a whole series — see **What does an open game hold?**
-above.
+What each of those 3 (or 100) holds is a whole series — see **What does an open game
+hold?** above.
+
+### Deleting an open game
+**The open-games list gains a delete action, so a slot can be freed.** This closes a hole
+— with a cap of 3 and a rematch staying in the same open game, nothing previously ever
+freed a slot.
 
 ### Do we support Dynamic Type?
 **Not for now.** *"Lets not do this as of yet."*

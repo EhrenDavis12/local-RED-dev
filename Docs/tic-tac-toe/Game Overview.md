@@ -34,8 +34,9 @@ a row on the same phone**:
 
 - A **scoreboard** at the top of the game screen tracks **Player One / Ties / Player Two**.
 - When a game is won or tied, the player is offered an option to **continue playing**.
-- Continuing **resets the board** and **increments the score** — the winner's column, or
-  the Ties column if it was a tie.
+- Continuing **resets the board**. The score increments at game end, not when continuing
+  is taken — see [Menus and UI](./Menus%20and%20UI.md) → Decisions → When does the
+  scoreboard increment.
 - The scoreboard carries across games so a session becomes a running series.
 - **The winner of the last game goes first in the next one.**
 

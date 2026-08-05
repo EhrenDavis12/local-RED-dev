@@ -66,11 +66,23 @@ later feature if we decide we want it.
 Sound is theme-driven exactly like visuals are — no hardcoded audio anywhere.
 
 ### Are themes unlockable/rewards
-**No — all themes available from the start.** Every theme is free and unlocked.
+**Yes — some themes are paid.** *"We will label what themes are free as of now we will
+have 2 free themes the neon and the red Vs Blue themes any other themes will be a paid for
+theme."*
 
-Later on we might get into paid/purchasable themes, but **that is not the current goal**.
-Worth knowing the direction exists so we don't build something that makes it impossible,
-but no monetization work now.
+This reverses the earlier position on this doc, which said all themes were free and
+unlocked with no monetization goal. That is no longer the case — see **Which themes are
+free** below.
+
+### Which themes are free
+**Neon and Classic Red vs Blue are free. Every theme beyond those two is paid.** The theme
+selection list **labels** which themes are free and which are paid.
+
+### Does a theme supply its own font
+**Yes — a font stays a themeable value.** Inter 400/500/600 is bundled as **Neon's** font
+choice, not as an app-wide font constant. See [Tech Design](./Tech%20Design.md) →
+Decisions → Do themes pick their own font?, which stays true and is now clarified rather
+than contradicted.
 
 ### Marks beyond X and O
 **Marks are not locked to X and O — a theme supplies its own mark art, as an image or an

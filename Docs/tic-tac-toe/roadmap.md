@@ -77,10 +77,12 @@ rematch flow.
 - Does a game in progress have to be saved to device storage?
 - What does each row in the open-games list show?
 - Does the opponent name replace "Player Two" in game?
+- When does the scoreboard increment
 - Which theme is active by default?
 - How does theme selection show which theme is in use?
 - What does an open game hold?
 - How many open games do we keep?
+- Deleting an open game
 - Do we support Dynamic Type?
 
 ## [Rules](./Rules.md)
@@ -172,6 +174,8 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
 - Can you change the theme mid-game
 - Do themes affect sound
 - Are themes unlockable/rewards
+- Which themes are free
+- Does a theme supply its own font
 - Marks beyond X and O
 - What happens if a theme fails to load
 - Is anything distinguished by colour alone?
@@ -260,6 +264,7 @@ release/distribution.
 - CI — local builds only
 - Release tooling — fastlane
 - Crash reporting — catch and build the report, don't send it
+- In-app purchases
 
 ---
 

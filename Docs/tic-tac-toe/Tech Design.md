@@ -109,6 +109,9 @@ decides what gets written into it, and who is allowed to know it is Hive.
 **Yes.** A font is a themeable value like any other, and the theme object needs somewhere
 to put one. See [Theming](./Theming.md) → Architectural Rule.
 
+Inter 400/500/600 is bundled as **Neon's** font choice, not an app-wide font constant. See
+[Theming](./Theming.md) → Decisions → Does a theme supply its own font.
+
 ### How is the board rendered?
 **Widgets.** *"ok widgets is the winner lets make that happen."*
 
@@ -334,6 +337,20 @@ This keeps **Fully offline. No backend, no network, no accounts.** under **What 
 Docs Already Imply** below true for now. It stops being true the day a destination is
 chosen.
 
+### In-app purchases
+**The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
+vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
+[Theming](./Theming.md) → Decisions → Which themes are free, and
+[Menus and UI](./Menus%20and%20UI.md) → Decisions → How many open games do we keep.
+
+This is a reversal of the previous no-monetization position on themes (see
+[Theming](./Theming.md) → Decisions → Are themes unlockable/rewards).
+
+**Consequence for offline status:** in-app purchases require StoreKit, which needs network
+access and a restore-purchases path tied to the Apple ID. This means **Fully offline. No
+backend, no network, no accounts.** under **What the Design Docs Already Imply** below is
+no longer unconditionally true — see the amended row there.
+
 ---
 
 ## What the Design Docs Already Imply
@@ -342,7 +359,7 @@ here so they don't get re-litigated:
 
 | Requirement | Comes from |
 |---|---|
-| **Fully offline.** No backend, no network, no accounts. | Two players, one phone |
+| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. | Two players, one phone; qualified by Decisions → In-app purchases |
 | **Local persistence** for 4 values: theme, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence, Decisions |
 | **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
