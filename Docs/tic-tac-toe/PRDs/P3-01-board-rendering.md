@@ -7,14 +7,24 @@
 > parking-lot doc and was read only to confirm it is out of scope — no requirement here
 > comes from it.
 
-> **Wave:** P2 · **Depends on:** `P1-01-app-scaffold.md` (the `lib/ui/board/` directory
+> **Wave:** P3 · **Depends on:** `P1-01-app-scaffold.md` (the `lib/ui/board/` directory
 > and the Riverpod root), `P1-02-engine-rules.md` (the state this renders — quadrant
 > status, active quadrant, forced vs. free choice, last move), `P1-03-theme-system.md`
-> (every value drawn here comes from a theme slot).
-> **Depended on by:** `P2-02-move-input.md` (drives the pending selection this draws),
-> `P2-03-scoreboard-turn-indicator.md` and `P2-04-game-over-rematch.md` (sit above and
-> over this board), `P4-03-animations.md` (animates these highlights).
+> (every value drawn here comes from a theme slot), `P2-01-navigation.md` (the layer that
+> routes to this screen), `P2-04-animations.md` (wave 2 — the layer that animates these
+> highlights; requirement 31 is what keeps the board legible without it).
+> **Depended on by:** `P3-02-move-input.md` (drives the pending selection this draws),
+> `P3-03-scoreboard-turn-indicator.md` and `P3-04-game-over-rematch.md` (sit above and
+> over this board), `P3-05-how-to-play.md` (its legend swatches must match these
+> treatments).
 > Within a wave, work is parallel-safe; a lower wave ships first.
+>
+> **Caveat on the `P1-03` dependency:** `P1-03-theme-system.md` is being revised in
+> parallel to carry the consumer-derived slot inventory that requirement 28 assumes.
+> Until that revision lands, requirement 28 cites a dependency that does not yet carry
+> what it claims, and several values this PRD names are genuinely absent from the approved
+> Neon definition — see Open Questions → *Gaps in the approved Neon asset*. Those are gaps
+> in a read-only asset; this PRD flags them and does not fill them.
 
 > **Note on source status:** `Game Board Design.md` carries the house banner *"Nothing
 > here is settled"* and has **no `## Decisions` section at all** — the roadmap records
@@ -115,8 +125,15 @@ handles no gesture, and holds no hardcoded value.
 
 ### Quadrant states
 
-8. **Open** (playable, free-choice mode): the border brightens to `rgba(79,195,255,0.85)`
-   with glow `0 0 20px rgba(79,195,255,0.35)`.
+Requirement 14 defines the two orthogonal axes these treatments hang off. Requirements
+8–10 are **playability** treatments (one per quadrant, always); requirements 11–12 are
+**status** treatments that a finished quadrant carries *in addition to* its playability
+treatment.
+
+8. **Available** — still in play, and playable this turn because the player has a free
+   choice. The border brightens to `rgba(79,195,255,0.85)` with glow `0 0 20px
+   rgba(79,195,255,0.35)`. This is the state the handoff's *Quadrant states* table calls
+   **Open**; see requirement 14 on why this PRD renames it.
    *(`design_handoff_game_ui/README.md` → Quadrant states; screen 1d, where all nine
    quadrants are in this state)*
 
@@ -125,28 +142,38 @@ handles no gesture, and holds no hardcoded value.
    rgba(181,124,255,0.3)`.
    *(`design_handoff_game_ui/README.md` → Quadrant states; screen 1e)*
 
-10. **Locked** (illegal this turn): a veil of `rgba(15,16,26,0.50)` — **dimmed but still
-    readable, deliberately not blacked out**. This is half the rule and the half that is
-    easy to under-build: the other eight quadrants must not look normal and tappable, and
-    because an illegal tap produces no shake, no flash, no error message and **no haptic**,
-    the dimming is what has to prevent the tap. The absence of the buzz is the only
-    feedback there is.
+10. **Locked** (not playable this turn): a veil of `rgba(15,16,26,0.50)` — **dimmed but
+    still readable, deliberately not blacked out**. This is half the rule and the half
+    that is easy to under-build: the other quadrants must not look normal and tappable,
+    and because an illegal tap produces no shake, no flash, no error message and **no
+    haptic**, the dimming is what has to prevent the tap. The absence of the buzz is the
+    only feedback there is. Per requirement 14 this state covers **every** quadrant that
+    is neither forced nor available — including every claimed and every cat-game quadrant,
+    which are locked in both modes, always.
     *(`Game Board Design.md` → Active Quadrant Highlight (job 2) and → Taps outside the
     legal quadrant; `design_handoff_game_ui/README.md` → Quadrant states, Interactions &
     behavior)*
-    **Testable:** marks inside a locked quadrant remain legible under the veil.
+    **Testable:** marks inside a locked **still-in-play** quadrant remain legible under
+    the `0.50` veil. (Legibility under a *finished* quadrant's additional `0.76` veil is
+    not asserted here and is unresolved — see Open Questions.)
 
-11. **Claimed**: veil `0.76` plus a centered claim mark over the whole quadrant — P1 ✕ at
-    56pt `playerOneMark` with glow `0 0 26px rgba(255,61,113,0.95)`, P2 ○ at 52pt
-    `playerTwoMark` with glow `0 0 26px rgba(45,255,158,0.90)`.
+11. **Claimed** (status, either player): a centered claim mark over the whole quadrant —
+    P1 ✕ at 56pt `playerOneMark` with glow `0 0 26px rgba(255,61,113,0.95)`, P2 ○ at 52pt
+    `playerTwoMark` with glow `0 0 26px rgba(45,255,158,0.90)` — over a `0.76` veil. A
+    claimed quadrant is **always also locked** (requirement 14), so this treatment is
+    drawn *in addition to* requirement 10's, never instead of it. **How the two veils
+    resolve — stack, stronger-wins, or claimed subsumes locked — is unsettled; see Open
+    Questions.**
     *(`Game Board Design.md` → Player Feedback / Affordances, which asks for "a big X or O
     overlaid on the whole quadrant"; `design_handoff_game_ui/README.md` → Quadrant states;
     `neon.theme.json` → `type.scale.markClaimX` / `markClaimO`)*
 
-12. **Cat game** (dead): veil `0.76` plus a centered Ø at 44pt `catGame` with glow `0 0
-    22px rgba(154,162,194,0.75)` and an 8pt `CAT` label beneath it. It must be **visually
-    distinct from claimed and from in-play** — it is permanently dead and neither player
-    can ever have it.
+12. **Cat game** (status, dead): a centered Ø at 44pt `catGame` with glow `0 0 22px
+    rgba(154,162,194,0.75)` and an 8pt `CAT` label beneath it, over a `0.76` veil. It must
+    be **visually distinct from claimed and from in-play** — it is permanently dead and
+    neither player can ever have it. Like requirement 11 this composes with requirement
+    10's locked treatment rather than replacing it, and carries the same unresolved veil
+    question.
     *(`Game Board Design.md` → Player Feedback / Affordances;
     `design_handoff_game_ui/README.md` → Quadrant states; `neon.theme.json` →
     `marks.catGame`, `type.scale.markCat`)*
@@ -157,12 +184,33 @@ handles no gesture, and holds no hardcoded value.
     by glyph and color, not by a different veil.
     *(`design_handoff_game_ui/README.md` → Quadrant states, closing note)*
 
-14. Which state a quadrant is in is **derived, not authored**: a quadrant is **forced**
-    when it is the active quadrant; **open** when there is no active quadrant and the
-    quadrant is still unclaimed and not a cat game; **locked** otherwise.
-    *(`design_handoff_game_ui/README.md` → State → "Derived for rendering"; the underlying
-    game state comes from `P1-02-engine-rules.md`, whose requirement 18 exposes forced vs.
-    free choice as engine state the UI reads rather than infers)*
+14. A quadrant's rendered state is **two orthogonal facts, not one**, and both are derived
+    rather than authored:
+
+    | Axis | Values (mutually exclusive within the axis) | Source |
+    |---|---|---|
+    | **Status** — what the quadrant *is* | still in play · claimed by P1 · claimed by P2 · cat game | read directly from the engine (`P1-02-engine-rules.md` requirement 5) |
+    | **Playability** — what may be done with it *this turn* | **forced** (it is the active quadrant) · **available** (there is no active quadrant and its status is still-in-play) · **locked** (otherwise) | derived — the handoff's *"Derived for rendering"* rule |
+
+    **Every quadrant carries exactly one value on each axis, simultaneously.** The two do
+    not collapse into one enumeration. A claimed or cat quadrant is **never** the active
+    quadrant — the engine hands out a free choice instead (`P1-02-engine-rules.md`
+    requirements 18–19) — and is never available, so **every claimed and every cat
+    quadrant is locked, in both modes, always**. Requirements 8–10 render the playability
+    axis; requirements 11–12 render the status axis; a finished quadrant is drawn from
+    both at once.
+
+    *Naming note:* the handoff uses the word **open** for both axes — `quadrants[i] ===
+    'open'` for status and *"Open (playable, free-choice mode)"* for playability. This PRD
+    says **still in play** for the status value and **available** for the playability
+    value so the two can never be confused. The pixels are unchanged.
+
+    *(`design_handoff_game_ui/README.md` → State → "Derived for rendering", Quadrant
+    states; `P1-02-engine-rules.md` → requirements 5, 18, 19; `Rules.md` → Edge Cases →
+    Sent to a dead quadrant → free choice)*
+    **Testable:** for all 9 quadrants exactly one status and exactly one playability value
+    is derivable; no claimed or cat quadrant ever derives forced or available; and in
+    free-choice mode every claimed and cat quadrant derives locked.
 
 ### Cell states
 
@@ -179,7 +227,8 @@ handles no gesture, and holds no hardcoded value.
     not a constraint on the board.
     *(`Tech Design.md` → Decisions → Marks — image or icon, supplied by the theme;
     `Game Board Design.md` → Pieces & Marks; `Theming.md` → Decisions → Marks beyond X and
-    O; the slots themselves are `P1-03-theme-system.md`)*
+    O; the slots themselves are `P1-03-theme-system.md`)* What a point size means for a
+    non-glyph mark is unresolved — see Open Questions.
 
 ### The three highlights
 
@@ -217,17 +266,22 @@ handles no gesture, and holds no hardcoded value.
     | Mode | What's highlighted |
     |---|---|
     | **Forced** | Exactly one quadrant (requirement 9) |
-    | **Free choice** | *Every* still-open quadrant — up to 9 (requirement 8) |
+    | **Free choice** | *Every* still-in-play quadrant — up to 9 (requirement 8) |
 
     Free choice also covers the opening move. Nine forced rings at once would look like
-    noise, so free choice takes the calmer **open** treatment rather than nine copies of
-    the forced ring.
+    noise, so free choice takes the calmer **available** treatment rather than nine copies
+    of the forced ring.
     *(`Game Board Design.md` → Active Quadrant Highlight → The free-choice state, which
     floats the calmer treatment as a "may want"; resolved concretely by
     `design_handoff_game_ui/README.md` → Quadrant states and screen 1d)*
+    The **text** half of the free-choice cue is not this PRD's and is not pushed to any
+    other PRD by it: `P3-05-how-to-play.md` requirement 10 owns that free choice is stated
+    in words. Which element hosts that text is unsettled — see Open Questions. This
+    requirement owns only the highlight.
 
 22. In free choice, **claimed and cat-game quadrants still read as locked**. It is "pick
-    any of these open ones," not "the board is unlocked."
+    any of these open ones," not "the board is unlocked." This is requirement 14's
+    derivation, not an exception to it.
     *(`Game Board Design.md` → Active Quadrant Highlight → The free-choice state)*
 
 23. **Pending-move preview** — it marks a cell *and* a quadrant simultaneously, and
@@ -238,9 +292,14 @@ handles no gesture, and holds no hardcoded value.
     - the destination quadrant: 2pt **dashed** `highlightPending` at 80%, offset −3,
       radius 12, over a `rgba(233,233,237,0.05)` wash.
 
+    Both are drawn from the pending selection published by `P3-02-move-input.md`
+    (its requirement 3), which supplies the cell and its destination quadrant.
     *(`Game Board Design.md` → Three highlights on screen at once;
     `design_handoff_game_ui/README.md` → Cell states and its following paragraph, screen
     2d)*
+    As written this draws the destination ring **unconditionally**, with no exception for
+    a destination that is claimed or a cat game — which is exactly the case
+    `P3-02-move-input.md` → OQ-2 raises. Unresolved; see Open Questions.
 
 24. The three are separated **by weight, not by color**: **dashed = provisional, solid =
     committed**. Last move is a solid lavender ring, the active quadrant a solid purple
@@ -257,14 +316,17 @@ handles no gesture, and holds no hardcoded value.
     highlight.
     *(`design_handoff_game_ui/README.md` → Cell states → Z-order; screen 1e, where the
     last-move ring sits in the locked quadrant q8)*
-    **Testable:** a last move played in a quadrant that is locked on the following turn is
-    still drawn at full strength, not dimmed by the veil.
+    **Testable:** a last move played in a still-in-play quadrant that is locked on the
+    following turn is still drawn at full strength, not dimmed by the `0.50` veil. Note
+    the ring is lifted to z4 but the **cell** it circles stays at z0, under the z2
+    overlays — see Open Questions.
 
 26. The board wrapper establishes its **own stacking context**, because the claim and veil
     overlays are stacked — otherwise a sheet drawn over the board cannot reliably sit above
     them.
     *(`design_handoff_game_ui/README.md` → 1f, which notes this explicitly; the sheet
-    itself is `P2-04`/`P3-04` territory, not this PRD's)*
+    itself is `P3-04-game-over-rematch.md` / `P4-04-settings.md` territory, not this
+    PRD's)*
 
 ### Everything here is theme-driven
 
@@ -283,7 +345,11 @@ handles no gesture, and holds no hardcoded value.
     `gridLineWidth`, `gridLineInsetPercent`, the quadrant shadows, the forced ring and the
     last-move ring) and `radius` (`cell`, `quadrant`).
     *(`neon.theme.json`; `design_handoff_game_ui/README.md` → Design tokens; the slots are
-    `P1-03-theme-system.md`)*
+    `P1-03-theme-system.md`, whose slot inventory is being revised in parallel — see the
+    caveat in the dependency block)*
+    Several values this PRD names have **no key in `neon.theme.json` at all**; they are
+    listed under Open Questions → *Gaps in the approved Neon asset* rather than invented
+    here.
 
 29. The board must have separately addressable theme slots for the **last-move highlight,
     the active-quadrant highlight, the locked/inactive styling, the pending-move preview,
@@ -327,7 +393,9 @@ handles no gesture, and holds no hardcoded value.
 
 35. The board **renders engine state and computes no rules**. Legal-move computation, the
     sending rule, claim and cat-game detection and the free-choice state all come from
-    `P1-02-engine-rules.md`; the board reads them.
+    `P1-02-engine-rules.md`; the board reads them. Requirement 14's playability derivation
+    is a rendering projection of state the engine already exposes, not a re-derivation of
+    the rules.
     *(`Tech Design.md` → Decisions → Is the game logic separate from Flutter?;
     `P1-02-engine-rules.md` → Out of Scope)*
 
@@ -354,12 +422,27 @@ handles no gesture, and holds no hardcoded value.
     assert the highlight states appear.
     *(`Tech Design.md` → Decisions → Widget tests for the board — no golden tests)*
 
-40. Because there are no goldens, **each visual state must be addressable in the widget
-    tree** — a keyed or typed widget per quadrant state (open, forced, locked, claimed-P1,
-    claimed-P2, cat) and per cell state (empty, P1, P2, last move, pending) — so a test can
-    assert its presence without comparing pixels. This is what requirement 39's decision
-    requires in practice.
-    *(`Tech Design.md` → Decisions → Widget tests for the board — no golden tests)*
+40. Because there are no goldens, **each rendered fact must be independently addressable
+    in the widget tree** — a keyed or typed widget a test can find without comparing
+    pixels. The keys mirror requirement 14's two axes rather than flattening them into one
+    enumeration, and the cell keys are **facets that may coexist**, not an exclusive list:
+
+    | Group | Keys | Cardinality per quadrant / cell |
+    |---|---|---|
+    | Quadrant **status** | still-in-play · claimed-P1 · claimed-P2 · cat | exactly one |
+    | Quadrant **playability** | forced · available · locked | exactly one |
+    | Quadrant **highlight** | pending-destination ring (requirement 23) | zero or one, independent of both axes |
+    | Cell **content** | empty · P1 mark · P2 mark | exactly one |
+    | Cell **highlight** | last-move ring · pending ring · ghost mark | zero or more, independent of content |
+
+    *(`Tech Design.md` → Decisions → Widget tests for the board — no golden tests; the
+    axes are requirement 14, the destination ring requirement 23, and the coexistence of
+    cell facets requirements 19, 20 and 23)*
+    **Testable:** a claimed quadrant is findable as **both** claimed-P1 **and** locked; a
+    played cell that is the last move is findable as **both** a P1/P2 mark **and** a
+    last-move ring; a pending cell is findable as empty **and** pending ring **and** ghost
+    mark; and the destination quadrant of a pending selection is findable on its own,
+    separately from whichever playability key it carries.
 
 41. Tests **run locally** via `flutter test`. There is no CI; nothing runs them on a push.
     *(`Tech Design.md` → Decisions → CI — local builds only)*
@@ -371,18 +454,26 @@ here.
 
 - **The two-tap gesture and all input handling** — select, confirm, reselect, tap-outside
   to clear, illegal taps doing nothing, and the haptic on every valid click:
-  `P2-02-move-input.md`. This PRD draws the pending selection; it does not produce or
+  `P3-02-move-input.md`. This PRD draws the pending selection; it does not produce or
   manage it. Focus/hover styling on pointer and keyboard platforms
   (`design_handoff_game_ui/README.md` → Interactions & behavior) is input-state styling and
   belongs there too.
 - **The scoreboard, the turn indicator and the turn banner above the board** —
-  including the banner's mode cue ("Free choice — pick any board", "Play the middle
-  board", "Play here? / Tap again to lock it in"): `P2-03-scoreboard-turn-indicator.md`.
-  Note that `Game Board Design.md` → The free-choice state offers a text cue as an
-  *alternative* to a calmer highlight; the handoff provides both, and only the highlight
-  half is this PRD's (requirement 21).
+  `P3-03-scoreboard-turn-indicator.md`. **This PRD does not push the free-choice text cue
+  there.** That cue belongs to `P3-05-how-to-play.md` requirement 10, which owns that free
+  choice is stated in words; only its host element is unsettled (see Open Questions).
+  `Game Board Design.md` → The free-choice state offers a text cue as an *alternative* to a
+  calmer highlight; the handoff provides both, and only the highlight half is this PRD's
+  (requirement 21).
+- **The provisional turn banner** — the "Play here? / Tap again to lock it in" voice on
+  screen 2d, and whether a turn banner is built at all. Not built by this PRD, and
+  currently owned by nobody: see Open Questions.
+- **The on-board legend and hint text** — the Open / Locked / Cat game swatches, the
+  two-tap hint, and the in-words explanations of the two rings: `P3-05-how-to-play.md`.
+  Its swatches are drawn from the same theme slots this PRD's states use (its requirement
+  3), so the two must not drift.
 - **Game-over presentation** — the winner and draw modals, the finished board dimmed
-  behind them, and rematch: `P2-04-game-over-rematch.md`.
+  behind them, and rematch: `P3-04-game-over-rematch.md`.
 - **The theme mechanism** — the theme object, its slots, YAML loading, merge-over-Neon and
   the Neon definition itself: `P1-03-theme-system.md`. This PRD says which slots the board
   reads, not how they are loaded.
@@ -390,10 +481,10 @@ here.
   choice, win and draw detection: `P1-02-engine-rules.md`.
 - **Animation of the highlights** — the looping glow-pulse on the active quadrant and the
   last move, one-at-a-time sequencing, non-blocking input, and the animations-off path:
-  `P4-03-animations.md`. Requirement 31 only fixes that the board must be readable without
+  `P2-04-animations.md`. Requirement 31 only fixes that the board must be readable without
   any of it.
 - **Sound** — the pending selection deliberately has no sound of its own
-  (`Game Board Design.md` → Move Input → Sound); audio playback is `P4-01-audio.md`.
+  (`Game Board Design.md` → Move Input → Sound); audio playback is `P2-02-audio.md`.
 - **Anything from `Alternative Game Styles.md`** — a declared parking-lot doc, explicitly
   not the game being built.
 
@@ -406,9 +497,38 @@ now"*), and no Open Question in `Tech Design.md` lands on rendering. The one adj
 item:
 
 - **Which values, concretely, does Classic Red vs Blue override?** *(`Theming.md` → Open
-  Questions.)* Owned by `P4-04-classic-theme.md`, listed here because the second theme is
+  Questions.)* Owned by `P5-01-classic-theme.md`, listed here because the second theme is
   the first real test of requirement 30 — the board's highlights have to stay legible
   under a theme that is not Neon.
+
+### Three known collisions between treatments — flagged, not resolved
+
+All three are cases where two requirements in this PRD are individually correct and land
+on the same pixels. None is resolvable from the docs; each needs a call.
+
+- **The forced ring and the destination ring are geometrically identical and can
+  coincide.** Requirement 9's forced ring and requirement 23's destination ring are both
+  2pt, offset −3, radius 12, and both sit at z-level 3 (requirement 25). They differ only
+  in being solid vs. dashed. They land on the *same quadrant* whenever the selected cell's
+  position within its small board equals that small board's own index — about **one
+  selection in nine**, and always including a centre-cell selection made in the centre
+  quadrant. Which one wins, whether they compose, or whether the destination ring shifts
+  is unspecified.
+- **The last-move ring survives the veil but the mark it circles does not.** Requirement
+  25 lifts the last-move ring to z4, above the z2 overlays, but the **cell** and its mark
+  stay at z0 — beneath the `0.76` claim or cat overlay of requirement 11/12. Since the
+  move that completes a small board *is* by definition the last move, this happens after
+  **every claim**: the ring floats above a quadrant-sized ✕ or Ø while the mark it points
+  at is underneath it. That defeats the stated purpose of the highlight
+  (`Game Board Design.md` → Last Move Highlight, "readable at a quick glance"), and
+  requirement 10's testable does not catch it because it only asserts legibility against
+  the `0.50` veil.
+- **The destination ring is drawn unconditionally, including onto a dead quadrant.**
+  Requirement 23 has no exception for a destination that is claimed or a cat game, so the
+  preview would highlight a quadrant the opponent will not be sent to — they get a free
+  choice instead (`Rules.md` → Edge Cases → Sent to a dead quadrant → free choice). This
+  is the same question `P3-02-move-input.md` carries as its **OQ-2**, seen from the
+  drawing side; neither PRD may be implemented as though its own wording settled it.
 
 ### Contradictions and gaps between documents — flagged, not resolved
 
@@ -427,7 +547,7 @@ item:
   them exactly — dashed ring, ghost mark, dashed destination quadrant, all with concrete
   values. This PRD builds from the specified version (requirement 23) on the grounds that
   2d exists and the Fidelity section calls the drawn values final, but the sentence should
-  probably go.
+  probably go. Also carried by `P3-02-move-input.md` → OQ-3.
 - **`Game Board Design.md` has no `## Decisions` section**, despite being the sole source
   for an entire feature and despite the house style requiring one. Several of its
   statements are hedged (*"probably* a big X or O", *"dimmed, desaturated, greyed,
@@ -435,37 +555,74 @@ item:
   settled here only because the approved handoff drew a concrete answer. If the intent is
   that the handoff's answers *are* the decisions, that doc should say so under Decisions.
 
+### Gaps in the approved Neon asset — flagged, not filled
+
+Requirement 27 forbids hardcoding these, and requirement 28 says they live in the theme
+file — but `neon.theme.json` has no key for them. They exist only as prose in the
+handoff's README. Since the handoff bundle is a read-only reference asset, this PRD
+records the gaps rather than inventing keys; filling them belongs with
+`P1-03-theme-system.md`'s slot inventory and, for the values themselves, with whoever owns
+the asset.
+
+- **The grid line's 0.75 opacity** (requirement 5). `neon.theme.json` carries `boardLine`
+  and `boardLineGlow` but no opacity for the drawn lines, and no `7px` glow radius.
+- **The claim and cat glow radii** (requirements 11–12). It carries `playerOneGlow`,
+  `playerTwoGlow` and `catGameGlow` as colors, but not the `0 0 26px` / `0 0 22px` radii
+  the quadrant-scale claim marks use — which are different from the `0 0 12px` a cell-scale
+  mark uses (requirement 16).
+- **The 8pt `CAT` caption style** (requirement 12). `type.scale`'s smallest entry is
+  `chipLabel` at 9pt, and the caption's `0.16em` tracking appears nowhere in the file.
+
 ### Raised by this PRD — not discussed in any design doc, and flagged rather than answered
 
 Each is a place an implementer would otherwise have to guess.
 
-- **How do quadrant states compose when more than one applies?** The handoff's derived
-  rule (requirement 14) makes a claimed or cat quadrant **locked** in free-choice mode,
-  while the *Quadrant states* table gives claimed and cat their own `0.76` veil and locked
-  a `0.50` veil. Whether the veils stack, whether the stronger one wins, or whether
-  claimed/cat simply subsume locked is unstated. The same question applies to whether a
-  **forced** quadrant also takes the brightened "open" border or keeps the base one.
+- **How do the veils compose on a finished quadrant?** Requirement 14 establishes that
+  every claimed and cat quadrant is *also* locked, so requirement 10's `0.50` veil and
+  requirements 11–12's `0.76` veil both apply to the same quadrant, always. Whether they
+  stack (compositing to ~0.88), whether the stronger wins, or whether the finished
+  treatment subsumes the locked one is unstated — and the answer changes whether a claimed
+  quadrant looks different in forced mode than in free-choice mode. The same question
+  applies to whether a **forced** quadrant also takes the brightened available border or
+  keeps the base one. *This is the visual half of what requirement 14 splits apart; the
+  derivation half is now settled in the requirement text.*
+- **What does a point size mean for a mark that is not a glyph?** Requirement 17 fixes
+  marks as theme-supplied asset slots — an image or an icon — while requirements 11, 12 and
+  16 size them off the *type* scale (19/600, 56pt, 52pt, 44pt/500) with font weights and
+  text glows. That is coherent for Neon, whose marks are `kind: "glyph"`
+  (`neon.theme.json` → `marks`), and only for Neon. For a theme supplying `kind: "image"`,
+  either the size is the side of a box the image is fitted into and the weight is ignored,
+  or the sizes apply to glyphs only — in which case **nothing constrains a claim mark to
+  fit inside its quadrant**. Requirement 30's legibility contract binds every theme, so
+  this is not hypothetical. It also sits under `P1-03-theme-system.md` requirement 16,
+  which defines the slot but not its sizing semantics.
 - **What happens at frame widths other than 402pt?** Every number in requirement 4 is
   committed at a 402pt frame. iPhone SE is 375pt, Pro Max is 430pt, and iPad is the
   declared second target *(`Tech Design.md` → Decisions → Device support)*. Whether the
   board scales proportionally, holds fixed point values and re-centers, or caps at a
   maximum width is not stated — and if it scales, whether the mark sizes (19 / 56 / 52 /
   44pt) scale with it. Dynamic Type is off *(`Menus and UI.md` → Decisions → Do we support
-  Dynamic Type?)*, so nothing else moves these numbers.
+  Dynamic Type?)*, so nothing else moves these numbers. `P3-05-how-to-play.md` raises the
+  same question against the same vertical budget.
 - **What does the board render once the game is over?** The engine reports the game as
   won or tied and no further moves are legal *(`P1-02-engine-rules.md` → requirements
   20–22)*, but nothing says whether the active-quadrant highlight, the last-move ring and
   the locked veils persist, all clear, or the whole board goes to a single finished state
   underneath the result modal. The handoff only says the finished board stays visible at
   60% behind the scrim.
-- **Who owns the on-screen legend and hint text?** Screen 1d pins a legend to the bottom
-  (Open · Locked · Cat game) plus hint text *"Tap a square to see where it sends them. /
-  Tap it again to play it."*, and 1e's legend explains both rings in words. These explain
-  board state, so they may belong here; they are screen chrome below the board, so they
-  may belong with the board screen or `P2-03`. No PRD currently claims them, so as things
-  stand they would simply not get built.
+- **The provisional turn banner is orphaned, and with it the free-choice cue's host.**
+  Ownership of the legend and hint text is settled — `P3-05-how-to-play.md` claims screen
+  1d's legend, its hint text, and 1e's in-words explanation of both rings. The **banner**
+  is not: `P3-02-move-input.md` → Out of Scope pushes the provisional banner ("Play here?"
+  / "Tap again to lock it in") to *this* PRD; this PRD does not build it and pushes it to
+  `P3-03-scoreboard-turn-indicator.md`; `P3-03` → Open Questions 1 declines it and pushes
+  back; and `P3-05` records that its requirement 10 needs a host for the free-choice text
+  cue that the handoff puts inside that same banner. Four PRDs, no owner — as things stand
+  the banner is not built and the free-choice cue has no home.
+  *(`Menus and UI.md` → Open Questions carries the underlying question.)*
 - **Is the ghost mark a distinct theme slot or the player's mark at 40% opacity?**
   Requirement 23 says "a ghost mark in the current player's color at 40% opacity", and
   marks are images or icons supplied by the theme (requirement 17). Dropping an icon to
   40% is trivial; a theme wanting distinct ghost art would need its own slot in
-  `P1-03-theme-system.md`. Not settled either way.
+  `P1-03-theme-system.md`. Not settled either way — and it inherits the sizing question
+  above.

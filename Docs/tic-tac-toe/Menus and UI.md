@@ -1,6 +1,7 @@
 # Menus and UI
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
+> what's under **Decisions**.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Every screen here now has a
@@ -361,5 +362,69 @@ freed a slot.
 
 The app does not scale its text to the iOS Dynamic Type setting in this version.
 
+### Navigation and the back stack
+**The app has a defined navigation model — this is now in scope to build out.** No screen
+flow in this doc currently says what "back" does anywhere: whether exiting a game pops to
+an existing main menu or pushes a fresh one, or whether the iOS back-swipe gesture can
+carry a player back into a game they just exited. The user was asked which currently-
+unowned work should be built and answered "all of it" — *"I want to be deliberate with all
+things here."* The details of the routing approach and of where each back affordance leads
+are not decided — see Open Questions below.
+
+The main menu being the app's launch screen is assumed throughout this doc (e.g. Main
+Menu is screen 1 in **Screens (so far)**) and stated nowhere explicitly. Recording it here
+since nothing contradicts it.
+
+### How to play — the on-board legend and hint
+**The game explains its own central mechanic — this is now in scope to build out.** The
+approved handoff makes this strip **state-dependent** — what it says changes with what the
+board is doing:
+- `1d` (opening move / free choice) — the legend (Open · Locked · Cat game) **and** the
+  hint *"Tap a square to see where it sends them. / Tap it again to play it."*
+- `1e` (forced quadrant + last move) — neither of those. Its bottom strip instead carries
+  two lines explaining the two rings: *"They played here last — that's what sent you."* /
+  *"The only board you can play in right now."*
+- `2d` (pending move) — a third, different pair of lines, on the turn banner rather than a
+  bottom strip: *"Play here?"* / *"Tap again to lock it in."*
+
+The sending rule is the hardest thing in the game to explain, kids are a stated target
+audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform), and
+today nothing in these docs explains it anywhere. Whether there is also a fuller
+Rules/How-to-Play screen is left open — see Open Questions below, which already carries
+that as a future menu item.
+
+### Where the open-game slot unlock is sold
+**The Settings screen.** The Settings screen gains a purchases section holding the $4.99
+open-game-slot unlock and a global **Restore purchases** control. This is the conventional
+iOS placement, it keeps one parental gate in one place, and it keeps the purchase flow off
+the other menu screens.
+
+This means the Settings screen now carries more than the three toggles specified in
+**Settings Menu** above — it also holds the purchases section described here.
+
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
+- **What is the routing/navigation approach**, and does exiting a game pop back to an
+  existing main menu instance or push a fresh one?
+- **Where does each back affordance lead** — the in-game back/exit action, and the iOS
+  back-swipe gesture — and can the swipe gesture carry a player back into a game they just
+  exited?
+- **Is there also a fuller Rules/How-to-Play screen**, separate from the on-board legend
+  and hint, or does the legend/hint fully cover "how to play" for this version? (Already
+  listed above as a future menu item to consider.)
+- **Is the turn banner drawn above the board in the approved handoff actually built, and
+  does it carry the free-choice text cue (`Free choice — pick any board`)?** Right now the
+  scoreboard's name-highlight is the *only* whose-turn mechanism in these docs, but
+  [Game Board Design](./Game%20Board%20Design.md) says that cue must be "unmissable"
+  because both players share one phone — the turn banner is the redundancy the approved
+  design provides for exactly that case, stating whose turn it is in words. Three PRDs
+  each deferred the banner to another and none of them accepted it, so as things stand it
+  does not get built.
+- **Is the About Us screen (`1c`) in the approved handoff actually built, and does the main
+  menu carry a fourth button for it?** (See **Screens (so far)** above — the handoff draws
+  it, but the main menu in this doc only has three buttons, and either answer changes the
+  main menu's layout.)
+- **Which strip content belongs to which board state, and is the set of states exactly the
+  three the handoff draws (`1d`, `1e`, `2d`)?** The board has more states than that — game
+  over, and free choice after being sent to a dead quadrant — and it's not decided what,
+  if anything, this strip shows for those.

@@ -7,18 +7,43 @@
 > *2d — Board, pending move*). `Alternative Game Styles.md` is a declared parking-lot doc
 > and was read only to confirm it is out of scope — no requirement here comes from it.
 
-**Wave:** P4.
+**Wave:** P2 · **File:** `P2-03-haptics.md` — parallel-safe with the other P2 PRDs.
 
 **Dependencies:**
 
-- `P2-02-move-input.md` — owns the two-tap select-then-confirm gesture and what counts as a
-  legal cell. This PRD says only *when a buzz fires*, never how a move is made.
-- `P2-01-board-rendering.md` — owns the locked/dimmed quadrant styling. Requirement 9 below
-  records the constraint this feature places on it; it specifies no visuals.
-- `P3-04-settings.md` — owns the settings surfaces and the vibrate-on-touch toggle control.
-- `P1-04-persistence.md` — owns storing and restoring that toggle. This PRD only reads it.
+- `P1-04-persistence.md` — stores and restores the vibrate-on-touch preference this feature
+  reads. This is the only thing the buzz is gated on.
 - `P1-03-theme-system.md` — req 29 already states the theme object has no haptics slot.
   Requirement 7 below is the behavioral half of that same boundary.
+
+> **The toggle is a persisted preference, not a settings-screen behavior.** This PRD reads
+> the stored value through `P1-04-persistence.md`. `P4-04-settings.md` draws the switch and
+> owns no part of what "off" means — so it is a wave-4 consumer of this feature, not a
+> dependency of it.
+
+**Depended on by:**
+
+- `P3-02-move-input.md` — owns the two-tap select-then-confirm gesture and what counts as a
+  legal cell, and calls into this layer on each valid tap. This PRD says only *when a buzz
+  fires*, never how a move is made.
+- `P3-01-board-rendering.md` — owns the locked/dimmed quadrant styling. Requirement 9 below
+  records the constraint this feature places on it; it specifies no visuals.
+- `P3-04-game-over-rematch.md` req 15 (the rematch control) and `P4-03-theme-selection.md`
+  req 18 (selecting a theme) call into this layer on their own non-board controls. Both are
+  the **broad** reading of the rule and both already carry the OQ-2 caveat; neither is
+  evidence that the docs settled it.
+- `P4-04-settings.md` req 8 owns the *switch* for vibrate on touch and none of the behavior
+  behind it — a consumer of this feature's setting semantics, not a caller that fires a
+  buzz. `P4-01-main-menu.md` carries **no** haptic requirement at all; haptics appear there
+  only in its Out of Scope.
+
+**Callers land in later waves, deliberately not blocking:** the deliverable of this wave is
+the haptic layer and its gate — requirement 13 — not any screen that calls it. Several
+testables below are written as board interactions and cannot run until
+`P3-02-move-input.md` lands in wave 3. At this wave they are verified against this layer's
+own seam with a fake haptic sink; the board-level assertions themselves are **owned by**
+`P3-02-move-input.md` requirements 10 and 14, which state the same rule from the input
+side. Requirements 2, 3 and 4 here define the rule; they do not claim the test.
 
 **Note on source status:** `Game Board Design.md` carries the house banner *"Nothing here is
 settled"* and has **no `## Decisions` section** (`roadmap.md` records this). The Haptic Rule
@@ -43,11 +68,20 @@ having no haptic at all. Today no such rule is implemented anywhere.
 
 ## Goal
 
-Every valid click in the app produces one small, subtle buzz, and nothing else ever does.
-That single rule becomes the app's validity signal — *a buzz means "that registered," no
-buzz means "that did nothing"* — so an illegal tap needs no error message, no shake and no
-flash to explain itself. The buzz is gated only by the player's vibrate-on-touch setting,
+**While vibrate on touch is on**, every valid click produces one small, subtle buzz and
+nothing else ever does. That single rule becomes the app's validity signal — *a buzz means
+"that registered," no buzz means "that did nothing"* — so an illegal tap needs no error
+message, no shake and no flash to explain itself. The buzz is gated only by that setting,
 lives at the application-setting level, and is identical under every theme.
+
+Two conditions on that sentence, stated rather than smoothed over:
+
+- **With the setting off there is no validity signal at all.** Requirements 5 and 9 forbid
+  any substitute, so a legal tap and an illegal tap become indistinguishable to a player who
+  is not watching the screen. That follows from the docs; whether it is the intended
+  outcome is with the user — see OQ-5.
+- **How far "every valid click" reaches is unsettled** — the whole app, or the board
+  alone. See OQ-2. No requirement below assumes an answer.
 
 ## Requirements
 
@@ -59,8 +93,10 @@ lives at the application-setting level, and is identical under every theme.
    Any valid selection or valid action buzzes"); `Menus and UI.md` → Settings Menu
    ("Fires on every *valid* click"); `design_handoff_game_ui/README.md` → Interactions &
    behavior ("Haptic on every valid tap").*
-   *Testable:* each valid action fires the haptic exactly once — never zero times, never
-   twice for one action.
+   *Testable:* **with vibrate on touch on**, each valid action fires the haptic exactly once
+   — never zero times, never twice for one action. Requirement 10 is the gate on this and on
+   every requirement in this section; "never zero times" is false with the setting off, by
+   design. Which controls count as "valid clicks" outside the board is unsettled — see OQ-2.
 
 2. **The first tap of a two-tap move fires it**, because selecting a legal cell is itself a
    valid action. The confirming second tap, being a valid action too, fires it as well.
@@ -71,12 +107,15 @@ lives at the application-setting level, and is identical under every theme.
    *Testable:* a select-then-confirm sequence on a legal cell fires two haptic events, one
    per tap. Note this differs from sound, which fires only on the confirmed move
    (`Game Board Design.md` → Move Input → Sound) — the two channels are not interchangeable.
+   *Wave note:* a board interaction; the assertion is owned by `P3-02-move-input.md` req 14
+   and runs in wave 3. Here it is verified at the seam — see the header posture.
 
 3. **Re-selecting a different legal cell fires it**, since that is a valid selection.
    *Source: `Game Board Design.md` → Haptic Rule (any valid selection); → Move Input →
    Changing your mind ("Tap a different cell → that cell becomes the new selection").*
    *Testable:* tapping legal cell A then legal cell B fires two haptic events and leaves one
    pending selection.
+   *Wave note:* a board interaction; owned by `P3-02-move-input.md` req 14, wave 3.
 
 ### When it does not
 
@@ -89,17 +128,27 @@ lives at the application-setting level, and is identical under every theme.
    behavior ("Illegal tap does nothing — no shake, no flash, no error, and **no haptic**").*
    *Testable:* tapping every cell of every non-legal quadrant produces zero haptic events,
    zero state changes, and no visible error affordance of any kind.
+   *Wave note:* a board interaction; owned by `P3-02-move-input.md` req 10, wave 3. What this
+   PRD owns is that the layer is never called for such a tap and would produce nothing if it
+   were.
 
 5. **No error state exists for invalid input anywhere in this feature.** The absence of the
    buzz is the feedback; nothing is added to explain, warn about, or scold an invalid tap —
-   not a toast, not a message, not a substitute effect.
+   not a toast, not a message, not a substitute effect. This holds regardless of the vibrate
+   setting: nothing appears to compensate when the buzz is off.
    *Source: `Game Board Design.md` → Haptic Rule ("The player doesn't need an error state —
    the *absence* of feedback is the feedback. Nothing scolds them; invalid taps just quietly
    don't happen"); → Taps outside the legal quadrant ("The lack of a buzz *is* the
    feedback").*
-   *Testable:* the resulting system holds as a pair — for any tap, exactly one of these is
-   true: it was valid and buzzed, or it did nothing at all and produced no output on any
-   channel.
+   *Testable:* **with vibrate on touch on**, the pair holds as a biconditional — for any tap,
+   exactly one of these is true: it was valid and buzzed, or it did nothing at all and
+   produced no output on any channel. The scope is deliberate: with the setting **off** the
+   biconditional does not hold, because requirement 10 removes the buzz from valid taps too.
+   A test asserting it unconditionally would fail on that path and should not be written.
+   *Consequence, recorded not hidden:* with vibrate off, a valid tap and an invalid tap
+   produce the same nothing on this channel, and this requirement plus requirement 9 forbid
+   any substitute — so the app has no validity signal at all in that mode. That is what the
+   cited sources say when combined; whether it is intended is the user's call — see OQ-5.
 
 ### What it feels like
 
@@ -136,14 +185,17 @@ lives at the application-setting level, and is identical under every theme.
 9. **The locked/dimmed styling has to prevent the illegal tap in the first place**, because
    nothing explains it afterwards. This feature adds no compensating affordance and depends
    on that styling doing the work; the visuals themselves are specified in
-   `P2-01-board-rendering.md`.
+   `P3-01-board-rendering.md`.
    *Source: `Game Board Design.md` → Taps outside the legal quadrant ("This is why the
    locked/dimmed styling matters so much: it has to prevent the tap, because nothing will
    explain it after the fact"); `design_handoff_game_ui/README.md` → Interactions & behavior
    ("which is why the locked veil sits at 0.50: it must be obviously non-tappable while still
    readable").*
-   *Testable:* recorded as a constraint carried into `P2-01-board-rendering.md`, not as
-   behavior implemented here.
+   *Testable:* recorded as a constraint carried into `P3-01-board-rendering.md`, not as
+   behavior implemented here. Note that PRD ships in a later wave, so this is a constraint
+   handed forward rather than one this PRD waits on. It carries more weight when vibrate is
+   off, where per requirement 5 the styling is the *only* thing standing between the player
+   and an unexplained tap.
 
 ### The setting that gates it
 
@@ -154,7 +206,10 @@ lives at the application-setting level, and is identical under every theme.
     tap. Fires on every *valid* click. On/off").*
     *Testable:* with the setting off, a full select-then-confirm move and every other valid
     action fire zero haptic events; turning it on restores exactly the behavior of
-    requirements 1–3.
+    requirements 1–3. "Anywhere in the app" is bounded by whatever OQ-2 settles as the scope
+    of the rule; the gate applies to every haptic this feature fires, whatever that set is.
+    *Wave note:* the move half is a board interaction, owned by `P3-02-move-input.md` req 14
+    in wave 3; the gate itself is testable here through requirement 13's seam.
 
 11. **The setting is a global player setting, not a theme property**, and its stored value is
     what governs — this feature reads it and never owns, defaults or writes it.
@@ -173,25 +228,50 @@ lives at the application-setting level, and is identical under every theme.
     available mid-game"); `design_handoff_game_ui/README.md` → *1f* (the vibrate row is in
     the in-game sheet).*
     *Testable:* toggling vibrate off from the in-game sheet and returning to the board, the
-    very next valid tap fires no haptic; toggling it back on, the next one does.
+    very next valid tap fires no haptic; toggling it back on, the next one does. The sheet
+    itself is `P4-04-settings.md`'s and lands in a later wave; this requirement constrains
+    how this layer reads the value, not when the sheet exists.
+
+### What this wave delivers
+
+13. **One haptic layer, and the gate lives inside it.** Every haptic in the app goes through
+    a single app-level entry point. That entry point reads the vibrate-on-touch preference
+    itself and fires or stays silent accordingly, so a call site invokes it unconditionally
+    on a valid action and never consults the setting. No call site holds its own gate, and no
+    code path fires a platform haptic without going through the layer.
+    *(**Derived, not stated** — no design doc names a haptic layer. It is the shape the cited
+    requirements force: `Theming.md` → What a Theme Does NOT Control calls haptics "a single
+    app-level behavior, the same under every theme" (requirement 8); requirement 10 has to
+    hold for "no valid action **anywhere in the app**"; and requirement 12 requires the value
+    to be read at fire time rather than captured. The alternative shape — an ungated fire
+    that each call site gates for itself — makes requirement 10 depend on every future caller
+    remembering, and a caller that forgets breaks it invisibly with no test in this PRD able
+    to catch it. This mirrors `P2-02-audio.md` requirement 2, which takes the same shape for
+    sound. If a different structure delivers requirements 10 and 12 with the same guarantee,
+    this requirement is negotiable.)*
+    *Testable:* a call site that invokes the layer unconditionally produces one haptic event
+    with the setting on and zero with it off, without the call site reading the preference; a
+    source scan finds no platform haptic invocation outside the layer. Both run in this wave,
+    with no screen present.
 
 ## Out of Scope
 
 Named so the boundary is explicit. Each is specified elsewhere; do not specify it here.
 
 - **The two-tap select-then-confirm gesture, what counts as a legal cell, and the
-  tap-outside-to-deselect behavior** — `P2-02-move-input.md`. This PRD attaches a buzz to
-  valid actions; it does not define them.
+  tap-outside-to-deselect behavior** — `P3-02-move-input.md`. This PRD attaches a buzz to
+  valid actions; it does not define them, and its requirements 10 and 14 own the board-level
+  assertions that requirements 2–4 here state as rules.
 - **Locked, dimmed, claimed and cat-game quadrant visuals, and the three highlights** —
-  `P2-01-board-rendering.md`. Requirement 9 records a constraint on that work, nothing more.
+  `P3-01-board-rendering.md`. Requirement 9 records a constraint on that work, nothing more.
 - **The settings screen and sheet, the toggle control, and its layout** —
-  `P3-04-settings.md`.
+  `P4-04-settings.md`, whose requirement 8 owns the switch.
 - **Storing and restoring the vibrate-on-touch preference, and its first-launch default** —
   `P1-04-persistence.md`.
-- **Sound effects, the global mute toggle, and the audio package** — `P4-01-audio.md`. Sound
+- **Sound effects, the global mute toggle, and the audio package** — `P2-02-audio.md`. Sound
   is theme-driven and fires on different events; the two channels are specified separately
   and must not be wired together.
-- **Animations and the animations toggle** — `P4-03-animations.md`.
+- **Animations and the animations toggle** — `P2-04-animations.md`.
 - **Anything from `Alternative Game Styles.md`.** That is a declared parking-lot doc and
   explicitly not the game being built.
 
@@ -212,10 +292,13 @@ The rule as written is app-wide — "every valid click", "any valid selection or
 action" — and the setting is named "Vibrate on **touch**". But every example the docs give is
 a board tap, and the justification given in `Menus and UI.md` → Vibrate on Touch is entirely
 about the board's 81 small targets. Whether pressing PLAY GAME, a theme row, REMATCH, or the
-vibrate toggle itself buzzes is not stated. `P2-04-game-over-rematch.md` req 15 has already
-read the rule the broad way for the rematch control; that is a sibling PRD's reading, not a
+vibrate toggle itself buzzes is not stated. `P3-04-game-over-rematch.md` req 15 and
+`P4-03-theme-selection.md` req 18 have already read the rule the broad way for their own
+controls, each carrying a caveat pointing here; those are sibling PRDs' readings, not a
 decision in the docs. A narrow reading and a broad reading produce visibly different apps, so
-this needs a call rather than an implementer's guess.
+this needs a call rather than an implementer's guess. Requirements 1 and 10 are worded to
+hold under either answer: whatever set of actions counts, the gate and the once-only rule
+apply to all of it.
 
 ### OQ-3 — What happens on a device with no haptic engine?
 
@@ -239,3 +322,19 @@ otherwise decide by accident. None is resolved here.
   game being won, the turn handing over — is not stated. The narrow reading (taps only) is
   assumed nowhere in this PRD; requirement 1 fires on valid *actions the player performs*,
   and nothing here attaches a haptic to a game event.
+
+### OQ-5 — With vibrate off, is the app meant to have no validity signal at all?
+
+Stated as a condition of the design rather than resolved, per requirement 5.
+
+The docs combine to this: the haptic is the validity signal (`Game Board Design.md` → Haptic
+Rule, *"the absence of feedback is the feedback"*), the setting can switch it off
+(`Menus and UI.md` → Settings Menu), and nothing may stand in for it — no shake, no flash, no
+error message (`Game Board Design.md` → Taps outside the legal quadrant). So with vibrate
+off, a legal tap and an illegal tap are indistinguishable on this channel, and requirement 9
+leaves the locked/dimmed styling as the only thing preventing the confusion.
+
+No doc acknowledges this state, so it is unclear whether it is an accepted trade-off or an
+oversight. The PRD does not choose: requirements 1, 5 and 10 are all explicitly scoped to the
+setting's state, so an implementer building from this document cannot invent a substitute
+signal by accident. This one needs the user's intent.

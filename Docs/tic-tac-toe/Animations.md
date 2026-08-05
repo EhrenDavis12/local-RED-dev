@@ -1,6 +1,7 @@
 # Animations
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
+> what's under **Decisions**.
 >
 > Animations are **part of the theme**. See [Theming](./Theming.md).
 >
@@ -9,9 +10,9 @@
 > animation set live in `neon.theme.json → animation` there. Reference asset — read-only.
 
 ## The Direction
-**Poppy.** That's the word for it. Things grow and shrink, glow, jiggle, dance. Snappy and
-playful, not slow and cinematic. It should feel alive and fun — this is a game aimed
-partly at kids.
+**Poppy.** That's the word for it. Things grow and shrink, glow, shadowbox, jiggle, dance.
+Snappy and playful, not slow and cinematic. It should feel alive and fun — this is a game
+aimed partly at kids.
 
 ## Scope For Now
 Keep it simple to start. We are **not** animating the board, the layout, or transitions
@@ -87,8 +88,8 @@ Neon definition, because it's the fallback for every other theme.
 
 ### Themes author their own animations — no shared library
 There is **no shared animation library or menu to pick from**. The vocabulary above
-(grow/shrink, glow, jiggle, dance) is the *direction* — not a fixed set of options a theme
-selects between.
+(grow/shrink, glow, shadowbox, jiggle, dance) is the *direction* — not a fixed set of
+options a theme selects between.
 
 This is about *authoring*, not inheritance: a theme writes its own animations rather than
 picking from a menu, and whatever it doesn't write it inherits from Neon. See **Do themes

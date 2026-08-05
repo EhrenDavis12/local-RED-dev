@@ -84,6 +84,9 @@ rematch flow.
 - How many open games do we keep?
 - Deleting an open game
 - Do we support Dynamic Type?
+- Navigation and the back stack
+- How to play — the on-board legend and hint
+- Where the open-game slot unlock is sold
 
 ## [Rules](./Rules.md)
 The rules of play — setup, turn structure, placement rules, winning conditions, and edge
@@ -107,6 +110,7 @@ cases.
 - Open Questions
 
 **Decisions:**
+- Does the opening move send the opponent?
 - Who goes first after a tie?
 
 ## [Game Board Design](./Game%20Board%20Design.md)
@@ -179,6 +183,8 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
 - Marks beyond X and O
 - What happens if a theme fails to load
 - Is anything distinguished by colour alone?
+- How a theme merges over Neon
+- What the theme's slots are derived from
 
 ## [Animations](./Animations.md)
 The animation vocabulary and how animations tie into the theme system.
@@ -229,9 +235,12 @@ release/distribution.
   - 1. Persisted data — versioning
   - 2. Theme loading
   - 3. Build and distribution
+  - 4. Navigation approach
+  - 5. Kids category — age rating questionnaire
 
 **Decisions:**
 - Framework — Flutter
+- App name
 - Primary target — Apple
 - Language — Dart
 - Theme representation — data, not code
@@ -254,6 +263,8 @@ release/distribution.
 - Where do sound and art assets come from?
 - Do we add a test that fails on hardcoded theme values?
 - State management — Riverpod
+- Navigation
+- The app icon
 - Online multiplayer is an intended future direction
 - Game state is immutable
 - Project structure — layer-first
@@ -265,6 +276,8 @@ release/distribution.
 - Release tooling — fastlane
 - Crash reporting — catch and build the report, don't send it
 - In-app purchases
+- Entitlements — Apple stores them, no backend needed
+- Kids category
 
 ---
 

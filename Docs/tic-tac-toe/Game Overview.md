@@ -1,6 +1,7 @@
 # Game Overview
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
+> what's under **Decisions**.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Approved high-fidelity mockups

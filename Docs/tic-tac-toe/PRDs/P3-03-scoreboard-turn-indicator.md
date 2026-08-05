@@ -7,18 +7,37 @@
 > strip; no requirement below is sourced from it, and where it goes beyond the design docs
 > that is recorded in Open Questions.)
 
-**Wave:** P2 — the game screen wave, alongside `P2-01-board-rendering.md`.
+**Wave:** P3 — the game screen wave, alongside `P3-01-board-rendering.md`.
 
 **Dependencies:**
 
-- `P1-02-engine-rules.md` — supplies whose turn it is and the running score. This PRD
-  displays those values and defines none of the rules behind them.
+- `P1-02-engine-rules.md` — supplies whose turn it is, the running series score, and the
+  increment itself: its requirement 27 moves the winner's or Ties column on the move that
+  ends the game, and its requirements 20–22, 24–26 own outcome detection, the series state
+  and turn order. This PRD displays those values and performs none of that.
 - `P1-03-theme-system.md` — every value on this strip is read from the active theme.
+  Requirement 14 below names the slots this strip needs; `P1-03` requirement 15 currently
+  names "turn indicator" and "scoreboard" as one bundle each, which is coarser than what
+  this strip renders.
 - `P1-04-persistence.md` — where the score is stored and how each open game carries its
   own scoreboard.
-- `P2-01-board-rendering.md` — shares the game screen; this strip sits above it.
-- `P2-04-game-over-rematch.md` — owns the game-over flow that changes the score. This PRD
-  owns only what the strip shows.
+- `P2-01-navigation.md` — **wave 2, ships before this PRD.** Its requirement 7 holds the
+  rule that settings is reachable from exactly two entry points, one of them "the game
+  screen's top-right button," and its requirement 10 holds that opening that surface does
+  not leave the game. Requirement 12 below places that button and invokes that entry
+  point; it does not define the route.
+- `P3-01-board-rendering.md` — shares the game screen; this strip sits above it.
+- `P3-04-game-over-rematch.md` — presents the finished game and offers the rematch. It
+  does **not** change the score (its Out of Scope disclaims "the score as data, the
+  increment itself"), and its requirements 11–12 cover what the *result surface* says
+  about the score, not this strip.
+
+> **One forward reference, deliberately narrow.** Requirement 12 places a settings button on
+> this strip and requires that activating it invokes the settings entry point. What that
+> button *opens* is `P4-04-settings.md`'s, which is a **later wave**. This is not a build
+> dependency — the button and its position ship here, the route exists from wave 2
+> (`P2-01-navigation.md`), and the destination surface is wired when that PRD lands — but it
+> is the one place this PRD points forward, and it is flagged rather than hidden.
 
 ## Problem
 
@@ -64,9 +83,9 @@ the board losing any of its visibility.
 4. **The strip shows the incremented score from the moment the game ends** — as soon as the
    game is won or tied, the winner's column, or Ties, reads one higher. It does not wait for
    a rematch to be taken; taking the rematch only resets the board. So while the game-over
-   state is on screen, the strip already shows the new score. Performing the increment is
-   part of the game-over flow and belongs to `P2-04-game-over-rematch.md`; this PRD requires
-   only that the strip reflects it at that moment.
+   state is on screen, the strip already shows the new score. This strip renders the score
+   the engine reports and never increments anything itself: performing the increment belongs
+   to `P1-02-engine-rules.md` requirement 27, which binds it to the move that ends the game.
    *Source: `Menus and UI.md` → Decisions → When does the scoreboard increment ("**At game
    end.** The winner's column, or Ties, increments as soon as the game is won or tied — not
    when a rematch is taken. Taking the rematch only resets the board"); → Decisions → What
@@ -77,7 +96,9 @@ the board losing any of its visibility.
    board full with no three-in-a-row ("The Ties counter on the scoreboard goes up one").*
    *Testable:* play a game to a win with the score at 2–1–0; at the instant the game is over
    and before any rematch input, the strip reads 3–1–0. Play one to a straight draw and the
-   Ties column, not a player column, is the one that changed.
+   Ties column, not a player column, is the one that changed. Rendering the same finished
+   game twice shows the same three values both times — this component contributes no
+   counting of its own.
 
 5. **The scoreboard carries across games in a series rather than resetting.** Continuing
    into the next game resets the board but not the counters, so a session reads as a running
@@ -151,13 +172,22 @@ the board losing any of its visibility.
 ### Settings button
 
 12. **A settings button sits at the top right of the game screen, alongside the
-    scoreboard**, and is the mid-game entry point. What it opens is
-    `P3-04-settings.md`'s; this PRD requires only that it is present in that position on
-    the game screen and that activating it invokes that entry point.
+    scoreboard**, and activating it invokes the game-screen settings entry point held by
+    `P2-01-navigation.md` requirement 7. What that entry point opens is `P4-04-settings.md`'s;
+    this PRD requires only the button, its position, and that invocation.
     *Source: `Game Board Design.md` → Scoreboard ("A settings button sits at the top right,
     alongside the scoreboard — the mid-game entry point to quick actions and exiting the
     game"); `Menus and UI.md` → How you reach settings from gameplay; → Decisions → How do
-    you get back to the main menu from a game?*
+    you get back to the main menu from a game?; `P2-01-navigation.md` requirement 7
+    ("Settings is reachable from exactly two entry points — the main menu's Settings button
+    and the game screen's top-right button — and from nowhere else").*
+    *Testable:* the game screen renders exactly one settings control, in the top-right
+    position alongside the scoreboard; activating it calls the navigation layer's
+    game-screen settings entry point exactly once, and calls no other route — assertable
+    against a test double for that layer without `P4-04-settings.md` existing. Per
+    `P2-01-navigation.md` requirement 10 the game is still mounted afterwards.
+    *Note on wave order:* the route ships in wave 2 and the surface it opens ships in wave 4;
+    this button and its invocation ship here, in between.
 
 ### Styling and fit
 
@@ -172,14 +202,42 @@ the board losing any of its visibility.
     *Testable:* the hardcoded-theme-value test (`P1-05-theme-guard-test.md`) reports zero
     violations for these files.
 
-14. **What the turn highlight looks like is a theme value, and every theme must keep it
+14. **The theme slots this strip needs, at the grain it needs them.** Requirement 13 is
+    unbuildable against two bundled slots: `P1-03-theme-system.md` requirement 15 names
+    "turn indicator" and "scoreboard" as one slot each, while what this strip renders varies
+    **per player** and **per state**. The slots this PRD requires the theme object to carry:
+
+    | Slot | Needed by |
+    |---|---|
+    | Strip container background | requirement 1 |
+    | Inter-counter gap; counter padding; counter corner radius | requirements 1, 16 |
+    | Inactive counter surface, and its outline | requirements 1, 7 |
+    | **Active counter fill, border and glow — one per player** | requirements 6, 7 |
+    | **Active and inactive label color — one pair per player** | requirements 6, 7 |
+    | Counter *label* typography and counter *value* typography, as two slots | requirement 1 |
+    | The Ties counter's own treatment | requirement 7 — it can never take the active state, so it cannot borrow a player's |
+    | The settings icon button's icon asset and its tint | requirement 12 — `P1-03` covers no icon-button slot today |
+
+    Naming a slot decides nothing about its value: what any of these look like is the
+    theme's, and Neon's values are the handoff's.
+    *Source: `Theming.md` → Architectural Rule ("No hardcoded colors, backgrounds, fonts…
+    everywhere"), → What a Theme Controls (turn indicator styling, scoreboard styling);
+    `Game Board Design.md` → Turn Indicator ("what the highlight looks like is
+    theme-driven"). That the grain is per-player and per-state is what this strip's own
+    requirements 6, 7 and 12 require; `design_handoff_game_ui/README.md` → 1d/1e draws it
+    that way (each active chip tinted in its own player's color) and is cited as evidence
+    of the grain, not as the source of any value.*
+    *Testable:* every value this component reads resolves through a named theme slot, and
+    changing the active theme changes all of them with no code change.
+
+15. **What the turn highlight looks like is a theme value, and every theme must keep it
     legible.** The component states *that* a counter is active; the theme decides how that
     reads.
     *Source: `Game Board Design.md` → Turn Indicator; `Theming.md` → What a Theme Controls
     (the note that these treatments must stay legible in every theme, "not just the default
     one").*
 
-15. **The scoreboard fits above the board on a portrait phone with the whole 9x9 board
+16. **The scoreboard fits above the board on a portrait phone with the whole 9x9 board
     still visible and no zoom or scrolling.** The strip costs vertical space that a board
     with 81 cells needs, and the board's full visibility is the constraint that wins.
     *Source: `Game Board Design.md` → Scoreboard ("Takes vertical space away from the board
@@ -188,31 +246,41 @@ the board losing any of its visibility.
     → Decisions → Orientation — portrait only.*
     *Testable:* on the target portrait phone frame, the scoreboard, the settings button and
     all 81 cells are laid out without overflow and without a scroll view.
+    Note that `P3-05-how-to-play.md` competes for the same vertical budget from below the
+    board; its requirement 13 states the same constraint from the other end.
 
-16. **The strip's text does not scale with the iOS Dynamic Type setting.**
+17. **The strip's text does not scale with the iOS Dynamic Type setting.**
     *Source: `Menus and UI.md` → Decisions → Do we support Dynamic Type? ("Not for now").*
 
 ## Out of Scope
 
 - **Where the score is stored, and each open game carrying its own scoreboard through
   persistence** — `P1-04-persistence.md`.
-- **Incrementing the score as part of the game-over flow, the winner/draw modals, and
-  rematch** — `P2-04-game-over-rematch.md`. This PRD states the display requirement only.
+- **Performing the increment, outcome detection, the series score as data, and turn order
+  across games** — `P1-02-engine-rules.md` (requirements 20–22, 24–27). Requirement 4 states
+  *when* the increment lands because this strip must show it then, not because this layer
+  performs it.
+- **The game-over surface — the winner and draw modals, the rematch control, and what that
+  surface says about the score** — `P3-04-game-over-rematch.md` (its requirements 11–12).
+  That PRD does not change the score either.
 - **What the settings button opens** — the quick-actions contents, the toggles, and exiting
-  to the main menu: `P3-04-settings.md`.
-- **The board itself**, its highlights and its tap handling — `P2-01-board-rendering.md`.
-- **Turn-order rules within and across games**, including who goes first after a win or a
-  tie — `P1-02-engine-rules.md`.
+  to the main menu: `P4-04-settings.md`. **The route it invokes** —
+  `P2-01-navigation.md` (requirements 7 and 10).
+- **The board itself**, its highlights and its tap handling — `P3-01-board-rendering.md`
+  and `P3-02-move-input.md`.
+- **The on-board legend and hint text below the board** — `P3-05-how-to-play.md`.
+- **The free-choice text cue's existence and wording** — `P3-05-how-to-play.md`
+  requirement 10 owns it; only its *host* is open here (Open Question 1).
 - **The open-games list and its per-row score chips** — a different screen with different
-  labels; `P3-02-open-games-list.md`.
+  labels; `P4-02-open-games-list.md`.
 - **Real player names.** Requirement 11 keeps the swap cheap; it does not add the feature.
 - **Animating the scoreboard or the turn highlight.** `Animations.md` → Scope For Now
   scopes animation to the player's marker only, and nothing in the docs asks for a
-  scoreboard animation.
+  scoreboard animation. The animation layer itself is `P2-04-animations.md`.
 
 ## Open Questions
 
-### 1. Is the handoff's turn banner part of this feature?
+### 1. Is the handoff's turn banner built, and if not, where does the free-choice cue live?
 
 `Game Board Design.md` → Turn Indicator names the highlighted name in the scoreboard as
 *the* mechanism for the whose-turn affordance. The approved handoff draws a second element
@@ -221,20 +289,46 @@ the design docs never mention: a **turn banner** below the scoreboard row carryi
 board"), and on `2d` it switches to a provisional voice for a pending move
 (`design_handoff_game_ui/README.md` → 1d, 1e, 2d).
 
-Two things are unsettled as a result: whether the banner is built at all, and if so whether
-it belongs to this feature or to `P2-01-board-rendering.md` (its mode cue describes board
-state, not score). Relatedly, the docs highlight *the name*, while the handoff tints the
-whole counter chip in the active player's color — settled either way only once the banner
-question is.
+Two things are unsettled:
+
+- **Whether the banner is built at all.** If it is, whether it belongs to this feature or to
+  `P3-01-board-rendering.md` is the second half of that call — its mode cue describes board
+  state, not score.
+- **Which element hosts the free-choice text cue.** The cue itself is owned and required:
+  `P3-05-how-to-play.md` requirement 10 requires that the free-choice state is stated in
+  words, and `P3-01-board-rendering.md` requirement 21 builds the highlight half and
+  explicitly leaves the text half to that PRD. What is open is only its host — the handoff
+  puts it inside the banner, and `P3-05` places its own explanatory layer *below* the board.
+  So this is a two-way question between this PRD and `P3-01`/`P3-05`'s bottom strip, not a
+  cue with no home.
+
+Relatedly, the docs highlight *the name*, while the handoff tints the whole counter chip in
+the active player's color — settled either way only once the banner question is.
+*(`Menus and UI.md` → Open Questions carries the underlying question.)*
 
 ### 2. Gaps found while writing this PRD (flagged by the PRD author, not asked by the docs)
 
-Neither is resolved here; both are things an implementer would otherwise guess.
+None is resolved here; each is a place an implementer would otherwise guess.
 
 - **Whether the settings button stays available and active while a game-over state is on
   screen.** The button is the only way out of a game (`Menus and UI.md` → Decisions → How
   do you get back to the main menu from a game?), and the game-over state overlays the
-  finished board — but nothing settles whether it remains reachable underneath.
+  finished board — but nothing settles whether it remains reachable underneath. Also
+  carried by `P3-04-game-over-rematch.md` → OQ3 and `P2-01-navigation.md` → Open Question
+  12.
+- **Whether the settings button buzzes.** This PRD is silent, and the docs' haptic rule is
+  written app-wide ("the haptic fires on every valid click") but justified entirely by the
+  board's 81 small targets. `P3-04-game-over-rematch.md` requirement 15 already reads it
+  broadly and fires the haptic on Rematch as "a valid action," while
+  `P2-03-haptics.md` → OQ-2 records that whether non-board controls buzz at all is
+  unsettled. As things stand, two sibling PRDs' implementers would guess differently about
+  two controls on the same screen.
+- **Whose component draws the score chips inside the game-over surface.**
+  `P3-04-game-over-rematch.md` requirement 11 requires the scoreboard shown as part of the
+  result with the moved column identifiable. If that is this component re-rendered, two
+  things collide: the handoff's `1h` highlights the **TIES** chip, which requirement 7 here
+  forbids ever taking the active state, and the `+1` treatment both `1g` and `1h` draw has
+  no slot in requirement 14. If it is a separate component, the two must not drift.
 - **How the counters read once a series runs long.** Nothing settles a maximum score, a
-  digit budget, or what the layout does at double or triple digits, and requirement 15
+  digit budget, or what the layout does at double or triple digits, and requirement 16
   makes the strip's height the tight dimension.

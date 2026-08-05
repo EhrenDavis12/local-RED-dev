@@ -7,14 +7,15 @@
 
 > **Wave:** P1 · **Depends on:** nothing. The engine is pure Dart and can be built and
 > unit-tested with no other PRD in place. **Depended on by:** `P1-04-persistence.md`
-> (serializes these models), `P2-01-board-rendering.md`, `P2-02-move-input.md`,
-> `P2-03-scoreboard-turn-indicator.md` (all read this state).
+> (serializes these models), `P3-01-board-rendering.md`, `P3-02-move-input.md`,
+> `P3-03-scoreboard-turn-indicator.md`, `P3-04-game-over-rematch.md` (all read this state).
 
 > **Note on source status:** `Rules.md` carries the house banner *"Nothing here is settled"*
-> yet is the only specification of the rules of play, its **Conflicting Ideas** and **Open
-> Questions** sections are both empty, and the approved UI handoff was built from it. This
-> PRD therefore treats the body of `Rules.md` as settled, and flags the one place where it
-> disagrees with another doc under **Open Questions** rather than picking a side.
+> while being the only specification of the rules of play, and the approved UI handoff was
+> built from it. This PRD therefore treats the body of `Rules.md` as settled. Its
+> **Decisions** section now settles the opening-move question an earlier draft of this PRD
+> had to flag — see OQ-1, closed — and its **Open Questions** section carries one live
+> question, reproduced here as OQ-6, which this PRD does not resolve.
 
 ## Problem
 
@@ -83,17 +84,29 @@ engine and covered by unit tests; no UI layer implements any of it.
    after which it is the other player's turn. *(Rules → Turn Structure 1–2; Menus and UI →
    A New Game → What It Starts; Pass-and-Play Turn Handoff — "the game switches the active
    player automatically after each move".)*
-9. **First move of a game:** the player who goes first has a free choice — they select the
-   starting quadrant and place their mark somewhere in that quadrant's small board. *(Rules
-   → Placement Rules → First move; Edge Cases → "This is the same kind of freedom the first
-   player has on the opening move".)*
-10. **Second move of a game:** the second player must play in the quadrant that the first
-    player selected. *(Rules → Placement Rules → Second player.)*
-    **Contested — see OQ-1.** This is stated in `Rules.md` as written, and it is the one
-    requirement here that another doc reads differently.
-11. **Every move after that — the sending rule:** the cell played inside a small board maps
-    to the corresponding quadrant on the big board, and that is where the opponent must play
-    next. *(Rules → Placement Rules → Every move after that.)*
+9. **First move of a game:** the player who goes first selects the starting quadrant and
+   places their mark somewhere in that quadrant's small board. This is **not a third
+   placement state** — the opening move *is* the free-choice state of requirement 18, over
+   all nine quadrants because all nine are open. *(Rules → Placement Rules → First move;
+   Rules → Edge Cases → Sent to a dead quadrant — "This is the same kind of freedom the
+   first player has on the opening move"; Game Board Design → Active Quadrant Highlight →
+   The free-choice state — "This also covers the opening move".)*
+   **Testable:** on a new game the engine reports the free-choice state, and the legal moves
+   are all 81 cells.
+10. **The opening move sends the opponent, exactly like every other move.** The cell the
+    first player plays sends the second player to the matching quadrant. There is **no
+    exception for move 1**, and the second player is *not* bound to the quadrant the first
+    player selected. *(Rules → Decisions → Does the opening move send the opponent? —
+    "**Yes — the cell the first player plays sends the second player, exactly as on every
+    later move. There is no exception for move 1.**"; Rules → Placement Rules → The sending
+    rule — "This is true of the opening move exactly the same as every move after it";
+    Game Overview → Core Concept.)*
+    **Testable:** the first player selects the top-left quadrant and plays its centre cell —
+    the second player's only legal quadrant is the centre quadrant, not the top-left one.
+11. **The sending rule, on every move:** the cell played inside a small board maps to the
+    corresponding quadrant on the big board, and that is where the opponent must play next.
+    It applies uniformly from move 1 onward — there is no move to which it does not apply.
+    *(Rules → Placement Rules → The sending rule.)*
 12. The **cell → quadrant mapping is positional identity**: the 3x3 position of the cell
     within its small board is identical to the 3x3 position of the quadrant within the big
     board — top-left cell → top-left quadrant, centre cell → centre quadrant, and so on for
@@ -130,13 +143,19 @@ engine and covered by unit tests; no UI layer implements any of it.
     **cat game**, that player instead gets a **free choice: they may play in any other
     quadrant that is still unclaimed and open**. *(Rules → Edge Cases → Sent to a dead
     quadrant → free choice.)*
+    **"Already claimed" carries an unstated timing** in the one case where the sending move
+    is itself what claimed or cat-gamed the destination — see **OQ-6**.
 18. The engine exposes which of the two placement states is active — **forced** (exactly one
     legal quadrant) or **free choice** (every still-open quadrant, up to 9) — as engine
-    state the UI reads rather than as something the UI infers. *(Tech Design → Decisions →
-    Is the game logic separate from Flutter?, which names "legal moves, sending rule,
-    win/cat-game detection, free-choice state" as engine responsibilities; Game Board Design
-    → Active Quadrant Highlight → The free-choice state, whose two modes are Forced and Free
-    choice.)*
+    state the UI reads rather than as something the UI infers. There are only these two
+    states: the opening move is the free-choice state (requirement 9), not a third one.
+    *(Tech Design → Decisions → Is the game logic separate from Flutter?, which names "legal
+    moves, sending rule, win/cat-game detection, free-choice state" as engine
+    responsibilities; Game Board Design → Active Quadrant Highlight → The free-choice state,
+    whose two modes are Forced and Free choice and which says "This also covers the opening
+    move".)*
+    **This two-state definition presupposes one of the two answers to OQ-6** — read that
+    question before implementing.
 19. **Legal-move computation.** In the forced state the legal moves are exactly the empty
     cells of the forced quadrant. In the free-choice state they are the empty cells of every
     still-open quadrant. Cells that are occupied, and every cell in a claimed or cat-game
@@ -198,7 +217,7 @@ engine and covered by unit tests; no UI layer implements any of it.
     with that column one higher and the other two unchanged, with no further call needed;
     across a series of *n* finished games the three counters sum to *n* whether or not each
     was followed by another game. The presentation side of this same answer is
-    `P2-03-scoreboard-turn-indicator.md` requirement 4 and `P2-04-game-over-rematch.md`
+    `P3-03-scoreboard-turn-indicator.md` requirement 4 and `P3-04-game-over-rematch.md`
     requirement 4 — this requirement is the engine-side statement that the score is series
     state changed by the game resolving.
 
@@ -215,13 +234,13 @@ Named here so the boundary is explicit. Each is specified elsewhere; do not spec
 here.
 
 - **Rendering, the three highlights, and quadrant/cell visual states** —
-  `P2-01-board-rendering.md`. The engine supplies the state; it draws nothing and holds no
+  `P3-01-board-rendering.md`. The engine supplies the state; it draws nothing and holds no
   theme value.
 - **The two-tap select-then-confirm gesture, the pending selection, illegal taps, and
-  haptics** — `P2-02-move-input.md`. A pending selection is input state, never engine state.
-- **The scoreboard UI and the turn indicator** — `P2-03-scoreboard-turn-indicator.md`. The
+  haptics** — `P3-02-move-input.md`. A pending selection is input state, never engine state.
+- **The scoreboard UI and the turn indicator** — `P3-03-scoreboard-turn-indicator.md`. The
   engine owns the score *data* as part of series state; the display is not its problem.
-- **The game-over surface and the rematch control** — `P2-04-game-over-rematch.md`. The
+- **The game-over surface and the rematch control** — `P3-04-game-over-rematch.md`. The
   engine reports the outcome and counts it; offering the rematch and drawing the result are
   that PRD's.
 - **Storage — the Hive box, the repository interface, the open-games list, the 3-game cap,
@@ -238,22 +257,19 @@ here.
 
 ## Open Questions
 
-**OQ-1 — Does the first player's opening cell send the second player, or is the second
-player bound to the opening quadrant?** `Rules.md` → Placement Rules says: *"**Second
-player:** must play in the big quadrant that the first player selected"*, and then
-*"**Every move after that — the sending rule**"*. Read literally, move 2 ignores which cell
-move 1 was played in. `Game Overview.md` → Core Concept states the sending rule without an
-exception: *"**The cell you play sends your opponent to the matching quadrant**... Every
-move both contests a small board and dictates where the opponent goes next."* The two
-readings diverge observably whenever the first player's cell position differs from the
-quadrant they selected. Requirement 10 is written to `Rules.md` as worded; this is not
-resolved here.
+Numbering is stable — answered questions stay as stubs, because other PRDs cite these
+numbers.
+
+**OQ-1 — Answered and closed.** *Does the first player's opening cell send the second
+player, or is the second player bound to the opening quadrant?* Settled in `Rules.md` →
+Decisions → **Does the opening move send the opponent?**: *"**Yes — the cell the first
+player plays sends the second player, exactly as on every later move. There is no exception
+for move 1.**"* The *Second player* bullet that said otherwise is gone from `Rules.md` →
+Placement Rules. Requirements 10 and 11 carry the answer.
 
 **OQ-2 — Answered and closed.** *When does the score increment — at game end, or when the
 rematch is taken?* Settled in `Menus and UI.md` → Decisions → **When does the scoreboard
-increment**: *"**At game end.**"* The three docs that disagreed now agree, and requirements
-26 and 27 carry the answer. Kept here as a stub so the numbering of the questions below is
-stable.
+increment**: *"**At game end.**"* Requirements 26 and 27 carry the answer.
 
 **OQ-3 — What is the concrete shape of the persisted game object?** From `Tech Design.md`,
 alongside Decisions → Serialization and the storage layer: *"A candidate shape for the
@@ -274,3 +290,29 @@ Design.md` → Taps outside the legal quadrant: *"An illegal tap does nothing."*
 `applyMove` throws, returns the board unchanged, or returns a result type carrying a reason
 is unspecified, and requirement 3's signature `Board applyMove(Board, Move)` does not settle
 it. An implementer will otherwise decide this by accident.
+
+**OQ-6 — A move that claims (or cat-games) the very quadrant it sends the opponent to —
+which state does the send see, before or after the move?** From `Rules.md` → Open Questions,
+as worded there:
+
+> Example: play the centre cell of quadrant 5, and that same move completes three in a row
+> *in* quadrant 5, claiming it. The cell played sends the opponent to the center quadrant —
+> but is the send evaluated against quadrant 5's state *before* this move (in which case the
+> opponent is sent to a quadrant that, by the time they'd play, is already claimed — an
+> illegal position unless the free-choice rule kicks in), or *against its state after* this
+> move (the quadrant is already dead by the time the send happens, so the opponent gets free
+> choice instead)? This is reachable in normal play, not an edge case someone has to go
+> looking for, and reviewers flagged it as the most common defect in an
+> ultimate-tic-tac-toe engine.
+
+**This PRD does not resolve it — but requirement 18 as written already presupposes the
+*after* reading, and whoever answers needs to know that.** Requirement 18 admits exactly two
+placement states: *forced*, defined as **exactly one legal quadrant**, and *free choice*.
+Under the *before* reading the engine would have to report "forced → quadrant 5" while
+quadrant 5 holds **zero** legal moves — a state that definition cannot express, and one
+requirement 19 forbids by implication, since no cell of a claimed or cat-game quadrant is
+ever legal. So **answering "before" requires requirement 18 to change**: it would need a
+third placement state, or a forced state that can carry an empty legal-move set, plus a
+rule for what the opponent actually does from there. Requirement 17 inherits the same
+unstated timing — its *"already claimed"* does not say whether "already" is evaluated
+before or after the move that sends.

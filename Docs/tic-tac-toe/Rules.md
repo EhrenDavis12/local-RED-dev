@@ -1,6 +1,7 @@
 # Rules
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
+> what's under **Decisions**.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Game logic stays in this doc;
@@ -24,10 +25,10 @@ Here is a list of our game rules.
 ## Placement Rules
 - **First move:** the player who goes first gets to **select the starting big quadrant**.
   They then place their mark somewhere in that quadrant's small board.
-- **Second player:** must play in the big quadrant that the first player selected.
-- **Every move after that — the sending rule:** the *cell* you play inside a small board
-  maps to the corresponding *quadrant* on the big board, and that's where your opponent
-  must play next.
+- **The sending rule:** the *cell* you play inside a small board maps to the corresponding
+  *quadrant* on the big board, and that's where your opponent must play next. This is true
+  of the opening move exactly the same as every move after it — the cell the first player
+  plays sends the second player, no exception for move 1.
   - Play the **top-left cell** of any small board → opponent must play in the
     **top-left quadrant** of the big board.
   - Play the **center cell** → opponent must play in the **center quadrant**.
@@ -111,6 +112,13 @@ advantage to whoever is already ahead.
 
 ## Decisions
 
+### Does the opening move send the opponent?
+**Yes — the cell the first player plays sends the second player, exactly as on every later
+move. There is no exception for move 1.** This resolves a contradiction: this doc's old
+*Second player* bullet said the second player must play in the big quadrant the first
+player selected (no sending), while [Game Overview](./Game%20Overview.md) → Core Concept
+stated the sending rule with no exception. The sending rule now applies uniformly.
+
 ### Who goes first after a tie?
 **The player that went first last time for the tie game goes first again.** A tie doesn't
 pass the first-move advantage — it stays where it was.
@@ -119,4 +127,13 @@ That completes the turn order rule across games: first game → Player One; afte
 the winner; after a tie → whoever went first in the tied game.
 
 ## Open Questions
-<!-- Nothing outstanding on this doc right now. -->
+- **A move that claims (or cat-games) the very quadrant it sends the opponent to — which
+  state does the send see, before or after the move?** Example: play the centre cell of
+  quadrant 5, and that same move completes three in a row *in* quadrant 5, claiming it.
+  The cell played sends the opponent to the center quadrant — but is the send evaluated
+  against quadrant 5's state *before* this move (in which case the opponent is sent to a
+  quadrant that, by the time they'd play, is already claimed — an illegal position unless
+  the free-choice rule kicks in), or *against its state after* this move (the quadrant is
+  already dead by the time the send happens, so the opponent gets free choice instead)?
+  This is reachable in normal play, not an edge case someone has to go looking for, and
+  reviewers flagged it as the most common defect in an ultimate-tic-tac-toe engine.

@@ -147,7 +147,10 @@ The free-choice state should still make the *locked* quadrants (claimed, cat-gam
 locked. It's "pick any of these open ones," not "the board is unlocked." Nine glowing
 quadrants at once also risks looking like noise, so free choice may want a calmer
 treatment than the single-quadrant forced highlight — or a text cue ("Free choice — pick
-any open quadrant").
+any open quadrant"). Whether this cue is text, a calmer highlight, or both is answered (or
+not) by [Menus and UI](./Menus%20and%20UI.md) → Decisions → How to play — the on-board
+legend and hint, which is where the on-board explanatory layer this hedge was waiting on
+now lives.
 
 ### Taps outside the legal quadrant
 Illegal cells shouldn't accept input. They also shouldn't *look* like they would — the
@@ -283,7 +286,8 @@ decides *what it looks like*.
 
 ## Animation & Juice
 Animations are **theme-controlled** and currently scoped to the player's marker —
-poppy grow/shrink, glow, jiggle, dance. Full detail in [Animations](./Animations.md).
+poppy grow/shrink, glow, shadowbox, jiggle, dance. Full detail in
+[Animations](./Animations.md).
 
 ## Responsive / Screen Size
 - **Phone is the primary target** — two players passing one device.
@@ -319,4 +323,12 @@ don't happen.
 [Menus and UI](./Menus%20and%20UI.md).)
 
 ## Open Questions
-<!-- Nothing outstanding on this doc right now. -->
+- **What word does the player-facing copy use for a quadrant — "board" or "quadrant"/
+  "section"?** [Game Overview](./Game%20Overview.md) → Terminology settles the docs' own
+  vocabulary as **quadrant** (or section) for one of the nine cells of the big board, and
+  **board** only for the big board itself or a small board. But the approved handoff's
+  free-choice cue reads *"Free choice — pick any board"*, while the free-choice cue as
+  written above in this doc reads *"Free choice — pick any open quadrant"* — the two
+  disagree. "Board" is arguably the more natural word for a child, who is a stated target
+  audience, even though it collides with "big board" and "small board." Since this is text
+  shown to a player, the choice matters more than a style nit.

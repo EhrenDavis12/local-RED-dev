@@ -1,6 +1,7 @@
 # Theming
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled.
+> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
+> what's under **Decisions**.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Neon now exists as a concrete,
@@ -18,9 +19,19 @@ Build the theme system **from the beginning**, not bolted on later.
 > **All of our code operates off of the theme. No code should be operating independently
 > from the selected theme.**
 
-Meaning:
-- No hardcoded colors, backgrounds, fonts, piece styles, sounds, or animations anywhere
-  in the code.
+Meaning — no hardcoded values anywhere in the code, across the full slot inventory the
+screens actually consume:
+- Colors, backgrounds, fonts, piece styles, sounds, animations.
+- Board geometry and sizing — outer gap, quadrant padding, inner gap, grid-line width,
+  grid-line inset, mark sizes.
+- Corner radii — cell, quadrant, modal, chip, control, button.
+- The type scale — sizes and weights, distinct from "fonts" meaning a typeface.
+- Opacities — the locked, claimed and cat-game veils.
+- Every surface: modals (winner, draw), sheets (theme select, in-game quick actions), the
+  settings card, open-game rows and their chips, badges, the main-menu logo, and a
+  gradient-capable page background.
+
+And:
 - Every visual, audio, and motion value is read from the currently selected theme.
 - If something on screen has a color, that color came from the theme. If something makes
   a noise, that sound came from the theme. **If something moves, that motion came from
@@ -30,7 +41,7 @@ Meaning:
 
 This is a day-one constraint because retrofitting it later means touching every file.
 
-<!-- Enforced by: the hardcoded-theme-value test, which covers all six categories listed
+<!-- Enforced by: the hardcoded-theme-value test, which covers the slot inventory listed
      above. See Tech Design → Decisions → Do we add a test that fails on hardcoded theme
      values? -->
 
@@ -115,6 +126,32 @@ distinguish things by more than colour — shape, icon, outline, pattern. It is 
 currently written as a requirement that every theme must do so; compare **What a Theme
 Controls** below, which does require every theme to keep the gameplay-critical highlights
 legible.
+
+### How a theme merges over Neon
+**Deep merge, null = clear.** *"If the new theme has no value at all then that is inherit.
+Like it's missing the option entirely."* Three distinct cases:
+
+- **Key absent** from the overriding theme → inherit Neon's value.
+- **Key present with a value** → that value wins.
+- **Key present and explicitly null** → the value is *cleared*, not inherited.
+
+And the merge is **deep**: a theme naming one key inside a section keeps Neon's other keys
+in that section rather than replacing the whole section. Nested maps merge recursively.
+
+See [Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
+
+**Consequence:** `neon.theme.json` ships `sound.music` as an explicit `null`. Under this
+rule a null means "cleared," so Neon's own null is a deliberate clear rather than a gap —
+worth noting so nobody later mistakes it for an unfilled slot.
+
+### What the theme's slots are derived from
+**The theme's slot list is derived from what the screens actually consume, not from a
+category list written in the abstract.** The earlier six-category list — colors,
+backgrounds, fonts, piece styles, sounds, animations — was written before the screens
+existed. It omits board geometry and sizing, corner radii, the type scale, and
+opacities, and it has no slot for any modal, sheet, settings card, open-game row, badge,
+or the main-menu logo — so four PRDs were left unbuildable under the "no hardcoded
+values" rule. See **Architectural Rule** above for the corrected enumeration.
 
 ---
 
@@ -254,6 +291,18 @@ Everything visual and audible. Rough list, not exhaustive:
 - Turn indicator styling
 - Scoreboard styling
 - Main menu styling (background, button look, title)
+- **Board geometry and sizing** — outer gap, quadrant padding, inner gap, grid-line
+  width, grid-line inset, mark sizes
+- **Corner radii** — cell, quadrant, modal, chip, control, button
+- **The type scale** — sizes and weights, distinct from a theme's choice of font
+- **Opacities** — the locked, claimed and cat-game veils
+- **Modals** — winner, draw
+- **Sheets** — theme select, in-game quick actions
+- **The settings card**
+- **Open-game rows and their chips**
+- **Badges**
+- **The main-menu logo**
+- **Page background** — gradient-capable
 
 > **Every theme must keep these legible.** The last-move highlight and active-quadrant
 > highlight are *gameplay-critical*, not decoration — a theme that makes them hard to spot
@@ -318,3 +367,19 @@ channel and one switches off an app behavior.
 - Which values, concretely, does Classic Red vs Blue override? (Settled in principle —
   graphics and its splat sound, inheriting the rest. An exact list will fall out when it's
   actually built.)
+- What is the exact slot schema — the key structure — for what a theme defines? The
+  approved `neon.theme.json` does not currently cover the pending-move highlight, any
+  modal or sheet surface, a gradient background, a logo, or a theme's own display name
+  and description.
+- Neon is required to be complete (see **Neon Is the Base Theme**), but the approved
+  `neon.theme.json` has no pending-move highlight values at all — no pending colour, no
+  pending cell ring, no destination ring — while the board's pending preview is a
+  required, separately addressable treatment. The same gap covers the grid-line opacity
+  and glow, the claimed and cat-game mark glows, and the cat-game caption style. How does
+  this gap get closed?
+- What form does the legibility contract take — a contrast floor, a review step,
+  something else? **What a Theme Controls** requires every theme to keep the last-move
+  and active-quadrant highlights legible, but this is unfalsifiable as written: Classic
+  Red vs Blue has a near-white ground while inheriting Neon's near-white text and its
+  veils and glows tuned for a near-black ground, so a theme could be complete, pass every
+  stated check, and still be unreadable.

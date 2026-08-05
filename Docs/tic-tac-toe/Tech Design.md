@@ -18,6 +18,11 @@
 ### Framework — Flutter
 **Flutter.** Already in use for the game.
 
+### App name
+**"Tic Tac Toe Extreme."** 20 characters, inside Apple's 30-character App Store limit. The
+approved handoff draws it as a kicker/wordmark split (`TIC TAC TOE` over `EXTREME`) on
+screen `1a`.
+
 ### Primary target — Apple
 **iOS is the primary target as of right now.** Android is supported by virtue of Flutter,
 but Apple is what we're building and testing against first.
@@ -182,7 +187,7 @@ this doc.
      Docs/tic-tac-toe/design_handoff_game_ui/README.md. -->
 
 ### Do we add a test that fails on hardcoded theme values?
-**Yes — add it, covering all six categories the Architectural Rule names.** An ordinary
+**Yes — add it, covering the slot inventory the Architectural Rule names.** An ordinary
 test in the suite, not a custom analyzer plugin. It scans the source under `lib/` for
 banned patterns outside the theme layer itself, and it holds a per-file baseline that
 fails when a new violation appears. There is no application code yet, so **the baseline
@@ -191,9 +196,11 @@ starts at zero**.
 <!-- "The theme layer" is concretely `lib/theme/`. See Decisions → Project structure —
      layer-first. -->
 
-The six categories come straight from [Theming](./Theming.md) → Architectural Rule —
-colors, backgrounds, fonts, piece styles, sounds, and animations. Indicative patterns to
-catch, to be sharpened at the keyboard rather than settled here:
+The scope comes from [Theming](./Theming.md) → Architectural Rule, which derives its slot
+list from what the screens actually consume rather than a closed category list — see
+Theming → Decisions → What the theme's slots are derived from. Indicative patterns to
+catch, to be sharpened at the keyboard rather than settled here — and not a complete
+enumeration of that slot inventory:
 
 | Category | Roughly what the scan looks for |
 |---|---|
@@ -206,6 +213,13 @@ catch, to be sharpened at the keyboard rather than settled here:
 Durations are in scope because [Animations](./Animations.md) → Decisions → Duration lives
 in the animation puts timing inside the theme's animation definitions, so a hardcoded
 `Duration` is a theme value that escaped.
+
+PRD review found several of these indicative patterns miss the idiomatic forms this
+project actually decided on, and this is a finding to sharpen rather than a redesign: the
+sound rule looks for literal `assets/…` paths, but `audioplayers` uses
+`AssetSource('audio/…')` and supplies the prefix itself; the font rule looks for
+`GoogleFonts.*`, which will never appear because Inter is bundled; and the piece-style
+rule looks for `'X'`/`'O'`, while Neon's approved marks are `✕ ○ Ø`.
 
 This is the structural enforcement that **The theme system is the main architectural
 risk** below asks for, and it is what makes [Theming](./Theming.md) → Architectural Rule a
@@ -223,10 +237,21 @@ It also covers the requirement that settings and the theme be readable from
 `Notifier`/`NotifierProvider` — fey-tactics is a reference for the sync shape, not for
 the API surface.
 
+### Navigation
+**The app has an explicit navigation layer, and it is now in scope.** No Decision above
+names a routing approach, and the dependency list has no router in it yet. The approach
+is open — see Open Questions.
+
+### The app icon
+**The app ships an icon, and it is not the main-menu logo.** App Store submission cannot
+happen without a 1024×1024 icon. It lives in the iOS asset catalog rather than the
+Flutter `assets/` tree, and it is a separate asset from the logo. Who produces it, and
+whether it is generated, is open — see Open Questions.
+
 ### Online multiplayer is an intended future direction
 **Tech choices must not foreclose syncing board state over a network.** Not built now —
-see **Fully offline. No backend, no network, no accounts.** under What the Design Docs
-Already Imply below, which holds today.
+see **Fully offline, except for in-app purchases.** under What the Design Docs Already
+Imply below, which holds today.
 
 ### Game state is immutable
 **Immutable.** The engine never mutates a board in place — every move produces a new state
@@ -252,6 +277,7 @@ lib/
     theme.dart     ← merged theme object
     loader.dart    ← YAML → theme
   state/           ← Riverpod providers
+  navigation/      ← the app's routing layer
   ui/
     board/
     menus/
@@ -265,6 +291,12 @@ assets/
 implementation (see **Serialization and the storage layer** above). There is still **no
 backend data layer**: nothing in the app talks to a server. One gets added if multiplayer
 arrives.
+
+`navigation/` is a new layer, for the same reason `storage/` was added above: **Navigation**
+above names an explicit navigation layer that this tree had no home for. It is Flutter-side,
+same as `ui/` and `state/` — nothing here changes the `engine/` purity rule. What goes inside
+it is not decided; the routing approach is still open — see Open Questions → Navigation
+approach. A navigation PRD already depends on this layer existing.
 
 `assets/themes/`, `assets/images/` and `assets/audio/` are the **designated folders for
 assets** required by **Where do sound and art assets come from?** above.
@@ -307,8 +339,11 @@ The three pieces:
 
 - **`deliver`** (aka `upload_to_app_store`) keeps the listing as local files:
   `fastlane/metadata/` for description, keywords, release notes and categories — one
-  file per field per locale — and `fastlane/screenshots/` for the images. Edit
-  locally, commit, run, and it pushes to App Store Connect.
+  file per field per locale for the localized fields (description, keywords, release
+  notes, name, subtitle), and one file per field at the top level for the
+  non-localized fields (primary and secondary category, copyright) — and
+  `fastlane/screenshots/` for the images. Edit locally, commit, run, and it pushes to
+  App Store Connect.
 - **`match`** stores signing certificates and provisioning profiles in a git repo and
   syncs them.
 - **`produce`** creates the app record and registers the bundle identifier from the CLI.
@@ -333,9 +368,10 @@ So the error handling and the report object are day-one work; the transport is n
 destination is deliberately left for later rather than being an open question — today's
 answer is "nowhere."
 
-This keeps **Fully offline. No backend, no network, no accounts.** under **What the Design
-Docs Already Imply** below true for now. It stops being true the day a destination is
-chosen.
+This keeps **Fully offline, except for in-app purchases.** under **What the Design Docs
+Already Imply** below true for now. StoreKit being permitted does not make a report
+destination permitted — those are two separate exceptions, and this one stops being true
+the day a destination is chosen.
 
 ### In-app purchases
 **The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
@@ -351,6 +387,45 @@ access and a restore-purchases path tied to the Apple ID. This means **Fully off
 backend, no network, no accounts.** under **What the Design Docs Already Imply** below is
 no longer unconditionally true — see the amended row there.
 
+### Entitlements — Apple stores them, no backend needed
+**No receipt-validation server, and no backend of ours.** StoreKit provides
+`Transaction.currentEntitlements` — the set of currently-valid transactions for this app
+under the signed-in Apple ID, cryptographically signed by Apple and verified on device.
+That is the authoritative answer to "does this player own this." `Transaction.all` gives
+full purchase history if it is ever needed.
+
+Restore for non-consumables is largely automatic: signing in on a new device repopulates
+entitlements without the player doing anything. The visible **Restore purchases** control
+is still required by Apple's review guidelines, and `AppStore.sync()` is the explicit call
+behind it — so the control is a compliance requirement more than a functional one.
+
+On-device verification is sufficient for an app this size.
+
+**Consequence for the architecture: Apple is the record of truth and it is queryable at
+runtime.** Any locally stored entitlement state is an offline convenience, not the record.
+A refunded or lapsed purchase simply stops appearing in `currentEntitlements` — that is what
+answers "what happens when an entitlement goes away."
+
+### Kids category
+**The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
+changes what gets built in features that ship long before release work:
+
+- A **parental gate** is required before any purchase flow and before any link that leaves
+  the app.
+- Third-party analytics and behavioural advertising are restricted.
+- A privacy policy is mandatory.
+
+These reach the purchase flow and theme-selection features directly, and the gate has to
+exist before those are built rather than being added at submission.
+
+A separate, consequent fact: the age rating is **4+.**
+
+**The parental gate's scope is purchases only.** The game has no outbound links today — no
+in-app support URL, no social links, no advertising — so purchases are the only trigger that
+currently exists. If an outbound link is ever added, it needs the gate too — that is a thing
+to remember rather than a thing already handled. What the gate looks like and how it
+challenges is a PRD's job, not this doc's.
+
 ---
 
 ## What the Design Docs Already Imply
@@ -359,7 +434,7 @@ here so they don't get re-litigated:
 
 | Requirement | Comes from |
 |---|---|
-| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. | Two players, one phone; qualified by Decisions → In-app purchases |
+| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see Decisions → Entitlements — Apple stores them, no backend needed. | Two players, one phone; qualified by Decisions → In-app purchases |
 | **Local persistence** for 4 values: theme, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence, Decisions |
 | **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
@@ -408,10 +483,38 @@ block other work.
   does not guard a theme file that misspells a key.
 
 ### 3. Build and distribution
-- App name?
+- Who produces the app icon, and is it generated or hand-made? See Decisions → The app
+  icon.
+- A set of hard App Store submission blockers, none of which any doc currently mentions,
+  and all of which must be decided before shipping:
+  - **Paid Applications Agreement**, plus banking and tax details — required before
+    anything, including any in-app purchase, can be sold. A human, multi-day process
+    with no automation path.
+  - **A privacy policy URL and a support URL** — both required listing fields. The
+    project has no website of any kind.
+  - **The privacy nutrition label and the age rating questionnaire.**
+  - **App Store category, price tier, and territory availability.**
+  - **Export compliance** — asked on every upload; can be pre-answered with an
+    `Info.plist` key, which is the scaffold's file.
+  - **Content rights** — the submission asks whether the app contains third-party
+    content, and the answer depends on the licensing of Replicate-generated assets and
+    of the bundled Inter and Phosphor dependencies, none of which is established.
+  - **Screenshots** at Apple's required device sizes — who captures them, and by what
+    means, is unowned.
+  - **App Review contact information**, and **sandbox testing of the purchase flow**
+    before submission.
 
 <!-- Resolved: public App Store release; bundle identifier
      com.ehrendavis.tictactoeextreme; local builds only, no CI; fastlane as the release
-     tooling. Only the app name — the display name under the icon — is still open.
-     See Decisions → Distribution — public App Store release, Bundle identifier,
-     CI — local builds only, and Release tooling — fastlane. -->
+     tooling; the app name. See Decisions → Distribution — public App Store release,
+     Bundle identifier, CI — local builds only, Release tooling — fastlane, and App name. -->
+
+### 4. Navigation approach
+- The app has an explicit navigation layer (see Decisions → Navigation), but no Decision
+  names how it's built — plain `Navigator` push/pop, `go_router`, or something else — and
+  the dependency list has no router in it yet.
+
+### 5. Kids category — age rating questionnaire
+- The Kids-category listing choice and the resulting parental-gate, analytics, and
+  privacy-policy requirements are settled — see Decisions → Kids category, and the age
+  rating (4+). What remains open is the exact age-rating questionnaire answers.

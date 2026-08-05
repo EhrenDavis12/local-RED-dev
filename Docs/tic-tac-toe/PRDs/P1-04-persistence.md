@@ -11,19 +11,26 @@
 
 **Dependencies:**
 
+- `P1-01-app-scaffold.md` creates the `lib/storage/` directory this PRD fills, as part of
+  the layer-first tree (its req 2), and states the `engine/`-purity rules from the scaffold
+  side (its reqs 4–5). Requirements 12–14 below constrain what goes *in* that tree; they do
+  not create it. Same wave.
 - `P1-02-engine-rules.md` owns the domain models this layer serializes. Same wave, so
   build against the model API rather than defining models here. This PRD names *what
   must survive a restart*, never the class or field shape.
 - `P1-03-theme-system.md` owns theme materialization. This PRD only stores and returns
   the selected theme's UUID.
-- `P4-05-in-app-purchases.md` owns querying, purchasing and restoring — every StoreKit
-  interaction. This PRD owns only what is written to the device as a result. The two meet
-  at one seam: that PRD produces entitlement state, this one persists and serves it.
-- `P3-02-open-games-list.md` consumes this layer, and owns the open-games list UI
+- `P1-07-entitlements.md` owns the entitlement model, the free-tier defaults, the cap
+  numbers, the per-theme query interface and the rule that Apple is the authority while the
+  local copy is a cache. Same wave, so build against that interface. This PRD owns only
+  what is written to the device and read back. `P4-05-purchase-flow.md` (wave 4) is what
+  later produces the store results that entitlement state is populated from; nothing in
+  this wave waits on it.
+- `P4-02-open-games-list.md` consumes this layer, and owns the open-games list UI
   including the delete action's presentation and confirmation. It shares one unresolved
-  decision with this PRD — what happens when a player at the cap starts a new game. See
-  Open Questions 3.
-- `P3-04-settings.md` consumes this layer; nothing here depends on it.
+  decision with this PRD — what New Game does when the player is at the cap. See Open
+  Questions 3.
+- `P4-04-settings.md` consumes this layer; nothing here depends on it.
 
 ## Problem
 
@@ -42,12 +49,12 @@ mid-play, rematch-in-the-same-series, deleting a game to free a slot, and a paid
 
 The app has a `storage/` layer that is the single place local persistence happens: the
 four player preferences live in `shared_preferences` (the theme as its UUID), open games
-live in Hive as JSON behind a repository interface that can also delete them, and the
-player's purchased entitlements are readable locally so the open-game ceiling and which
-themes are unlocked resolve without asking Apple every time. A player can quit mid-move,
-relaunch, pick the same game out of the open-games list, and find the board, whose turn it
-is, and the series scoreboard exactly as they left them — while `engine/` stays pure Dart
-and no caller outside `storage/` knows Hive exists.
+live in Hive as JSON behind a repository interface that can also delete them, and whatever
+`P1-07-entitlements.md` decides the player owns is written down so it survives a restart.
+A player can quit mid-move, relaunch, pick the same game out of the open-games list, and
+find the board, the last move played, whose turn it is, and the series scoreboard exactly
+as they left them — while `engine/` stays pure Dart and no caller outside `storage/` knows
+Hive exists.
 
 ## Requirements
 
@@ -90,23 +97,53 @@ and no caller outside `storage/` knows Hive exists.
    progress have to be saved to device storage?; `Tech Design.md` → Decisions → Game
    state storage — Hive.*
    *Testable:* persist a partially played game, rebuild the store from disk, and the
-   restored game is equal to the one saved.
+   restored game is equal to the one saved. Note that this check compares whatever the
+   implementer chose to model, so it does not by itself catch a missing field —
+   requirement 7 carries the behavioral checks.
 
 7. **An open game persists a whole series, not one board.** What survives per open game:
-   the board, whose turn it is, that game's own running scoreboard (Player One / Ties /
-   Player Two), and the opponent name the game is titled with in the open-games list.
+   the board, the **most recent completed move** (which quadrant, which cell), whose turn
+   it is, that game's own running scoreboard (Player One / Ties / Player Two), and the
+   opponent name the game is titled with in the open-games list.
    *Source: `Menus and UI.md` → Decisions → What does an open game hold? and → What does
    each row in the open-games list show?; `Game Overview.md` → Decisions → Scoreboard
    lifetime and → Session Structure; `Tech Design.md` → Decisions → Game state storage —
-   Hive ("the board, whose turn it is, and the scoreboard").*
+   Hive ("the board, whose turn it is, and the scoreboard"). For the last completed move:
+   `P1-02-engine-rules.md` req 23 — the engine's state includes the most recent completed
+   move, and it is "what has to survive leaving and resuming a game" — citing
+   `Game Board Design.md` → Last Move Highlight and → Lifetime, and `Menus and UI.md` →
+   Leaving a game mid-play.*
+   *Why the last move is called out:* it has **two** consumers, and the move itself is the
+   only thing that serves both. The forced quadrant is derived from it and is **not**
+   derivable from the board; the opponent's last-move highlight is rendered from it
+   (`P3-01-board-rendering.md` reqs 19–20). Its field name and shape stay
+   `P1-02-engine-rules.md`'s (its OQ-3); this requirement says only that it must survive.
+   *Testable, both assertions:*
+   1. Resume a game whose previous move forced a quadrant — the resumed game forces the
+      same quadrant.
+   2. Resume a game and the opponent's last-move ring is still drawn, on the same cell it
+      was on before the restart.
+   An implementer who persists only a derived `forcedQuadrant` passes assertion 1 and
+   requirement 6, and fails assertion 2 — which is the case where the highlight silently
+   vanishes on every resumed game.
 
-8. **A rematch continues in the same stored open game.** It does not create a second
-   stored record; the scoreboard carries over and increments.
-   *Source: `Menus and UI.md` → Game Over → Rematch and → Decisions → What happens when a
-   game ends?, → What does an open game hold? ("A rematch continues in the same open game
-   with the scoreboard intact").*
-   *Testable:* after a rematch, the count of stored open games is unchanged, the record's
-   identity is unchanged, and the score reflects the finished game.
+8. **A rematch continues in the same stored open game, and does not itself change the
+   score.** Taking the rematch resets the board for the next game; the series score is
+   carried forward exactly as it stands, having already been incremented at game end. No
+   second stored record is created.
+   *Source: `Menus and UI.md` → Decisions → When does the scoreboard increment ("**At game
+   end.** The winner's column, or Ties, increments as soon as the game is won or tied — not
+   when a rematch is taken. Taking the rematch only resets the board"); → Game Over →
+   Rematch ("Taking it resets the board for the next game ... The rematch continues in the
+   **same open game** — same series, scoreboard intact"); → Decisions → What does an open
+   game hold?*
+   *Testable:* after taking a rematch, the count of stored open games is unchanged, the
+   stored record is the same one, its board is reset, and all three score counters are
+   identical to their values immediately before the rematch was taken.
+   *Boundary:* the increment itself is engine-side and lands on the move that ends the game
+   — `P1-02-engine-rules.md` req 27. `P3-04-game-over-rematch.md` req 9 cites this
+   requirement as its persistence boundary; the two agree that persisting a rematch writes
+   a reset board and an unchanged score.
 
 9. **The persisted series carries enough state to resume turn order across games
    correctly** — after a win the winner goes first; after a tie whoever went first in the
@@ -119,21 +156,31 @@ and no caller outside `storage/` knows Hive exists.
    *Testable:* finish a game in a tie, restart the store from disk, resume, and the same
    player goes first as would have without the restart.
 
-10. **The store never holds more open games than the current ceiling, and the ceiling is
-    not a constant: 3 by default, 100 with the $4.99 cap entitlement.** The ceiling is
-    resolved from entitlement state (requirement 18) at the moment it is enforced, never
-    hardcoded to 3.
+10. **The store does not create an open game that would exceed the current ceiling.** This
+    is a **create-time check**, not a standing invariant: it constrains what may be added,
+    and nothing else. The ceiling is not a constant — 3 by default, 100 with the cap
+    entitlement — and is read from `P1-07-entitlements.md` (its req 3) at the moment a
+    create is attempted. This layer defines neither number.
     *Source: `Menus and UI.md` → Decisions → How many open games do we keep? ("3 by
     default, no more. A $4.99 in-app purchase raises the cap to 100 open game slots");
-    `Tech Design.md` → Decisions → In-app purchases.*
-    *Testable:* with no cap entitlement, no sequence of operations leaves more than 3
-    stored; with the entitlement, the same sequences allow up to 100; a test that flips
-    the entitlement changes the enforced ceiling with no code change.
-    *Not specified here:* what happens when a player at the ceiling starts a new game.
-    The docs settle both ceilings and neither behavior at them, so this PRD does not
-    choose between refusing the new game and replacing an existing one — see Open
-    Questions 3, which `P3-02-open-games-list.md` carries too. Implement requirement 10
-    so that both answers stay reachable; do not bake either one in before it is decided.
+    `Tech Design.md` → Decisions → In-app purchases; `P1-07-entitlements.md` req 3, whose
+    testable requires that "no other source in `lib/` defines either number."*
+    *Testable:* with the cap entitlement absent, a create attempted with 3 stored does not
+    add a fourth; with it present, creates succeed up to 100; flipping the entitlement
+    changes the enforced ceiling with no code change; a scan of `lib/storage/` finds
+    neither `3` nor `100` as a cap constant.
+    *Settled, and enforced here:* the store **never evicts**. A create at the ceiling does
+    not silently remove an existing game — replacing the oldest was considered and
+    rejected in `P4-02-open-games-list.md` req 7 ("Nothing in this feature deletes a game
+    the player did not choose to delete"). A slot is freed only by the explicit delete in
+    requirement 17.
+    *Deliberately not authorized here:* trimming, evicting or refusing to load games that
+    already exist. If the ceiling ever drops below the number stored — an entitlement
+    lapsing — this requirement does not license deleting any of them. That case is Open
+    Questions 5 and is with the user.
+    *Not specified here:* what the New Game action does when the create is refused —
+    refuse outright, route the player into the delete flow, or offer the unlock. That is
+    Open Questions 3, and `P4-02-open-games-list.md` carries it too.
 
 11. **Leaving a game mid-play discards nothing.** Returning to the main menu from a game
     in progress leaves that game in stored open games, with its scoreboard, resumable.
@@ -148,7 +195,8 @@ and no caller outside `storage/` knows Hive exists.
 12. **`storage/` holds a repository interface with a Hive implementation that stores
     JSON, and defines no Hive `TypeAdapter`s.**
     *Source: `Tech Design.md` → Decisions → Serialization and the storage layer; →
-    Project structure — layer-first.*
+    Project structure — layer-first. The directory itself is created by
+    `P1-01-app-scaffold.md` req 2.*
     *Testable:* the source registers no adapter and generates no `TypeAdapter`; box
     values are JSON.
 
@@ -166,7 +214,8 @@ and no caller outside `storage/` knows Hive exists.
     *Source: `Tech Design.md` → Decisions → Serialization and the storage layer
     ("`hive_flutter` is not pure Dart, so it must never be imported from `engine/`"); →
     Is the game logic separate from Flutter? ("pure Dart with zero Flutter imports"); →
-    Project structure — layer-first.*
+    Project structure — layer-first. Stated from the scaffold side as
+    `P1-01-app-scaffold.md` reqs 4–5; this is the same rule seen from the storage side.*
     *Testable:* an import scan over `lib/engine/` finds zero Flutter-dependent imports.
 
 15. **Serialization lives with the model: `storage/` persists what the models' generated
@@ -179,7 +228,7 @@ and no caller outside `storage/` knows Hive exists.
     persisted type.
 
 16. **`storage/` is local only — nothing in it talks to a network, StoreKit included.**
-    The app's one sanctioned network path belongs to `P4-05-in-app-purchases.md`, not
+    The app's one sanctioned network path belongs to `P4-05-purchase-flow.md`, not
     here.
     *Source: `Tech Design.md` → Decisions → Project structure — layer-first ("`storage/`
     is local persistence only ... There is still no backend data layer"); → What the
@@ -193,67 +242,98 @@ and no caller outside `storage/` knows Hive exists.
     leaves every other stored game byte-identical, and touches no preference. After a
     delete at the ceiling, a new game fits.
     *Source: `Menus and UI.md` → Decisions → Deleting an open game ("The open-games list
-    gains a delete action, so a slot can be freed").*
+    gains a delete action, so a slot can be freed"); `P4-02-open-games-list.md` req 7.*
     *Testable:* with the ceiling reached, delete one game and a create then succeeds; the
     surviving games and all four preferences are unchanged; the deleted game is still
     absent after rebuilding the store from disk.
     *Not here:* the delete affordance, and whether it confirms first, belong to
-    `P3-02-open-games-list.md`.
+    `P4-02-open-games-list.md`.
 
-### Entitlements
+### Storing entitlement state
 
 > **Premise flag.** That entitlement state is kept on the device *at all* is not stated in
-> any design doc — it comes from this PRD's task direction. What the docs settle is that
-> the two purchases exist and that Apple is behind them. Which store holds it, and whether
-> it is stored rather than re-queried at launch, is Open Questions 5.
+> any design doc. `P1-07-entitlements.md` originates that premise (its req 7, its own
+> flagged premise); this PRD is where it lands. Which store holds it — or whether it is
+> held at all rather than re-queried at launch — is Open Questions 5.
 
-18. **Entitlement state is locally readable, covering both purchasable kinds:** per-theme
-    unlocks (every theme beyond the two free ones) and the $4.99 100-slot cap unlock. It
-    is readable without a StoreKit round trip, so requirement 10's ceiling and a theme's
-    unlocked state both resolve from local data.
-    *Source: `Tech Design.md` → Decisions → In-app purchases ("Themes beyond the two free
-    ones ... and a $4.99 unlock that raises the open-game cap from 3 to 100");
-    `Theming.md` → Decisions → Which themes are free, → Are themes unlockable/rewards.
-    The local-readability premise is flagged above.*
-    *Testable:* the ceiling and a theme's unlocked state can both be read with no network
-    available and no StoreKit double configured.
+> **Boundary with `P1-07-entitlements.md`.** That PRD (same wave) is **the model**: what
+> the entitlements are, what the free tier means, the cap numbers, the per-theme
+> `free`/`owned`/`locked` query, and the rule that Apple is the authority. This PRD is
+> **the write-down**: what bytes are stored, under what key, and what a read gives back.
+> The three requirements below say nothing about what the stored values *mean* — a reader
+> looking for defaults, cap values or gating belongs in `P1-07`.
 
-19. **Apple is the authority; the local copy is a cache and never the grantor.** Nothing
-    in this layer grants, mints or upgrades an entitlement on its own — it stores what
-    `P4-05-in-app-purchases.md` hands it, and a locally stored entitlement is superseded
-    by what Apple reports whenever the two disagree. Restoring purchases on a fresh
-    install must be able to repopulate this state from Apple alone, with nothing on the
-    device to seed it.
-    *Source: `Tech Design.md` → Decisions → In-app purchases ("in-app purchases require
-    StoreKit, which needs network access and a restore-purchases path tied to the Apple
-    ID"); → What the Design Docs Already Imply → the amended Fully offline row.*
+18. **Entitlement state is written down and read back unchanged.** Whatever set of
+    entitlements `P1-07-entitlements.md` defines — the cap unlock and the per-theme
+    unlocks — survives an app restart and returns equal to what was written. Per-theme
+    unlocks are keyed by the theme's **UUID**, so renaming a theme does not orphan an
+    entitlement the player paid for.
+    *Source: `P1-07-entitlements.md` req 7 ("Entitlement state survives an app restart.
+    The values are handed to the persistence layer; `P1-04-persistence.md` owns the store,
+    the keys and the format"). For UUID keying: `Tech Design.md` → Decisions → Theme
+    identity — UUID, the same reasoning that makes requirement 3 store a UUID.*
+    *Testable:* write an entitlement set, rebuild the store from disk, and read back an
+    equal set; an unlock written against a theme UUID still reads against that UUID after
+    the theme's display name changes.
+
+19. **This layer never mints an entitlement, and only an affirmative store answer
+    overwrites what is held.** It writes what the purchase layer hands it. A failed,
+    timed-out or otherwise unanswered query is **not** an answer of "owns nothing" and
+    must not clear or downgrade stored entitlement state.
+    *Source: `Tech Design.md` → Decisions → In-app purchases ("a restore-purchases path
+    tied to the Apple ID"); `P1-07-entitlements.md` req 10 (the local copy is a copy of
+    Apple's answer, never the grantor) and **req 9** ("When the store cannot be reached,
+    locally held entitlement state is what gating uses. A failed or timed-out query is not
+    treated as an answer of 'owns nothing', and does not clear what is held").*
+    *Why the narrowing:* "Apple is the authority" means an *affirmative* store answer
+    overrides local state. Read as "whatever Apple reports, whenever the two disagree," a
+    dropped network call is a disagreement — and a code writer working from this file
+    alone would clear a player's purchases on an offline launch. A failed network call must
+    not revoke something a player bought.
     *Testable:* the storage API exposes no way to set an entitlement except by applying a
-    result supplied by the purchases layer; on an empty device, a restore repopulates
-    entitlements with no local seed.
+    result supplied by the purchase layer; with an entitlement stored, stub every store
+    call to fail, relaunch, and the stored entitlement is still there and still returned.
+    *Not specified here:* what happens if the store affirmatively reports an entitlement
+    **gone**. That is `P1-07-entitlements.md`'s Open Question 1 and this PRD's Open
+    Questions 5; requirement 19 covers only the unanswered case.
 
-20. **With nothing stored and nothing purchased, the defaults are the free tier:** a
-    ceiling of 3 open games, and only Neon and Classic Red vs Blue unlocked.
-    *Source: `Menus and UI.md` → Decisions → How many open games do we keep?;
-    `Theming.md` → Decisions → Which themes are free ("Neon and Classic Red vs Blue are
-    free. Every theme beyond those two is paid").*
-    *Testable:* on an empty store, the ceiling reads 3 and every theme other than those
-    two reads as locked.
+20. **An empty store is a valid state, not an error, and reads back as "nothing stored".**
+    A fresh install with no entitlement written must read cleanly, and a restore must be
+    able to repopulate the store from a store result alone with nothing local to seed it.
+    What "nothing stored" *means* — the free tier, a ceiling of 3, which themes are
+    unlocked — is `P1-07-entitlements.md`'s (its reqs 1 and 3), not this layer's.
+    *Source: `P1-07-entitlements.md` req 7 and its "Nothing here requires a network or a
+    store" note, which makes an unpopulated entitlement store the normal wave-1 condition.*
+    *Testable:* on an empty store the entitlement read completes and returns an empty set
+    rather than throwing or returning a default tier; on an empty device, applying a
+    restore result populates the store with no prior local state.
 
 ## Out of Scope
 
 - **The domain models themselves** — board, move, score, and their `freezed` /
-  `json_serializable` definitions: `P1-02-engine-rules.md`.
+  `json_serializable` definitions: `P1-02-engine-rules.md`. That includes the field name
+  and shape of the last completed move (its OQ-3); requirement 7 says only that it must
+  survive.
+- **Incrementing the score.** The increment happens engine-side at game end
+  (`P1-02-engine-rules.md` req 27); this layer writes whatever the engine produced.
+- **The entitlement model** — what the entitlements are, the free-tier defaults, **both cap
+  numbers**, the per-theme `free`/`owned`/`locked` query, and the authority rule:
+  `P1-07-entitlements.md`. Requirements 18–20 store and return values; they never define or
+  interpret one, and `lib/storage/` defines neither cap number (requirement 10).
 - **Querying, purchasing and restoring** — StoreKit, product lookup, the purchase flow,
   the restore-purchases path, receipt handling, and the paywall UI:
-  `P4-05-in-app-purchases.md`. This PRD covers only what lands on the device afterwards.
+  `P4-05-purchase-flow.md`. This PRD covers only what lands on the device afterwards.
 - **The open-games list UI**, including the delete action's presentation and confirmation,
-  and what a player sees when the ceiling is reached: `P3-02-open-games-list.md`. The
+  and what a player sees when the ceiling is reached: `P4-02-open-games-list.md`. The
   underlying decision both PRDs are waiting on is Open Questions 3.
-- **The settings screen and its toggles' UI**: `P3-04-settings.md`.
+- **The settings screen and its toggles' UI**: `P4-04-settings.md`.
 - **Theme loading, merging over Neon, and materialization** — this layer stores a UUID and
   nothing else about themes: `P1-03-theme-system.md`. Labelling which themes are free or
-  paid in the selection list is that PRD's and `P4-05`'s; requirement 18 only stores the
-  answer.
+  paid in the selection list is `P1-07-entitlements.md`'s (the state) and
+  `P4-03-theme-selection.md`'s (the rendering); requirement 18 only stores the answer.
+- **Creating the `lib/` tree** — `main.dart`, `app.dart` and the layer directories
+  including `storage/` itself: `P1-01-app-scaffold.md` req 2. Requirements 12–14 constrain
+  what may live in that directory and what may import it; they do not create it.
 - **A migration or versioning scheme for already-stored data.** Unsettled — see Open
   Questions 1. No migration hooks, schema-version fields, or upgrade paths are designed
   here.
@@ -282,40 +362,35 @@ As worded in `Menus and UI.md` → Leaving a game mid-play: "Whether leaving sti
 confirmation prompt is undecided; the original reason for one ('Leave game? Your score
 will be lost') no longer applies."
 
-### 3. What happens when a player at the cap starts a new game? (author-raised)
+### 3. What does New Game do when the player is at the cap? (author-raised)
 
-**Partly answered, still open.** `Menus and UI.md` → Decisions → Deleting an open game now
-gives the player a way to free a slot, which removes the trap that made refusing
-unsurvivable — a player at the cap is no longer stuck there permanently. It does not decide
-what the *attempt* does. The ceiling is now 3 or 100 (requirement 10); the question applies
-at whichever one is in force.
+**Narrowed since the previous draft.** What is settled now:
 
-Where the three sources stand:
+- **Both ceilings** — 3 by default, 100 with the $4.99 unlock. *(`Menus and UI.md` →
+  Decisions → How many open games do we keep?; the values themselves are
+  `P1-07-entitlements.md` req 3's.)*
+- **A slot is freed by an explicit, player-initiated delete.** *(`Menus and UI.md` →
+  Decisions → Deleting an open game; requirement 17.)*
+- **Replace-the-oldest is ruled out.** `P4-02-open-games-list.md` req 7 records it as
+  considered and rejected — "Nothing in this feature deletes a game the player did not
+  choose to delete" — and notes that the `1b` footer in `design_handoff_game_ui/` that
+  proposed it is stale and annotates itself as reflecting an unconfirmed question.
+  Requirement 10 follows that: the store never evicts.
 
-- **The design docs settle both ceilings and neither behavior at them.** `Menus and UI.md`
-  → Decisions → How many open games do we keep? says "3 by default, no more" and names the
-  $4.99 unlock to 100. No doc says what a create attempt at the ceiling does.
-- **The read-only handoff says replace-oldest.** The `1b` screen footer in
-  `design_handoff_game_ui/` reads "Starting a fourth replaces the oldest," and the handoff
-  annotates that line as unconfirmed. It is a reference asset, not a decision, and it
-  predates both the delete action and the 100-slot tier.
-- **`P3-02-open-games-list.md` carries this same question**, having reached it
-  independently from the UI side. Both PRDs point here rather than each asserting an
-  answer.
+**Still open:** what the New Game action does when the player is at the ceiling. Candidates
+named for whoever answers, not chosen here:
 
-The two candidate behaviors, now that delete exists:
+- **Refuse** — tell the player the list is full and leave them to delete a game
+  themselves.
+- **Route into the delete flow** — take the tap as intent and ask which game to replace,
+  so the deletion is still the player's choice.
+- **Offer the unlock** — surface the $4.99 100-slot purchase at the moment the limit
+  bites.
+- Or some combination of those.
 
-- **Refuse** — the new game is not created; the player is told the list is full and
-  deletes one, or buys the 100-slot unlock, first. Nothing already played is destroyed
-  without the player choosing it. The cost is a dead end at the moment they wanted a new
-  game.
-- **Replace the oldest** — the new game is created and the oldest open game is deleted,
-  scoreboard and series included. Starting a new game always works, at the cost of
-  silently discarding a series the player never chose to lose — which now sits oddly
-  beside an explicit delete action.
-
-Until this is answered, requirement 10 asserts only the ceiling, and neither behavior is
-implemented — in this layer or in the open-games list.
+`P4-02-open-games-list.md` carries this same question from the UI side. The storage half is
+already fixed either way by requirement 10 — the create does not succeed, and nothing is
+evicted — so this decision changes the UI's response, not this layer's behavior.
 
 ### 4. Other gaps found while writing this PRD (author-raised)
 
@@ -335,12 +410,13 @@ None is resolved here.
   two taps, select then confirm (`Game Overview.md` → How a Move Is Made). The only
   statement that a pending selection is never persisted is in the handoff's *State*
   sketch, which `Tech Design.md` records as "a design sketch, not a decision taken here."
+  Distinct from the *completed* last move, which requirement 7 does persist.
 - **Which layer owns preference access.** `Tech Design.md` → Project structure —
   layer-first describes `storage/` only as "the repository interface and its Hive
   implementation," and never says where `shared_preferences` access lives. Requirement 14
   settles only the part the docs do settle — that it cannot be `engine/`.
 
-<!-- Closed since the previous draft: "how is an open-game slot ever freed" is answered by
+<!-- Closed since earlier drafts: "how is an open-game slot ever freed" is answered by
      Menus and UI → Decisions → Deleting an open game, and is now requirement 17. -->
 
 ### 5. Which store do entitlements belong in? (author-raised)
@@ -361,7 +437,9 @@ equivalent:
 - **Neither — re-queried from StoreKit at launch**, with nothing persisted. Apple stays the
   only source, so nothing on the device can drift or be tampered with; the cost is that the
   ceiling and the theme list are unknown until the query returns, and unavailable offline,
-  which collides with a game that is otherwise fully playable with no network.
+  which collides with a game that is otherwise fully playable with no network. Note this
+  option sits badly with `P1-07-entitlements.md` req 9, which requires locally held state
+  to be what gating uses when the store cannot be reached.
 
 Two consequences ride on the answer and are also unsettled:
 
@@ -369,6 +447,34 @@ Two consequences ride on the answer and are also unsettled:
   free tier, or the last known state.
 - **What happens to stored games above the free ceiling if the entitlement goes away**
   (refund, family-sharing change, a restore that returns less than before). A player with
-  60 open games whose ceiling drops to 3 has 57 games that requirement 10 says should not
-  exist. Deleting them is destructive; keeping them silently violates the ceiling. The docs
-  do not cover this, and this PRD does not choose.
+  60 open games whose ceiling drops to 3 has 57 games that requirement 10 declines to
+  touch. Deleting them is destructive; keeping them means the stored count sits above the
+  ceiling until the player deletes some. Requirement 10 is deliberately a create-time
+  check so that nothing is destroyed by default, but that is a holding position, not the
+  answer. The same question is `P1-07-entitlements.md`'s Open Question 1.
+
+*Boundary note, resolved in this pass:* earlier drafts recorded that the overlap between
+requirements 18–20 here and `P1-07-entitlements.md` was undrawn. It is drawn now, along the
+line that PRD's own note proposes: **`P1-07` is the model, this is the write-down.**
+Requirements 18–20 were reduced to storage statements, and the free-tier defaults, the cap
+numbers and the gating meaning of an entitlement now live only in `P1-07`. That PRD's Open
+Question 4 still records the overlap as open from its side; closing it there is its
+author's call, not this PRD's.
+
+### 6. What gives a stored open game its stable identity? (author-raised)
+
+Nothing in the design docs establishes a unique key for an open game, and two requirements
+here already lean on one: requirement 8's check that a rematch leaves "the same stored
+record," and requirement 17's deletion of one specific game. Resuming a game from the list
+needs the same thing.
+
+**The opponent name cannot serve.** `P4-02-open-games-list.md` req 9 pre-fills the New Game
+prompt with `ItSaMeMaRiO` and confirming without editing accepts it, so two or three games
+titled `ItSaMeMaRiO` is the *default* case rather than an edge case. A name-keyed store
+would collide on first use, and `Menus and UI.md` → Decisions → What does each row in the
+open-games list show? makes the name a title, not a key.
+
+No id scheme is proposed here. Whoever answers should also say whether the identity is
+visible to the player at all, since it is otherwise a purely internal handle, and whether
+duplicate titles need disambiguating in the list — the latter is
+`P4-02-open-games-list.md`'s call.
