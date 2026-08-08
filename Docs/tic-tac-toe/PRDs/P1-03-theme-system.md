@@ -1,3 +1,5 @@
+**Build-readiness: 93**
+
 # PRD: Theme System
 
 > **Status:** Draft · Source docs read: `Theming.md`, `Tech Design.md`, `Animations.md`,
@@ -6,38 +8,39 @@
 > `neon.theme.json`, `themes.catalog.json`). `Alternative Game Styles.md` is a declared
 > parking-lot doc and was not used as a source.
 >
-> **Revised** after `Theming.md` → Architectural Rule was rewritten and → Decisions →
-> *What the theme's slots are derived from* was added. The slot list is no longer a closed
-> six-category list; it is derived from what the screens consume. Requirement 15 now
-> carries the full inventory, Requirements 11–13 were reconciled against it, and
-> Requirements 32–34 close three structural gaps found by the consumer PRDs.
+> **Revised for build-readiness.** Requirement 15 is a **normative schema** — key path,
+> value shape, status. Requirement 8 carries the settled deep-merge rule. Requirement 13
+> states exactly what `neon.yaml` must contain. Requirement 24 publishes the accessor.
 >
-> **Revised again** after `Menus and UI.md` → Decisions → *Where the open-game slot unlock
-> is sold* put a purchases section on the Settings screen. Requirement 15 gains the slots
-> that section consumes, and Requirement 13 records them as a Neon gap.
+> **Revised** after `Theming.md` → *Closing Neon's value gaps*, `Animations.md` → *Themes
+> describe their animations*, `Game Board Design.md` → *Where does the free-choice cue
+> live?*, `Theming.md` → *Does a theme control spacing and padding?* (no — every spacing key
+> removed in v7), *Do all four toggles ship, and is music a theme concern?* (yes; shape open,
+> Blocking 1), `Menus and UI.md` → *How does a player delete an open game?* (`icons.trash`
+> added in v8), and user answers on discovery and chrome icons.
+>
+> **Schema version 8.** The last open contradiction with `Tech Design.md` closed when its
+> guard table dropped the "inside board widgets" scoping; Requirement 25 and that doc now
+> agree.
 
 **Wave:** P1 · **File:** `P1-03-theme-system.md`
 
 **Depends on:** `P1-01-app-scaffold.md` — same wave; it creates `lib/theme/`,
-`assets/themes/`, `pubspec.yaml` and the Riverpod root this layer lands in. Nothing else:
-`src/Tic-Tac-Toe-Extreme` has no application code yet.
+`assets/themes/`, `pubspec.yaml` and the Riverpod root this layer lands in.
 
-**Depended on by** — every PRD below declares this one a dependency, and each is a
-consumer of the Requirement 15 inventory:
+**Depended on by** — every PRD below declares this one a dependency, and each compiles
+against the Requirement 15 schema and the Requirement 24 providers:
 
-- Wave 1: `P1-04-persistence.md` (stores the selected theme UUID),
-  `P1-05-theme-guard-test.md` (enforces Requirement 25), `P1-07-entitlements.md` (attaches
-  entitlement to a theme UUID from outside the theme file).
-- Wave 2: `P2-02-audio.md` (plays the sound slots), `P2-03-haptics.md` (relies on
-  Requirement 29), `P2-04-animations.md` (plays the animation slots).
+- Wave 1: `P1-04-persistence.md`, `P1-05-theme-guard-test.md`, `P1-07-entitlements.md`.
+- Wave 2: `P2-02-audio.md`, `P2-03-haptics.md`, `P2-04-animations.md`.
 - Wave 3: `P3-01-board-rendering.md`, `P3-03-scoreboard-turn-indicator.md`,
   `P3-04-game-over-rematch.md`, `P3-05-how-to-play.md`.
-- Wave 4: `P4-01-main-menu.md`, `P4-02-open-games-list.md`, `P4-03-theme-selection.md`,
-  `P4-04-settings.md`, `P4-05-purchase-flow.md`.
-- Wave 5: `P5-01-classic-theme.md` (authors the second theme against this schema),
-  `P5-02-asset-generation-replicate.md` (produces the files these slots name).
+- Wave 4: `P4-01-main-menu.md`, `P4-02-open-games-list.md` (the delete flow: `icons.trash`
+  and `surfaces.destructive`), `P4-03-theme-selection.md`, `P4-04-settings.md` (its **four**
+  toggles), `P4-05-purchase-flow.md`.
+- Wave 5: `P5-01-classic-theme.md`, `P5-02-asset-generation-replicate.md`.
 
-This PRD defines the **slots**; those define the behavior.
+This PRD defines the **schema, the base theme and the accessor**; those define the behavior.
 
 ---
 
@@ -46,646 +49,648 @@ This PRD defines the **slots**; those define the behavior.
 There is no application code yet, and the one constraint the design docs say is expensive
 to retrofit is the theme system: *"All of our code operates off of the theme. No code
 should be operating independently from the selected theme"* (`Theming.md` → Architectural
-Rule; repeated in `Tech Design.md` → The theme system is the main architectural risk).
-Any screen built before the theme layer exists will hardcode a color, a font, a mark, a
-sound or a duration, and every one of those is a file that has to be touched again later.
+Rule).
 
 The failure mode is not hypothetical. `Theming.md` → Decisions → *What the theme's slots
 are derived from* records that the original six-category list *"was written before the
-screens existed"* and *"omits board geometry and sizing, corner radii, the type scale, and
-opacities, and it has no slot for any modal, sheet, settings card, open-game row, badge, or
-the main-menu logo — so four PRDs were left unbuildable under the 'no hardcoded values'
-rule."* A slot list shorter than what the screens consume does not produce a smaller theme
-system; it produces screens that quietly hardcode the difference.
+screens existed"* and omitted board geometry, radii, the type scale, opacities and every
+surface — *"so four PRDs were left unbuildable under the 'no hardcoded values' rule."*
 
-There is also no runtime home for the Neon definition. Neon exists as an approved,
-machine-readable file in the handoff bundle, but nothing in the app can load it, merge a
-partial theme over it, or hand its values to a widget.
+A second failure mode is specific to this PRD, and it has two levels. Seventeen PRDs read
+values from this layer, and none can name a key until this one does. **One level up, the
+same thing happens to the accessor itself:** "readable through Riverpod" admits both
+`ref.read(activeThemeProvider)` and a `ThemeExtension` reached through `Theme.of(context)`,
+and those do not compile together. Requirement 15 closes the first level; Requirement 24 the
+second.
+
+A third is subtler and has bitten three times: **a missing key does not fail loudly.** A
+consumer with nowhere to read from either writes a literal — which the guard catches — or
+binds to the nearest existing key, which it does not. And when a component needs **N**
+variants and is handed one style object, it does the third thing: a hardcoded switch among
+style objects, which is bare Dart and invisible to the guard entirely.
+
+**Not every gap is the same weight, and the difference decides priority.** An unauthored
+*value* is debt: a control rendered with a plain fill is ugly but legal, and it ships.
+A missing *glyph* is a deadlock: with no slot to read and no permitted literal, there is no
+legal way to draw the thing at all. `icons.trash` was the second instance of that class
+after `padding`, which is why it is `required` in the same pass that reported it — see
+Appendix A.2, which states the triage rule this produced.
 
 ## Goal
 
-The app ships a theme layer in which a theme is a **data file, not code**: YAML, bundled
-with the app, identified by a UUID, materialized once at startup by merging over a
-complete Neon base, and readable from anywhere in the widget tree. Neon is authored in
-full — every slot in the inventory defined, no gaps — because it is the floor with no
-fallback. Every visual, audio and motion value any screen in this project consumes has a
-named slot on that object, so that adding a theme later requires adding a theme file and
-changing no game, board or menu code.
+The app ships a theme layer in which a theme is a **data file, not code**: YAML, dropped into
+`assets/themes/`, discovered by a folder scan, identified and described by its own contents,
+materialized once at startup by deep-merging over a complete Neon base, and reachable from
+anywhere through one named provider. The schema is published with key paths and value shapes,
+and is bounded to what the guard can actually enforce. `assets/themes/neon.yaml` holds every
+value the approved design defines, plus the short list the design settled without drawing.
 
 ## Requirements
 
 ### Themes as data
 
-1. A theme is **data loaded at runtime, not a Dart class compiled into the app** — "a
-   universal, theme-like object that can be loaded in."
+1. A theme is **data loaded at runtime, not a Dart class compiled into the app**.
    *(`Tech Design.md` → Decisions → Theme representation — data, not code)*
 2. The on-disk format for theme files is **YAML**.
    *(`Tech Design.md` → Decisions → What format are theme files — JSON or YAML?)*
 3. Theme files are **bundled/shipped with the app**, living in `assets/themes/*.yaml`.
-   They are not user-uploaded, not user-authored and not downloaded from a server.
-   *(`Theming.md` → Where Themes Live; `Tech Design.md` → Decisions → Project structure —
-   layer-first)*
+   *(`Theming.md` → Where Themes Live; `Tech Design.md` → Decisions → Project structure)*
 4. **Each theme carries a UUID in its YAML file, and that UUID is the theme's identity.**
-   Nothing downstream identifies a theme by name — renaming a theme must not change which
-   theme it is.
+   Schema key: `meta.id`.
    *(`Tech Design.md` → Decisions → Theme identity — UUID)*
-5. The theme layer lives at `lib/theme/`, with `theme.dart` holding the merged theme
-   object and `loader.dart` holding YAML → theme.
+5. The theme layer lives at `lib/theme/`: `theme.dart`, `loader.dart`, `catalog.dart`,
+   `theme_providers.dart` (Requirement 24) and `required_keys.dart` (Requirement 11).
    *(`Tech Design.md` → Decisions → Project structure — layer-first)*
 
 ### Inheritance and materialization
 
-6. **Neon is the base theme.** Anything a theme does not define comes from Neon — colors,
-   art style, sound effects, animations, "the whole nine yards."
+6. **Neon is the base theme.** Anything a theme does not define comes from Neon.
    *(`Theming.md` → Neon Is the Base Theme)*
-7. **Inheritance depth is exactly one level.** A theme inherits from Neon, full stop. No
-   chains, no theme inheriting from another theme.
-   *(`Theming.md` → Inheritance Depth; corroborated by
-   `design_handoff_game_ui/themes.catalog.json` → `inheritanceDepth: 1`)*
-8. Fallback is implemented as a **merge, not a per-lookup resolve**: each theme is
-   materialized into a complete theme **at startup** by merging its overrides over Neon,
-   so at runtime every lookup hits a complete theme and there is no fallback step.
-   *(`Tech Design.md` → Decisions → Fallback to Neon — merge, not resolve; `Theming.md` →
-   Why this matters for the build)*
-9. A theme file may define **only** what it wants to be different; a theme that overrides
-   two colors and nothing else must still materialize into a complete, working theme.
-   *(`Theming.md` → Neon Is the Base Theme → How it works, Why this matters for the
-   build)*
-10. Animations and sounds merge by the same rule as every other value — a theme starts
-    from Neon's complete set and its own definitions merge over the top, overriding only
-    what it names.
+7. **Inheritance depth is exactly one level.**
+   *(`Theming.md` → Inheritance Depth; `themes.catalog.json` → `inheritanceDepth: 1`)*
+8. **Deep merge, null = clear.** Each theme is materialized into a complete theme **at
+   startup** by merging its overrides over Neon, so at runtime every lookup hits a complete
+   theme and there is no fallback step. Three cases:
+
+   | Case | Result |
+   |---|---|
+   | **Key absent** from the overriding theme | inherit Neon's value |
+   | **Key present with a value** | that value wins |
+   | **Key present and explicitly null** | the value is **cleared**, not inherited |
+
+   And the merge is **deep**: *"a theme naming one key inside a section keeps Neon's other
+   keys in that section rather than replacing the whole section. Nested maps merge
+   recursively."*
+   *(`Theming.md` → Decisions → How a theme merges over Neon; `Tech Design.md` → Decisions
+   → Fallback to Neon — merge, not resolve)*
+   **Consequence:** Neon ships `sound.music` as an explicit `null` — a deliberate clear, not
+   an unfilled slot; Requirement 11's check treats it as defined.
+   **A list is a leaf.** A theme naming a list **replaces it whole**. *PRD-author judgment:
+   there is no stable identity for "the second keyframe."*
+   **`meta` does not merge.** `meta.id`, `meta.name` and `meta.blurb` are never inherited.
+   **Testable:** a theme overriding `color.ground` alone materializes with all 42 other
+   `color.*` keys at Neon's values; `sound.buttonTap: null` yields no button-tap sound; a
+   theme overriding `surfaces.legend.swatchStyle.locked` alone keeps Neon's other five;
+   a theme omitting `meta.name` fails to load rather than inheriting `"Neon"`.
+9. A theme file may define **only** what it wants to be different — beyond `meta` — and must
+   still materialize complete.
+10. Animations and sounds merge by the same rule as every other value.
     *(`Animations.md` → Decisions → Do themes inherit Neon's animations?; `Theming.md` →
     Sound Decisions → Sound falls back to Neon)*
 
 ### The Neon base theme
 
-11. **Neon must define every slot in the Requirement 15 inventory** — it is the one theme
-    with nothing to fall back to, and a gap in Neon is the one failure the system cannot
-    absorb.
-    *(`Theming.md` → Neon Is the Base Theme → How it works; Why this matters for the
-    build; What happens if a theme fails to load)*
-    **Testable:** Requirement 15's inventory is the checklist. Every slot it names resolves
-    to a value in Neon's materialized theme, and that is a test rather than a reading of
-    the file.
-12. **Where `neon.theme.json` defines a value, that value is authoritative and is not
-    re-decided here** — its `color`, `marks`, `type`, `radius` and `board` sections are
-    final and exact, and the handoff's *Design tokens* tables are the human-readable form
-    of the same values.
-    *(`design_handoff_game_ui/README.md` → Fidelity, Design tokens; `Theming.md` → Theme
-    Catalog → Neon as drawn)*
-13. **`neon.theme.json` does not cover the whole of Requirement 15's inventory, and the
-    difference is not this PRD's to invent.** `Theming.md` → Open Questions names part of
-    the gap directly: the approved file *"has no pending-move highlight values at all — no
-    pending colour, no pending cell ring, no destination ring"*, and *"the same gap covers
-    the grid-line opacity and glow, the claimed and cat-game mark glows, and the cat-game
-    caption style"*, alongside *"any modal or sheet surface, a gradient background, a logo,
-    or a theme's own display name and description."*
-    Requirements 11 and 12 are both binding and do not conflict: 12 fixes what is already
-    drawn, 11 fixes what Neon must end up holding, and closing the difference is an open
-    question carried below rather than a value chosen here.
-    *(`Theming.md` → Open Questions, second and third bullets;
-    `design_handoff_game_ui/README.md` → Cell states and screen 2d, which draw the pending
-    values the JSON omits)*
+11. **Neon defines every key the Requirement 15 schema marks `required`** — whether that
+    value is transcribed from the handoff or authored (Requirement 13).
+    *(`Theming.md` → Neon Is the Base Theme; → Decisions → Closing Neon's value gaps)*
+    **Testable — runnable form:** `lib/theme/required_keys.dart`, a flat
+    `const List<String>` of every `required` key path. One test iterates it and asserts each
+    resolves in Neon's materialized theme, **counting an explicit null as defined**. A second
+    asserts list and schema agree.
+12. **`assets/themes/neon.yaml` is the authoritative Neon definition.** `neon.theme.json`
+    stays as it is and is a **reference**: *"the two can drift, and the YAML is authoritative
+    where they differ."* **Do not "correct" the YAML back toward the JSON** — the JSON now
+    carries three spacing keys the schema no longer has.
+    *(`Theming.md` → Decisions → Closing Neon's value gaps)*
+13. **What `assets/themes/neon.yaml` must contain — and the two ways a value gets there.**
 
-    **The theme-selection overlay's values extend that gap, and are recorded here because
-    the design doc's list does not reach them.** Requirement 15 names a badge slot, and
-    Neon holds no value for it. This case deserves naming separately because the nearest
-    existing Neon keys are **near-misses**: an implementer who reaches for one is not
-    hardcoding anything, so `P1-05-theme-guard-test.md` cannot catch it — the screen is
-    simply drawn from the wrong slot, four points of alpha or half a point of type away
-    from the approved design.
-    *(Values drawn in `design_handoff_game_ui/README.md` → 2a and
-    `themes.catalog.json` → `ownershipStates`, `activeBadge`; consumed by
-    `P4-03-theme-selection.md` reqs 8, 10, 13. Neon's nearest keys from `neon.theme.json`.)*
+    **(a) Transcribed — the large majority.** Every value the approved design draws *that the
+    schema still carries*, copied faithfully. Two read-only sources, neither edited:
 
-    - The **`OWNED` badge** is drawn `rgba(45,255,158,0.16)`; Neon's nearest key is
-      `color.playerTwoTint` at `rgba(45,255,158,0.12)` — four points of alpha apart, and a
-      player token rather than a badge one.
-    - The **active row's ring** is drawn `0 0 0 2px #4fc3ff` with glow
-      `rgba(79,195,255,0.30)`; `#4fc3ff` is Neon's `color.boardLine`, and its nearest glow
-      `color.boardLineGlow` is `rgba(79,195,255,0.90)`.
-    - The **price button** is drawn at **radius 11**, which is absent from Neon's radius
-      set — `{3, 9, 10, 12, 13, 14, 20, 999}`.
-    - **Badge tags** are drawn at 9.5pt with 0.1em tracking; `type.scale.chipLabel` is 9
-      with 0.1.
+    | Source | What comes from it |
+    |---|---|
+    | `neon.theme.json` | `id`, and every key in `color`, `marks`, `type`, `radius`, `sound`; the `board` keys the schema retains; and `animation`'s durations, easings and loop flags |
+    | `README.md` and `themes.catalog.json` | everything drawn in the token tables, board sections and screens `1a`–`2d` that the JSON does not carry — the pending-move colour and its rings, grid-line opacity and glow, the claimed and cat-game glows, the cat caption, the modal and sheet surfaces, the scrims, the settings card, the game rows and chips, the theme rows and badges, the menu, the buttons, the input field, the legend typography and its six swatches, the free-choice cue, the scoreboard chips, the five drawn chrome icons, and Neon's `name` and `blurb` |
 
-    And these, for which Requirement 15's inventory names no slot at all:
+    **No value is invented, altered or rounded.** Composites are restructured per
+    Requirement 35 and motion re-expressed per Requirement 18.
 
-    - The **theme-row surface** — its fill, radius and padding. This is a different surface
-      from the open-game row Requirement 15 already covers for
-      `P4-02-open-games-list.md`, and is drawn differently.
-    - The **locked row's preview tile at 45% opacity**
-      (`themes.catalog.json` → `ownershipStates.locked.rowTreatment`).
-    - The **behind-menu dim at 35%**, which is distinct from the scrim drawn over it: Neon
-      has `color.scrim` at 0.62 and `color.scrimHeavy` at 0.72, and neither is this value.
-    - The **sheet header's type** — a 20/600 title over 11.5pt sub-copy. Neither size is in
-      `type.scale`, whose nearest entries are `subhead` 22/600 and `caption` 11.
+    **(b) Authored — a short, named list.** Some `required` keys have **no drawn source at
+    all**: the design settled the affordance without the handoff ever drawing it. These are
+    still `required`, and this is the exhaustive list:
 
-    **The settings card's own radius is a near-miss of the same kind**, and the clearest
-    illustration of why this list exists: three of that card's four drawn values resolve
-    cleanly to Neon keys and the fourth does not, so an implementer gets the fill and the
-    border right and the corner wrong, with nothing failing.
-    *(`design_handoff_game_ui/README.md` → 2b — "The four toggles live in one grouped card:
-    `#1e2131`, radius 16, padding `6/16`, `0 0 0 1px #2b2f42`"; `neon.theme.json` →
-    `radius`, `color`; consumed by `P4-04-settings.md` reqs 6 and 16, and provisioned as
-    the settings-card slot in Requirement 15.)*
+    | Key | Why there is nothing to copy | Settled by |
+    |---|---|---|
+    | `icons.trash.*` | Handoff `1b` predates the delete decision; no trash glyph is drawn anywhere | `Menus and UI.md` → How does a player delete an open game? |
+    | `surfaces.destructive.*` | Same drawing, same gap — the revealed control's panel and the modal's Yes button | as above |
+    | `animation.<moment>.tracks[].keyframes[].value` | The handoff gives durations, easings and loop flags but never says *how far* | `Animations.md` → Themes describe their animations |
 
-    - The card is drawn at **radius 16**, absent from Neon's radius set —
-      `{3, 9, 10, 12, 13, 14, 20, 999}`. The plausible wrong answers are its two nearest
-      keys, `radius.buttonLarge` at 14 and `radius.modal` at 20. Its fill `#1e2131` and its
-      border `#2b2f42` *do* resolve, to `color.surfaceRaised` and `color.hairline`.
+    **Everything else `required` is transcribed.**
+    **`icons.trash` is the urgent one, and not for aesthetic reasons.** The other two are
+    debt: an unauthored colour still renders, and a theme with plain values ships. A missing
+    glyph is a **deadlock** — `P1-05`'s icon-constant rule covers the whole scan root against
+    a zero baseline, so `Icons.delete` in `lib/ui/menus/` fails the build, and with no slot
+    there is no legal alternative. Authoring a Phosphor `trash` reference costs one line;
+    leaving it costs `P4-02` its delete flow entirely. Appendix A.2 generalises this into the
+    rule for triaging any future `deferred` call.
 
-    **The settings surface's purchases section adds three more, on the same terms** —
-    values a screen is required to read from the theme, with no Neon definition and, until
-    now, nothing recording them as missing. This is the sharper form of the same trap,
-    because **no approved screen draws this section at all**: handoff `2b` predates the
-    Decision that put it there, so an implementer has neither a Neon key nor a drawing to
-    work from, and every nearby key belongs to a different surface.
-    *(`Menus and UI.md` → Decisions → Where the open-game slot unlock is sold; consumed by
-    `P4-04-settings.md` reqs 20 and 22, under its req 16, which forbids hardcoding styling
-    on that surface.)*
+    **Still `deferred`:**
 
-    - The **section grouping** that separates the purchases items from the three toggle
-      rows inside the same settings card. Neon's nearest keys — `color.surfaceRaised` and
-      `color.hairline` — describe the card itself, not a division within it.
-    - The **price row** — product name, price display, and the affordance that initiates
-      the purchase. The only price affordance drawn anywhere is the theme overlay's locked
-      row (`themes.catalog.json` → `ownershipStates.locked.buttonStyle`: accent outline 2px
-      `#9184d9`, radius 11) — a different surface selling a different product.
-    - The **restore control**. The only restore control drawn anywhere is the theme
-      overlay's footer link on `2a` — 11.5pt `#595d6c`, a size absent from `type.scale` and
-      a color equal to `color.textFaint` — and that is again a different surface.
+    | Key | Why |
+    |---|---|
+    | `surfaces.settingsCard.purchases.*` | Nothing drawn, and no Decision describes what the section *is* — *Blocking* item 7 |
+    | Music beyond `sound.music`'s placeholder null | A theme supplies its music, but the key's final **shape** is open — *Blocking* item 1 |
 
-    **A judgment this PRD makes rather than assumes: the settings price row is a *distinct*
-    slot from the theme overlay's price action, not the same slot reused.** The two sit in
-    different containers (a row inside a grouped full-screen card versus a control inside a
-    bottom-sheet list row), sell different products (open-game slots versus a theme), and
-    only one of them carries a padlock and a dimmed preview tile beside it. The asymmetry
-    settles it: if the two should look identical, a theme can author both slots to the same
-    values — but if they are collapsed into one slot and should differ, no theme can pull
-    them apart. This is a PRD-author call, not a decision in any design doc; it is
-    reversible, and it deserves a sentence in `Theming.md` either way.
-
-    As with the rest of this requirement, these are recorded as gaps between the inventory
-    and the approved asset. **Closing them is not this PRD's to invent** — see Open
-    Questions.
+    **Testable:** every leaf in `neon.yaml` traces to a source in (a) or appears in (b)'s
+    table, and Requirement 11's manifest resolves completely.
 14. Neon's UUID is `b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40`, and Neon is both the base theme
-    and the default active theme — what a player sees before they have ever opened theme
-    selection.
-    *(`neon.theme.json` → `id`; `design_handoff_game_ui/themes.catalog.json` →
-    `baseThemeId`, `defaultThemeId`; `Menus and UI.md` → Decisions → Which theme is active
-    by default?)*
+    and the default active theme.
+    *(`neon.theme.json` → `id`; `themes.catalog.json` → `baseThemeId`, `defaultThemeId`;
+    `Menus and UI.md` → Decisions → Which theme is active by default?)*
 
-### The slot inventory
+### Requirement 15 — the schema
 
-15. **The theme object carries every slot below.** This is an enumeration, not an
-    illustration: each entry is a value some screen in this project is required to read
-    from the theme, and a theme layer missing any one of them forces the consuming PRD to
-    hardcode it. The list is **not closed** — the governing rule is that *"the theme's slot
-    list is derived from what the screens actually consume,"* so a new screen adds slots —
-    but nothing on this list is optional.
-    *(`Theming.md` → Architectural Rule, as rewritten; → What a Theme Controls → Visual,
-    Audio, Animation; → Decisions → What the theme's slots are derived from. Per-slot
-    consumers cited inline.)*
-    **Testable:** every concrete value quoted in a consumer PRD resolves to a slot named
-    here; no consumer PRD needs a value this inventory cannot supply.
+15. **This is the theme schema. Every key a consumer reads is named here, with its value
+    shape and its status.** Naming a key does not decide its value.
 
-    **Board and geometry**
-    - Page/board background, **gradient-capable** — the main menu's ground is a radial
-      gradient, so one flat color is not sufficient.
-      *(`Theming.md` → "Page background — gradient-capable"; `P4-01-main-menu.md` req 13)*
-    - Big-board and small-board grid lines — color, thickness, style, **and the drawn
-      line's opacity and glow**. *(`P3-01-board-rendering.md` reqs 5–7)*
-    - **Board geometry:** outer gap, quadrant padding, inner gap, grid-line width,
-      grid-line inset. *(`Theming.md` → "Board geometry and sizing";
-      `P3-01-board-rendering.md` reqs 3, 5, 28; `neon.theme.json` → `board`)*
-    - Quadrant fill, quadrant border and its open-state variant, and the forced-ring and
-      last-move-ring treatments. *(`P3-01-board-rendering.md` reqs 6, 8, 9, 19)*
-    - **Veil opacities as individually addressable values** — locked, claimed, cat-game.
-      The locked veil is deliberately weaker than the other two, so one shared opacity will
-      not do. *(`Theming.md` → "Opacities — the locked, claimed and cat-game veils";
-      `P3-01-board-rendering.md` reqs 10–13)*
-    - **Corner radii:** cell, quadrant, chip, control, button, buttonLarge, modal, pill.
-      *(`Theming.md` → "Corner radii"; `P3-01-board-rendering.md` req 28;
-      `P3-04-game-over-rematch.md` req 13; `P4-01-main-menu.md` req 13; `neon.theme.json` →
-      `radius`)*
+    **Status:** `required` — Neon must hold a value; transcribed unless Requirement 13(b)
+    lists it as authored. `deferred` — in the contract, nothing drawn and nothing settled.
+    `undecided` — **do not implement**, pending *Blocking*.
 
-    **Marks**
-    - The player marks themselves (Requirement 16).
-    - **Mark sizes**, separately per context: the in-cell mark, the claimed-quadrant P1
-      mark, the claimed-quadrant P2 mark and the cat-game glyph — four distinct sizes, not
-      one. *(`Theming.md` → "Board geometry and sizing — … mark sizes";
-      `P3-01-board-rendering.md` reqs 11, 12, 16; `neon.theme.json` → `type.scale.mark`,
-      `markClaimX`, `markClaimO`, `markCat`)*
-    - The claimed-mark and cat-mark **glows**. *(`P3-01-board-rendering.md` reqs 11, 12;
-      named as a Neon gap in `Theming.md` → Open Questions)*
-    - The cat-game **`CAT` caption's type and color**.
-      *(`P3-01-board-rendering.md` req 12)*
+    Shapes: `color` = `#rrggbb` or `rgba(r,g,b,a)`; `dp` = logical pixels; `ms` = integer
+    milliseconds; `assetPath` = a path under `assets/`, or null; `ref` = a `type.scale` style
+    name.
 
-    **The three highlights** — separately addressable per Requirement 20: last-move,
-    active-quadrant (both its forced and its open treatment), locked/inactive, and the
-    pending-move preview's **two** halves, the selected cell and the destination quadrant.
-    Claimed-quadrant and cat-game quadrant styling likewise.
-    *(`Theming.md` → What a Theme Controls → Visual; `P3-01-board-rendering.md` reqs 19,
-    21, 23, 29)*
+    #### The boundary: what a theme does *not* control
 
-    **Surfaces and chrome**
-    - **Modal surface** — card fill, border, radius, and a **winner-colored border**
-      variant. This also carries Requirement 27's own failure modal.
-      *(`Theming.md` → "Modals — winner, draw"; `P3-04-game-over-rematch.md` reqs 10, 13)*
-    - **Sheet surface** — used by the theme-select overlay, the in-game quick-actions sheet
-      and the name prompt, including its **header and close control**.
-      *(`Theming.md` → "Sheets — theme select, in-game quick actions";
-      `P4-03-theme-selection.md` reqs 1, 3; `P4-04-settings.md` req 3;
-      `P4-02-open-games-list.md` req 8)*
-    - **Scrim** — the approved screens draw four distinct scrim values, so this is a set of
-      addressable values rather than one constant.
-      *(`P3-04-game-over-rematch.md` req 13; `P4-03-theme-selection.md` req 1;
-      `P4-02-open-games-list.md` req 18)*
-    - **Settings card** — card fill, border and radius, the toggle row, its sub-label, and
-      the switch's **track and knob in both on and off states**. Neon has no value for the
-      drawn radius — see Requirement 13.
-      *(`Theming.md` → "The settings card"; `P4-04-settings.md` reqs 6, 16)*
-    - **The settings surface's purchases section** — three further slots, because the
-      Settings screen now carries more than the three toggles:
-      - a **section grouping** that separates the purchases items from the toggle rows
-        inside the same card;
-      - a **price row** — the product's name, its price display, and the affordance that
-        initiates the purchase;
-      - a **restore control** — a text link or secondary action, **visually distinct from
-        both the toggle rows and the price row**.
+    **Spacing and padding are fixed in code, not themed**, because the guard cannot catch a
+    hardcoded gap — a padding section would have been *"a rule that nothing verifies."*
+    *(`Theming.md` → Decisions → Does a theme control spacing and padding?)*
 
-      Neon holds no value for any of the three and no approved screen draws them — see
-      Requirement 13, which also records this PRD's call that the price row is a distinct
-      slot from the theme overlay's price action rather than the same slot reused.
-      *(`Menus and UI.md` → Decisions → Where the open-game slot unlock is sold — "The
-      Settings screen gains a purchases section holding the $4.99 open-game-slot unlock and
-      a global **Restore purchases** control"; `P4-04-settings.md` reqs 20 and 22, under
-      its req 16, which forbids hardcoding styling on that surface.)*
-    - **Open-game rows and their chips** — row fill, row title type, the three score chips
-      including their active and inactive states, and the chevron.
-      *(`Theming.md` → "Open-game rows and their chips"; `P4-02-open-games-list.md` reqs 4,
-      17, 18)*
-    - **Badges** — `FREE`, `OWNED`, `ACTIVE`, and the price action's treatment. The badge
-      *styling* is a theme slot; which badge a row gets is entitlement state and is not
-      (Requirement 31). Neon holds no value for any of them — see Requirement 13.
-      *(`Theming.md` → "Badges"; `P4-03-theme-selection.md` reqs 8, 10, 13)*
-    - **Turn indicator and scoreboard styling**, including the active player's tinted chip.
-      *(`Theming.md` → What a Theme Controls → Visual;
-      `P3-03-scoreboard-turn-indicator.md`)*
-    - **Main menu styling** — background, title/wordmark/kicker treatment, and a **logo
-      slot**. *(`Theming.md` → "Main menu styling", "The main-menu logo";
-      `P4-01-main-menu.md` reqs 7, 8, 10, 13)*
-    - **Two button tiers, not one** — a large primary (Play Game, Theme) and a secondary
-      (Settings), plus the prompt's primary/secondary pair. A single "button look" slot is
-      satisfied by one style and would force the second to be hardcoded.
-      *(`P4-01-main-menu.md` reqs 4, 6; `P4-02-open-games-list.md` req 12)*
-    - **Text input field** — fill, radius, focused border, caret and counter, for the
-      opponent-name prompt. *(`P4-02-open-games-list.md` reqs 8, 9, 17)*
-    - **Destructive-action styling** for deleting an open game.
-      *(`P4-02-open-games-list.md` req 7)*
-    - **Legend and hint typography and their text colors** — three distinct text colors are
-      drawn. *(`P3-05-how-to-play.md` reqs 17, 18, whose own open question names this gap)*
+    | Fixed in code | Still themed |
+    |---|---|
+    | outer gap, quadrant padding, inner gap | grid-line width, grid-line inset, mark sizes |
 
-    **Type**
-    - **The type scale** — display, title, heading, subhead, body, label, caption,
-      chipLabel and chipValue, each with size and weight, and where drawn tracking and
-      line-height. This is a different axis from Requirement 19's typeface: a theme that
-      picks a font has not thereby picked sizes.
-      *(`Theming.md` → "The type scale — sizes and weights, distinct from a theme's choice
-      of font"; `neon.theme.json` → `type.scale`)*
+    **Stated in its own terms:** a theme controls **the drawn geometry of a thing itself** —
+    stroke width, glyph size, corner radius, glow spread. Code controls **where things sit
+    relative to one another**. Classify a new key with that sentence, not by looking for the
+    word "padding."
 
-    **Audio** — Requirement 17. **Animation** — Requirement 18.
+    #### `meta` — all **required**, and never inherited (Requirement 8)
 
-16. **Marks are asset slots on the theme, not shapes drawn in board code** — a theme
-    supplies its mark art as an **image or an icon**, and marks are not locked to X and O.
-    The slot must also carry what Neon's approved definition actually authors: a `kind`, a
-    `value`, and a **per-mark font and weight** distinct from the theme's `type.family`.
-    Neon's ✕, ○ and Ø are Neon's choice of art, not a constraint on the system.
-    *(`Tech Design.md` → Decisions → Marks — image or icon, supplied by the theme;
-    `Theming.md` → Decisions → Marks beyond X and O; `neon.theme.json` → `marks`, which
-    authors `{"kind": "glyph", "value": "✕", "font": "Inter", "weight": 600}`;
-    `P3-01-board-rendering.md` req 17)*
-    The docs name two kinds and Neon authors a third — see Open Questions.
-17. **The theme object carries audio slots for the five moments the game makes a sound** —
-    placing a mark, winning a small board / claiming a quadrant, cat game, winning the
-    whole game, and button taps / menu navigation — plus **two further keys in the same map
-    that are not playable moments**:
-    - **`music`**, a background-music slot that is part of the shape but **unused in this
-      version**. One-shot sound effects only, and the audio structure must not make adding
-      a music layer painful later.
-    - **`signature`**, which is **descriptive metadata naming the theme's sonic character —
-      Neon's value is the word `"buzz"` — never an asset and never played.**
+    | Key path | Shape | Notes |
+    |---|---|---|
+    | `meta.id` | UUID string | the theme's identity |
+    | `meta.schemaVersion` | integer — **8** | Requirement 37 |
+    | `meta.name` | string | the display name. `P4-03` req 6 renders it |
+    | `meta.blurb` | string | the one-line description. `P4-03` req 6 renders it |
 
-    Seven keys, five of them playable. The distinction is part of the slot definition, not
-    an implementation detail downstream: a consumer must not treat this map as an iterable
-    list of sounds.
-    *(`Theming.md` → What a Theme Controls → Audio, which lists exactly those five moments
-    plus background music; → Sound Decisions → One-shot sound effects only, for now; →
-    Theme Catalog → Theme 1 — Neon → Signature sound; `neon.theme.json` → `sound`, whose
-    `signature` is `"buzz"` and whose `music` is `null`. Consumed by `P2-02-audio.md`
-    reqs 6, 7, 14 and 15 — its req 7 is the one that forbids implementing the audio layer
-    by iterating `sound.*`.)*
-18. The theme object carries **animation** slots, and each animation carries **its own
-    duration** — speed is specified in the animation, not globally, so a theme controls
-    its own pacing. The animated moments named are placing a marker, claiming a quadrant,
-    cat game, winning the game, and the active-quadrant and last-move highlights.
-    *(`Animations.md` → Decisions → Duration lives in the animation; Where Animations
-    Fire; `neon.theme.json` → `animation`; consumed by `P2-04-animations.md`)*
-19. **A theme supplies its own font**, and the theme object needs somewhere to put one.
-    Inter 400/500/600 is bundled as **Neon's font choice, not an app-wide font constant** —
-    a font is a themeable value like any other. This is what keeps Requirement 25 whole:
-    fonts are named in the slot inventory, so an app-wide font constant would be an
-    exception carved into the rule rather than a value the theme owns.
-    *(`Theming.md` → Decisions → Does a theme supply its own font; `Tech Design.md` →
-    Decisions → Do themes pick their own font?; `design_handoff_game_ui/README.md` →
-    Assets → Fonts)*
-20. The last-move highlight, the active-quadrant highlight and the pending-move preview
-    are **separately addressable slots**, because all three can be on screen at once and
-    must be visually distinguishable.
-    *(`Game Board Design.md` → Three highlights on screen at once; The Two Highlights
-    Together; `design_handoff_game_ui/README.md` → Cell states;
-    `P3-01-board-rendering.md` req 29)*
-21. The schema must let a theme distinguish things by **more than colour** — shape, icon,
-    outline, pattern — because whether anything is distinguished by colour alone is
-    "handled per theme," not a system-wide rule.
-    *(`Theming.md` → Decisions → Is anything distinguished by colour alone?)*
+    #### `color` — 43 keys, all **required**
+
+    | Group | Key paths |
+    |---|---|
+    | Grounds and surfaces | `ground`, `groundDeep`, `groundLift`, `surface`, `surfaceRaised`, `surfaceSunken`, `hairline`, `hairlineStrong` |
+    | Text | `text`, `textMuted`, `textSubtle`, `textDim`, `textFaint` |
+    | Board | `boardLine`, `boardLineGlow`, `quadrantBorder`, `quadrantBorderOpen`, `quadrantFill` |
+    | Player one | `playerOne`, `playerOneMark`, `playerOneGlow`, `playerOneTint`, `playerOneOnTint` |
+    | Player two | `playerTwo`, `playerTwoMark`, `playerTwoGlow`, `playerTwoTint`, `playerTwoOnTint` |
+    | Highlights | `highlightForced`, `highlightForcedGlow`, `highlightLastMove`, `highlightLastMoveGlow`, `highlightPending` |
+    | Accent | `accent`, `accentLight`, `accentSoft` |
+    | Cat game | `catGame`, `catGameGlow` |
+    | Veils and scrims | `veilLocked`, `veilClaimed`, `veilCat`, `scrim`, `scrimHeavy` |
+
+    **`color.*` and `radius.*` are palette tokens, not component tokens.** A component reads
+    its own `surfaces.*` or `icons.*` key, never a palette key that happens to hold the same
+    value.
+
+    #### `marks` — **required**
+
+    `marks.{playerOne,playerTwo,catGame}.{kind,value,font,weight}`, where `kind` is
+    `glyph | icon | image` (see *Blocking*) and `font`/`weight` are **per-mark**.
+
+    #### `icons` — glyphs, all **required**
+
+    | Key path | Shape |
+    |---|---|
+    | `icons.<slot>.kind` | `iconSet` \| `image` |
+    | `icons.<slot>.set` | string — e.g. `phosphor`; required when `kind: iconSet` |
+    | `icons.<slot>.name` | string — the glyph name in that set |
+    | `icons.<slot>.path` | `assetPath` — required when `kind: image` |
+    | `icons.<slot>.tint` | `color` |
+    | `icons.<slot>.size` | `dp` |
+    | `icons.<slot>.button.{fill,radius,size}` | optional per slot — **chrome buttons only** |
+
+    | Slot | Consumer | Source |
+    |---|---|---|
+    | `settings` | `P3-03` req 12 — drawn 44×44 on `1d`/`1e` | transcribed |
+    | `close` | `P4-03` req 3, `P4-04` | transcribed |
+    | `chevronLeft` | the back control on `1b`/`1c` | transcribed |
+    | `chevronRight` | the row chevron on `1b`, `P4-02` | transcribed |
+    | `plus` | the New Game row on `1b`, `P4-02` | transcribed |
+    | **`trash`** | **`P4-02`'s revealed delete control** | **authored** — Req 13(b) |
+
+    **`icons.trash` takes no `button` sub-object.** The other five are chrome sitting on a
+    screen's own background, so each owns its button treatment. The trash is a **revealed row
+    control**: swiping the row exposes a panel behind it, and that panel is
+    `surfaces.destructive.action` — fill and radius — while the row's own height sizes it.
+    Giving the slot a `button` sub-object would put two owners on one surface.
+    **One control, one surface owner:** `icons.trash` carries the glyph, its `tint` and its
+    `size`; `surfaces.destructive.action` carries what is behind it.
+    *(`Menus and UI.md` → Decisions → How does a player delete an open game? — *"The revealed
+    control is a **trash button** — an icon, not a worded 'Delete' label."*)*
+
+    #### `type` — **required**
+
+    `type.family`; `type.weights.{regular,medium,semibold}`; `type.scale.<style>.{size,
+    weight}` with optional `tracking`, `lineHeight`, `uppercase`. `<style>` ∈ `display`,
+    `title`, `heading`, `subhead`, `body`, `label`, `caption`, `chipLabel`, `chipValue`,
+    `mark`, `markClaimX`, `markClaimO`, `markCat`, `sheetTitle`, `sheetSub`, `rowTitle`.
+
+    #### `radius` — **required**, palette tokens
+
+    `cell`, `quadrant`, `chip`, `control`, `button`, `buttonLarge`, `modal`, `pill`, `card`,
+    `row`, `priceAction`. All `dp`.
+
+    #### `board` — **required**
+
+    | Key path | Shape | Source |
+    |---|---|---|
+    | `board.gridLineWidth` | `dp` | JSON — **explicitly themed** by the spacing Decision |
+    | `board.gridLineInsetPercent` | number, percent | JSON — likewise |
+    | `board.quadrantShadow`, `.quadrantShadowOpen` | shadow list (Req 35) | JSON |
+    | `board.forcedRing`, `.lastMoveRing` | ring object (Req 35) | JSON |
+    | `board.gridLineOpacity`, `.gridLineGlow` | number / shadow list | README |
+    | `board.pendingCellRing`, `.pendingQuadrantRing` | ring object | 2d |
+    | `board.pendingGhostOpacity`, `.pendingQuadrantWash` | number / color | 2d |
+    | `board.claimedMarkGlow`, `.catMarkGlow` | shadow list | README |
+    | `board.catCaption.{size,weight,tracking,color}` | `dp` / int / number / color | README |
+
+    `outerGap`, `quadrantPadding` and `innerGap` are **not here** — fixed in code.
+
+    #### `sound` — seven keys, five playable one-shots
+
+    `sound.{placeMark,claimQuadrant,catGame,winGame,buttonTap}` (`assetPath`, **required**,
+    values are prose `"TODO"` today); `sound.signature` (string, **metadata, never played**);
+    `sound.music` (`assetPath` or null — the placeholder, its final shape open per *Blocking*
+    item 1). See Requirement 17.
+
+    #### `animation` — a motion **description**, not a behaviour name
+
+    | Key path | Shape | Status |
+    |---|---|---|
+    | `animation.<moment>.duration` | `ms` | **required** |
+    | `animation.<moment>.repeat.{count,mode}` | integer \| `infinite` / `restart` \| `reverse` | **required** |
+    | `animation.<moment>.tracks` | list of track objects, ≥ 1 | **required** |
+    | `…tracks[].{property,easing}` | closed set (Req 18) / easing string | **required** |
+    | `…tracks[].delay` | `ms` | optional |
+    | `…tracks[].keyframes` | list of ≥ 2 `{at, value}` | **required** |
+    | `…keyframes[].at` | 0.0–1.0, fraction of `duration` | **required** |
+    | `…keyframes[].value` | number, or `color` | **required — authored** |
+    | `…keyframes[].easing` | overrides the track's for the segment ending here | optional |
+
+    `<moment>` ∈ `placeMark`, `claimQuadrant`, `catGame`, `winGame`, `activeQuadrant`,
+    `lastMove`.
+
+    #### `surfaces`
+
+    | Key path | Status | Drawn in / consumer |
+    |---|---|---|
+    | `surfaces.modal.{fill,border,radius,shadow,winnerBorder}` | **required** | `1f`–`1h` / `P3-04` reqs 10, 13; **reused by the delete confirmation** |
+    | `surfaces.sheet.{fill,radius}` | **required** | `1f`, `2a`, `2c` |
+    | `surfaces.sheet.header.{titleStyle,subStyle,closeControl}` | **required** | `2a` / `P4-03` req 3 |
+    | `surfaces.scrim.{modal,settings,themeSelect,namePrompt}` | **required** | `1f`–`1h`, `2a`, `2c` |
+    | `surfaces.settingsCard.{fill,border,radius}` | **required** | `2b` / `P4-04` reqs 6, 16 |
+    | `surfaces.settingsCard.toggleRow.{labelStyle,subLabelStyle}` | **required** | `2b` — four rows, one of them Music |
+    | `surfaces.settingsCard.switch.{trackOn,trackOff,knobOn,knobOff,glowOn}` | **required** | `1f`, `2b` |
+    | `surfaces.settingsCard.purchases.{sectionDivider,priceRow,restoreControl}` | **deferred** | nothing drawn, no Decision on treatment |
+    | `surfaces.gameRow.{fill,radius,titleStyle,timeStyle,chip,chipYouOutline,chevron}` | **required** | `1b` / `P4-02` reqs 4, 17, 18 |
+    | `surfaces.themeRow.{fill,radius,previewTile,activeRing,lockedPreviewOpacity}` | **required** | `2a` / `P4-03` reqs 6, 8, 13 |
+    | `surfaces.badge.{free,owned,active,priceAction}` | **required** | `2a`, `themes.catalog.json` |
+    | `surfaces.menu.{background,kickerStyle,wordmarkStyle,wordmarkGlow,taglineStyle,footerStyle}` | **required** | `1a` / `P4-01` reqs 7, 13 |
+    | `surfaces.menu.logo` | **required** slot; asset is a placeholder | `1a` / art by `P5-02` |
+    | `surfaces.menu.dimBehindOverlay` | **required** | `2a` (35%) |
+    | `surfaces.button.{primary,secondary}` | **required** | `1a`, `2c` / `P4-01` reqs 4, 6 |
+    | `surfaces.input.{fill,radius,focusBorder,caret,valueStyle,labelStyle,counterStyle}` | **required** | `2c` / `P4-02` reqs 8, 9, 17 |
+    | `surfaces.placeholder.{border,radius,glow}` | **required** | `1a`'s logo **and** `1c`'s avatars |
+    | `surfaces.focusRing` | **required** | README → *Interactions & behavior* |
+
+    **Destructive — `required`, authored (Requirement 13(b)), and reshaped in v8.**
+
+    | Key path | Carries |
+    |---|---|
+    | `surfaces.destructive.action.{fill,radius}` | the **panel revealed by swiping a row left**, behind `icons.trash` |
+    | `surfaces.destructive.confirmAccept.{fill,labelStyle,border,radius}` | the modal's **Yes** button |
+
+    **What changed and why.** The action key previously carried `labelStyle` and `icon`. Both
+    are gone: the Decision specifies *"a trash button — an icon, not a worded 'Delete'
+    label,"* so **there is no label to style**, and the glyph now has its own slot. A component
+    key with no reader comes out — the same test `turnBanner` and `turnIndicator` failed.
+    **The modal's other button is not a new key.** Its choices are **Yes and No**: **Yes** is
+    `surfaces.destructive.confirmAccept`, **No** is the existing `surfaces.button.secondary`,
+    and the dialog's chrome is `surfaces.modal` over `surfaces.scrim.modal`.
+    **Authoring brief:** deletion is *"the only irreversible action in the app — it destroys
+    the game and its whole running scoreboard"* and kids are a stated target audience.
+
+    **Legend and how-to-play strip.**
+
+    | Key path | Status | Notes |
+    |---|---|---|
+    | `surfaces.legend.hintStyle` | **required** | the two-tap hint — `1d`, 12/400 |
+    | `surfaces.legend.labelStyle` | **required** | the legend entry's text — `1d`, 10.5/400 |
+    | `surfaces.legend.swatchStyle.<state>` | **required** | **a map keyed by state**, six entries |
+    | `surfaces.legend.ringExplanationStyle` | **required** | `1e`, `2d` |
+    | `surfaces.legend.freeChoiceCueStyle` | **required** | `1d` — 12/400 `#4fc3ff` |
+
+    `<state>` ∈ `open`, `locked`, `catGame`, `lastMove`, `activeQuadrant`, `pending`.
+
+    **Scoreboard chips — per player, because the states are not shared.**
+
+    | Key path | Status | Notes |
+    |---|---|---|
+    | `surfaces.scoreboard.chip.playerOne.active.{fill,border,glow,labelStyle,valueStyle}` | **required** | `1d` |
+    | `surfaces.scoreboard.chip.playerOne.inactive.{fill,border,labelStyle,valueStyle}` | **required** | `1d`/`1e` |
+    | `surfaces.scoreboard.chip.playerTwo.active.{…}` / `.inactive.{…}` | **required** | `1e` |
+    | `surfaces.scoreboard.chip.ties.{fill,border,labelStyle,valueStyle}` | **required** | **No active variant, by design** |
+    | `surfaces.scoreboard.radius` | **required**, `dp` | `1d` |
+
+    #### Not in the schema
+
+    | Section | Why |
+    |---|---|
+    | **spacing and padding** | **Decided against** — the guard cannot verify it. Hedged *"for now"* |
+    | fill patterns / textures | **not supported** — Requirement 21 |
+    | `surfaces.destructive.action.labelStyle` | **removed in v8** — the control is an icon, not a word |
+    | `surfaces.scoreboard.turnBanner` | **removed in v5** — the banner is not built |
+    | `surfaces.scoreboard.turnIndicator` | **removed in v6** — no reader |
+    | `surfaces.deleteDialog.*` | never existed — the confirmation reuses `surfaces.modal` |
+    | a `music.<context>` map | **not yet** — *Blocking* item 1 |
+    | haptics | Never theme-driven — Requirement 29 |
+    | ownership, price | Never in a theme definition — Requirement 31 |
+
+16. **Marks are asset slots on the theme, not shapes drawn in board code.**
+    *(`Tech Design.md` → Decisions → Marks — image or icon; `P3-01` req 17)* Neon authors a
+    third kind, `glyph` — see *Blocking*.
+17. **Five playable one-shot moments, plus `signature` (metadata, never played) and
+    `music`.** A consumer must not treat `sound.*` as an iterable list of playable assets.
+
+    **Music is a theme concern**, per `Theming.md` → Decisions → *Do all four toggles ship,
+    and is music a theme concern?*, which **supersedes** *One-shot sound effects only, for
+    now*. The Decision establishes ownership, not shape: `sound.music` stays the minimal
+    placeholder, no key is added or re-shaped, and the choice is *Blocking* item 1.
+    **Music is not a one-shot** — a one-shot fires and ends; music loops and has a lifecycle —
+    so whatever shape wins, it is never another `SoundMoment`.
+    **Nothing plays it**, but the *setting* has a consumer: `P4-04` ships a fourth toggle
+    controlling it. A confirmed consumer of the setting and none of the asset is why this is
+    `deferred` rather than removed.
+    *(`Theming.md` → What a Theme Controls → Audio; `P2-02` reqs 6, 7.)*
+18. **A theme describes its motion; the runtime interprets the description.** Each moment is
+    a **duration, a repeat rule and a list of tracks**.
+    *(`Animations.md` → Decisions → Themes describe their animations; → Duration lives in the
+    animation)*
+    **The property set is closed**: `scale`, `opacity`, `glowRadius`, `glowColor`,
+    `translateX`, `translateY`, `rotation`. *Blocking item 5 carries the shadowbox finding.*
+
+    | Moment | Was | Becomes | Transcribed | Authored |
+    |---|---|---|---|---|
+    | `placeMark` | `grow-shrink`, 220ms, `cubic-bezier(.34,1.56,.64,1)` | one `scale` track | duration, easing | scale magnitudes |
+    | `claimQuadrant` | `grow-shrink-glow`, 420ms | `scale` + `glowRadius` | duration | both magnitudes |
+    | `catGame` | `shrink-fade`, 300ms | `scale` + `opacity` | duration | scale magnitude |
+    | `winGame` | `glow-pulse`, 900ms | one `glowRadius` track | duration | pulse magnitude |
+    | `activeQuadrant` | `glow-pulse`, 1600ms, `loop` | `glowRadius`, `repeat: {infinite, reverse}` | duration, loop | pulse magnitude |
+    | `lastMove` | as above | as above | duration, loop | pulse magnitude |
+
+    **The interpreter is `P2-04`'s.**
+19. **A theme supplies its own font** — `type.family`. Inter 400/500/600 is bundled as
+    **Neon's font choice, not an app-wide font constant**.
+20. The last-move, active-quadrant and pending-move treatments are **separately addressable
+    keys**; the legend's six swatches are the same rule applied to the strip that explains
+    them.
+21. **The schema supports distinguishing things by shape, icon, outline style and motion —
+    and *not* by fill pattern or texture.** `P5-01` req 12's pattern permission has no
+    backing here.
 
 ### Runtime integration
 
-22. Use Flutter's **`ThemeData` / `ThemeExtension` as far as possible**, filled out from
-    the theme file. The parts Flutter's theming does not support are implemented
-    ourselves.
-    *(`Tech Design.md` → Decisions → Flutter's ThemeData vs our own theme object)*
-23. **Sounds and animations live in the same theme object**, not a parallel structure —
-    Flutter gets what it can take, we handle the rest, all fed from the same file.
-    *(`Tech Design.md` → Decisions → Flutter's ThemeData vs our own theme object)*
-24. The active theme is exposed through **Riverpod** (plain `Notifier`/`NotifierProvider`,
-    no `@riverpod` codegen), and must be readable from **everywhere**, including deep in
-    the board widget tree.
-    *(`Tech Design.md` → Decisions → State management — Riverpod)*
-25. **Architectural Rule.** No hardcoded values anywhere in the code, **across the full
-    slot inventory of Requirement 15** — not only colors, backgrounds, fonts, piece styles,
-    sounds and animations, but board geometry and sizing, corner radii, the type scale,
-    opacities, and every surface: modals, sheets, the settings card and its purchases
-    section, open-game rows and their chips, badges, the main-menu logo, and a
-    gradient-capable page background. Every visual, audio and motion value is read from the
-    currently selected theme: if something on screen has a color, that color came from the
-    theme; if something makes a noise, that sound came from the theme; if something moves,
-    that motion came from the theme. No exceptions.
-    *(`Theming.md` → Architectural Rule, as rewritten; → Decisions → What the theme's slots
-    are derived from; `Tech Design.md` → Decisions → Do we add a test that fails on
-    hardcoded theme values?, whose scope is *"the slot inventory the Architectural Rule
-    names"* and whose pattern table is explicitly *"not a complete enumeration of that slot
-    inventory"*.)*
-    The guard is `P1-05-theme-guard-test.md`; this requirement is the rule it enforces, so
-    narrowing it here would narrow the guard. Note its limit, recorded in Requirement 13:
-    the guard catches a value written into code, not a value read from the wrong slot.
-26. **Adding a new theme requires zero changes to game, board or menu code** — only adding
-    a new theme definition.
-    *(`Theming.md` → Architectural Rule)*
+22. **Flutter's `ThemeData` / `ThemeExtension` is populated *from* the theme object** — a
+    **mirror, not the source**.
+23. **Sounds and animations live in the same theme object**, which is also why the theme
+    object rather than `ThemeData` is the accessor.
+24. **The accessor is published. Consumers read the theme through these symbols and no
+    others.**
+
+    ```dart
+    // lib/theme/theme_providers.dart
+
+    /// The materialized active theme. Never null (Requirement 8).
+    /// Reachable with or without a BuildContext.
+    final Provider<Theme> activeThemeProvider;
+
+    /// The installed themes, discovered by folder scan (Requirement 32),
+    /// ordered by asset key. Each entry carries {id, name, blurb, assetKey}
+    /// and its own materialized Theme — the read path required by Requirement 33.
+    final Provider<List<ThemeCatalogEntry>> themeCatalogProvider;
+
+    /// The selected theme's UUID, and the only write path for changing it.
+    final NotifierProvider<ActiveThemeNotifier, String> activeThemeIdProvider;
+    ```
+
+    - **`activeThemeProvider` is the source of truth**, not `Theme.of(context)`.
+    - **No `BuildContext` is required** — decisive, because `P2-02` req 2 publishes
+      `void play(SoundMoment)`, which has none.
+    - **Widgets `watch`. Services `read` at use time.**
+    - **`ThemeCatalogEntry`** — `id`, `name`, `blurb`, `assetKey`, `theme`.
+    - **Overriding `activeThemeProvider` is the test seam.**
+
+    **PRD-author judgment**, following `P1-04` req 26's precedent.
+25. **Architectural Rule.** No hardcoded values anywhere in the code, across the full
+    Requirement 15 schema — including motion, chrome, and **the shape of a variant set**.
+    **Spacing is the one named exception.**
+    *(`Theming.md` → Architectural Rule, as amended; `Tech Design.md` → Decisions → Do we add
+    a test that fails on hardcoded theme values?, whose guard table now reads *"`Icons.*`
+    anywhere outside the theme layer"* — the earlier board-widgets scoping is gone, and this
+    requirement and that doc agree.)*
+    **The guard's limits:**
+    - It catches a value written into code, not a value read from the wrong key
+      (Appendix A.1).
+    - It **cannot see bare numeric geometry** (`P1-05` req 4(c)) — which is why spacing came
+      out, and why **`board.gridLineWidth`** is the one deliberate false negative left.
+    - It cannot see a switch over hardcoded style objects — hence per-state key shapes.
+    - **Where it works perfectly is icons**, now that its rule covers the whole scan root:
+      that is what turned a missing `trash` slot from an oversight into a build failure.
+26. **Adding a new theme requires zero changes to game, board or menu code** — only dropping
+    a theme file into `assets/themes/`.
 
 ### Failure behavior
 
-27. If a theme fails to load, show a **modal on the Theme screen** saying the theme is
-    unavailable and asking the player to pick another, **then fall back to Neon**.
-    *(`Theming.md` → Decisions → What happens if a theme fails to load; restated in
-    `themes.catalog.json` → `failureBehavior`; the screen half is
-    `P4-03-theme-selection.md` reqs 20–21)*
+27. If a theme fails to load, show a **modal on the Theme screen**, then **fall back to
+    Neon**. *(`P4-03` reqs 20–21)*
 28. Neon is the one theme with nothing to fall back to.
-    *(`Theming.md` → Decisions → What happens if a theme fails to load; Why this matters
-    for the build)*
 
 ### Boundaries of the theme object
 
-29. **Haptics are not theme-driven.** Vibration lives at the application setting level; a
-    theme cannot define or change the buzz. The theme object has no haptics slot.
-    *(`Theming.md` → What a Theme Does NOT Control; relied on by `P2-03-haptics.md` and
-    `P4-04-settings.md` req 14)*
-30. The sound-effects, animations and vibrate **toggles are global player settings, not
-    theme properties** — a theme cannot override them, and they mute or disable a channel
-    for every theme. No key in a theme file sets, forces or reads any of the three.
-    *(`Theming.md` → Sound Decisions → Global mute; `Animations.md` → Decisions → Turn
-    animations off — a global setting; `Menus and UI.md` → Settings Menu;
-    `P4-04-settings.md` req 11)*
-31. **Ownership / entitlement is not part of a theme definition.** A theme is an
-    audio-visual package; purchase state is account/device state and lives outside the
-    theme object. This holds now that some themes are paid — a theme file still describes
-    a theme; what a player owns lives elsewhere. No shipped theme YAML contains an
-    ownership or price key. The same line holds for the purchases section Requirement 15
-    provisions: the theme supplies that section's styling, never the product, its price, or
-    whether it is owned.
-    *(`design_handoff_game_ui/themes.catalog.json` → `note`;
-    `design_handoff_game_ui/README.md` → 2a → The four themes shown;
-    `P1-07-entitlements.md` req 5; `P4-03-theme-selection.md` req 12)*
+29. **Haptics are not theme-driven**, and the haptic fires on every valid tap app-wide as an
+    app behavior. *(`Theming.md` → What a Theme Does NOT Control; `P2-03`)*
+30. **Four toggles ship — Music, Sound Effects, Vibrate on Touch, Animations — and all four
+    are global player settings, not theme properties.** They are read through `P1-04`'s
+    providers, never through `activeThemeProvider`.
+    **The asymmetry is three-to-one:** music, sound and animations switch off a *theme-defined
+    channel*; vibrate switches off an *app behavior a theme never defines*.
+    *(`Theming.md` → Decisions → Do all four toggles ship…; `P4-04` req 11)*
+31. **Ownership / entitlement is not part of a theme definition.**
 
 ### The catalog, and reading a non-active theme
 
-32. **The app has a theme catalog — an enumeration of the installed themes that the UI
-    reads to know what exists.** Adding a theme definition must add it to the catalog, and
-    therefore add a row to the selection list, with **no change to menu code and no edit to
-    a hand-maintained list of UUIDs in Dart**. A hardcoded Dart list of themes satisfies
-    neither Requirement 26 nor `P4-03-theme-selection.md` req 4, whose stated test is that
-    a third theme definition produces a third row with no edit under the menu UI source.
-    *(`Theming.md` → Architectural Rule — "Adding a new theme should require zero changes
-    to game/board/menu code — only adding a new theme definition";
-    `P4-03-theme-selection.md` reqs 4, 5)*
-    **Testable:** dropping a valid theme YAML into `assets/themes/` and rebuilding makes it
-    appear in the catalog with no source file edited outside the theme layer.
-    How themes are *discovered*, and what a catalog entry holds, are open questions below.
-33. **A non-active theme's values must be readable without making it active.** The
-    selection list renders each row's preview tile *"in that theme's own colors and
-    marks"*, and that is the one place in the app that reads a theme other than the active
-    one. Requirement 24's provider exposes the active theme only, so this requires a
-    second, explicit read path.
-    *(`P4-03-theme-selection.md` reqs 6, 7 — "The preview tile is the one place in the app
-    that reads a non-active theme's values. Rendering a row must not require making that
-    theme active"; `design_handoff_game_ui/README.md` → 2a)*
-    What this costs at startup depends on the unresolved materialization-scope question
-    below.
-34. **A theme that fails to load must not take the app down with it.** Requirements 27–28
-    give the player-facing behavior; this requires the failure be *reportable* — the loader
-    surfaces which theme failed, so the selection overlay can name it and fall back.
-    *(`Theming.md` → Decisions → What happens if a theme fails to load;
-    `P4-03-theme-selection.md` reqs 20–21, which consume the report)*
-    What counts as a failure is an open question below.
+32. **Themes are discovered by scanning the themes folder.**
+    1. `assets/themes/` is declared in `pubspec.yaml` **as a directory**.
+    2. At startup the catalog reads Flutter's **asset manifest** and selects every bundled key
+       under `assets/themes/` ending in `.yaml`.
+    3. Each file is validated: well-formed YAML, an understood `meta.schemaVersion`, non-empty
+       `meta.id`, `meta.name`, `meta.blurb`.
+    4. A **catalog entry** is `{id, name, blurb, assetKey}` plus the materialized theme.
+    5. Entries are ordered **by asset key**; display order is `P4-03`'s.
+
+    | Failure | Result |
+    |---|---|
+    | Unparseable YAML, or missing/blank `meta.*` | that file is **excluded** and reported |
+    | `meta.schemaVersion` not understood | same |
+    | **Duplicate `meta.id`** | the entry earlier by asset key wins |
+    | A duplicate of **Neon's** UUID from another file | the other file always loses — reserved |
+    | No valid theme at all | Neon has failed to load; *Blocking* item 3 |
+
+    **PRD-author judgment, flagged:** the duplicate-id and reserved-base-id rules are not in
+    any design doc.
+33. **A non-active theme's values are readable without making it active** — via
+    `themeCatalogProvider`.
+34. **A theme that fails to load must not take the app down with it.**
+
+### Encoding, dependencies and versioning
+
+35. **Composite values are structured fields, not parsed CSS strings.**
+    - **shadow list** — `{offsetX, offsetY, blur, spread: dp, color, inset: bool}`.
+    - **ring object** — `{width: dp, style, color, offset: dp, radius: dp, glow: shadow
+      list}`, `style` ∈ `solid | dashed`, plus **`dashLength` / `dashGap`**.
+    - **gradient** — `{type: linear | radial, stops: [{at, color}], …}`.
+    - **colors stay strings**, parsed at load.
+36. **YAML parsing uses the `yaml` package, declared in `pubspec.yaml` by `P1-01`, and
+    `assets/themes/` is declared as a directory.** **PRD-author judgment on both.**
+37. **The schema is versioned. `meta.schemaVersion` is now `8`.**
+
+    | Version | What changed |
+    |---|---|
+    | 1 | the original `type` / `durationMs` / `easing` / `loop` animation shape |
+    | 2 | animation redesigned as a motion description |
+    | 3 | `icons` added; scoreboard chips per-player; `turnBanner` deferred |
+    | 4 | `meta.name` and `meta.blurb` added |
+    | 5 | `turnBanner` removed; `freeChoiceCueStyle` and `surfaces.placeholder` added; gradient and dash shapes defined |
+    | 6 | `surfaces.destructive` promoted to required (authored); `swatchStyle` per-state; `legend.labelStyle` added; `turnIndicator` removed |
+    | 7 | all spacing and padding keys removed |
+    | 8 | `icons.trash` added; `surfaces.destructive.action` reshaped to `{fill, radius}` |
+
+    **No bump for the music Decision** — it changed what `sound.music` means without changing
+    a key path, and its real shape is still open.
+    **There is no migration:** the only theme file in existence is Neon's, and Requirement 13
+    writes it fresh this wave.
 
 ## Out of Scope
 
-- **The hardcoded-theme-value enforcement test.** Requirement 25 states the rule; the test
-  that checks it, its banned-pattern list and its zero baseline are
-  `P1-05-theme-guard-test.md`.
-- **Persisting the selected theme UUID** to device storage via `shared_preferences` —
-  `P1-04-persistence.md`. This PRD only fixes that the identity persisted is the UUID
-  (Requirement 4).
-- **The theme selection overlay UI** — the sheet, the rows, the preview tiles, the active
-  highlight, the free/paid labelling, and the failed-to-load modal's layout:
-  `P4-03-theme-selection.md`. Note also that the theme **cannot be changed mid-game**
-  (`Theming.md` → Decisions → Can you change the theme mid-game).
-- **The entitlement model** — the `free` / `owned` / `locked` states, the free-tier
-  defaults and the per-theme query: `P1-07-entitlements.md`. **Buying and restoring:**
-  `P4-05-purchase-flow.md`. Themes beyond the two free ones are paid (`Theming.md` →
-  Decisions → Which themes are free; `Tech Design.md` → Decisions → In-app purchases), and
-  none of it reaches the theme object — Requirement 31.
-- **The settings surface's purchases section itself** — the section, its two controls, the
-  parental gate that precedes a purchase, and what activating either control invokes:
-  `P4-04-settings.md` reqs 20–22 and `P4-05-purchase-flow.md`. This PRD supplies only the
-  slots that section is drawn from.
-- **The Classic Red vs Blue theme content** — its YAML file and the concrete list of values
-  it overrides: `P5-01-classic-theme.md`. Two themes ship at launch (`Theming.md` →
-  Decisions → How many themes ship at launch), but only Neon is authored here.
-- **Audio playback** — loading and firing the sound assets and the `audioplayers`
-  integration: `P2-02-audio.md`. This PRD defines only the slots.
-- **Animation playback** — running the animations, one-at-a-time sequencing, non-blocking
-  input, and the animations-off instant-state-change path: `P2-04-animations.md`. This PRD
-  defines only the slots and that each carries its own duration.
-- **Every screen that consumes these slots** — the board (`P3-01-board-rendering.md`), the
-  scoreboard (`P3-03-scoreboard-turn-indicator.md`), game over
-  (`P3-04-game-over-rematch.md`), the legend and hints (`P3-05-how-to-play.md`), the main
-  menu (`P4-01-main-menu.md`), the open-games list (`P4-02-open-games-list.md`) and
-  settings (`P4-04-settings.md`). This PRD supplies the slots those read; it draws nothing.
-- **Producing sound and art assets.** Assets are generated with Replicate when actually
-  needed, not now: `P5-02-asset-generation-replicate.md`.
-  *(`Tech Design.md` → Decisions → Where do sound and art assets come from?)*
+- **The guard test** — `P1-05`. **Persistence** — `P1-04`. **Entitlements** — `P1-07`.
+- **The delete flow itself** — the swipe gesture, the trash button's behaviour, the modal's
+  copy, and what deleting does to storage: `P4-02`. This PRD supplies the glyph slot and the
+  two destructive treatments.
+- **Playing music** — no PRD owns it yet.
+- **The settings screen and its four toggles** — `P4-04`.
+- **All spacing and layout numbers**, now code constants.
+- **The animation interpreter** — `P2-04`. **The audio layer** — `P2-02`.
+- **The how-to-play strip** — `P3-05`. **The scoreboard** — `P3-03`.
+- **The About Us screen's own surface keys** — `1c` ships but no PRD names what it reads.
+- **The Classic theme** — `P5-01`. **Assets and the real logo** — `P5-02`.
+
+---
+
+## Appendix A — non-normative
+
+**Nothing in this appendix is work.**
+
+### A.1 Near-miss forensics — why the schema names keys the guard cannot protect
+
+| Drawn value | The near-miss it invites |
+|---|---|
+| **Active P1 chip fill `rgba(255,61,113,0.14)`** | **`color.playerOneTint`, the *same value*.** Correct today, silently wrong the first time either moves. `color.playerTwoTint` is `0.12` — **not** symmetric |
+| **Free-choice cue `#4fc3ff`** | `color.boardLine`, the same hex. Board-blue *on purpose* |
+| **Six legend swatches** | one `swatchStyle` plus a Dart switch — the failure with no literal in it |
+| **`board.gridLineWidth` 1.5** | a literal `1.5` in a painter. The one *deliberate* false negative |
+| `OWNED` badge `rgba(45,255,158,0.16)` | `color.playerTwoTint` at `0.12` |
+| Legend label 10.5 / `#595d6c` | `surfaces.legend.hintStyle` at 12 / `#75798c` |
+| **The trash glyph** | `Icons.delete` — **the one row the guard catches.** It fails the build instead of shipping wrong |
+| Any value via `Theme.of(context)` | resolves, returning Flutter's mirror — wrong for `surfaces.*`, `sound.*`, `animation.*` |
+
+**The trash row is the odd one out, and that asymmetry is the argument for the widened
+`Icons.*` rule.** Every other row is a value that resolves to something plausible and ships:
+the screen renders, nothing throws, and the defect surfaces whenever someone next compares
+against the handoff. `Icons.delete` cannot do that — the scan covers the whole root against a
+zero baseline, so it fails the build the moment it is written. That is worth the rule's cost
+in false negatives elsewhere, and it is more persuasive as an observed case than it was as a
+prediction: the missing `trash` slot was found *because* the guard would have stopped the
+workaround.
+
+### A.2 Authored, not transcribed — and the two weights of "missing"
+
+Requirement 13(b) is the normative list. The distinction worth carrying: **`icons.trash` is a
+deadlock, the other two are debt.** An unauthored `surfaces.destructive` fill renders as
+something and ships; unauthored animation magnitudes leave motion looking flat. A missing
+glyph has no legal implementation at all — no slot to read, no literal permitted.
+
+**The triage rule this produces, for every future `deferred` call:** ask whether the absence
+is *ugly* or *impossible*. Ugly can wait for a design pass — the feature ships, looks wrong,
+and is fixed by authoring one value later with no code change, because the key already exists
+and the consumer already reads it. Impossible cannot wait at any price: there is no
+implementation an author could write that both satisfies the requirement and passes the
+build, so the feature does not ship at all and no amount of scheduling helps. **Only the
+second kind blocks.** Applied to what is open now: `surfaces.settingsCard.purchases.*` is
+ugly — `P4-04` can render its section unstyled — and music's shape is neither, because nothing
+plays it yet.
+
+---
 
 ## Open Questions
 
-### From the design docs, worded as the docs word them
+**None of the below blocks a landed consumer from compiling against this PRD.** Items 1 and 7
+are the closest: nothing plays music, and `P4-04` can build its purchases section but has no
+styling source for it. Both are *ugly*, not *impossible*, by A.2's rule.
 
-*(`Tech Design.md` → Open Questions → 2. Theme loading — all three sit directly on this
-feature and are **not** resolved here.)*
+### Blocking — needs the user
 
-- Are all themes loaded and materialized at startup, or only the selected one, on demand?
-  `Theming.md` → Why this matters for the build says materialization happens "at startup"
-  but does not say for how many themes. *(Requirement 33 sharpens this rather than settling
-  it: the preview tiles need every listed theme's values, not just the active one's.)*
-- Are the theme YAML files declared as assets in `pubspec.yaml`? *(`P1-01-app-scaffold.md`
-  records the same question from the other side — whether that declaration is its file's or
-  this one's. It is also entangled with how the catalog discovers themes, below.)*
-- What happens to an unknown or misspelled *key* inside an otherwise-valid theme file?
-  Merge-over-Neon will quietly fill the gap with Neon's value, so a typo in a theme file
-  fails silently. The hardcoded-theme-value test guards code that bypasses the theme; it
-  does not guard a theme file that misspells a key.
+1. **What shape does a theme's music take?** The Decision settles ownership and explicitly
+   leaves open *"whether music loops, whether it differs by screen, and where the audio comes
+   from."* The per-screen half decides the key:
 
-*(`Theming.md` → Open Questions — three of its four land on this PRD.)*
+   | Shape | Reading | Cost if wrong |
+   |---|---|---|
+   | `sound.music: assetPath \| null` — today's placeholder | one track for the whole app | every theme authored against it needs re-authoring, plus a version bump and a migration |
+   | `music.<context>: assetPath \| null` | per-screen tracks | provisions keys nothing reads today |
 
-- What is the exact slot schema — the key structure — for what a theme defines? The
-  approved `neon.theme.json` does not currently cover the pending-move highlight, any modal
-  or sheet surface, a gradient background, a logo, or a theme's own display name and
-  description. *(Requirement 15 enumerates **which** slots exist; this asks what their keys
-  look like. Different questions — only the first is answered here.)*
-- Neon is required to be complete (see **Neon Is the Base Theme**), but the approved
-  `neon.theme.json` has no pending-move highlight values at all — no pending colour, no
-  pending cell ring, no destination ring — while the board's pending preview is a required,
-  separately addressable treatment. The same gap covers the grid-line opacity and glow, the
-  claimed and cat-game mark glows, and the cat-game caption style. How does this gap get
-  closed? *(This is what Requirement 13 refuses to invent, and Requirement 13 extends the
-  same gap to the theme-selection overlay's badge, row, dim and header values, to the
-  settings card's drawn radius, and to the settings surface's purchases section. The values
-  are drawn in `design_handoff_game_ui/README.md` → Cell states, screen 2a, screen 2b and
-  screen 2d but are absent from the machine-readable file — and the purchases section is
-  drawn nowhere at all — so whether transcribing them counts as authoring Neon or as
-  editing an approved read-only asset needs a call.)*
-- What form does the legibility contract take — a contrast floor, a review step, something
-  else? **What a Theme Controls** requires every theme to keep the last-move and
-  active-quadrant highlights legible, but this is unfalsifiable as written: Classic Red vs
-  Blue has a near-white ground while inheriting Neon's near-white text and its veils and
-  glows tuned for a near-black ground, so a theme could be complete, pass every stated
-  check, and still be unreadable.
+   **Not picked here** — the question is cheap for the user and both wrong answers are
+   expensive.
+2. **What goes in Neon's five `"TODO"` sound values.**
+3. **What counts as "fails to load" beyond Requirement 32's table, and what happens if
+   *Neon* fails?**
+4. **Are all themes materialized at startup, or only the selected one?**
+5. **Does the animation property set need an eighth member?** `P2-04` reports **shadowbox has
+   no obviously right property** — it maps onto `glowRadius`/`glowColor`, but a drop shadow
+   that lifts the marker off the board is *directional and offset*.
+6. **Is `glyph` a third mark `kind`?** The docs say *image or icon*; Neon authors `glyph`.
+7. **Should `surfaces.settingsCard.purchases.*` become `required` (authored)?** It sits where
+   `surfaces.destructive` sat — a required reader and a settled placement, but nothing drawn,
+   and no Decision describes what the section *is*.
 
-Also open, from `Theming.md` → Open Questions (owned by `P5-01-classic-theme.md`, listed
-here because it is the first real test of Requirement 9):
+### From the design docs — carried, not resolved
 
-- Which values, concretely, does Classic Red vs Blue override?
+- **What form does the legibility contract take?** Unfalsifiable as written.
+- **Which values does Classic Red vs Blue override?** Owned by `P5-01`; it will need a music
+  position the day Blocking 1 lands, and its req 12 needs revisiting against Requirement 21.
+- **Unknown or misspelled keys inside a valid theme file** — Requirement 32 catches malformed
+  files and bad versions, not bad keys inside a good one.
+- **Resolved earlier:** spacing and padding (v7), the three lookup paths (Requirement 24), the
+  turn banner (v5), theme discovery and per-file name/blurb (Requirement 32), chrome icons,
+  and the `Tech Design.md` guard-table scoping — its table now reads *"`Icons.*` anywhere
+  outside the theme layer"*, so nothing is outstanding against Requirement 25.
+- **The exact slot schema.** Requirement 15 is this PRD's answer, structure ratified. Writing
+  it, the chrome-icon Decision and the spacing boundary into `Theming.md` is
+  `forge-doc-writer`'s to route.
 
 ### Contradiction between docs — flagged, not resolved
 
-- **How many themes the selection list shows.** `design_handoff_game_ui/README.md` →
-  *2a — Theme Select* and `themes.catalog.json` show **four** themes — Neon, Classic Red
-  vs Blue, Splat and Dinosaurs — and header the sheet *"Two free, two extra"*, while
-  `Theming.md` → Decisions → How many themes ship at launch says **two**, and
-  `Menus and UI.md` → Theme Selection lists exactly those two. The handoff itself marks
-  Splat and Dinosaurs as placeholders that "do not exist" and must not ship as designed, so
-  this may be a mock artifact rather than a real disagreement — but the two documents still
-  describe different screens. `P4-03-theme-selection.md` → Open Question 1 carries it; it
-  touches Requirement 32 only in that the catalog must not care how many there are.
-
-  The free-vs-paid half is **settled and no longer contested**: `Theming.md` → Decisions →
-  Are themes unlockable/rewards now says some themes are paid, which agrees with the
-  handoff's `free` / `owned` / `locked` states and its price button. Requirement 31 is
-  stated by both sides and stands unchanged.
-- **The mark slot has two kinds in the docs and three in Neon.** `Theming.md` → Decisions →
-  Marks beyond X and O and `Tech Design.md` → Decisions → Marks say **an image or an
-  icon**; `neon.theme.json` → `marks` authors `"kind": "glyph"` with a text `value`, a
-  per-mark `font` and a `weight` — a text glyph in a bundled font, which is neither an
-  image file nor an `IconData`. Requirement 16 requires the slot carry what Neon actually
-  authors, but whether `glyph` is a third supported kind or a shorthand for "icon" is
-  stated nowhere, and it changes the schema.
-
-### Needs a decision — raised by this PRD or by a consumer, not settled in any doc
-
-Each is a place an implementer would otherwise guess.
-
-- **How are themes discovered, and what does a catalog entry hold?** Requirement 32
-  requires a catalog and forbids a hand-maintained Dart list; it does not choose between an
-  asset-manifest scan, a committed index file, or per-theme `pubspec.yaml` declarations —
-  which is entangled with the `pubspec.yaml` question above. Related and equally unstated:
-  **does a theme carry its own display name and blurb?** The selection row needs a name and
-  a one-line description per theme (`P4-03-theme-selection.md` req 6); today those exist
-  only in `themes.catalog.json`, a handoff reference asset that ships nowhere, and
-  `Theming.md` → Open Questions notes the schema has no place for them.
-- **What counts as "fails to load"?** Requirements 27 and 34 give the behavior but not the
-  trigger. Missing file, malformed YAML, missing or duplicate UUID, an unparseable value,
-  and a referenced asset that is absent are five different failures, and only some are
-  detectable at startup.
-- **What happens if *Neon* fails to load?** The docs say Neon is the theme with nothing to
-  fall back to, which states the constraint but not the behavior. Hard failure at startup?
-  A built-in minimal fallback?
-- **Merge depth and null semantics.** Requirement 8 says "merge" without saying whether it
-  is shallow — a theme naming `color` replaces that whole section — or deep, per key; and
-  without saying what an explicit null means: inherit Neon's, or "deliberately nothing."
-  `neon.theme.json` → `sound.music: null` makes the second concrete today, and the
-  shallow-vs-deep choice decides whether a theme overriding one color loses the other
-  forty.
-- **Which of the three lookup paths a widget uses for a given value.** Requirements 22–24
-  create three: `ThemeData` via `Theme.of(context)`, a `ThemeExtension` via the same, and
-  the Riverpod-exposed theme object. *"As far as possible"* is the only guidance on the
-  split, nothing enumerates which slots Flutter's own theming can carry, and
-  `P1-05-theme-guard-test.md` has to recognize all three as legitimate reads.
-- **What goes in Neon's five `"TODO"` sound slots.** `neon.theme.json` → `sound` carries
-  `"TODO: neon buzz one-shot"` and four bare `"TODO"`s. Neon's completeness is **this
-  PRD's** to hold: Requirement 11 requires Neon define every slot, and `P2-02-audio.md`
-  req 12 disowns it back here — it carries an *Owner of the behavior* line naming
-  Requirements 11, 12 and 14, and records that the audio PRD *"authors no theme content and
-  must not edit `assets/themes/`."* But the assets are explicitly deferred (`Tech
-  Design.md` → Decisions → Where do sound and art assets come from?), and that PRD builds
-  against the placeholders as *"named but unloadable, never absent"* (its req 17). Whether
-  Neon ships with silent placeholder audio files, keeps the prose TODOs, or is blocked on
-  `P5-02-asset-generation-replicate.md` is unstated.
-- **Is there a sound slot for a whole-game draw?** `P2-02-audio.md` → Open Questions raises
-  it against this inventory: `catGame` is a small-board draw and `winGame` names a winner,
-  while a straight draw is a distinct outcome with its own drawn screen (*1h — Modal:
-  draw*) and no slot named for it. Reuse one, add a slot, or stay silent — all three are
-  guesses today.
-- **Is screen padding a theme value?** The handoff commits per-screen padding (`96 / 28 /
-  52` on the menu, 16pt sides on board screens, safe-area tops of 62 / 64 / 96).
-  `Theming.md`'s inventory names board geometry and radii but not screen padding, so it is
-  unclear whether these are theme slots or layout constants — and Requirement 25 makes the
-  distinction load-bearing rather than cosmetic.
-- **Are chrome icons theme values or app assets?** `design_handoff_game_ui/README.md` →
-  Assets names the Phosphor set (chevron-left, chevron-right, plus, x,
-  sliders-horizontal) for navigation and control chrome. Mark art is unambiguously
-  theme-supplied (Requirement 16), but nothing says whether a theme may replace the chevron
-  or the close icon, and `Tech Design.md`'s guard table bans `Icons.*` only *"inside board
-  widgets"*.
-- **JSON reference vs YAML runtime format.** The approved Neon definition is
-  `neon.theme.json` and the handoff says "load it as the base theme," while `Tech
-  Design.md` settles the shipped theme-file format as **YAML**. This PRD reads that as:
-  ship Neon as YAML transcribed faithfully from `neon.theme.json`, which stays the
-  read-only source of truth for the values. If the intent was instead to load the JSON
-  directly, that is a decision that needs stating.
-- **CSS-shaped values in `neon.theme.json`.** Several `board` values are CSS shadow
-  strings (`"0 0 0 1.5px rgba(...), 0 0 14px rgba(...)"`) and colors appear as `rgba()`
-  strings. Flutter has no direct equivalent, so the YAML schema has to decide how these
-  are represented — structured fields, or parsed strings. Requirement 12 fixes the values,
-  not their encoding.
+- **How many themes the selection list shows** — the handoff's *2a* draws four,
+  `Theming.md` says two. `P4-03` → OQ 1 carries it; Requirement 32 is indifferent.
+- **`P2-02-audio.md` reqs 14 and 15 were written under a superseded stance** — "no background
+  music in this version" no longer holds. Being reconciled by that PRD.

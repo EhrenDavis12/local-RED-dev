@@ -72,7 +72,7 @@ free-choice state — is **pure Dart with zero Flutter imports**, and the UI lay
 it.
 
 ### Persistence package
-**`shared_preferences` — for the four player preferences.**
+**`shared_preferences` — for the five player preferences.**
 
 Game state does not go here. It is saved too, in Hive — see **Game state storage — Hive**
 below.
@@ -207,7 +207,7 @@ enumeration of that slot inventory:
 | **Colors** | Raw `Color(0x…)` literals and references to Flutter's `Colors.*` palette |
 | **Animations** | Hardcoded `Duration(…)` timing values |
 | **Fonts** | `GoogleFonts.*` and literal `fontFamily:` values |
-| **Piece styles** | Hardcoded `'X'`/`'O'` strings and `Icons.*` inside board widgets |
+| **Piece styles** | Hardcoded `'X'`/`'O'` strings and `Icons.*` anywhere outside the theme layer |
 | **Sounds and backgrounds** | Literal `assets/…` paths outside the theme layer |
 
 Durations are in scope because [Animations](./Animations.md) → Decisions → Duration lives
@@ -238,9 +238,30 @@ It also covers the requirement that settings and the theme be readable from
 the API surface.
 
 ### Navigation
-**The app has an explicit navigation layer, and it is now in scope.** No Decision above
-names a routing approach, and the dependency list has no router in it yet. The approach
-is open — see Open Questions.
+**The app has an explicit navigation layer, and it is now in scope.** The routing approach
+is settled — see Decisions → Navigation approach — go_router below.
+
+### Navigation approach — go_router
+**`go_router`.** The user asked for the choice that serves the end objective of building
+larger games, made once and correctly rather than as a stopgap: *"I want to pick the
+navigation layer that solves for the full problems this application can have. Something
+that is not just temporary but the right choice for the end objective of building larger
+games… Lets get this right the first time."*
+
+Why: it is the Flutter team's recommended routing package; it is declarative, so routes
+are described rather than imperatively pushed; it handles deep links and the browser URL
+bar without rework; it supports nested and shell navigation, which is what larger games
+need for persistent chrome; and it scales past this game's six screens without a second
+migration.
+
+Consequences, recorded honestly rather than as caveats:
+- It adds a dependency, and this doc's existing structure means `P1-01`'s exhaustive
+  dependency list must be amended to carry it.
+- Dismissing a route becomes `context.pop()` rather than `Navigator.pop`, so the
+  navigation layer's internals are shaped by this choice even though its public
+  operations are not.
+
+The route table and route paths are not designed here — that is a PRD's job.
 
 ### The app icon
 **The app ships an icon, and it is not the main-menu logo.** App Store submission cannot
@@ -278,6 +299,11 @@ lib/
     loader.dart    ← YAML → theme
   state/           ← Riverpod providers
   navigation/      ← the app's routing layer
+  audio/           ← sound playback, owned by P2-02-audio
+  haptics/         ← haptic feedback, owned by P2-03-haptics
+  entitlements/    ← StoreKit entitlement state, owned by P1-07-entitlements
+  diagnostics/     ← crash catching/reporting, owned by P1-06-crash-reporting
+  purchase/        ← store integration, owned by P4-05-purchase-flow
   ui/
     board/
     menus/
@@ -294,12 +320,20 @@ arrives.
 
 `navigation/` is a new layer, for the same reason `storage/` was added above: **Navigation**
 above names an explicit navigation layer that this tree had no home for. It is Flutter-side,
-same as `ui/` and `state/` — nothing here changes the `engine/` purity rule. What goes inside
-it is not decided; the routing approach is still open — see Open Questions → Navigation
-approach. A navigation PRD already depends on this layer existing.
+same as `ui/` and `state/` — nothing here changes the `engine/` purity rule. The routing
+approach is settled — see Decisions → Navigation approach — go_router. What goes inside the
+layer beyond that is a PRD's job, not this doc's. A navigation PRD already depends on this
+layer existing.
 
 `assets/themes/`, `assets/images/` and `assets/audio/` are the **designated folders for
 assets** required by **Where do sound and art assets come from?** above.
+
+`audio/`, `haptics/`, `entitlements/`, `diagnostics/`, and `purchase/` are five more new
+layers, each proposed by the PRD that needs it and following the same one-folder-per-layer
+convention as `storage/` and `navigation/` above. This closes the same gap in five PRDs at
+once — several had been carrying it as an open question they could not resolve alone, and
+two shipped wrong import paths in the meantime. File names inside each are that PRD's to
+decide, not this doc's.
 
 ### Widget tests for the board — no golden tests
 **Widget tests, no goldens.** Test that taps do the right thing and that the highlight
@@ -373,6 +407,19 @@ Already Imply** below true for now. StoreKit being permitted does not make a rep
 destination permitted — those are two separate exceptions, and this one stops being true
 the day a destination is chosen.
 
+### What does a crash report capture?
+**The error, the stack trace, and a timestamp. Nothing else.** No game state, no screen,
+and specifically no opponent name — no text a player has typed.
+
+This is about more than debugging convenience: the app is in the **Kids category**, and in
+a 4+ app *transmitting* personal data is itself the regulated act, not merely something a
+privacy label declares. Capturing nothing personal means that if a destination is ever
+added later, no consent flow is required — the decision keeps a future option open rather
+than only satisfying today's rules.
+
+Named cost: reproducing a bug that depends on board position or which screen the player was
+on becomes harder, because the report will not say.
+
 ### In-app purchases
 **The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
 vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
@@ -405,6 +452,18 @@ On-device verification is sufficient for an app this size.
 runtime.** Any locally stored entitlement state is an offline convenience, not the record.
 A refunded or lapsed purchase simply stops appearing in `currentEntitlements` — that is what
 answers "what happens when an entitlement goes away."
+
+**The entitlement provider's shape — last-known plus refresh.** Entitlement state is exposed
+as a plain value, seeded from the locally cached copy and refreshed when the store answers —
+not as an async wrapper every consumer must branch on. This is the same class of decision as
+**State management — Riverpod** above.
+
+Consequences:
+- Consumers never handle a "pending" case; they always get a usable answer.
+- A paying player never sees their purchased content as locked while a query is in flight —
+  which is the failure the alternative produces.
+- The value carries an indication of whether it is still provisional, so a consumer that
+  cares can tell.
 
 ### Kids category
 **The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
@@ -509,12 +568,7 @@ block other work.
      tooling; the app name. See Decisions → Distribution — public App Store release,
      Bundle identifier, CI — local builds only, Release tooling — fastlane, and App name. -->
 
-### 4. Navigation approach
-- The app has an explicit navigation layer (see Decisions → Navigation), but no Decision
-  names how it's built — plain `Navigator` push/pop, `go_router`, or something else — and
-  the dependency list has no router in it yet.
-
-### 5. Kids category — age rating questionnaire
+### 4. Kids category — age rating questionnaire
 - The Kids-category listing choice and the resulting parental-gate, analytics, and
   privacy-policy requirements are settled — see Decisions → Kids category, and the age
   rating (4+). What remains open is the exact age-rating questionnaire answers.

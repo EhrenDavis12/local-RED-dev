@@ -47,6 +47,8 @@ colors.
 ## Scoreboard
 A **scoreboard sits at the top of the game screen**, above the board. Three counters:
 
+See Decisions → What do the scoreboard chips read? for the settled chip labels.
+
 | Player One | Ties | Player Two |
 |:----------:|:----:|:----------:|
 
@@ -147,10 +149,9 @@ The free-choice state should still make the *locked* quadrants (claimed, cat-gam
 locked. It's "pick any of these open ones," not "the board is unlocked." Nine glowing
 quadrants at once also risks looking like noise, so free choice may want a calmer
 treatment than the single-quadrant forced highlight — or a text cue ("Free choice — pick
-any open quadrant"). Whether this cue is text, a calmer highlight, or both is answered (or
-not) by [Menus and UI](./Menus%20and%20UI.md) → Decisions → How to play — the on-board
-legend and hint, which is where the on-board explanatory layer this hedge was waiting on
-now lives.
+any open board"). Whether this cue is text, a calmer highlight, or both is answered by
+Decisions → Where does the free-choice cue live? below: the cue lives in the how-to-play
+strip below the board, not a turn banner above it — the banner is not built.
 
 ### Taps outside the legal quadrant
 Illegal cells shouldn't accept input. They also shouldn't *look* like they would — the
@@ -219,7 +220,9 @@ Placing a mark takes **two taps**, not one.
 
 1. **First tap — select.** The player taps a cell in the small board. This *doesn't* place
    the mark. Instead, the big board **highlights the quadrant that choice points to** —
-   showing where this move would send the opponent.
+   showing where this move would send the opponent. (Unless that move would claim or
+   cat-game the very quadrant it points at — see Decisions → What does the board preview
+   when the selected move would claim its own send target?)
 2. **Second tap — confirm.** Tapping the same cell again commits the move. The mark is
    placed and the turn passes.
 
@@ -322,13 +325,53 @@ don't happen.
 (Subject to the vibrate-on-touch setting being on — see
 [Menus and UI](./Menus%20and%20UI.md).)
 
+## Decisions
+
+### Where does the free-choice cue live?
+**The free-choice cue lives in the how-to-play strip below the board — not in a turn banner
+above it.** That strip already exists, already swaps its content by board state, and
+already has an owner and a theme slot.
+
+**The turn banner is not built.** It was the only thing that banner was needed for, so
+nothing above the board is added, and the vertical space it would have taken on small
+screens is not spent.
+
+### Does a tap outside the board clear a pending move?
+**Yes — any tap outside the nine quadrants clears a pending, unconfirmed selection.** That
+includes the legend/how-to-play strip, the scoreboard, the settings button, and opening any
+menu or sheet. One rule, uniformly applied.
+
+The gutters between cells (3pt) and the quadrant padding (5pt) are outside the cells, so a
+near-miss between two cells clears the selection rather than doing nothing. That is the
+accepted cost of the single uniform rule.
+
+### What does the board preview when the selected move would claim its own send target?
+**Every still-open quadrant is highlighted.** Normally, selecting a cell previews the
+quadrant the opponent will be sent to. But if that move would claim or cat-game the very
+quadrant it points at, the quadrant is dead by the time the send resolves and the opponent
+gets a free choice — so there is no single quadrant to ring. The preview shows the truth —
+the opponent may play anywhere still open — rather than showing nothing.
+
+This reuses the free-choice highlight that already exists for the state after such a move
+lands (see **The free-choice state** above), so the preview and the resulting board state
+look consistent. It also teaches the rule at the moment it fires, which matters because
+sending an opponent to a dead quadrant is a real strategic cost that players have to learn.
+
+### What do the scoreboard chips read?
+**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `TIES` between them), not
+`PLAYER ONE` / `PLAYER TWO`.
+
+This does **not** change the settled term for the player — the players are still called
+"Player One" and "Player Two." The chip uses the numeral because that is what every drawn
+screen shows and because the spelled-out form is materially wider in a fixed-width column.
+
+### Does the haptic fire on non-board controls?
+**Yes — every valid tap buzzes, anywhere in the app.** Menu buttons, theme rows, settings
+toggles, the game-over card's controls, the settings gear — not only board cells.
+
+It matches the setting's own name, *Vibrate on Touch*, and it is what three PRDs had
+already assumed while the question was open. The buzz still fires only on a **valid**
+action — an illegal board tap remains silent, which is the existing rule and is unchanged.
+
 ## Open Questions
-- **What word does the player-facing copy use for a quadrant — "board" or "quadrant"/
-  "section"?** [Game Overview](./Game%20Overview.md) → Terminology settles the docs' own
-  vocabulary as **quadrant** (or section) for one of the nine cells of the big board, and
-  **board** only for the big board itself or a small board. But the approved handoff's
-  free-choice cue reads *"Free choice — pick any board"*, while the free-choice cue as
-  written above in this doc reads *"Free choice — pick any open quadrant"* — the two
-  disagree. "Board" is arguably the more natural word for a child, who is a stated target
-  audience, even though it collides with "big board" and "small board." Since this is text
-  shown to a player, the choice matters more than a style nit.
+<!-- Nothing outstanding on this doc right now. -->

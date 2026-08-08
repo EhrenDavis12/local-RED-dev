@@ -1,428 +1,550 @@
-# PRD: Settings — the three toggles, the purchases section, and both entry points
+**Build-readiness: 92**
+
+# PRD: Settings — the four toggles, the purchases section, and both entry points
 
 > **Status:** Draft · Source docs read: `Menus and UI.md`, `Theming.md`, `Animations.md`,
-> `Game Board Design.md`, `Tech Design.md`, `Game Overview.md`, `Rules.md`.
+> `Game Board Design.md`, `Tech Design.md`, `Game Overview.md`, `Rules.md`, `roadmap.md`.
 > (`Alternative Game Styles.md` is a parking-lot doc and was not sourced.
 > `design_handoff_game_ui/` is a read-only reference asset — screens `2b` and `1f` were
-> read, and where the handoff and the docs disagree the disagreement is recorded under Open
-> Questions rather than resolved. No requirement below is sourced from the handoff.)
+> read. No requirement below is sourced from the handoff.)
 >
-> **Revised** after `Menus and UI.md` → Decisions → *Where the open-game slot unlock is
-> sold* and `Tech Design.md` → Decisions → *Kids category* and → *Entitlements — Apple
-> stores them, no backend needed* were added. Both docs were re-read in full. The screen is
-> no longer only settings — see requirements 20–22.
+> **Revised** after two Decisions landed: `Menus and UI.md` → *What are the settings toggle
+> sub-labels?* — four settled strings, quoted verbatim in requirement 18 — and `Theming.md`
+> → *Do non-board controls make a sound?* — **one tap sound, everywhere**, which gives
+> requirement 25 its sound half and closes `P2-02-audio.md`'s OQ-3.
+>
+> Earlier revisions: the fifth preference landing in `P1-04-persistence.md` (completing
+> requirement 13); the purchases gap classified *ugly, not impossible*; four toggles and
+> music as a theme concern; the app-wide haptic rule; the Kids Category gate; the
+> pending-selection rule (closing Open Question 5); the spacing ruling (requirement 16).
+>
+> **Why 92.** Every control on both surfaces has a complete named write path, settled
+> player-facing copy, and both feedback channels specified with assertions this PRD owns.
+> **This PRD carries no open item of its own.** What remains is debt owned elsewhere and
+> explicitly non-blocking: requirement 20's section ships unstyled until a Decision describes
+> it, requirement 24's switch is wired to a channel nothing plays yet, and `surfaces.button.*`
+> has no published sub-keys (requirement 19). None stops an agent; none is this PRD's to clear.
 
 **Wave:** P4 — the settings surface itself, once the things it switches off exist.
 
+**Files this PRD owns:** `lib/ui/menus/settings_screen.dart` (`SettingsScreen`) and
+`lib/ui/menus/quick_actions_surface.dart` (`QuickActionsSurface`) — the two widgets
+`P2-01-navigation.md` requirement 2's route table already names, at `Routes.settings`
+(`/settings`) and `Routes.quickActions` (`/game/<id>/quick-actions`). `lib/ui/menus/` is
+settled, not provisional: `Tech Design.md` → Decisions → Project structure — layer-first.
+
 **Dependencies:**
 
-- `P1-04-persistence.md` owns storing and restoring the four preferences. This PRD reads
-  and writes through that layer and defines no storage of its own.
-- `P1-03-theme-system.md` owns the theme object and its materialization. This PRD requires
-  only that the three toggles are *not* part of it, and names the slots this surface reads.
-- `P2-02-audio.md`, `P2-03-haptics.md`, `P2-04-animations.md` own the three channels —
-  **the mechanism and what "off" means**. This PRD owns the player-facing switch UI for
-  each and nothing about the behavior behind it. All three are wave 2, so they ship first.
-- `P2-01-navigation.md` owns the two entry points as routes and the rule that reaching
-  settings mid-game does not leave the game (its requirements 7 and 10). Its Out of Scope
-  assigns **the exit control's own presentation** to this PRD — requirement 19.
-- `P4-05-purchase-flow.md` owns the purchase surface, the restore operation, and everything
-  a trigger presents, exposed as an invocable API (its requirements 5 and 10). This PRD is
-  the **host** that surfaces the two controls — requirements 20–22. Same wave,
-  parallel-safe: the coupling is an interface, not a screen.
-- `P1-07-entitlements.md` owns what an entitlement is and how it is held. This surface
-  grants nothing and stores nothing about ownership.
-- `P4-01-main-menu.md` owns the Settings button on the main menu; this PRD owns what that
-  button opens. Same wave, parallel-safe.
-- `P3-03-scoreboard-turn-indicator.md` owns the placement of the in-game settings button in
-  the scoreboard strip (its requirement 12); this PRD owns what tapping it opens. Wave 3,
-  so it ships first.
+- `P1-04-persistence.md` owns the settings state and its persistence, and publishes all four
+  setters and all four `Provider<bool>` read points — requirement 13.
+- `P1-03-theme-system.md` owns the theme object. Every value drawn here is a key path from
+  its requirement 15 schema; requirement 16 tabulates them, and excepts spacing.
+- `P2-02-audio.md` owns the audio layer and the `buttonTap` moment this surface fires
+  (requirement 25). **It does not own music** — see requirement 24.
+- `P2-03-haptics.md` owns the haptic this surface fires (requirement 25);
+  `P2-04-animations.md` owns the animation channel.
+- `P2-01-navigation.md` owns both entry points as routes (its requirement 10), the mid-game
+  rule (its requirement 14), the exit transition (its requirement 15), dismissal (its
+  requirement 5), and the structural bar on theme selection from a game (its requirement 18).
+- `P3-02-move-input.md` owns the pending selection; requirement 2 states only what opening
+  this surface does to it.
+- `P4-05-purchase-flow.md` owns the purchase surface, the restore operation **and the
+  parental gate** (its requirement 12). This PRD hosts the triggers — requirements 20–22.
+- `P1-07-entitlements.md` owns what an entitlement is. This surface grants nothing.
+- `P4-01-main-menu.md` owns the Settings button; `P3-03-scoreboard-turn-indicator.md`
+  requirement 12 owns the in-game settings button. This PRD owns what each opens.
 
-> **Ownership boundary, stated once.** The three channel PRDs own each channel's behavior,
-> including what happens when it is switched off. Requirements 7–10 below restate that
-> behavior because a switch is not specifiable without saying what it switches — but where
-> this PRD and a channel PRD describe the same behavior, **the channel PRD is the owner**
-> and this one is the restatement. See Open Question 4. **The same split governs the
-> purchases section:** this PRD owns the section and its entry points, `P4-05` owns what
-> those entry points present.
+> **Ownership boundary, stated once.** The channel PRDs own each channel's behavior,
+> including what happens when it is switched off. Requirements 7–10 restate that behavior
+> because a switch is not specifiable without saying what it switches — but where this PRD
+> and a channel PRD describe the same behavior, **the channel PRD is the owner**. See Open
+> Question 4. The same split governs the purchases section. **Music is the one channel with
+> no owning PRD at all** — requirement 24.
 
 ## Problem
 
-Sound, haptics and animations are all theme-driven or app-driven behaviors a player has no
-way to stop. There is no application code yet, so today there is no settings surface at
-all: no way to mute a theme (`Theming.md` → Sound Decisions → Global mute), no way to turn
-off the buzz that fires on every valid tap (`Menus and UI.md` → Vibrate on Touch), and no
-way to turn animations off (`Animations.md` → Decisions → Turn animations off). Worse for
-the pass-and-play case, there is also no way out of a game short of finishing it — the
-docs put the exit inside this same surface (`Menus and UI.md` → Decisions → How do you get
-back to the main menu from a game?), so without it a player who starts a game is stuck in
-it. And the $4.99 open-game-slot unlock now has a host named but not built: without this
-screen the product is unbuyable, and the *Restore purchases* control Apple requires has
-nowhere to live.
+Music, sound, haptics and animations are all theme-driven or app-driven behaviors a player
+has no way to stop. There is no application code yet, so today there is no settings surface
+at all: no way to mute a theme (`Theming.md` → Sound Decisions → Global mute), no way to
+turn off the buzz that fires on every valid tap (`Menus and UI.md` → Vibrate on Touch), and
+no way to turn animations off (`Animations.md` → Decisions → Turn animations off). Worse for
+the pass-and-play case, there is no way out of a game short of finishing it — the docs put
+the exit inside this same surface (`Menus and UI.md` → Decisions → How do you get back to
+the main menu from a game?), so a player who starts a game is stuck in it. And the $4.99
+open-game-slot unlock has a host named but not built: without this screen the product is
+unbuyable, and the *Restore purchases* control Apple requires has nowhere to live.
 
 ## Goal
 
 A player can reach settings from two places — the main menu's Settings button and the
-gameplay screen's top-right button — and from either one switch sound effects, vibrate on
-touch and animations on or off. The three are global, player-owned and remembered between
-sessions, so a theme can never override them; because the in-game route is a set of quick
-actions that also contains "exit to main menu", a player can change a setting or walk away
-mid-game without losing the game, which stays in the open-games list with its own
-scoreboard; and the screen carries the purchases section that makes the slot unlock buyable
-and restorable, behind the parental gate the Kids Category requires.
+gameplay screen's top-right button — and switch music, sound effects, vibrate on touch and
+animations on or off. All four are global, player-owned and remembered between sessions, so
+a theme can never override them; the in-game route also carries the exit, so a player can
+change a setting or walk away mid-game without losing the game; and the screen carries the
+purchases section that makes the slot unlock buyable and restorable, behind the parental
+gate the Kids Category requires.
 
 ## Requirements
 
 ### Entry points
 
-1. **The main menu's Settings button opens the settings surface.**
-   *Source: `Menus and UI.md` → Main Menu ("**Settings** — opens the settings menu");
-   → Settings Menu ("Reachable from two places: 1. The **main menu** (Settings button)");
-   → Screens (so far) #6.*
+1. **The main menu's Settings button opens `SettingsScreen` at `Routes.settings`**, via
+   `ref.read(appNavigatorProvider).openSettings()`.
+   *Source: `Menus and UI.md` → Main Menu; → Settings Menu ("Reachable from two places: 1.
+   The **main menu** (Settings button)"); `P2-01-navigation.md` requirements 2, 3 and 10.*
 
-2. **The gameplay screen's settings button opens the settings surface too, and reaching it
-   does not abandon or end the game in progress.** The doc calls this the important
-   requirement of the two: settings must be available mid-game.
-   *Source: `Menus and UI.md` → Settings Menu ("2. The **gameplay screen** — you can get to
-   settings without abandoning a game. That second one is the important requirement");
-   → How you reach settings from gameplay; `Game Board Design.md` → Scoreboard.*
+2. **The gameplay screen's settings button opens `QuickActionsSurface` at
+   `Routes.quickActions`, and reaching it does not abandon or end the game in progress**,
+   via `openQuickActions()`. The doc calls this the important requirement of the two:
+   settings must be available mid-game.
+   *Source: `Menus and UI.md` → Settings Menu ("you can get to settings without abandoning a
+   game. That second one is the important requirement"); `Game Board Design.md` → Scoreboard;
+   `P2-01-navigation.md` requirement 14, which makes it a child route so the game screen
+   stays mounted beneath.*
    *Testable:* open the surface mid-game, dismiss it, and the board, whose turn it is, and
-   the scoreboard are exactly as they were.
-   *Deliberately not asserted:* what happens to a **pending (selected-but-unconfirmed)
-   move** while the surface is up. An earlier draft of this requirement asserted as
-   testable that the pending selection survives; that is not settled by any design doc, and
-   `P3-02-move-input.md` → OQ-1 carries it as an open question. It is demoted here to Open
-   Question 5 rather than decided in either direction.
+   the scoreboard are exactly as they were. (`P2-01` requirement 14's *Wave note* assigns
+   this assertion here.)
+
+   **A pending selection does not survive it.** Opening either surface clears a pending,
+   unconfirmed move selection — not as a rule of this screen's, but as one instance of the
+   single rule governing every tap off the nine quadrants.
+   *Source: `Game Board Design.md` → Decisions → Does a tap outside the board clear a pending
+   move? — "**Yes — any tap outside the nine quadrants clears a pending, unconfirmed
+   selection.** That includes the legend/how-to-play strip, the scoreboard, the settings
+   button, and opening any menu or sheet. One rule, uniformly applied."*
+   *Testable:* with a pending selection active, tapping the settings button leaves no pending
+   selection; dismissing returns to a board with none, and with the board, the current player
+   and the scoreboard unchanged.
+   *Boundary:* the pending selection is `P3-02-move-input.md`'s state (its requirement 20).
+   The same Decision's near-miss consequence — the 3pt gutters and 5pt quadrant padding also
+   counting as outside — is that PRD's, not this one's.
 
 3. **The in-game entry point opens *quick actions* — a short list of things you can do
-   mid-game — not just a list of toggles.** Contents so far: exit the game / back to the
-   main menu, plus the sound effects and vibrate toggles.
-   *Source: `Menus and UI.md` → How you reach settings from gameplay ("Tapping it opens
-   **quick actions** — a short list of things you can do mid-game, including **exit the
-   game** back to the main menu"), and its **Quick actions contents (so far)** list.*
-   *Note:* whether the Animations toggle also appears here follows from Open Question 1 —
-   the doc's quick-actions list names only sound and vibrate, while the Settings Menu
-   section names three toggles. Requirement 6 is scoped accordingly, and requirement 20
-   carries the same open scoping for the purchases section.
+   mid-game — not just a list of toggles.**
+   *Source: `Menus and UI.md` → How you reach settings from gameplay, and its **Quick
+   actions contents (so far)** list: "Exit the game / back to main menu" and "The sound
+   effects and vibrate toggles".*
+   Requirement 6 fixes the contents of each surface.
 
 4. **The settings button does double duty in-game: it is both the settings entry point and
    the way out of a game.** Exiting is available without finishing the game.
-   *Source: `Menus and UI.md` → How you reach settings from gameplay ("So the settings
-   button does double duty in-game"); → Decisions → How do you get back to the main menu
-   from a game? ("It opens quick actions, which include exiting the game. You don't have to
-   finish a game to leave it").*
+   *Source: `Menus and UI.md` → How you reach settings from gameplay; → Decisions → How do
+   you get back to the main menu from a game?*
+   *Not the only way out of a finished game:* `P3-04-game-over-rematch.md` requirement 5
+   gives the result card two controls of its own and states the card is self-sufficient, so
+   "a player is never dependent on the in-game settings button to leave a finished game,
+   whatever that button's liveness turns out to be."
 
 5. **Exiting from quick actions returns the player to the main menu and discards nothing.**
-   The game stays in the open-games list with its own scoreboard and is resumable.
-   *Source: `Menus and UI.md` → Leaving a game mid-play ("going back to the main menu
-   doesn't discard anything — the game stays in the open-games list with its own
-   scoreboard, and you can pick it up again"); → Decisions → What does an open game hold?;
-   `Game Overview.md` → Decisions → Scoreboard lifetime.*
+   The game stays in the open-games list with its own scoreboard and is resumable. The
+   control calls `exitGameToMainMenu()` — requirement 19.
+   *Source: `Menus and UI.md` → Leaving a game mid-play; → Decisions → What does an open
+   game hold?; `Game Overview.md` → Decisions → Scoreboard lifetime.*
    *Testable:* leave mid-game, return to the open-games list, reopen the same game, and the
    board and its running series score are unchanged.
-   The routing half — whether this pops to an existing main menu or pushes a fresh one — is
-   `P2-01-navigation.md` requirements 11 and 12, and its Open Question 2. The control the
-   player taps to trigger it is requirement 19 below.
+   The routing half — `go` or `pop` — is `P2-01-navigation.md` requirement 15 and its Open
+   Question 2.
 
-### The three toggles
+### The four toggles
 
-6. **There is no *setting* on either surface beyond these three — Sound effects, Vibrate on
-   touch, Animations — and each is a plain two-state on/off.** Scoped, because the two
-   surfaces are not settled to be the same thing:
-   - **The main-menu surface draws all three.** *(`Menus and UI.md` → Settings Menu:
-     "Contents so far — three toggles".)*
-   - **How many of the three the in-game quick-actions surface draws is not settled.** The
-     doc's quick-actions list names only the sound effects and vibrate toggles
-     (requirement 3); whether the Animations toggle joins them follows from Open
-     Question 1, and this PRD does not decide it.
-   - **Neither surface gains a fourth setting**, whichever way Open Question 1 falls. This
-     is unaffected by requirement 20: a purchase item is **not a setting**, so the
-     purchases section does not make a fourth. What it does change is that the screen is no
-     longer *only* settings — see requirement 20, and the title of this PRD.
-   *Source: `Menus and UI.md` → Settings Menu; → How you reach settings from gameplay
-   (**Quick actions contents (so far)**); → Persistence (the persisted preferences are
-   theme, sound, vibrate, animations — "So there are four persisted preferences").*
-   *Note:* the handoff draws a fourth toggle, **Music**, in both `2b` and `1f` — see Open
-   Question 3.
+6. **There is no *setting* on either surface beyond these four — Music, Sound effects,
+   Vibrate on touch, Animations — each a plain two-state on/off. The two surfaces differ,
+   and this is their shape:**
 
-7. **Sound effects is a global mute.** It is global for the whole game rather than
-   per-theme, it is separate from the theme, and it mutes *any* theme.
-   *Source: `Theming.md` → Sound Decisions → Global mute ("**Global for the whole game**,
-   not per-theme"); `Menus and UI.md` → Decisions → Should there be a mute button, and
-   where does it live? ("it mutes any theme").*
-   *Testable:* with sound off, switch between Neon and Classic Red vs Blue and no sound
-   plays under either.
+   | Surface | Toggles | Exit | Purchases |
+   |---|---|---|---|
+   | `SettingsScreen` (main menu) | **all four** — Music, Sound effects, Vibrate on touch, Animations | no | yes — requirement 20 |
+   | `QuickActionsSurface` (in game) | Sound effects, Vibrate on touch | yes | no |
+
+   *Source: `Menus and UI.md` → Settings Menu ("**Contents so far — four toggles**", and the
+   mock drawing all four); → Decisions → What are the settings on a fresh install? ("**All
+   four toggles default to on**"); → Persistence ("five persisted preferences — theme, music,
+   sound, vibration, and animations"); `Theming.md` → Decisions → Do all four toggles ship,
+   and is music a theme concern?*
+   *Testable:* `SettingsScreen` renders exactly four switches, `QuickActionsSurface` exactly
+   two; neither widget tree contains a fifth.
+
+   **The in-game row is a fence, and the fence needs saying out loud.**
+   `Menus and UI.md`'s quick-actions list names the sound effects and vibrate toggles and
+   nothing else — but that list **predates the four-toggle Decision and was not updated with
+   it**, so its silence on Music is not evidence any more than its silence on Animations was.
+   Fenced to the two the doc names, because they are the two it names; reversible.
+   `P2-01-navigation.md` requirement 2 makes reversing it a change to **widget contents
+   only** — not the route table, the operation mapping, or any call site. Which of the four
+   the in-game surface carries is part of Open Question 1's substance.
+   *No default is resolved here.* "Nothing stored" resolves to `true` in `Settings.defaults`
+   and nowhere else — `P1-04-persistence.md` requirement 26. This surface writes no `?? true`.
+
+7. **Sound effects is a global mute for the game's one-shot sounds** — global for the whole
+   game rather than per-theme, separate from the theme, and it mutes *any* theme. It is a
+   different channel from Music (requirement 24): switching one off does not switch the other.
+   *Source: `Theming.md` → Sound Decisions → Global mute; `Menus and UI.md` → Decisions →
+   Should there be a mute button, and where does it live?; → Settings Menu, whose table
+   distinguishes the two.*
+   *Testable:* with sound off and music on, switch between Neon and Classic Red vs Blue and
+   no sound effect plays under either, while the music channel is untouched.
    *Owner of the behavior:* `P2-02-audio.md` requirement 16. This PRD owns the switch.
+   *Note:* this toggle also gates the tap sound its own row makes — requirement 25's
+   `buttonTap` runs through the same mute, since `P2-02` req 16 puts the gate inside the
+   layer. A player muting sound stops hearing the taps that mute it.
 
 8. **Vibrate on touch switches the haptic on and off.** With it on, the haptic fires on
    every valid click, including the first tap of a two-tap move; with it off, no haptic
    fires anywhere.
-   *Source: `Menus and UI.md` → Settings Menu table ("Haptic feedback on tap. Fires on
-   every *valid* click. On/off"); → Vibrate on Touch; `Game Board Design.md` → Haptic Rule
-   ("Subject to the vibrate-on-touch setting being on").*
+   *Source: `Menus and UI.md` → Settings Menu table; → Vibrate on Touch;
+   `Game Board Design.md` → Haptic Rule ("Subject to the vibrate-on-touch setting being
+   on").*
+   *Testable:* with a recording haptic double, flipping this switch off and performing a
+   valid board tap records zero haptics; flipping it on and repeating records exactly one.
    *Owner of the behavior:* `P2-03-haptics.md` requirements 10–12. This PRD owns the switch.
 
-9. **Animations off means the game does the thing instantly** — the mark simply appears,
-   the quadrant is simply claimed. No animation, and no substitute effect, fade or
-   transition standing in for one. The game stays fully playable and fully readable in this
-   mode.
-   *Source: `Animations.md` → Decisions → Animations off = instant state change; →
-   Decisions → Turn animations off — a global setting.*
+9. **Animations off means the game does the thing instantly** — the mark simply appears, the
+   quadrant is simply claimed. No animation, and no substitute effect, fade or transition
+   standing in for one.
+   *Source: `Animations.md` → Decisions → Animations off = instant state change; → Turn
+   animations off — a global setting.*
    *Testable:* with animations off, a confirmed move produces the new board state with no
    intermediate frames and no substitute effect.
-   *Owner of the behavior:* `P2-04-animations.md` requirements 19–21, whose own requirement
-   17 names this PRD as the owner of the switch. This PRD owns the switch.
+   *Owner of the behavior:* `P2-04-animations.md` requirements 19–21, whose requirement 17
+   names this PRD as the owner of the switch.
 
-10. **iOS Reduce Motion does not drive the Animations toggle.** There is exactly one
-    control and the player owns it; Reduce Motion being on does not change what the game
-    does.
+10. **iOS Reduce Motion does not drive the Animations toggle.** There is exactly one control
+    and the player owns it.
     *Source: `Animations.md` → Decisions → Does iOS Reduce Motion drive the animations
-    toggle? ("no lets leave this as a game setting for user to command").*
-    *Testable:* with Reduce Motion on at the OS level and the Animations toggle on,
-    animations still play.
-    *Owner of the behavior:* `P2-04-animations.md` requirement 18, including the
-    platform-flag half of that testable. This PRD owns the switch.
+    toggle?*
+    *Owner of the behavior:* `P2-04-animations.md` requirement 18.
 
-11. **All three are global, player-controlled and not theme-defined — a theme cannot
-    override them.** No key in a theme file sets, forces or reads any of the three, and
-    switching themes never changes their values.
-    *Source: `Menus and UI.md` → Settings Menu ("All three are **global**,
-    **player-controlled**, and **not theme-defined** — a theme can't override them");
-    `Animations.md` → Decisions → Turn animations off ("it is **not theme-defined**");
-    `Theming.md` → Sound Decisions → Global mute ("Muting is a player setting, not a theme
-    property").*
-    *Testable:* set the three toggles, switch the active theme, and all three values are
-    unchanged; a theme file carrying keys with these names changes nothing.
+11. **All four are global, player-controlled and not theme-defined.** No key in a theme file
+    sets, forces or reads any of the four, and switching themes never changes their values.
+    This holds for Music too: a theme supplies the music, and the player's mute of it is not
+    the theme's to override.
+    *Source: `Menus and UI.md` → Settings Menu ("All four are **global**,
+    **player-controlled**, and **not theme-defined**"); `Animations.md` → Decisions → Turn
+    animations off; `Theming.md` → Sound Decisions → Global mute; → Decisions → Do all four
+    toggles ship, and is music a theme concern? `P1-03-theme-system.md` requirement 30 holds
+    the same line from the schema side.*
+    *Testable:* set the four toggles, switch the active theme, and all four are unchanged.
 
-12. **The two entry points edit the same values.** There is one global value per toggle —
-    not a main-menu copy and an in-game copy.
-    *Source: `Menus and UI.md` → Settings Menu ("All three are **global**"); → How you
-    reach settings from gameplay.*
-    *Testable:* change a toggle in-game, exit to the main menu, open Settings there, and it
-    shows the changed value (and the reverse).
+12. **The two entry points edit the same values** — one global value per toggle, because both
+    surfaces read and write the same provider (requirement 13).
+    *Testable:* change a toggle in `QuickActionsSurface`, exit to the main menu, open
+    `SettingsScreen`, and it shows the changed value (and the reverse).
 
-13. **All three are remembered between sessions, in whatever state they were left**, read
-    back on launch through the persistence layer rather than any store of this feature's
-    own.
-    *Source: `Menus and UI.md` → Settings Menu ("All three are **remembered between
-    sessions**"); → Persistence (table); `Theming.md` → Sound Decisions → Global mute
-    ("**Remembered between sessions**"); `Tech Design.md` → Decisions → Persistence package.*
+13. **Every switch writes through `SettingsNotifier`'s setters and reads through the four
+    settings providers. `PreferencesRepository` is never called from this surface.**
+
+    ```dart
+    // write — the only write path for these preferences
+    ref.read(settingsProvider.notifier).setMusic(value);
+    ref.read(settingsProvider.notifier).setSoundEffects(value);
+    ref.read(settingsProvider.notifier).setVibrateOnTouch(value);
+    ref.read(settingsProvider.notifier).setAnimations(value);
+
+    // read — Provider<bool>, synchronous, never null
+    ref.watch(musicEnabledProvider);
+    ref.watch(soundEffectsEnabledProvider);
+    ref.watch(vibrateOnTouchEnabledProvider);
+    ref.watch(animationsEnabledProvider);
+    ```
+
+    All eight symbols are declared in `lib/state/settings_providers.dart` by
+    `P1-04-persistence.md` requirements 26 and 27, over a `Settings` class whose `music`
+    field is backed by `ttt.pref.musicEnabled`. **This PRD is `musicEnabledProvider`'s first
+    consumer** — that PRD ships it noting it has none yet.
+    *Source: `P1-04-persistence.md` requirement 27 — the setters update `state` first and then
+    persist, and "a caller that writes to the repository directly bypasses the provider and
+    leaves the two out of step — so `P4-04-settings.md`'s switches call the setters, not the
+    repository."*
+    **Why this is not a detail.** Writing to the repository would still persist and still
+    reload, so the switch would *look* correct — while every in-session consumer kept reading
+    a stale provider. `P2-03-haptics.md` requirement 12 (a vibrate toggle flipped in quick
+    actions governing the very next tap) would fail silently.
+    *Testable:* a scan of `lib/ui/menus/` finds no `PreferencesRepository` and no
+    `preferencesRepositoryProvider`; with a fake repository, flipping the vibrate switch makes
+    `vibrateOnTouchEnabledProvider` read the new value on the next read **within the same
+    frame**, and records exactly one write.
 
 ### What the toggles are, structurally
 
-14. **Sound and Animations switch off a *theme channel*; Vibrate switches off an *app
-    behavior* that is never theme-defined at all.** The three look alike in the UI, but
-    only two of them correspond to something a theme defines. Concretely: the theme object
-    has no haptic concept, and turning sound or animations off suppresses a theme-supplied
-    channel without altering the active theme or its definition.
-    *Source: `Theming.md` → What a Theme Does NOT Control ("Haptics are **not**
-    theme-driven. Vibration lives at the **application setting level** ... two of them
-    switch off a theme channel and one switches off an app behavior"); → What Is a Theme?
-    (sound and animations are pillars of a theme).*
-    *Testable:* the theme schema defines sound and animation values and defines nothing
+14. **Music, Sound and Animations switch off a *theme channel*; Vibrate switches off an *app
+    behavior* that is never theme-defined at all.** The theme object has no haptic concept,
+    and turning a theme channel off suppresses it without altering the active theme or its
+    definition.
+    *Source: `Theming.md` → What a Theme Does NOT Control (whose table lists Music as
+    theme-controlled and haptics as not); → What Is a Theme?; `P1-03-theme-system.md`
+    requirement 29.*
+    *Testable:* the theme schema defines music, sound and animation values and nothing
     haptic; muting does not modify the loaded theme.
 
-15. **Neither entry point offers theme selection or a theme change.** Theme selection lives
-    on the main menu, and the theme cannot be changed mid-game.
-    *Source: `Theming.md` → Decisions → Where theme selection lives ("Not buried in a
-    settings screen"); → Decisions → Can you change the theme mid-game ("**No** — leave it
-    out for now. Theme changes happen from the main menu only"); `Menus and UI.md` → Theme
-    Selection.*
-    *Testable:* no control on either surface changes the selected theme.
-    `P2-01-navigation.md` requirement 14 and `P4-03-theme-selection.md` requirement 19 hold
-    the same constraint from the routing and screen sides. Whether the surface may
-    *display* the active theme read-only is a separate question — see Out of Scope.
-    *Not disturbed by requirement 20:* hosting the slot-unlock purchase is not hosting theme
-    selection. No theme is bought, browsed or applied from this surface.
+15. **Neither surface offers theme selection or a theme change**, and neither invokes
+    `openThemeSelection()`.
+    *Source: `Theming.md` → Decisions → Where theme selection lives; → Can you change the
+    theme mid-game; `P2-01-navigation.md` requirement 18; `P4-03-theme-selection.md`
+    requirement 19.*
+    *Testable:* no call site in either of this PRD's files invokes `openThemeSelection()`,
+    and no control on either surface changes the selected theme.
 
-16. **Both surfaces are theme-driven — no hardcoded colors, backgrounds, fonts or motion
-    values**, and both pass the hardcoded-theme-value test. The slots they read are the
-    **Settings card** and **Sheets** entries in `P1-03-theme-system.md` requirement 15,
-    plus the button tier named in requirement 19.
-    *Source: `Theming.md` → Architectural Rule ("No hardcoded colors, backgrounds, fonts,
-    piece styles, sounds, or animations anywhere in the code"); `Menus and UI.md` → Main
-    Menu ("The entire main menu is itself theme-driven ... No hardcoded styling here
-    either"); `Tech Design.md` → Decisions → Do we add a test that fails on hardcoded theme
-    values?*
-    *Gap this opens:* `P1-03-theme-system.md` requirement 15 provisions no slot for a
-    purchases section, a price row or a restore link. See Open Question 3.
+16. **Every value drawn on both surfaces comes from the theme — except spacing, which is
+    code** — and both pass the hardcoded-theme-value test with the baseline at zero.
+
+    | What | Key path (`P1-03-theme-system.md` req 15) |
+    |---|---|
+    | The settings card | `surfaces.settingsCard.{fill,border,radius}` |
+    | A toggle row's text | `surfaces.settingsCard.toggleRow.{labelStyle,subLabelStyle}` |
+    | The switch | `surfaces.settingsCard.switch.{trackOn,trackOff,knobOn,knobOff,glowOn}` |
+    | The in-game sheet | `surfaces.sheet.{fill,radius}`, `surfaces.sheet.header.{titleStyle,subStyle,closeControl}` |
+    | The scrim behind it | `surfaces.scrim.settings` |
+    | The exit control | `surfaces.button.secondary` — requirement 19 |
+    | The close control | `icons.close.{kind,set,name,path,tint,size}`, plus `icons.close.button.{fill,radius,size}` where drawn — requirement 23 |
+    | The purchases section | `surfaces.settingsCard.purchases.{sectionDivider,priceRow,restoreControl}` — **`deferred`**, see requirement 20 |
+
+    The four toggle rows are four instances of the same row keys; no per-setting key exists
+    or is needed. **This screen reads no `sound` key** — the tap sound is `P2-02-audio.md`'s
+    to resolve from `sound.buttonTap`, not this screen's to look up (requirement 25).
+    **The spacing exception, and where the line falls.** The card's padding, the sheet's
+    inset, the gap between toggle rows and every margin on both surfaces are **constants in
+    this PRD's own files**, not theme lookups — and their presence in the source is not a
+    violation of this requirement.
+    *Source: `Theming.md` → Decisions → Does a theme control spacing and padding? — "**No.
+    Spacing and layout numbers are fixed in the code, not theme-controlled — for now.**" The
+    reason is enforcement: the guard "cannot catch a hardcoded gap."*
+    **Classify a new key by the boundary, not by the word "padding"** — `P1-03-theme-system.md`
+    requirement 15: a theme controls **the drawn geometry of a thing itself** — stroke width,
+    glyph size, corner radius, glow spread — while code controls **where things sit relative
+    to one another**. So `radius`, the switch's knob and track sizes and `icons.close.size`
+    remain themed; `surfaces.settingsCard.padding` and `surfaces.sheet.padding` no longer
+    exist, removed in schemaVersion 7 and **must not be read or re-added**.
 
 ### Text scaling
 
 17. **This surface offers no text-size control of its own**, because Dynamic Type is not
     supported in this version.
-    *Source: `Menus and UI.md` → Decisions → Do we support Dynamic Type? ("**Not for now.**
-    *'Lets not do this as of yet.'*").*
+    *Source: `Menus and UI.md` → Decisions → Do we support Dynamic Type?*
     *Testable:* no control on either surface changes text size.
-    *Not deliverable here:* the app-wide half of that decision — that the app does not
-    scale its text to the iOS Dynamic Type setting — is **not this surface's to
-    implement**, and an earlier draft of this requirement asserted it as though it were.
-    Flutter's default behavior follows the OS text-scale factor, so "does not scale" needs
-    a clamp at the app root. No PRD owns that. See Open Question 3.
+    *Not deliverable here:* the app-wide clamp needed to make "does not scale" true is not
+    this surface's, and no PRD owns it — `P4-01-main-menu.md` requirement 20 records the same
+    gap. See Open Question 3.
 
 ### The surface's own controls
 
-*Appended after requirement 17 rather than inserted above, so requirement numbers 1–17 stay
-stable — `P1-03-theme-system.md`, `P2-01-navigation.md`, `P2-04-animations.md` and
-`P4-03-theme-selection.md` all cite them. Requirements 20–22 are appended for the same
-reason.*
+*Requirements 18–25 are appended rather than inserted, so numbers 1–17 stay stable —
+`P1-03-theme-system.md`, `P1-04-persistence.md`, `P2-01-navigation.md`, `P2-02-audio.md`,
+`P2-03-haptics.md`, `P2-04-animations.md` and `P4-03-theme-selection.md` all cite them.*
 
-18. **Each toggle row is labelled with its setting's name as the design doc names it** —
-    *Sound effects*, *Vibrate on touch*, *Animations* — and the control on each row is the
-    on/off switch of requirement 6.
-    *Source: `Menus and UI.md` → Settings Menu (the three-toggle table naming each setting,
-    and the mock drawing one labelled row per setting).*
-    *Testable:* the surface renders exactly one row per setting, each carrying that
-    setting's name.
-    *Not settled — the sub-label.* `P1-03-theme-system.md` requirement 15 provisions a
-    theme slot for *"the toggle row, its sub-label"*, citing this PRD's requirements 6 and
-    16 — but no design doc asks for a sub-label. The explanatory second lines exist only in
-    the handoff (`1f`/`2b`: "Buzzes, pops and splats", "A little buzz on every valid tap",
-    "Marks pop, glow and jiggle"). This PRD does not specify sub-label copy; if that slot is
-    to be filled, the copy needs a decision. See Open Question 3.
+18. **Each toggle row carries its name and a sub-label, both settled copy.** The name reads
+    `surfaces.settingsCard.toggleRow.labelStyle`; the sub-label reads
+    `surfaces.settingsCard.toggleRow.subLabelStyle`. **The four sub-labels, verbatim:**
 
-19. **Exit is presented as one item in the quick-actions list, labelled as leaving the game
-    and going back to the main menu, and it is the control that triggers requirement 5.**
-    `P2-01-navigation.md` → Out of Scope assigns the exit control's own presentation here;
-    that PRD owns only the transition it invokes (its requirement 11).
-    *Source: `Menus and UI.md` → How you reach settings from gameplay — quick actions is "a
-    short list of things you can do mid-game", whose listed contents begin "Exit the game /
-    back to main menu".*
-    *Testable:* the in-game surface presents exactly one exit affordance, and activating it
-    performs requirement 5.
-    *Slot:* per requirement 16 its styling is theme-driven, reading the **secondary button
-    tier** provisioned in `P1-03-theme-system.md` requirement 15 (*"Two button tiers, not
-    one"*).
-    *Not settled — emphasis.* Whether exiting warrants a **destructive** treatment is
-    nowhere decided, and it cannot borrow one: `P1-03-theme-system.md` requirement 15
-    scopes its destructive-action slot to *deleting an open game* (citing
-    `P4-02-open-games-list.md` requirement 7). Leaving a game destroys nothing
-    (requirement 5), which argues against it — but that is an inference, not a Decision.
-    See Open Question 3.
+    | Toggle | Sub-label |
+    |---|---|
+    | Music | Tunes while you play |
+    | Sound Effects | Buzzes, pops and splats |
+    | Vibrate on Touch | A little buzz on every tap |
+    | Animations | Marks that pop and glow |
+
+    *Source: `Menus and UI.md` → Decisions → What are the settings toggle sub-labels? —
+    "**Each of the four toggles carries a short playful sub-label**, matching the handoff's
+    voice and the fact that children are a target audience," and closing: "**These are
+    settled strings — quote them exactly, don't paraphrase.**"*
+    *Testable:* one row per setting; each renders that setting's name and exactly the string
+    above, character for character.
+    **The Decision supersedes the handoff's sub-labels, deliberately — do not "correct" these
+    back.** Three of the four differ from `design_handoff_game_ui/README.md` → `1f`, which
+    draws "Background track", "A little buzz on every **valid** tap" and "Marks pop, glow
+    **and jiggle**". The difference was put to the user with both sets side by side,
+    including the argument that the handoff's are more literally accurate, and the strings
+    above are what they chose. A future reader comparing the two will find a mismatch that
+    looks like drift and is not; the Decision is the source of truth for this copy, and the
+    handoff is not.
+
+19. **Exit is one item in `QuickActionsSurface`, labelled as leaving the game and going back
+    to the main menu, drawn from `surfaces.button.secondary`, calling
+    `ref.read(appNavigatorProvider).exitGameToMainMenu()`.** No `go_router` symbol is
+    imported or called anywhere in this PRD's files; `P2-01-navigation.md` requirement 1's
+    scan fails the build if one is.
+    *Source: `Menus and UI.md` → How you reach settings from gameplay; `P2-01-navigation.md`
+    requirements 3 and 15, whose *Wave note* names this control as this PRD's. The two button
+    tiers are the schema's shape — `P1-03-theme-system.md` requirement 15 publishes
+    `surfaces.button.{primary,secondary}` as `required` — not a phrasing quoted from it.*
+    *Testable:* exactly one exit affordance; activating it calls `exitGameToMainMenu()` once
+    on a recording `AppNavigator` fake; a scan of `lib/ui/menus/` finds no `go_router` import.
+    *Not settled — emphasis.* Whether exit warrants a **destructive** treatment is undecided
+    and it cannot borrow one: `surfaces.destructive` is `required` and authored, but its two
+    paths are scoped to deleting an open game (`P4-02-open-games-list.md` reqs 17, 27).
+    Neither describes a menu row that ends nothing. Until decided, exit reads
+    `surfaces.button.secondary`.
+    *Upstream gap — the tier's own shape is unpublished.* `surfaces.button.{primary,secondary}`
+    is `required` but its **sub-keys are not enumerated**, unlike `surfaces.input` or
+    `surfaces.settingsCard` beside it in the same table. Three PRDs now read it — this one,
+    `P4-01-main-menu.md` and `P4-02-open-games-list.md` — and none can name the members it
+    resolves to. That is `P1-03`'s to close; see Open Question 3.
 
 ### The purchases section
 
-20. **The settings surface carries a purchases section, distinct from the toggles, holding
-    two items: the $4.99 open-game-slot unlock, and a global *Restore purchases* control.**
-    *Source: `Menus and UI.md` → Decisions → Where the open-game slot unlock is sold ("**The
-    Settings screen.** The Settings screen gains a purchases section holding the $4.99
-    open-game-slot unlock and a global **Restore purchases** control" — and, in the same
-    Decision, "the Settings screen now carries more than the three toggles specified in
-    **Settings Menu** above"); → Decisions → How many open games do we keep? ("**3 by
-    default** ... a **$4.99 in-app purchase raises the cap to 100 open game slots**").*
-    *Testable:* the main-menu surface presents a purchases section containing exactly these
-    two items, distinct from the toggle rows.
-    Scoped like requirement 6, because the two surfaces are not settled to be the same
-    thing:
-    - **The main-menu surface carries it.** The Decision names "the Settings screen", which
-      is unambiguously the main-menu route.
-    - **Whether it also appears in the in-game quick-actions surface is not settled** — see
-      Open Question 6. This PRD does not decide it, and builds neither reading into the
-      in-game surface.
-    *Boundary:* this PRD owns the section, the two controls, and the fact that activating
-    one invokes `P4-05-purchase-flow.md`'s API (its requirements 5 and 10). It owns nothing
-    the controls then present — not the product, its type, the price display, the store
-    query, the purchase sheet, or what restore does. `P4-05`'s own preamble anticipates
-    exactly this arrangement: *"The winning host adds one control that invokes it and owns
-    nothing else."*
-    *Not a fourth setting:* see requirement 6's third bullet.
+20. **`SettingsScreen` carries a purchases section, distinct from the toggles, holding two
+    items: the $4.99 open-game-slot unlock, and a global *Restore purchases* control.**
+    `QuickActionsSurface` does not carry it — requirement 6's table.
+    *Source: `Menus and UI.md` → Decisions → Where the open-game slot unlock is sold; → How
+    many open games do we keep?*
+    *Testable:* `SettingsScreen` presents a purchases section containing exactly these two
+    items, distinct from the toggle rows; `QuickActionsSurface` presents neither.
 
-21. **The purchase control does not reach the purchase flow unless the parental gate has
-    been passed.** The app is listed in Apple's Kids Category, which requires a parental
-    gate before any purchase flow; the gate's scope is purchases only.
-    *Source: `Tech Design.md` → Decisions → Kids category ("A **parental gate** is required
-    before any purchase flow and before any link that leaves the app"; "**The parental
-    gate's scope is purchases only.** The game has no outbound links today — no in-app
-    support URL, no social links, no advertising").*
-    *Testable:* activating the purchase control with the gate not passed does not invoke
-    `P4-05`'s purchase API; the invocation happens only on the gate's success path.
-    **Where the line is drawn** — the doc leaves this to a PRD (*"What the gate looks like
-    and how it challenges is a PRD's job, not this doc's"*), so: this PRD requires **that**
-    the gate precedes the purchase, because the trigger is this surface's. It does **not**
-    design the challenge — what it asks, how it validates, how failure and retry behave —
-    which belongs with everything else the trigger presents, in `P4-05-purchase-flow.md`.
-    That is the same split as requirement 20 and the boundary block above, and it is the
-    cleaner one: a gate designed here would be a second thing to keep in sync with the flow
-    it guards.
-    *Gap this names:* `P4-05-purchase-flow.md` has **no parental-gate requirement today** —
-    its requirement 10 runs a purchase straight to a store outcome, and
-    `P5-03-release-fastlane.md` had already flagged that nothing in the pipeline owns this.
-    Requirement 21 pins the *ordering* to this surface; the challenge itself still has no
-    owner. Routed, not fixed — see Open Question 3.
-    *Restore is not gated:* the Decision names purchases as the trigger, and a restore makes
-    no charge. No doc states that restore needs the gate, so nothing here requires it.
+    **It ships unstyled until a Decision describes it — this does not block.**
+    `surfaces.settingsCard.purchases.{sectionDivider,priceRow,restoreControl}` is `deferred`
+    in `P1-03-theme-system.md` requirement 15, whose triage rule classifies the absence as
+    **ugly, not impossible**: *"Ugly can wait for a design pass — the feature ships, looks
+    wrong, and is fixed by authoring one value later with no code change, because the key
+    already exists and the consumer already reads it."* It names this section explicitly —
+    *"`surfaces.settingsCard.purchases.*` is ugly — `P4-04` can render its section
+    unstyled."* Contrast the trash glyph, authored immediately because with no slot and no
+    permitted literal there was **no legal implementation at all**.
+    So: build the section, read the keys, accept that it looks plain until values are
+    authored, and **do not hardcode a substitute** — `deferred` still forbids that. What is
+    missing is a Decision describing what the section *is*: `P1-03`'s *Blocking* item 6.
+    *Boundary:* this PRD owns the section and the two controls, and that activating one
+    invokes `P4-05-purchase-flow.md`'s API. It owns nothing they present.
+
+21. **The purchase control invokes `P4-05-purchase-flow.md`'s gated purchase entry point, and
+    this surface implements no parental gate of its own.**
+    *Source: `P4-05-purchase-flow.md` requirement 12, which **is** the gate — "no purchase can
+    be initiated without passing it" — and whose ownership block states that
+    "`P4-04-settings.md` should defer to this requirement rather than specify a gate of its
+    own." Underlying decision: `Tech Design.md` → Decisions → Kids category, scope purchases
+    only.*
+    *Testable:* activating the purchase control calls `P4-05`'s purchase entry point exactly
+    once; a scan of this PRD's files finds no gate, challenge or age-check widget of its own.
+    *Restore is not gated:* `P4-05` requirement 12 scopes the gate to the purchase operation,
+    and a restore makes no charge.
 
 22. **The *Restore purchases* control is a compliance control, not the mechanism by which
     entitlements arrive.** It is present because Apple's review guidelines require it;
     activating it invokes `P4-05-purchase-flow.md`'s restore operation (its requirement 5),
-    behind which is `AppStore.sync()`. Entitlements are authoritative from StoreKit's
-    `Transaction.currentEntitlements` and repopulate on their own — signing in on a new
-    device restores a non-consumable without the player ever touching this control.
+    behind which is `AppStore.sync()`. Entitlements are authoritative from
+    `Transaction.currentEntitlements` and repopulate on their own.
     *Source: `Tech Design.md` → Decisions → Entitlements — Apple stores them, no backend
-    needed ("Restore for non-consumables is largely automatic: signing in on a new device
-    repopulates entitlements without the player doing anything. The visible **Restore
-    purchases** control is still required by Apple's review guidelines, and
-    `AppStore.sync()` is the explicit call behind it — so the control is a compliance
-    requirement more than a functional one"); `Menus and UI.md` → Decisions → Where the
-    open-game slot unlock is sold, which places the control here and calls it global.*
-    *Testable:* the control is present and invokes the restore operation; **no
-    entitlement-granting logic lives in this surface**; and a fresh install signed into the
-    same Apple ID holds its entitlements with this control never having been tapped.
-    *Why worded this way:* built as though it were the mechanism, this control becomes a
-    step the player is expected to complete, and the "I paid and it's gone" path gets built
-    around a button instead of around `currentEntitlements`.
+    needed ("the control is a compliance requirement more than a functional one").*
+    *Testable:* the control invokes the restore operation exactly once; **no
+    entitlement-granting logic lives in this surface**; a fresh install signed into the same
+    Apple ID holds its entitlements with this control never having been tapped.
+
+### Leaving the surface
+
+23. **Both surfaces present one dismiss control — a close control reading `icons.close`, and
+    on the in-game sheet positioned per `surfaces.sheet.header.closeControl` — calling
+    `ref.read(appNavigatorProvider).dismissCurrent()`.**
+    *Source: `P2-01-navigation.md` requirements 5 and 14; `P1-03-theme-system.md`
+    requirement 15, whose `icons.close` slot is `required` and cited to this PRD.*
+    *Testable:* exactly one dismiss affordance per surface; activating it calls
+    `dismissCurrent()` once on a recording fake; from `/game/abc/quick-actions` the player
+    lands back on `/game/abc`.
+    **This is a fence, not a Decision** — `P2-01-navigation.md` → Open Question 9 records the
+    gap. If the answer is a back affordance, `icons.chevronLeft` is the provisioned
+    alternative and the call is unchanged.
+
+### The Music toggle, and the layer it does not have
+
+24. **The Music switch is a global mute for the theme's background music, on the same terms
+    as the other three: global, player-controlled, not theme-defined, persisted, defaulting
+    to on.**
+    *Source: `Theming.md` → Decisions → Do all four toggles ship, and is music a theme
+    concern?; `Menus and UI.md` → Settings Menu ("**Music** — Global mute toggle for
+    background music. Separate from the theme — mute any theme's music"); → Persistence; →
+    What are the settings on a fresh install?*
+
+    **The switch is fully wired; what it controls does not exist yet.** Only the second half
+    is outstanding:
+
+    - **Wired.** `P1-04-persistence.md` publishes `ttt.pref.musicEnabled`, the `music` field,
+      `setMusic` and `musicEnabledProvider` — requirement 13 calls them. The row renders,
+      flips, persists and reloads today.
+    - **Not played.** No PRD plays music. `P2-02-audio.md` owns one-shot effects; its
+      `SoundMoment` enum has five members and no music among them, and it scopes a music
+      layer as a **sibling rather than an extension of itself** — looping, lifecycle across
+      screens and ducking are a different problem from fire-and-forget. That layer is unowned.
+    - **The theme key exists; its shape does not.** `sound.music` is a placeholder Neon ships
+      as an explicit `null`. `P1-03-theme-system.md` records music as `deferred` rather than
+      adding a key, because the shape turns on the open per-screen question; its *Blocking*
+      item 1 writes out both candidates without picking one. There is a confirmed consumer of
+      the **setting** — this toggle — and none of the **asset**.
+
+    *Testable, in two parts.* **Now:** `SettingsScreen` renders the Music row, and flipping it
+    persists and reloads like the other three. **When a music layer exists:** with Music off,
+    no music plays under any theme, and the Sound effects toggle does not change that either
+    way.
+    *Not answered here, and not to be answered by an implementer:* whether a theme's music
+    loops, whether it differs by screen, and where the audio comes from — all three are open
+    in `Theming.md` → Open Questions.
+
+### Feedback on this surface's own controls
+
+25. **Every control on both surfaces fires both feedback channels on activation — the haptic
+    and the tap sound.** The six are the four switches, the exit control and the dismiss
+    control; on `QuickActionsSurface` the two switches, exit and dismiss.
+
+    ```dart
+    ref.read(hapticServiceProvider).validAction();
+    ref.read(audioLayerProvider).play(SoundMoment.buttonTap);
+    ```
+
+    *Source — haptics: `Game Board Design.md` → Decisions → Does the haptic fire on non-board
+    controls? — "**Yes — every valid tap buzzes, anywhere in the app.** Menu buttons, theme
+    rows, settings toggles, the game-over card's controls, the settings gear — not only board
+    cells."*
+    *Source — sound: `Theming.md` → Decisions → Do non-board controls make a sound? — "**Yes
+    — one tap sound, everywhere.** Every button, row and toggle plays the same short tap
+    sound: menu buttons, theme rows, settings toggles, the game-over card's two controls, the
+    trash button and the modal's Yes and No," which the same Decision frames as restoring
+    symmetry with the haptic rule "rather than one buzzing where the other is silent."*
+    **`buttonTap` is one moment and one sound file, not a family** — `P2-02-audio.md`
+    requirement 6. This surface names the moment and nothing else: no asset path, no player,
+    no await, and it reads no `sound` key.
+    **Both gates live inside their layers, not here.** The haptic is gated on vibrate-on-touch
+    (requirement 8) and the sound on sound-effects (requirement 7); this surface calls both
+    unconditionally. One consequence worth naming: muting sound effects silences the tap of
+    the switch that mutes them.
+    *Testable — and it is this PRD's to write, not the layers':* `P2-02-audio.md` requirement
+    6 states that a control's tap reaching `play` exactly once is "a **call-site fact, owned
+    by each calling PRD**", naming this requirement for the four toggles, exit and dismiss;
+    `P2-03-haptics.md` says the same for `validAction()`. So: activating any of the six
+    records exactly one `validAction()` and exactly one `play(SoundMoment.buttonTap)` on
+    recording fakes — never zero, never twice — and with the respective setting off, that
+    channel records zero while the other still records one.
+    *Owners of the behavior:* `P2-03-haptics.md` and `P2-02-audio.md`. This PRD owns only the
+    call sites and their counts.
 
 ## Out of Scope
 
-- **Storing and restoring the four preferences**, including first-launch behavior on an
-  empty store: `P1-04-persistence.md`.
-- **The haptic mechanism, and what "vibrate off" means** — how the buzz is produced, how
-  subtle it is, and the gating rule: `P2-03-haptics.md`.
-- **Audio playback, and what "sound off" means** — the audio layer, the five sound moments
-  and how muting is implemented: `P2-02-audio.md`.
-- **The animations system, and what "animations off" means** — the vocabulary, where
-  animations fire, durations, the one-at-a-time and don't-block-input rules, the
-  instant-state-change path, and the Reduce Motion rule: `P2-04-animations.md`.
-- **Everything the purchase and restore controls present** — the product definition and its
-  type, price display and localization, the store query, the purchase sheet, offline and
-  failure behavior, and what a restore does: `P4-05-purchase-flow.md`. This PRD hosts the
-  entry points and owns nothing behind them.
-- **The parental gate's challenge design** — what it asks, how it validates, retry and
-  failure: `P4-05-purchase-flow.md`, per requirement 21. This PRD requires only that the
-  gate precede the purchase.
-- **What an entitlement is, how it is held, and what happens when one lapses**:
-  `P1-07-entitlements.md`.
-- **The open-games list's behavior at the cap**, including any upsell shown there and the
-  delete action that frees a slot: `P4-02-open-games-list.md`.
-- **The routing layer** — the two entry points as routes, whether a sheet is a route, and
-  what the dismiss control is: `P2-01-navigation.md`. Requirement 19 covers the exit
-  control's presentation only, which that PRD assigns here.
-- **The main menu itself**, including the Settings button's own styling and placement:
-  `P4-01-main-menu.md`.
-- **The in-game settings button's placement in the scoreboard strip**:
-  `P3-03-scoreboard-turn-indicator.md` requirement 12.
-- **The pending move selection and the two-tap gesture**: `P3-02-move-input.md`. Whether
-  opening this surface clears a pending selection is that PRD's open question, restated
-  here as Open Question 5.
-- **Theme selection and the theme system**: `P1-03-theme-system.md` and
-  `P4-03-theme-selection.md` — and per requirement 15, theme selection is deliberately
-  absent from both surfaces.
+- **Storing the preferences and resolving the fresh-install default**:
+  `P1-04-persistence.md`, including all four setters and read points.
+- **The haptic mechanism and its gate**: `P2-03-haptics.md`. **The audio layer, the mute
+  gate, and resolving `sound.buttonTap`**: `P2-02-audio.md`. Requirement 25 names call sites
+  and counts only.
+- **Music playback** — no owner at all; requirement 24.
+- **Whether a theme's music loops, differs by screen, or where it comes from**:
+  `Theming.md` → Open Questions.
+- **The animations system, the instant-state-change path, and the Reduce Motion rule**:
+  `P2-04-animations.md`.
+- **Everything the purchase and restore controls present**, including the parental gate:
+  `P4-05-purchase-flow.md`.
+- **What an entitlement is and what happens when one lapses**: `P1-07-entitlements.md`.
+- **The open-games list's behavior at the cap and the delete action**:
+  `P4-02-open-games-list.md`.
+- **The result card's own controls**, and whether this screen's entry button is live over it:
+  `P3-04-game-over-rematch.md` req 5.
+- **The routing layer**: `P2-01-navigation.md`.
+- **The main menu and the in-game settings button themselves**: `P4-01-main-menu.md`,
+  `P3-03-scoreboard-turn-indicator.md` req 12.
+- **The pending move selection itself**: `P3-02-move-input.md`.
+- **Theme selection and the theme system**: `P1-03-theme-system.md`,
+  `P4-03-theme-selection.md`. **Enumerating `surfaces.button.*`'s sub-keys** is `P1-03`'s —
+  requirement 19.
 - **The read-only "Theme — Picked from the main menu" card — declined, not accepted.**
-  `P4-03-theme-selection.md` → Out of Scope hands `2b`'s read-only theme display to this
-  PRD. This PRD **does not specify one**, because no design doc names it: it exists only in
-  the handoff, and `Menus and UI.md` → Settings Menu lists this surface's contents as three
-  toggles. Requirement 6's "no fourth setting" is *not* the reason — a read-only display is
-  not a setting, and requirement 15 forbids only *changing* the theme here. The effect is
-  that the handoff's card currently has no owner, which is a visible gap rather than a
-  silent one. See Open Question 3.
-- **A Music toggle.** `Theming.md` → Sound Decisions → One-shot sound effects only, for now
-  rules out background music in this version, and `Menus and UI.md` → Persistence lists
-  four persisted preferences with no music among them. The handoff draws one anyway — see
-  Open Question 3.
-- **A confirmation prompt on exit.** Unsettled — see Open Question 2. Nothing here designs
-  one, and nothing here rules one out.
-- **What else quick actions might eventually hold.** The doc says "contents (so far)"; this
-  PRD builds the listed contents and nothing more.
+  `P4-03-theme-selection.md` hands `2b`'s read-only theme display here. This PRD does not
+  specify one, because no design doc names it — it exists only in the handoff. Requirement
+  6's "no fifth setting" is *not* the reason: a read-only display is not a setting, and
+  requirement 15 forbids only *changing* the theme. The card has no owner — a visible gap
+  rather than a silent one. See Open Question 3.
+- **A confirmation prompt on exit.** Unsettled — Open Question 2.
 
 ## Open Questions
 
@@ -433,12 +555,17 @@ As worded in `Menus and UI.md` → How you reach settings from gameplay:
 > Undecided: whether quick actions is the *same* settings screen as the main menu's, or a
 > trimmed-down in-game version with the exit option added.
 
-The handoff draws them as two different things — `2b — Settings page (from the main menu)`
-is a full screen and `1f — Modal: in-game settings / quick actions` is a bottom sheet, with
-`2b`'s own text saying "1f stays the trimmed in-game version with the exit action." That is
-*an* answer, but it is the handoff's, and no Decision in the docs takes it. It also decides
-requirement 6's second bullet — whether the Animations toggle appears in quick actions —
-and it now feeds Open Question 6. Also carried by `P2-01-navigation.md` → Open Question 7.
+**Still formally open — fenced, not answered**, and the four-toggle Decision sharpened what
+the question contains: **which of the four the in-game surface carries.** Requirement 6
+fences it to Sound effects and Vibrate on touch — the two the doc's quick-actions list names
+— while noting that list predates the four-toggle Decision, so its silence on Music is not
+evidence any more than its silence on Animations was. A fence is not an answer.
+
+If the "same screen" reading lands, three things arrive in-game together: the Animations row,
+the Music row, and the purchases section with its parental gate. The last is the one worth
+deciding deliberately rather than inheriting.
+
+Also carried by `P2-01-navigation.md` → Open Question 7.
 
 ### 2. Does leaving a game still need a confirmation prompt?
 
@@ -451,132 +578,61 @@ Also carried by `P2-01-navigation.md` → Open Question 6.
 
 ### 3. Gaps found while writing this PRD (flagged by the PRD author, not asked by the docs)
 
-Each of these is something an implementer of this surface would otherwise have to guess.
-None is resolved here.
+**Mine to carry: none.** Every item this PRD raised as its own has been answered — the
+sub-label copy (requirement 18) was the last, and the Music-versus-three-toggles
+disagreement, the parental-gate duplication and the pending-selection question before it.
 
-- **The handoff draws four toggles, the docs settle three.** `1f` and `2b` both include a
-  **Music** row (drawn `off` in `1f`), but `Theming.md` → Sound Decisions → One-shot sound
-  effects only, for now says there is no background music in this version, and
-  `Menus and UI.md` → Persistence lists exactly four persisted preferences with no music
-  key. Requirement 6 follows the docs. Same conflict already flagged by
-  `P1-04-persistence.md` and `P2-02-audio.md`.
-- **First-launch defaults for the three toggles.** The docs settle that all three are
-  remembered between sessions, but no Decision says what they read as before anything has
-  been written. The mock in `Menus and UI.md` → Settings Menu draws all three as `[ON]`,
-  which is a drawing, not a decision.
-- **When a toggle change takes effect.** "Global" and "player-controlled" are settled;
-  whether flipping a toggle applies to the running game the moment it is flipped, or only
-  on the next launch, is not stated anywhere. The in-game entry point only makes sense
-  under the first reading, but that is inference, not a Decision. Note `P2-03-haptics.md`
-  requirement 12 states the mid-game-change rule for haptics specifically; nothing states
-  it for sound or animations.
-- **How the in-game surface is dismissed back to the game.** Requirement 2 settles that
-  getting to settings does not abandon the game, but no doc names the control that returns
-  you to it. The handoff gives `1f` a close button and a "Back to the game" action; the
-  docs give it neither. Also carried by `P2-01-navigation.md` → Open Question 9.
-- **Toggle sub-label copy** (requirement 18). `P1-03-theme-system.md` requirement 15
-  provisions a theme slot for a sub-label, citing this PRD — but no design doc asks for
-  one, and the copy exists only in the handoff. Either the copy gets decided or that slot
-  goes unused.
-- **Whether the exit control is a destructive action** (requirement 19). No slot covers it;
-  `P1-03-theme-system.md`'s destructive-action styling is scoped to deleting an open game.
-- **No theme slot exists for the purchases section** (requirements 16 and 20).
-  `P1-03-theme-system.md` requirement 15 provisions a **Settings card** — card fill,
-  border, radius, the toggle row, its sub-label, and the switch's track and knob — and
-  nothing for a purchases section, a price row, or a restore link. Requirement 16 forbids
-  hardcoding, so as the two PRDs stand this section cannot be styled. That PRD's slot list
-  is explicitly "not closed" and is derived from what screens consume, so this is a slot to
-  add rather than a contradiction — but nobody has added it, and this PRD may not.
-- **`P4-05-purchase-flow.md` has no parental-gate requirement** (requirement 21). Its
-  requirement 10 runs a purchase straight to a store outcome. `Tech Design.md` → Decisions
-  → Kids category now settles that the gate is required before any purchase flow, and
-  `P5-03-release-fastlane.md` had already flagged that no PRD owns it. Requirement 21 pins
-  the ordering to this surface; the challenge itself remains unowned.
-- **`P4-05-purchase-flow.md`'s host question is now closed, and its preamble is stale.** It
-  is written around "Only *which screen hosts the entry point*" being open, listing the
-  settings screen as one candidate among several. `Menus and UI.md` → Decisions → Where the
-  open-game slot unlock is sold now answers it. The screen-agnostic API design still holds
-  and nothing needs rebuilding — but that PRD's framing should be updated so nobody reads
-  the question as live.
-- **The read-only Theme card has no owner.** `P4-03-theme-selection.md` hands `2b`'s
-  "Theme — Picked from the main menu" display to this PRD, which declines it above for want
-  of any doc naming it. If it is wanted, it needs a Decision and a theme slot; if it is
-  not, `P4-03`'s Out of Scope should stop pointing here.
-- **Dynamic Type has no owner at the app level** (requirement 17). `Menus and UI.md` →
-  Decisions settles that the app does not scale its text, but delivering that means a clamp
-  at the app root, and no PRD delivers it — several restate the negative and none owns it.
-  `P1-01-app-scaffold.md` is the plausible home; it does not claim it today.
-- **`P2-04-animations.md` requirement 17 states where the animations toggle lives** — that
-  it "sits alongside the sound-effects and vibrate toggles in the Settings menu" — which is
-  requirement 6's territory, not that PRD's. It is the exact mirror of the location claim
-  already removed from `P2-02-audio.md`. Flagged for the coordinator; not fixed here, since
-  this PRD may not edit another.
-- **`P2-01-navigation.md` → Open Question 11 is stale.** It records this PRD and
-  `P3-02-move-input.md` as *disagreeing about the status* of the pending-selection
-  question, quoting a testable from requirement 2 that no longer exists. See Open
-  Question 5.
-- **`Menus and UI.md` → Open Questions reads stale.** Its first entry — "Future menu items
-  to consider later: Rules/How to Play, Settings, vs. AI, Online" — lists Settings as a
-  future item, while the same doc's Main Menu section and Decisions treat the Settings
-  button as settled, and now give that screen a purchases section too. Worth a doc pass;
-  not this PRD's to fix.
+**Debt owned elsewhere, non-blocking:**
 
-### 4. Where does the switch end and the behavior begin? (raised by the renumbering pass)
+- **What the purchases section *is*** (requirement 20) — `P1-03-theme-system.md` *Blocking* 6.
+  Classified *ugly, not impossible*: the section ships unstyled.
+- **`surfaces.button.*` publishes no sub-keys** (requirement 19). The key is `required` and
+  its two tiers are real, but nothing enumerates what a tier contains — no fill, border,
+  radius or label style — while neighbouring entries in the same table do. Three consumers
+  read it: this PRD, `P4-01-main-menu.md` and `P4-02-open-games-list.md`. `P1-03`'s to close,
+  and its own triage rule decides whether that counts as *ugly* or *impossible*.
+- **Nothing plays music** (requirement 24) — unowned; `P2-02-audio.md` scopes it as a sibling
+  layer. **The `sound.music` key's shape** — `P1-03` *Blocking* item 1.
+- **Whether the exit control is a destructive treatment** (requirement 19).
+- **The read-only Theme card has no owner** — declined above; `P4-03` still points here.
+- **Dynamic Type has no owner at the app level** (requirement 17); `P4-01-main-menu.md`
+  requirement 20 records the same gap.
 
-The dependency block above now says this PRD owns the switch UI and the three channel PRDs
-own what "off" means — a correction, because both sides previously claimed the behavior.
-Requirements 7–10 still *describe* that behavior, because a switch cannot be specified
-without saying what it switches, and each now names its owner. If an implementer finds the
-two descriptions disagreeing, the channel PRD wins. Nobody has drawn the line more
-precisely than that. Requirements 20–22 follow the same rule with `P4-05-purchase-flow.md`.
+**Stale cross-references in sibling PRDs, routed and not fixed here:**
 
-### 5. Does opening this surface clear a pending move selection?
+- **`P2-04-animations.md` requirement 17** — "sits alongside the sound-effects and vibrate
+  toggles in the Settings menu" is requirement 6's territory, and numerically stale: four
+  toggles, not three.
+- **`P2-01-navigation.md` → Open Question 11** should be retired; the pending-selection
+  question it records as disputed is closed.
+- **`P4-05-purchase-flow.md`'s host question** is closed but its preamble still reads open.
 
-As worded in `P3-02-move-input.md` → OQ-1:
+### 4. Where does the switch end and the behavior begin?
 
-> whether opening the in-game settings / quick-actions modal (`1f`) clears a pending
-> selection or leaves it standing when the modal is dismissed.
+The channel PRDs own what "off" means; requirements 7–10 restate it and each names its owner.
+If an implementer finds the two disagreeing, the channel PRD wins. Requirements 20–22 follow
+the same rule with `P4-05-purchase-flow.md`, and requirement 25 with `P2-02-audio.md` and
+`P2-03-haptics.md` — where this PRD owns the call sites and their counts, and neither layer
+owns whether its own control fired. **Requirement 24 is the exception that proves it:** the
+Music switch has no channel PRD to defer to, which is why it is written as a gap.
 
-No design doc addresses it. An earlier draft of requirement 2 asserted as a testable that
-the pending selection is preserved; that assertion has been removed, because it decided a
-question the owning PRD holds open.
+### 5. Does opening this surface clear a pending move selection? — CLOSED
 
-**Four PRDs touch this, and they do not agree.** An earlier revision of this section
-claimed they did; that claim was wrong and is withdrawn.
+**Answered: yes.** `Game Board Design.md` → Decisions → *Does a tap outside the board clear a
+pending move?*:
 
-- **`P3-02-move-input.md` → OQ-1** holds it open. It is the owner.
-- **`P3-05-how-to-play.md` requirement 15 answers it by implication, in the opposite
-  direction, and with a testable:** *"a tap landing on the hint or the legend is a tap
-  outside the grid, and therefore clears any pending selection, **exactly as a tap on any
-  other non-board area does**."* `P3-03-scoreboard-turn-indicator.md` requirement 12 puts
-  the settings button at the top right of the game screen alongside the scoreboard — a
-  non-board area. So an implementer building `P3-05` requirement 15 as written clears the
-  pending selection when the settings button is tapped, having settled this question
-  without ever reading it. The generality of that rule, not its author's intent, is the
-  risk.
-- **`P2-01-navigation.md` → Open Question 11** records the two PRDs as disagreeing about
-  the *status* of the question, quoting requirement 2's since-removed testable. Its wording
-  is stale, and it is not evidence of agreement in either direction.
-- **This PRD** takes no side, per requirement 2.
+> **Yes — any tap outside the nine quadrants clears a pending, unconfirmed selection.** That
+> includes the legend/how-to-play strip, the scoreboard, the settings button, and opening any
+> menu or sheet. One rule, uniformly applied.
 
-Nothing settles it. It needs a decision, and until there is one, `P3-05` requirement 15's
-"any other non-board area" is the wording most likely to decide it by accident.
+Applied in requirement 2, which now asserts it rather than declining to.
 
-### 6. Does the purchases section appear in quick actions, or only on the main-menu surface?
-
-`Menus and UI.md` → Decisions → Where the open-game slot unlock is sold names "**The
-Settings screen**" and says the placement "keeps one parental gate in one place." It does
-not say whether the in-game quick-actions surface *is* that screen or a different one —
-which is Open Question 1 again. If quick actions turns out to be the same screen, the
-purchases section arrives mid-game by default, without anyone having chosen that.
-
-**Omission does not settle it.** The quick-actions list in `Menus and UI.md` is headed
-"Quick actions contents (**so far**)", and this PRD relies on that non-exhaustiveness
-elsewhere — Out of Scope's last bullet reads the same "(so far)" as leaving the list open.
-Treating the absence of a purchases entry as a decision would be reading one document's
-silence two different ways in one PRD. So it is raised, not decided.
-
-*Author's observation, not a requirement and not a Decision:* a purchase prompt behind a
-parental gate is an odd thing to meet in the middle of someone else's turn, and
-main-menu-only is the narrower reading. Recorded so the tradeoff is visible when this is
-answered.
+**Kept as a numbered stub, with the reason it mattered.** Before the Decision, four PRDs
+touched this and none owned it: `P3-02-move-input.md` → OQ-1 held it open, while
+`P3-05-how-to-play.md` requirement 15 asserted as a testable that a tap on its strip clears a
+pending selection *"exactly as a tap on any other non-board area does"* — and
+`P3-03-scoreboard-turn-indicator.md` requirement 12 puts the settings button in exactly such
+an area. `P3-05` ships in wave 3 and this PRD in wave 4, so the question would have been
+answered a wave early by a requirement whose author was describing a legend. The settled
+answer matches what that PRD asserted — but it is now settled deliberately, from one Decision
+all four cite, rather than inherited as a side effect of someone else's generality.

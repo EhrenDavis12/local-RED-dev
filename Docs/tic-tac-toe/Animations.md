@@ -86,6 +86,31 @@ Neon definition, because it's the fallback for every other theme.
 
 ## Decisions
 
+### Themes describe their animations; the runtime interprets them
+**A theme describes its animations as data, and the runtime interprets that data.** The
+user's intent: *"Say we want to create a new theme with new animations. I don't want to
+code the new animations into the game. I want to drop a file in the new theme folder that
+can tell the application what animations are and everything else the application needs to
+know to execute one of them… we just want to make sure the themes control as much as we
+can. This way new themes are easy to design and control customizations."*
+
+What this means, without designing the format:
+- A theme author adds a theme file and gets new motion. **Adding an animation must not
+  require changing game code.**
+- What a theme supplies is therefore a *description* of motion — what changes, by how
+  much, over what time, with what easing, and whether it repeats — not the name of a
+  behaviour the runtime already knows.
+- Neon's current animation entries (`type`, `durationMs`, `easing`, `loop`) are a
+  starting point that does not yet reach this bar, since `type` names a behaviour rather
+  than describing one.
+
+Consequence: this is a larger piece of work than a fixed set of named animations, and the
+schema for describing motion has to be designed. The schema itself belongs to the theme
+system's PRD and is not settled here.
+
+This is consistent with — and strengthens rather than replaces — **Themes author their
+own animations — no shared library** below.
+
 ### Themes author their own animations — no shared library
 There is **no shared animation library or menu to pick from**. The vocabulary above
 (grow/shrink, glow, shadowbox, jiggle, dance) is the *direction* — not a fixed set of

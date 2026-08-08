@@ -84,6 +84,10 @@ See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 - **Claim** — winning a small board and taking its quadrant on the big board.
 - **Cat game** — a small board filled with no winner. Quadrant stays unclaimed forever.
 
+**Internal vs. player-facing:** the terms above are the docs' own working vocabulary — for
+the docs, the PRDs and the code. What the player reads on screen is different — see
+Decisions → Player-facing vocabulary below.
+
 ## Decisions
 
 ### Recursion depth
@@ -110,6 +114,20 @@ adding real names down the road.
 
 ### Single-player / AI opponent
 **No.** Two players on one phone is the only mode.
+
+### Player-facing vocabulary: "board" vs. "quadrant"
+**Player-facing text says "board". The internal term stays "quadrant".** "Board" is what
+the player reads on screen; "quadrant" is what the docs, the PRDs and the code use. See
+Terminology (working vocabulary) above.
+
+This settles a disagreement the docs have carried for a while: every drawn screen says
+"board", while the docs' working vocabulary says "quadrant". "Board" is the more natural
+word for a child, and children are a stated target audience — see Target Audience &
+Platform above.
+
+The ambiguity that made this a real question does not disappear: "board" now refers both
+to the big 3x3 grid and to each of the nine small ones, and player-facing copy has to
+disambiguate by context. That's a known cost, not a solved problem.
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->

@@ -22,8 +22,9 @@ Build the theme system **from the beginning**, not bolted on later.
 Meaning — no hardcoded values anywhere in the code, across the full slot inventory the
 screens actually consume:
 - Colors, backgrounds, fonts, piece styles, sounds, animations.
-- Board geometry and sizing — outer gap, quadrant padding, inner gap, grid-line width,
-  grid-line inset, mark sizes.
+- Board geometry — grid-line width, grid-line inset, mark sizes. Spacing and padding —
+  outer gap, quadrant padding, inner gap — are the one named exception; see Decisions →
+  Does a theme control spacing and padding?
 - Corner radii — cell, quadrant, modal, chip, control, button.
 - The type scale — sizes and weights, distinct from "fonts" meaning a typeface.
 - Opacities — the locked, claimed and cat-game veils.
@@ -40,6 +41,21 @@ And:
   a new theme definition.
 
 This is a day-one constraint because retrofitting it later means touching every file.
+
+**When a theme value is missing, ask whether the absence is *ugly* or *impossible* — only
+the second one blocks.** Ugly: a slot exists in the schema and a consumer reads it, but
+nobody has authored a value yet. The feature ships — it renders, it looks wrong, and it
+gets fixed later by authoring one value with no code change, because the key and its
+reader are already there. This can wait for a design pass. Impossible: there is no slot to
+read *and* the rule above forbids writing the value literally in code. Then there is no
+legal implementation at all — the feature doesn't ship, and scheduling doesn't help,
+because no amount of later authoring changes what a developer can write today. This can't
+wait.
+
+A missing colour is the ugly case — a delete button renders unstyled, which is legal and
+shippable. A missing icon, where there's no slot to read and no permitted literal, is the
+impossible case — the button can't be drawn at all. One is debt, the other a deadlock, and
+treating them the same schedules the wrong one.
 
 <!-- Enforced by: the hardcoded-theme-value test, which covers the slot inventory listed
      above. See Tech Design → Decisions → Do we add a test that fails on hardcoded theme
@@ -152,6 +168,94 @@ existed. It omits board geometry and sizing, corner radii, the type scale, and
 opacities, and it has no slot for any modal, sheet, settings card, open-game row, badge,
 or the main-menu logo — so four PRDs were left unbuildable under the "no hardcoded
 values" rule. See **Architectural Rule** above for the corrected enumeration.
+
+### How are themes discovered, and does a theme file carry its own name and description?
+**Each theme file carries its own display name and one-line description, and the app
+discovers themes by scanning the themes folder.** Adding a theme is dropping one file in —
+no second file to edit, no code change.
+
+This follows directly from the principle already stated for animations: *"i want to drop a
+file in the new theme folder that can tell the application what animations are and
+everything else the applicaiton needs to know."* The name and blurb are part of "everything
+else."
+
+This rules out a separate catalog file as the source of truth, and it rules out a hardcoded
+list in Dart. The handoff's `themes.catalog.json` becomes a reference asset rather than a
+shipping input.
+
+### Do themes control the app's chrome icons?
+**Yes.** The settings gear, close X, chevrons and plus are theme-controlled, and a theme may
+either name a glyph from a bundled icon set or ship its own image.
+
+### Closing Neon's value gaps
+**Transcribe the drawn values from the design handoff into Neon's YAML.**
+`assets/themes/neon.yaml` is our file and the handoff README is the design source, so
+writing those values into it is **authoring Neon**, not editing an approved asset.
+
+Two consequences:
+- The read-only `neon.theme.json` stays as it is; it is a reference, and Neon's shipped
+  YAML is the complete definition. That means the two can drift, and the YAML is
+  authoritative where they differ.
+- Where the handoff draws no value at all — the settings purchases section is the known
+  case, since no approved screen shows it — transcription cannot help, and those values
+  still need authoring from scratch. That remains the gap this decision does not close.
+
+### Does a theme control spacing and padding?
+**No. Spacing and layout numbers are fixed in the code, not theme-controlled — for now.**
+*"No spacing will be fixed for now."*
+
+This is the one place that cuts against the project's general direction of pushing as much
+as possible into the theme. The reason is enforcement: the hardcoded-theme-value test (see
+[Tech Design](./Tech%20Design.md) → Decisions → Do we add a test that fails on hardcoded
+theme values?) **cannot** catch a hardcoded gap. It can see a colour, a font size, a radius
+or an asset path, but `SizedBox(width: 8)` holding a themed gap and `SizedBox(width: 8)`
+holding an incidental one are indistinguishable to it. A padding section in the schema
+would therefore have been a rule that nothing verifies — a claimed guarantee the project
+could not keep.
+
+Themes still control colour, marks, sounds, icons, animation, radii and the type scale.
+Spacing and padding is the one slot pulled out of the inventory, and "for now" is the
+user's own hedge — this is reversible if the enforcement story changes.
+
+### Do all four toggles ship, and is music a theme concern?
+**Yes — all four toggles ship (Music, Sound Effects, Vibrate on Touch, Animations), and
+music belongs to the theme.** In the user's own words: *"Do all four toggles, Music should
+be apart of the Theme documents."*
+
+This resolves the standing disagreement where the approved handoff draws four toggles and
+the docs had settled three: the handoff is right.
+
+The larger consequence is that **a theme supplies its own music**, the same way it
+supplies its sounds. This is new scope — no doc previously treated music as themed, and
+nothing currently produces any music. What is **not** settled: whether music loops, whether
+it differs by screen, and where the audio comes from — see Open Questions.
+
+This reverses **One-shot sound effects only, for now** below, which said no background
+music this version; that stance no longer holds.
+
+### Do non-board controls make a sound?
+**Yes — one tap sound, everywhere.** Every button, row and toggle plays the same short tap
+sound: menu buttons, theme rows, settings toggles, the game-over card's two controls, the
+trash button and the modal's Yes and No.
+
+This is the same symmetry the haptic question was already settled by — see
+[Game Board Design](./Game%20Board%20Design.md) → Decisions → Does the haptic fire on
+non-board controls? — so the two feedback channels now behave consistently rather than one
+buzzing where the other is silent. One sound file covers all of it.
+
+This does not change the existing board sound moments — placing a mark, claiming a
+quadrant, the cat game, winning — which are unaffected, and an invalid tap stays silent in
+both channels.
+
+### What are Classic Red vs Blue's colours?
+**The three colours in the design handoff are Classic's real palette, not placeholder
+swatches.** `#f3f5fe` for the ground, `#d92d3f` for player one, `#2453c4` for player two —
+and every other value in the theme derives from them.
+
+This unblocks authoring the theme file, and it means the derivation work is real work. A
+colour that is a tinted or alpha-adjusted version of one of these three must be recomputed
+from the new value rather than inherited from the first theme, because inheriting one
+silently produces a red player with pink chips.
 
 ---
 
@@ -291,8 +395,9 @@ Everything visual and audible. Rough list, not exhaustive:
 - Turn indicator styling
 - Scoreboard styling
 - Main menu styling (background, button look, title)
-- **Board geometry and sizing** — outer gap, quadrant padding, inner gap, grid-line
-  width, grid-line inset, mark sizes
+- **Board geometry** — grid-line width, grid-line inset, mark sizes. Spacing and padding
+  (outer gap, quadrant padding, inner gap) are fixed in code, not theme-controlled — see
+  Decisions → Does a theme control spacing and padding?
 - **Corner radii** — cell, quadrant, modal, chip, control, button
 - **The type scale** — sizes and weights, distinct from a theme's choice of font
 - **Opacities** — the locked, claimed and cat-game veils
@@ -327,9 +432,9 @@ A specific case of the general inheritance rule above — themes don't need a fu
 set; anything undefined comes from Neon.
 
 ### One-shot sound effects only, for now
-No background music in this version. Sound effects only — discrete one-shots on actions.
-Background music is a **possible later addition**, so don't build the audio system in a
-way that makes adding a music layer painful.
+**Superseded — see Decisions → Do all four toggles ship, and is music a theme concern?**
+This said no background music in this version; that no longer holds, since a theme now
+supplies its own music. Left here as history rather than deleted.
 
 ### Global mute
 There's a **global mute / sound toggle, separate from the theme.** Muting is a player
@@ -355,13 +460,14 @@ This draws the boundary of the theme system. Compare:
 |---|---|
 | Colors, art, backgrounds | ✅ Yes |
 | Sound effects | ✅ Yes |
+| Music | ✅ Yes |
 | Animations | ✅ Yes |
 | **Haptics / vibration** | ❌ No — app setting |
 
-Note the asymmetry with the settings toggles: sound and animations are *theme-defined but
-player-switchable*, while haptics are *never theme-defined at all*. The three toggles in
-[Menus and UI](./Menus%20and%20UI.md) look alike, but two of them switch off a theme
-channel and one switches off an app behavior.
+Note the asymmetry with the settings toggles: music, sound and animations are
+*theme-defined but player-switchable*, while haptics are *never theme-defined at all*. The
+four toggles in [Menus and UI](./Menus%20and%20UI.md) look alike, but three of them switch
+off a theme channel and one switches off an app behavior.
 
 ## Open Questions
 - Which values, concretely, does Classic Red vs Blue override? (Settled in principle —
@@ -369,17 +475,22 @@ channel and one switches off an app behavior.
   actually built.)
 - What is the exact slot schema — the key structure — for what a theme defines? The
   approved `neon.theme.json` does not currently cover the pending-move highlight, any
-  modal or sheet surface, a gradient background, a logo, or a theme's own display name
-  and description.
-- Neon is required to be complete (see **Neon Is the Base Theme**), but the approved
-  `neon.theme.json` has no pending-move highlight values at all — no pending colour, no
-  pending cell ring, no destination ring — while the board's pending preview is a
-  required, separately addressable treatment. The same gap covers the grid-line opacity
-  and glow, the claimed and cat-game mark glows, and the cat-game caption style. How does
-  this gap get closed?
+  modal or sheet surface, a gradient background, or a logo.
+- Neon is required to be complete (see **Neon Is the Base Theme**). The gap between the
+  approved `neon.theme.json` and the drawn handoff — the pending-move highlight, badges,
+  modal and sheet surfaces, several radii and glows — closes by transcription into Neon's
+  YAML (see **Closing Neon's value gaps** under Decisions). The settings purchases section
+  is the one value with **no drawn counterpart at all**, since no approved screen shows
+  it — transcription can't supply a value nothing draws, so that piece still needs
+  authoring from scratch. Is the purchases section the only such case, or are there others
+  the handoff never drew?
 - What form does the legibility contract take — a contrast floor, a review step,
   something else? **What a Theme Controls** requires every theme to keep the last-move
   and active-quadrant highlights legible, but this is unfalsifiable as written: Classic
   Red vs Blue has a near-white ground while inheriting Neon's near-white text and its
   veils and glows tuned for a near-black ground, so a theme could be complete, pass every
   stated check, and still be unreadable.
+- **Does a theme's music loop?** Not settled by Decisions → Do all four toggles ship, and
+  is music a theme concern?
+- **Does music differ by screen**, or is it one track for the whole app? Not settled.
+- **Where does the music come from** — composed, licensed, generated? Not settled.

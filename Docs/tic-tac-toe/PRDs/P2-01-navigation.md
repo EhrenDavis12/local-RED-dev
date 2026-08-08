@@ -1,3 +1,5 @@
+**Build-readiness: 91**
+
 # PRD: Navigation and the Back Stack
 
 > **Status:** Draft · Source docs read: `Menus and UI.md`, `Tech Design.md`,
@@ -5,16 +7,63 @@
 > `roadmap.md`, plus the read-only reference asset `design_handoff_game_ui/README.md`.
 > `Alternative Game Styles.md` is a declared parking-lot doc and was not sourced from.
 
-**Wave:** P2 · **File:** `P2-01-navigation.md`
+**Wave:** P2 · **File:** `P2-01-navigation.md` — parallel-safe with the other P2 PRDs.
 
-**Depends on:** `P1-01-app-scaffold.md` — `app.dart`, the layer-first `lib/` tree
-(including `lib/navigation/`, see Requirement 2 and Open Question 16) and the Riverpod
-root this layer is installed into.
+> **Why the stamp is not higher.** The mechanism is settled (`go_router`), so the route
+> table, the operation mapping and the layer's body are all specified below and buildable.
+> What remains are four **one-line variants** across two operations and two page builders:
+> Open Question 2 decides whether `exitGameToMainMenu()` is a `go` or a `pop`, Open
+> Question 8 the same for `leaveOpenGamesList()`, and Open Question 10 decides whether the
+> name prompt and the in-game quick actions are opaque or non-opaque pages. Both variants of
+> each are written out below, so nothing is left to invent — but they are the user's calls,
+> not an implementer's. One route (requirement 21) also points at a screen no PRD owns yet.
+
+> **Requirement numbering is load-bearing.** Four consumer PRDs cite requirements here by
+> number (`P4-01`, `P4-02`, `P4-03`, `P4-04`), and citation drift into this file has had to
+> be corrected once already. Requirements 1–19 have not moved; requirements 20, 21 and 22
+> were appended for exactly this reason, and anything further should be too.
+
+**Dependencies:**
+
+- `P1-01-app-scaffold.md` — creates `lib/navigation/` (its req 2, with a `.gitkeep`), the
+  single `runApp` call site and the `ProviderScope` above `MaterialApp` (its req 11), and
+  leaves `MaterialApp`'s `home:` / routing configuration as the placeholder this PRD
+  replaces (its reqs 11 and 13). Riverpod without codegen is its req 12.
+- `P1-03-theme-system.md` — `activeThemeProvider` in `lib/theme/theme_providers.dart`, the
+  accessor requirement 19 reads any transition value from. Its req 24 makes `read` normative
+  for services and `watch` for widgets.
+- `P1-04-persistence.md` — `OpenGamesRepository.count()` for requirement 7's branch, and
+  `GameId` (its req 22) as the parameter type of `openGame` and `openDeleteConfirmation`.
+  Its Open Question 6a records that this PRD's contract can be written against `GameId`
+  today.
+- `P3-02-move-input.md` — its req 24 publishes `pendingSelectionProvider` and its `clear()`
+  entry point, which requirement 20 below calls. This is a **wave-3 PRD**, so requirement 20
+  is specified here and lands when that provider exists; nothing else in this PRD waits on
+  it. See requirement 20 for why the call has to originate in this layer.
+
+**Cross-PRD consequence of the routing decision.** `go_router` is a new package, and
+`P1-01-app-scaffold.md` req 14 declares the dependency set exhaustively, so that list must
+gain `go_router`. `Tech Design.md` → Decisions → *Navigation approach — go_router* names
+this consequence itself. It is being routed separately; this PRD does not edit `P1-01`.
 
 **Depended on by:** every screen PRD. Each owns a destination this layer moves between and
-specifies its own contents: `P3-01-board-rendering.md`, `P3-04-game-over-rematch.md`,
-`P4-01-main-menu.md`, `P4-02-open-games-list.md`, `P4-03-theme-selection.md`,
-`P4-04-settings.md`. `P4-05-purchase-flow.md` may become a seventh — see Out of Scope.
+specifies its own contents: `P3-01-board-rendering.md`, `P3-04-game-over-rematch.md` (its
+req 5, whose back-to-main-menu control is the second caller of requirement 15's operation),
+`P4-01-main-menu.md` (its reqs 14–16, and its req 23, which requirement 21 below answers),
+`P4-02-open-games-list.md` (its reqs 8, 10, 12; its OQ-7, which names requirement 13's
+`leaveOpenGamesList()` as the owner of its back control; and its req 28, which requirement 22
+below answers), `P4-03-theme-selection.md`, `P4-04-settings.md`. `P4-05-purchase-flow.md` may
+become a seventh — see Out of Scope.
+
+**Callers land in later waves, deliberately not blocking.** The deliverable of this wave is
+the layer — its interface (requirement 3), its router configuration (requirement 2), its
+acquisition seam (requirement 4) and the scans in requirements 1, 16 and 19 — not any screen
+that calls it. Several testables below describe transitions between screens that waves P3
+and P4 have not built. At this wave they are verified against a **recording fake
+`AppNavigator`** injected through requirement 4's provider override, and the route table is
+verified directly against the `GoRouter` instance; the screen-level assertions are **owned
+by** the requirement named in each *Wave note*. This is the posture `P2-03-haptics.md` and
+`P2-02-audio.md` already publish, applied here.
 
 ---
 
@@ -22,35 +71,32 @@ specifies its own contents: `P3-01-board-rendering.md`, `P3-04-game-over-rematch
 
 Nothing owns the movement between screens. Every screen PRD specifies its own contents and
 then hands off by filename — main menu → open-games list → game screen → settings → game
-over — but no PRD, and no Decision in any design doc, says how a player gets from one to
-the next or back again. `Tech Design.md` → Decisions → *Navigation* states this outright:
-*"No Decision above names a routing approach, and the dependency list has no router in it
-yet."* `Menus and UI.md` → Decisions → *Navigation and the back stack* states the same for
-the flows: *"No screen flow in this doc currently says what 'back' does anywhere."*
+over — but no PRD says how a player gets from one to the next or back again.
+`Menus and UI.md` → Decisions → *Navigation and the back stack* states it for the flows:
+*"No screen flow in this doc currently says what 'back' does anywhere."*
 
 The cost is already visible in the other PRDs. `P4-02-open-games-list.md` → Open Question 7
 records that the approved drawing `1b` has a back button no design doc mentions and nothing
 says where it leads. `P4-04-settings.md` settles that reaching settings mid-game must not
 abandon the game, but its Open Questions record that no doc names the control that returns
-you to it. `P3-04-game-over-rematch.md` → OQ3 records that nothing says whether the
-top-right settings button — the settled way out of a game — is still live once the result
-is on screen. Three PRDs each assume someone else owns the back stack, and today nobody
-does. A fourth consequence is quieter: `P4-02-open-games-list.md` specifies the name
-prompt's own comings and goings (its Requirements 8, 10 and 12), which are screen changes
-with no routing owner. Requirement 8 below claims them.
+you to it. Three PRDs each assume someone else owns the back stack, and today nobody does. A
+fourth consequence is quieter: `P4-02-open-games-list.md` specifies the name prompt's own
+comings and goings (its reqs 8, 10 and 12), which are screen changes with no routing owner.
+Requirement 11 below claims them. A fifth arrived with the About Us button: `P4-01` req 23
+had a control with nowhere to send the player, and requirement 21 gives it a route. A sixth
+arrived with the delete confirmation, which had no legal host at all until requirement 22.
 
 ## Goal
 
-The app has one explicit navigation layer, in one known place, exposing one named operation
-per transition, and every screen change goes through it. The flows the design docs already
-settle work end to end: the app launches on the main menu, Play Game reaches either a new
-game or the list of open ones, the theme overlay opens on top of a main menu that stays
-mounted, settings is reachable from both the main menu and mid-game without abandoning the
-game, and exiting a game from the in-game quick actions lands the player back on the main
-menu with the game intact and resumable. **How** that layer is built — plain `Navigator`,
-`go_router`, or something else — and what every back affordance does are deliberately not
-decided here; they are recorded in Open Questions as the docs word them. Requirement 3 is
-written so that answer can land later without changing a single call site.
+The app has one explicit navigation layer, in one known place, built on `go_router`,
+published as one Dart interface acquired one way, and every screen change goes through it.
+The flows the design docs already settle work end to end: the app launches on the main menu,
+Play Game reaches either a new game or the list of open ones, the theme overlay opens on top
+of a main menu that stays mounted, settings is reachable from both the main menu and mid-game
+without abandoning the game, and a player leaves a game — mid-play from quick actions, or
+finished from the result card — back to the main menu with the game intact and resumable.
+Screens call operations, never routes, so the four remaining back-stack choices land as edits
+inside this layer.
 
 ## Requirements
 
@@ -60,233 +106,763 @@ screen contains.
 ### The layer itself
 
 1. **The app has one explicit navigation layer, and every screen change goes through it**
-   rather than being performed ad hoc inside a screen widget.
+   rather than being performed ad hoc inside a screen widget. Stated positively, because that
+   is the form the guard below has to take: **the only way any widget outside
+   `lib/navigation/` causes a surface to appear or disappear is by calling an `AppNavigator`
+   operation.**
    *Source: `Tech Design.md` → Decisions → Navigation ("The app has an explicit navigation
    layer, and it is now in scope"); `Menus and UI.md` → Decisions → Navigation and the back
    stack ("The app has a defined navigation model — this is now in scope to build out").*
-   *Testable:* a source scan finds no `Navigator.` call, no route construction and no route
-   name outside `lib/navigation/` — in particular none under `lib/ui/`. That assertion holds
-   whichever approach Open Question 1 resolves to.
 
-2. **The layer lives in `lib/navigation/`.**
-   *Source: `Tech Design.md` → Decisions → Project structure — layer-first, whose tree now
-   carries `navigation/   ← the app's routing layer`, and whose accompanying paragraph:
-   "`navigation/` is a new layer, for the same reason `storage/` was added above …  It is
-   Flutter-side, same as `ui/` and `state/` — nothing here changes the `engine/` purity
-   rule. What goes inside it is not decided; the routing approach is still open."*
-   The directory is created by `P1-01-app-scaffold.md`, which does not yet list it — see
-   Open Question 16.
+   *Testable, wave 2 — two scans, both of which run with zero screens built:*
 
-3. **The layer exposes one named operation per transition this PRD settles, and screens
-   invoke operations rather than routes.** A screen calls `exitGameToMainMenu()`; it does
-   not push, pop, name a route, or know what the layer does underneath. This is the contract
-   the six screen PRDs code against, and it is deliberately separable from the routing
-   approach: every operation below is expressible under plain `Navigator`, under `go_router`,
-   or under anything else Open Question 1 might land on.
+   - **The import scan (allow-list).** `import 'package:go_router/go_router.dart'` appears
+     **only** under `lib/navigation/`. This one assertion catches every routing call —
+     `context.go`, `context.push`, `context.pushReplacement`, `context.pop`, `GoRoute`,
+     `GoRouter` — because none of them compiles without that import.
+   - **The presentation scan (closed by shape, not by enumeration).** Outside
+     `lib/navigation/`, and in particular anywhere under `lib/ui/`, the source contains:
+     no call matching **`show[A-Z]\w*(`** — every Flutter API that puts a surface on screen is
+     a top-level `show…` function; no reference to `Navigator`, `Overlay`, `OverlayEntry`,
+     `ModalRoute`, `PageRoute`, `DialogRoute` or `PopupRoute`; and no
+     `GlobalKey<NavigatorState>`.
 
-   | Operation | The transition it performs | Settled by |
+   **Why the second scan is a pattern and not a list.** An earlier draft banned `showDialog`
+   and `showModalBottomSheet` by name. `showGeneralDialog` and `showAdaptiveDialog` contain
+   neither substring, so both passed a guard written to stop exactly what they do — and
+   `showCupertinoDialog`, `showCupertinoModalPopup`, `showMenu` and `showBottomSheet` are the
+   same family. This was found by `P4-02-open-games-list.md`, which needed a host for its
+   delete confirmation, found every legal mechanism closed, and identified `showGeneralDialog`
+   as the escape an agent under a name-shaped constraint reaches for first, *precisely because
+   it looks compliant*. A deny-list is always one API name behind; `show[A-Z]` is not,
+   because the naming convention is the thing being relied on rather than any particular name.
+   **Deliberately over-broad**, and the escape hatch is the point: a legitimate `show…` call
+   lives in `lib/navigation/` like every other presentation mechanism. Note `showAboutDialog`
+   is in the banned family — About Us is a route (requirement 21), not a platform dialog.
+
+2. **The layer lives in `lib/navigation/`, and the router is configured there and installed
+   at `MaterialApp.router`.**
+   *Source: `Tech Design.md` → Decisions → Project structure — layer-first ("`navigation/`
+   … is Flutter-side, same as `ui/` and `state/` — nothing here changes the `engine/` purity
+   rule"); → Decisions → Navigation approach — go_router, which states outright that "the
+   route table and route paths are not designed here — that is a PRD's job".*
+   `P1-01-app-scaffold.md` req 11 names `MaterialApp`'s routing configuration as this PRD's
+   extension point and req 13 ships a placeholder home; both are replaced here.
+   `MaterialApp` becomes `MaterialApp.router(routerConfig: …)`.
+
+   ```dart
+   // lib/navigation/routes.dart — path constants, so no route string is spelled twice
+   abstract final class Routes {
+     static const mainMenu = '/';
+     static const themeSelection = 'theme';       // child of '/'
+     static const settings = 'settings';          // child of '/'
+     static const openGames = 'games';            // child of '/'
+     static const newGamePrompt = 'new';          // child of '/games'
+     static const confirmDelete = 'confirm-delete/:gameId'; // child of '/games' — req 22
+     static const aboutUs = 'about';              // child of '/'  — requirement 21
+     static const game = '/game/:gameId';
+     static const quickActions = 'quick-actions'; // child of '/game/:gameId'
+   }
+
+   // lib/navigation/app_router.dart
+   GoRouter buildRouter() => GoRouter(
+         initialLocation: Routes.mainMenu, // requirement 6
+         routes: [
+           GoRoute(
+             path: Routes.mainMenu,
+             builder: (context, state) => const MainMenuScreen(), // P4-01
+             routes: [
+               GoRoute(
+                 path: Routes.themeSelection,
+                 // Non-opaque: the main menu stays mounted beneath. Requirement 9.
+                 pageBuilder: (context, state) =>
+                     const TransparentPage(child: ThemeSelectionOverlay()), // P4-03
+               ),
+               GoRoute(
+                 path: Routes.settings,
+                 builder: (context, state) => const SettingsScreen(), // P4-04
+               ),
+               GoRoute(
+                 path: Routes.openGames,
+                 builder: (context, state) => const OpenGamesListScreen(), // P4-02
+                 routes: [
+                   GoRoute(
+                     path: Routes.newGamePrompt,
+                     // Opaque or non-opaque: Open Question 10. See requirement 11.
+                     pageBuilder: (context, state) =>
+                         const TransparentPage(child: NewGamePrompt()), // P4-02
+                   ),
+                   GoRoute(
+                     path: Routes.confirmDelete,
+                     // Always non-opaque — requirement 22.
+                     pageBuilder: (context, state) => TransparentPage(
+                       child: DeleteGameConfirmation(     // P4-02 req 28
+                         id: GameId(state.pathParameters['gameId']!),
+                       ),
+                     ),
+                   ),
+                 ],
+               ),
+               GoRoute(
+                 path: Routes.aboutUs,
+                 // Ordinary opaque page. Requirement 21 — screen currently unowned.
+                 builder: (context, state) => const AboutUsScreen(),
+               ),
+             ],
+           ),
+           GoRoute(
+             path: Routes.game,
+             builder: (context, state) => GameScreen(          // P3-01
+               id: GameId(state.pathParameters['gameId']!),
+             ),
+             routes: [
+               GoRoute(
+                 path: Routes.quickActions,
+                 // Opaque or non-opaque: Open Question 10. See requirement 14.
+                 pageBuilder: (context, state) =>
+                     const TransparentPage(child: QuickActionsSurface()), // P4-04
+               ),
+             ],
+           ),
+         ],
+       );
+   ```
+
+   **The hierarchy is the load-bearing part, not the strings.** Every surface that must leave
+   something mounted beneath it is declared as a *child* of what it sits on: theme selection
+   under the main menu (requirement 9, settled), quick actions under the game (requirement 14,
+   settled), the name prompt and the delete confirmation under the open-games list
+   (requirements 11 and 22). That is what makes "the menu is still there behind the overlay" a
+   property of the route table rather than of each screen's discipline. **It also means
+   nothing unmounts when a surface opens over the board — which is why requirement 20
+   exists.**
+   **The game-over result card is not in this table.** It is drawn over the board by
+   `P3-04-game-over-rematch.md` rather than routed to; its two controls act on the game
+   (next game) and on this layer (back to main menu, requirement 15). Nothing here presents
+   it.
+   **Open Questions 5 and 10 reduce to a `pageBuilder` choice, not a route-table change.** A
+   surface drawn as a sheet is the same `GoRoute` with a non-opaque page; drawn as a full
+   screen it is the same `GoRoute` with an ordinary one. Neither answer moves a route or
+   changes a call site.
+   *The paths are this PRD's, per the Decision that leaves them to a PRD.*
+   *Testable, wave 2:* the built `GoRouter` reports `initialLocation == '/'`; every path above
+   resolves; `/game/:gameId` and `/games/confirm-delete/:gameId` each yield their id as a path
+   parameter; no route string appears outside `lib/navigation/routes.dart`.
+
+3. **The layer publishes this interface, and the `go_router` decision does not change it.**
+   Screens invoke operations, never routes: a screen calls `exitGameToMainMenu()` and does
+   not `go`, `push`, `pop`, or name a path. This is the contract the six screen PRDs code
+   against, and publishing it before the mechanism was chosen is why that choice arrived as
+   an additive change.
+
+   ```dart
+   // lib/navigation/app_navigator.dart
+   import 'package:tic_tac_toe_extreme/storage/game_id.dart'; // P1-04 req 22
+
+   abstract interface class AppNavigator {
+     /// Presents the main menu as the app's first screen. Requirement 6.
+     Future<void> openMainMenu();
+
+     /// The Play Game branch. Reads the stored open-game count and presents the
+     /// destination itself; the caller does not read the count. Requirements 7, 8.
+     Future<void> playGame();
+
+     /// The theme overlay, over a still-mounted main menu. Requirement 9.
+     Future<void> openThemeSelection();
+
+     /// The main menu's settings entry point. Requirement 10.
+     Future<void> openSettings();
+
+     /// The in-game settings entry point. Requirements 10, 14.
+     Future<void> openQuickActions();
+
+     /// Open-games list -> the opponent-name prompt. Requirement 11.
+     Future<void> openNewGamePrompt();
+
+     /// The game screen for one open game, newly created or resumed.
+     /// Requirements 11, 12.
+     Future<void> openGame(GameId id);
+
+     /// Leaving a game for the main menu — from quick actions mid-play, or from
+     /// the game-over result card. Requirement 15.
+     Future<void> exitGameToMainMenu();
+
+     /// Leaving the open-games list without picking anything. Requirement 13.
+     Future<void> leaveOpenGamesList();
+
+     /// Closes the surface on top and returns to what is beneath it. Requirement 5.
+     Future<void> dismissCurrent();
+
+     // Extended by requirement 21: Future<void> openAboutUs();
+     // Extended by requirement 22: Future<void> openDeleteConfirmation(GameId id);
+   }
+   ```
+
+   **This block is not the closed set.** Requirements 21 and 22 add `openAboutUs()` and
+   `openDeleteConfirmation(GameId)`, appended there rather than inserted here so the
+   requirement numbers four consumer PRDs cite do not move. Read requirements 3, 21 and 22
+   together for the full interface.
+
+   **Each operation maps onto exactly one `go_router` call:**
+
+   | Operation | `go_router` implementation | Settled? |
    |---|---|---|
-   | `openMainMenu()` | presents the main menu as the app's first screen | R4 |
-   | `playGame()` | the Play Game branch — the layer picks the destination, the caller does not | R5 |
-   | `openThemeSelection()` | the theme overlay, over a still-mounted main menu | R6 |
-   | `openSettings()` | the main menu's settings entry point | R7 |
-   | `openQuickActions()` | the in-game settings entry point | R7, R10 |
-   | `openNewGamePrompt()` | the open-games list → the opponent-name prompt | R8 |
-   | `openGame(gameId)` | the game screen for one open game, newly created or resumed | R8, R9 |
-   | `exitGameToMainMenu()` | the quick-actions exit | R11 |
-   | `dismissCurrent()` | closes the surface on top and returns to what is beneath it | R6, R8, R10 |
+   | `openMainMenu()` | `initialLocation` at startup; `router.go('/')` thereafter | yes |
+   | `playGame()` | `await count()`, then `push('/games')`, or the empty-state destination | branch yes; empty-state target is OQ4 |
+   | `openThemeSelection()` | `router.push('/theme')`, non-opaque page | yes |
+   | `openSettings()` | `router.push('/settings')` | yes |
+   | `openQuickActions()` | `router.push('/game/<id>/quick-actions')` | route yes; page opacity is OQ10 |
+   | `openNewGamePrompt()` | `router.push('/games/new')` | route yes; page opacity is OQ5 / OQ10 |
+   | `openGame(id)` | `router.push('/game/${id.value}')` | yes |
+   | `exitGameToMainMenu()` | `router.go('/')` **or** `router.pop()` | **OQ2** |
+   | `leaveOpenGamesList()` | `router.pop()` **or** `router.go('/')` | **OQ8** |
+   | `dismissCurrent()` | `if (router.canPop()) router.pop();` | yes — requirement 5 |
+   | `openAboutUs()` | `router.push('/about')`, ordinary opaque page | route yes — requirement 21 |
+   | `openDeleteConfirmation(id)` | `router.push('/games/confirm-delete/${id.value}')`, non-opaque | yes — requirement 22 |
 
-   *Testable:* every screen change in the app is a call to one of these, and the scan in
-   Requirement 1 finds no other means of changing screens under `lib/ui/`.
+   Every one of them is preceded by requirement 20's clear.
 
-   **Three things this table does not settle.** Whether `openSettings()` and
-   `openQuickActions()` resolve to the same surface follows Open Question 7 — two operations
-   are named because there are two settled entry points, not because there are certainly two
-   surfaces. What *invokes* `dismissCurrent()` on the in-game surface is unnamed in every doc
-   (Open Question 9), but the operation must exist regardless, because Requirement 10 requires
-   the return trip to work. And whether `dismissCurrent()` pops a route or hides an overlay is
-   Open Question 10.
+   **Every operation returns `Future<void>`.** `playGame()` is genuinely asynchronous
+   (requirement 8), and a mixed sync/async surface would make call sites differ for a reason
+   no caller can see. **No operation throws.** Requirement 8 is the only one that can fail,
+   and it recovers. **`GameId` is `P1-04-persistence.md`'s type**, referenced and never
+   defined here; its `.value` string is passed as a path parameter and parsed by nobody.
 
-   **The operation names are this PRD's, not the design docs'.** No doc names an API. The
-   *set* is derived from the settled transitions and each row cites the requirement that
-   settles it; the identifiers are a proposal, and renaming any of them is free so long as the
-   set stays one operation per settled transition.
+   **No operation returns a result to its caller — and callers must be designed around
+   that.** The `Future<void>` completes when the navigation is done, not when the surface it
+   opened is finished with. A modal's *outcome* — which button the player pressed, whether
+   they confirmed or cancelled — never comes back through this interface, and it cannot be
+   recovered another way either, because requirement 1 forbids observing the router outside
+   this layer. **So any flow that seems to need a modal's answer must be restructured so that
+   nothing has to hear it**: the surface acts on the state itself, or the caller does its work
+   before opening the surface rather than after it closes.
+
+   This has already bitten once, which is why it is written here rather than left implicit.
+   `P4-02-open-games-list.md` req 29 carried a bullet — the row's delete reveal closes when
+   the confirmation is dismissed with No — that became unimplementable the moment the
+   confirmation became a child route, and was fixed by reordering so the reveal closes
+   *before* the modal opens. The general shape is worth naming: **a host choice that touches
+   no model, no storage and no engine can still make a sibling requirement unassertable.**
+   Check what a flow needs to *hear* before assuming a route can host it.
+
+   *Testable, wave 2:* the interface compiles against `P1-04`'s `GameId`; a recording fake
+   records one invocation per call with its arguments; the real implementation, driven against
+   a test `GoRouter`, leaves the expected location after each operation.
+
+   **One thing this interface still does not settle.** Whether `openSettings()` and
+   `openQuickActions()` resolve to the same *surface* follows Open Question 7 — two operations
+   and two routes exist because there are two settled entry points, not because there are
+   certainly two screens.
+
+   **The identifiers are this PRD's, not the design docs'.** No doc names an API. The *set* is
+   derived from the settled transitions and each doc comment cites the requirement that
+   settles it; the names are a proposal, and renaming any of them is free so long as the set
+   stays one operation per settled transition.
+
+4. **Screens acquire the layer through a Riverpod provider — plain Riverpod, no codegen —
+   and by no other means.** No static singleton, no global instance, no `BuildContext`
+   extension reaching a `GlobalKey<NavigatorState>`.
+
+   ```dart
+   // lib/navigation/navigation_providers.dart
+   final goRouterProvider = Provider<GoRouter>((ref) => buildRouter());
+
+   final appNavigatorProvider = Provider<AppNavigator>(
+     (ref) => GoRouterAppNavigator(
+       router: ref.watch(goRouterProvider),
+       openGames: ref.watch(openGamesRepositoryProvider), // P1-04, for requirement 8
+       ref: ref,                                          // for requirement 20
+     ),
+   );
+   ```
+
+   `GoRouterAppNavigator` is the only implementation and the only holder of the `GoRouter`.
+   `app.dart` reads `goRouterProvider` for `MaterialApp.router`'s `routerConfig`; every screen
+   reads `appNavigatorProvider` and never the router.
+   *Source: `Tech Design.md` → Decisions → State management — Riverpod ("settings and the
+   theme be readable from **everywhere**, including deep in the board widget tree");
+   `P1-01-app-scaffold.md` req 12 (no `@riverpod` codegen, no legacy `StateNotifier`) and
+   req 11 (the `ProviderScope` above `MaterialApp`). Precedent: `P2-02-audio.md` req 5 reaches
+   its layer the same way.*
+   **`Provider`, not `NotifierProvider`:** the navigator exposes operations, not observable
+   state, so there is nothing for a `Notifier` to hold. `P1-01` req 12's constraint is *no
+   codegen and no `StateNotifier`*, and this satisfies both.
+
+   **This is why the seam matters, and it is not a stylistic preference.** Under a singleton
+   or an internal `GlobalKey`, `P4-01-main-menu.md` reqs 14–16 and `P4-02-open-games-list.md`
+   reqs 8, 10 and 12 would have no injection point, and their "invokes X exactly once"
+   testables could not be written at all. Six PRDs depend on this choice.
+   *Testable, wave 2:* a scan finds no top-level or static `AppNavigator` or `GoRouter`
+   instance anywhere in `lib/`; a widget test overrides `appNavigatorProvider` with a
+   recording fake and observes calls made by any widget beneath the scope.
+
+5. **`dismissCurrent()` takes no argument, returns nothing, and is a no-op when nothing is
+   dismissible.** It closes the surface on top and reveals what is beneath. Concretely:
+   `if (router.canPop()) router.pop();` — nothing else. With no dismissible surface on screen
+   it does nothing at all: it does not pop the main menu, does not exit the app, and does not
+   throw.
+   *Source: `Tech Design.md` → Decisions → Navigation approach — go_router ("Dismissing a
+   route becomes `context.pop()` rather than `Navigator.pop`"). The `canPop()` guard, and
+   therefore the no-op case, is this PRD's call: the alternatives are worse — throwing makes
+   every call site defensive, and popping the root blanks the app on a double invocation.*
+   **It is the single dismissal for every surface this layer presents:** the theme overlay
+   (requirement 9), the name prompt (requirement 11), the in-game quick actions
+   (requirement 14), About Us (requirement 21) and the delete confirmation (requirement 22).
+   Three of those have unresolved page kinds — Open Questions 5 and 10 — and because all are
+   child routes, one `pop()` covers them regardless, so a later answer changes a `pageBuilder`
+   and not this operation. It does **not** dismiss the game-over result card, which is not a
+   route — see requirement 2.
+   *Testable, wave 2:* on a router at `/` alone, calling it leaves the location `/` and
+   nothing is popped; from `/theme` it returns to `/`; from `/games/new` to `/games`; from
+   `/games/confirm-delete/abc` to `/games`.
 
 ### Launch
 
-4. **The main menu is the app's launch screen** — the first screen the app presents, with
-   nothing beneath it in the stack.
+6. **The main menu is the app's launch screen** — the first screen the app presents, with
+   nothing beneath it in the stack. This is the router's `initialLocation: '/'`.
    *Source: `Menus and UI.md` → Decisions → Navigation and the back stack ("The main menu
    being the app's launch screen is assumed throughout this doc … Recording it here since
    nothing contradicts it"); → Screens (so far) → 1. Main Menu.*
-   *Testable:* after a cold launch the main menu (`P4-01-main-menu.md`) is the screen on
-   display and the back stack holds nothing under it.
-   *Not settled:* whether anything renders *before* it — an iOS launch image, or a gate while
-   the persisted theme is materialized. See Open Question 13; this requirement is about the
-   first screen of the app, not the first pixels on the display.
+   *Testable, wave 2:* the built router's initial location is `/` and `canPop()` is false
+   there.
+   *Wave note:* the screen is `P4-01-main-menu.md`, wave 4.
+   *Not settled:* whether anything renders *before* it — see Open Question 13. This
+   requirement is about the first screen of the app, not the first pixels on the display.
 
 ### Out of the main menu
 
-5. **Play Game branches on whether stored open games exist: with none, the player goes
+7. **Play Game branches on whether stored open games exist: with none, the player goes
    straight into a new game and the open-games list is not shown; with one or more, the
    open-games list opens.** The branch is evaluated inside the layer, so callers of
-   `playGame()` do not test the count themselves.
+   `playGame()` never read the count themselves.
    *Source: `Menus and UI.md` → Play Game → Where It Takes You ("No open games — straight
    into a new game, no intermediate screen"; "Open games exist — a new screen listing all open
    games"); → Decisions → Is the main menu button "New Game" or "Play Game"?*
-   *Testable:* with zero stored open games, `playGame()` never renders the list destination;
-   with one or more, it does.
-   The count comes from `P1-04-persistence.md`; the list screen is
-   `P4-02-open-games-list.md`'s. Whether the **name prompt** appears on the empty path is
-   unresolved — Open Question 4 — so this must not be read as settling it either way.
+   *Testable, wave 2:* with a stub `OpenGamesRepository` reporting `count() == 0`,
+   `playGame()` never navigates to `/games`; at 1, 2 and 100 the resulting location is
+   `/games`.
+   *Wave note:* the button is `P4-01-main-menu.md` req 14; the list is
+   `P4-02-open-games-list.md` reqs 1–2, which own the screen-level assertions in wave 4.
+   Whether the empty path lands on the **name prompt** (`/games/new`) or directly on a new
+   game (`/game/<id>`) is Open Question 4, so this must not be read as settling it either way.
 
-6. **The Theme button opens theme selection as an overlay on the main menu, with the main
-   menu still mounted beneath it.** It is not a screen the menu is replaced by.
+8. **`playGame()` is asynchronous, navigates nowhere until the count resolves, navigates at
+   most once per invocation, and recovers from a failed read without reporting it.** The count
+   comes from `P1-04-persistence.md` req 21's `Future<int> count()`, which that PRD states is
+   asynchronous like every operation on the store. Concretely:
+   - **While the read is in flight the main menu stays on screen.** No spinner, no
+     intermediate surface and no blank frame is specified here — nothing is pushed until there
+     is a destination.
+   - **Re-entrancy:** a second `playGame()` while one is in flight results in at most one push
+     in total. Tapping Play Game twice does not stack two screens.
+   - **If the read fails, the failure is caught and recovered here:** nothing is pushed, the
+     player is left on the main menu, the in-flight guard is released so a later tap can
+     succeed, and **the operation does not rethrow**.
+   - **The failure is not reported this wave.** `P1-06-crash-reporting.md` req 1 fences its
+     scope to *unhandled* errors reaching `FlutterError.onError` and
+     `PlatformDispatcher.instance.onError`, and its req 13 publishes an install seam that
+     forbids globals, statics, service locators and a Riverpod-held sink **by name** — so
+     there is deliberately no public API for application code to report a caught, recovered
+     error, and this layer must not invent one. Whether recovered errors should be reported at
+     all is that PRD's **Open Question 4**, and this requirement is its concrete forcing case:
+     if it lands on "yes", this is the first caller and the reporting line is added here.
+
+   *(Proposed for ratification — the shape is this PRD's. No design doc addresses an
+   asynchronous read behind a menu button, and none specifies what the player sees when one
+   fails. Recovering rather than rethrowing is the deliberate half: letting it go unhandled
+   would reach the global handlers and satisfy a report, but a failed count is not a reason to
+   take the app down. What the player sees instead is Open Question 15.)*
+
+   *Testable, wave 2 — an assertion about the recovery path, not about a crash handler:* with
+   a repository stub that never completes, the location stays `/`; with one that completes
+   after two invocations, exactly one push occurs; with one that **throws**, `playGame()`
+   completes normally, no exception escapes it, the location stays `/`, and a subsequent
+   `playGame()` against a working stub navigates — proving the in-flight guard was released.
+
+9. **The Theme button opens theme selection as an overlay on the main menu, with the main
+   menu still mounted beneath it.** It is not a screen the menu is replaced by. In the route
+   table this is `/theme` as a **child of `/`** with a **non-opaque page**, which is what
+   keeps the menu mounted and painted behind it.
    *Source: `Menus and UI.md` → Decisions → Is theme selection its own screen or an overlay?
    ("**An overlay** on the main menu"); → Screens (so far) → 5; `Theming.md` → Decisions →
    Where theme selection lives.*
-   *Testable:* while the overlay is open the main menu is still mounted and visible behind it;
-   `dismissCurrent()` reveals that same menu rather than constructing a new one.
-   The overlay's contents are `P4-03-theme-selection.md`'s.
+   *Testable, wave 2:* at `/theme` the main menu widget is still in the tree; `pop()` returns
+   to `/` without rebuilding the menu from scratch.
+   *Wave note:* owned by `P4-03-theme-selection.md` req 1, wave 4.
 
-7. **Settings is reachable from exactly two entry points — the main menu's Settings button
-   and the game screen's top-right button — and from nowhere else.**
-   *Source: `Menus and UI.md` → Settings Menu ("Reachable from two places: 1. The **main
-   menu** (Settings button). 2. The **gameplay screen**"); → Screens (so far) → 6;
-   `Game Board Design.md` → Scoreboard.*
-   What either entry point opens is `P4-04-settings.md`'s; whether the two are the same
-   surface is unresolved there and here — Open Question 7.
+10. **Settings is reachable from exactly two entry points — the main menu's Settings button
+    and the game screen's top-right button — and from nowhere else.** They are two routes:
+    `/settings` under the menu, `/game/:gameId/quick-actions` under the game.
+    *Source: `Menus and UI.md` → Settings Menu ("Reachable from two places: 1. The **main
+    menu** (Settings button). 2. The **gameplay screen**"); → Screens (so far) → 6;
+    `Game Board Design.md` → Scoreboard.*
+    *Wave note:* the two buttons are `P4-01-main-menu.md` req 16 and
+    `P3-03-scoreboard-turn-indicator.md`; what either opens is `P4-04-settings.md` reqs 1–2.
+    Whether the two routes render the same surface is Open Question 7 — if they do, the two
+    `GoRoute`s build the same widget and nothing else changes.
 
 ### Into and out of a game
 
-8. **The New Game name prompt's three transitions belong to this layer:** the open-games list
-   opens the prompt; confirming it opens the game screen on the newly created game;
-   cancelling it returns to the open-games list, which is still there.
-   *Source: `Menus and UI.md` → Play Game → Where It Takes You ("Selecting New Game prompts
-   for the opponent's name"); → Decisions → What does each row in the open-games list show?;
-   → Screens (so far) → 3. New Game Name Prompt.*
-   *Testable:* selecting New Game renders the prompt and opens no game; confirming opens the
-   game screen exactly once; cancelling leaves the list on screen.
-   `P4-02-open-games-list.md` Requirements 8, 10 and 12 specify the prompt's *contents and
-   effects* — the `ItSaMeMaRiO` default, the 16-character limit, that confirming creates a
-   game and cancelling creates nothing. This requirement claims only the screen changes those
-   sentences imply, which previously belonged to nobody's routing graph. Creating the game is
-   `P1-04-persistence.md`'s; whether the prompt is its own screen or an overlay is Open
-   Question 5, and this requirement reads the same either way.
+11. **The New Game name prompt's three transitions belong to this layer, and the prompt
+    reports its outcome by calling forward, not by returning a value:** the open-games list
+    calls `openNewGamePrompt()` (`push('/games/new')`); confirming calls `openGame(id)` with
+    the id of the newly created game; cancelling calls `dismissCurrent()` and the list is
+    still there beneath it.
+    *Source: `Menus and UI.md` → Play Game → Where It Takes You ("Selecting New Game prompts
+    for the opponent's name"); → Decisions → What does each row in the open-games list show?;
+    → Screens (so far) → 3. New Game Name Prompt.*
+    **Not `Future<String?>`, and not a dialog function.** The idiomatic dialog-shaped
+    alternative — the prompt returning the entered name to whoever opened it — would wire
+    `P4-02-open-games-list.md` reqs 10 and 12 backwards: those requirements read as the prompt
+    *creating* the game and cancelling *costing nothing*, not as the list receiving a string
+    and acting on it. Call-forward keeps the ownership those requirements already state, and
+    the whole `show…` family outside `lib/navigation/` is banned by requirement 1's scan.
+    *Testable, wave 2:* against the recording fake, a confirm records exactly one
+    `openGame(id)` and no other call; a cancel records exactly one `dismissCurrent()` and no
+    `openGame`. Against the real router, cancelling from `/games/new` leaves `/games`.
+    *Wave note:* the prompt's contents and effects — the `ItSaMeMaRiO` default, the
+    16-character limit, that confirming creates a game and cancelling creates nothing — are
+    `P4-02-open-games-list.md` reqs 8–12, wave 4. Creating the record is
+    `P1-04-persistence.md` req 21's `create`. Whether the prompt is drawn as a sheet over the
+    list or as a full screen is Open Question 5 — a `pageBuilder` choice that leaves this
+    requirement unchanged.
 
-9. **Selecting an open game from the list opens the game screen on that game, and it resumes
-   the series rather than starting a new one.**
-   *Source: `Menus and UI.md` → Decisions → What does an open game hold? ("resuming a game
-   from the open-games list resumes the *series*, not just the last individual board");
-   → Play Game → Where It Takes You.*
-   Restoring board and score is `P1-04-persistence.md`'s and `P4-02-open-games-list.md`'s;
-   this covers only that the list's destination is the game screen
-   (`P3-01-board-rendering.md`), reached with the selected game's identity.
+12. **Selecting an open game from the list opens the game screen on that game, identified by
+    `GameId`, and it resumes the series rather than starting a new one.** The id travels as
+    the `:gameId` path parameter of `/game/:gameId`.
+    *Source: `Menus and UI.md` → Decisions → What does an open game hold? ("resuming a game
+    from the open-games list resumes the *series*, not just the last individual board");
+    → Play Game → Where It Takes You.*
+    The id is opaque, store-minted and stable for life — `P1-04-persistence.md` req 22 — so
+    this layer passes `id.value` into the path and never parses it, orders by it, or displays
+    it.
+    *Testable, wave 2:* `openGame(GameId('abc'))` leaves the location `/game/abc`, and the
+    route's builder receives that id.
+    *Wave note:* the row and its id are `P4-02-open-games-list.md` reqs 5 and 19; restoring
+    board and score is `P1-04-persistence.md`.
 
-10. **Opening the in-game settings / quick-actions surface does not leave the game.** The game
-    is still there when the surface is dismissed, and `dismissCurrent()` returns to that same
-    game.
+13. **Leaving the open-games list without picking anything is an operation this layer owns**
+    — `leaveOpenGamesList()`. That the affordance needs a routing operation is settled by the
+    screen having one drawn; **where it leads is not** (Open Question 8).
+    *Source: `P4-02-open-games-list.md` → Open Question 7 ("`1b` draws a back button; no
+    design doc mentions one, or says where back goes"), which now names this requirement as
+    the owner of that control while leaving its destination open.*
+    It is named separately from `dismissCurrent()` because the two are the same call only if
+    back from the list always unwinds one step, which is exactly what Open Question 8 asks. A
+    call site must not have to know.
+    *Testable, wave 2:* the operation exists and records one invocation against the fake. Its
+    resulting location is deliberately unasserted until Open Question 8 lands.
+
+14. **Opening the in-game settings / quick-actions surface does not leave the game.** It is a
+    **child route of `/game/:gameId`**, so the game screen stays mounted beneath it, and
+    `dismissCurrent()` returns to that same game.
     *Source: `Menus and UI.md` → Settings Menu ("you can get to settings without abandoning a
     game. That second one is the important requirement: settings must be available mid-game");
     → How you reach settings from gameplay.*
-    *Testable:* open the surface mid-game, dismiss it, and the same game is on screen with its
-    board, its current player and its scoreboard unchanged.
-    **Two things this does not settle:** what control invokes the dismissal (Open Question 9)
-    and what happens to a pending move selection while the surface is up (Open Question 11).
+    *Testable, wave 2:* from `/game/abc`, `openQuickActions()` leaves
+    `/game/abc/quick-actions` with the game screen still in the tree; `dismissCurrent()`
+    returns to `/game/abc` and the game screen is not rebuilt.
+    *Wave note:* the board-level assertion — board, current player and scoreboard unchanged —
+    is `P4-04-settings.md` req 2, wave 4.
+    **One thing this does not settle:** what control invokes the dismissal (Open Question 9).
+    What happens to a **pending move selection** is now settled and is requirement 20 — it is
+    cleared, and precisely because nothing unmounts here, this layer has to do the clearing.
+    Whether the surface is drawn as a sheet or a full screen is Open Question 10 — again a
+    `pageBuilder` choice.
 
-11. **Exiting the game from quick actions returns the player to the main menu, and it is
-    available without finishing the game.**
-    *Source: `Menus and UI.md` → Decisions → How do you get back to the main menu from a game?
-    ("Via the settings button at the top right of the game screen. It opens quick actions,
-    which include exiting the game. You don't have to finish a game to leave it"); → How you
-    reach settings from gameplay ("the settings button does double duty in-game: it's both the
-    settings entry point and the way out of a game").*
-    *Testable:* from a game in progress, `exitGameToMainMenu()` leaves the main menu as the
-    screen on display.
-    *Not settled:* whether it **pops** to an existing main-menu route or **pushes** a fresh one
-    (Open Question 2), and whether it prompts for confirmation first (Open Question 6).
+15. **`exitGameToMainMenu()` returns the player to the main menu, and it has two callers.**
+    Mid-play it is the quick-actions exit, available without finishing the game. At game over
+    it is the result card's **back to main menu** control. One operation serves both; neither
+    caller knows what it does underneath.
+    *Source, mid-play: `Menus and UI.md` → Decisions → How do you get back to the main menu
+    from a game? ("Via the settings button at the top right of the game screen. It opens quick
+    actions, which include exiting the game. You don't have to finish a game to leave it");
+    → How you reach settings from gameplay ("the settings button does double duty in-game").
+    Source, game over: `Menus and UI.md` → Decisions → What controls does the game-over result
+    card carry? — **next game, and back to main menu** — specified in
+    `P3-04-game-over-rematch.md` req 5, which is cited rather than restated here.*
+    *Testable:* after `exitGameToMainMenu()` the location is `/`, from either caller.
+    *Wave note:* the mid-play control is `P4-04-settings.md` reqs 4–5, wave 4; the game-over
+    control is `P3-04-game-over-rematch.md` req 5, wave 3. The operation is identical for
+    both — which also means **Open Question 2 resolves once and applies to both**, rather than
+    being answerable differently for a finished game than for a live one. That is the
+    interface earning its keep.
+    *One line still open:* `router.go('/')` — which replaces the stack, so the iOS back-swipe
+    cannot return the player into the game they just left — or `router.pop()` back to the menu
+    route already beneath, which leaves the swipe able to. That is Open Question 2. Whether
+    the mid-play exit prompts for confirmation first is Open Question 6; the game-over exit
+    has nothing to confirm, since the game is over and already saved.
 
-12. **Leaving a game discards nothing.** No part of this layer ends, resets, deletes or
-    finalizes a game on the way out; the game stays in the open-games list with its own
-    scoreboard and is resumable.
+16. **Leaving a game discards nothing.** No part of this layer ends, resets, deletes or
+    finalizes a game on the way out.
     *Source: `Menus and UI.md` → Leaving a game mid-play ("going back to the main menu doesn't
     discard anything — the game stays in the open-games list with its own scoreboard, and you
     can pick it up again"); → Persistence (table: "Game in progress — Saved to device storage,
     resumable from the open-games list"); → Decisions → Does a game in progress have to be
-    saved to device storage?; `Game Overview.md` → Decisions → Scoreboard lifetime.*
-    *Testable:* exit a game mid-board with a non-zero score, reopen it from the list, and the
-    board and its running series score are unchanged.
+    saved to device storage?; `Game Overview.md` → Decisions → Scoreboard lifetime. Corroborated
+    at game over by `P3-04-game-over-rematch.md` req 5, whose back-to-main-menu control
+    discards nothing because the finished game is already on disk by then.*
+    *Testable, wave 2:* a source scan finds no call to a mutating `OpenGamesRepository`
+    method — `create`, `save` or `delete` — anywhere in `lib/navigation/`. `count()` is the
+    only store call this layer makes (requirement 8). The scan runs with no game screen built.
+    **Requirement 22 is not an exception.** This layer *presents* the delete confirmation; the
+    deletion itself is performed by `P4-02-open-games-list.md` through
+    `P1-04-persistence.md`'s `delete`, and no `delete` call appears in `lib/navigation/`.
+    **Requirement 20's clear is not an exception either.** A pending selection is UI state that
+    is never persisted (`P3-02-move-input.md` req 21), so clearing it discards nothing stored.
+    *Wave note:* the round-trip assertion — leave mid-board, reopen, board and score
+    unchanged — is `P1-04-persistence.md` req 11's, and `P4-02-open-games-list.md` req 5
+    asserts it from the list side.
 
-13. **Taking the rematch performs no navigation.** The series continues in the same open game
-    rather than routing back to the open-games list or the main menu.
+17. **Taking the next game performs no navigation.** The series continues in the same open
+    game rather than routing back to the open-games list or the main menu — the location stays
+    `/game/:gameId`.
     *Source: `Menus and UI.md` → Game Over → Rematch ("The rematch continues in the **same
     open game** — same series, scoreboard intact. It does not start a second open game");
     `Game Overview.md` → Session Structure ("Continuing **resets the board**").*
-    *Testable:* taking the rematch leaves the game screen on display and adds no entry to the
-    back stack.
+    *Testable, wave 2:* against the recording fake, the next-game path records zero navigator
+    invocations; against the real router the location is unchanged.
+    *Wave note:* the control is `P3-04-game-over-rematch.md` req 5 — the *other* of the result
+    card's two controls, and the one that does not touch this layer. Because it performs no
+    navigation, requirement 20 does not fire on it; the clear there is
+    `P3-02-move-input.md` req 30's `boardProvider` listener, which *does* fire, since
+    `startNextGame()` replaces the board.
     *Note:* the docs settle this at the level of *which open game the series belongs to*;
-    reading it as "no route change" is the narrow routing consequence, not a separate decision.
-    Whether the game-over surface itself can be dismissed, and whether an exit control sits
-    beside Rematch, are `P3-04-game-over-rematch.md`'s open questions — Open Question 12.
+    reading it as "no route change" is the narrow routing consequence, not a separate
+    decision.
 
 ### Constraints on the graph
 
-14. **No route reachable from a game leads to theme selection.** The theme cannot be changed
-    mid-game.
+18. **No route reachable from a game leads to theme selection.** The theme cannot be changed
+    mid-game, and the route table enforces it structurally: `/theme` is a child of `/`, not of
+    `/game/:gameId`, so it is not reachable from inside a game without leaving it.
     *Source: `Theming.md` → Decisions → Can you change the theme mid-game ("**No** — leave it
     out for now. Theme changes happen from the main menu only"); `Menus and UI.md` → Theme
     Selection.*
-    *Testable:* no operation reachable from the game screen or its quick-actions surface
-    reaches the theme overlay. `P4-03-theme-selection.md` Requirement 19 asserts the same
-    constraint from the screen's side; this one holds it in the routing graph.
+    *Testable, wave 2:* `/theme` appears only as a child of `/` in the route table, and no
+    call site under the game screen or its quick-actions surface invokes
+    `openThemeSelection()`.
+    *Wave note:* `P4-03-theme-selection.md` req 19 asserts the same constraint from the
+    screen's side.
 
-15. **The navigation layer holds no hardcoded theme values** — including no hardcoded
-    `Duration(…)` for any transition — and passes the hardcoded-theme-value test with the
-    baseline at zero.
+19. **The navigation layer holds no hardcoded theme values** — including no hardcoded
+    `Duration(…)` for any transition, and no color on a non-opaque page's barrier — and passes
+    the hardcoded-theme-value test with the baseline at zero.
     *Source: `Theming.md` → Architectural Rule ("All of our code operates off of the theme. No
     code should be operating independently from the selected theme"); `Tech Design.md` →
     Decisions → Do we add a test that fails on hardcoded theme values? ("Durations are in
-    scope because … a hardcoded `Duration` is a theme value that escaped"; "the baseline starts
-    at zero").*
-    *Testable:* the scan in `P1-05-theme-guard-test.md` passes over `lib/navigation/` with no
-    baseline entries.
+    scope because … a hardcoded `Duration` is a theme value that escaped"; "the baseline
+    starts at zero").*
+    Note this bites here in a way it does not elsewhere: a transition page takes a
+    `transitionDuration` and a barrier color, and both are theme values, not constants.
+    `Theming.md` → What a Theme Controls lists modal and sheet surfaces among the theme's
+    slots. *(Spacing and padding are **not** theme values — `Theming.md` → Decisions fixes
+    them in code — but that changes nothing here, because this layer specifies no geometry at
+    all. Durations and the barrier colour are unaffected by that decision.)*
+    **Any such value is read from `activeThemeProvider`** (`lib/theme/theme_providers.dart`,
+    `P1-03-theme-system.md`) — `ref.read` inside `GoRouterAppNavigator`, which is a service,
+    and `ref.watch` inside a page builder's widget, per `P1-03` req 24. This layer defines no
+    theme slot of its own; whether the slots it needs exist is `P1-03`'s.
+    *Testable, wave 2:* the scan in `P1-05-theme-guard-test.md` passes over `lib/navigation/`
+    with no baseline entries.
     Whether there is any transition motion to time at all is Open Question 14.
+
+### State this layer must clear
+
+20. **Every navigation clears the pending move selection, and this layer is what clears it.**
+    Opening any menu or sheet — `/settings`, `/theme`, `/games`, `/about`,
+    `/game/:id/quick-actions` — discards an unconfirmed selection, as does leaving the board
+    by any route.
+    *Source: `Game Board Design.md` → Decisions: **"Any tap outside the nine quadrants clears
+    a pending, unconfirmed selection — including the legend/how-to-play strip, the scoreboard,
+    the settings button, and opening any menu or sheet. One rule, uniformly applied."** It
+    extends → Move Input → Changing your mind ("**Tap outside the full grid** → deselects
+    entirely, clearing the pending move") to the surfaces that open over the board.*
+
+    **`P3-02-move-input.md` req 30's `boardProvider` listener does not cover this case, and
+    this is the point.** That listener fires when the *board* changes. Opening a surface over
+    the board changes no board state, and requirement 2's child-route structure means the game
+    screen is never unmounted and `pendingSelectionProvider` is never disposed. So the listener
+    does not fire, nothing else disposes the state, and **the selection would survive** — the
+    exact opposite of what the Decision says. Something has to clear it actively, and that
+    something is here: a navigation is the one event this layer sees and `P3-02` does not.
+    That PRD has since removed its own competing clear-on-navigation mechanism, leaving one
+    owner for this path.
+
+    ```dart
+    // lib/navigation/go_router_app_navigator.dart — before every router call
+    void _clearPendingSelection() =>
+        _ref.read(pendingSelectionProvider.notifier).clear(); // P3-02 req 24
+    ```
+
+    **Clear on every operation, not on a subset.** A pending selection can only exist while a
+    board is on screen, so clearing when there is none is a no-op — `clear()` sets an already
+    null state to null. Making it unconditional means no operation can be added later that
+    forgets to, which is what "one rule, uniformly applied" asks for — and requirements 21 and
+    22 inherited it for free, which is the property working.
+    **It calls `P3-02`'s published entry point and adds no writer.** `clear()` is already that
+    provider's mutating surface for its tap-outside-the-grid case; this adds a caller, not a
+    second owner.
+    **Why the call cannot live in `P3-02` instead:** the board layer would have to observe the
+    router to know a navigation happened, and requirement 1's scan forbids importing
+    `go_router` outside `lib/navigation/`. Moving the observation there would breach the one
+    boundary this PRD exists to hold.
+
+    *Testable, wave 3* (when `pendingSelectionProvider` exists): with a selection pending on
+    `/game/abc`, each of `openQuickActions()`, `openSettings()`, `openThemeSelection()`,
+    `exitGameToMainMenu()` and `playGame()` leaves `pendingSelectionProvider` null; and
+    `dismissCurrent()` back to `/game/abc` finds it still null rather than restored.
+    *Testable, wave 2:* against a fake pending-selection notifier, every `AppNavigator`
+    operation records exactly one `clear()` before its router call.
+
+### The About Us route
+
+21. **`openAboutUs()` is an operation on `AppNavigator`, and it pushes `/about` as an ordinary
+    opaque page, a child of `/`.** Same `Future<void>` shape as every other operation, and
+    preceded by requirement 20's clear like every other operation.
+
+    ```dart
+    // lib/navigation/app_navigator.dart — appended to the interface in requirement 3
+    /// The main menu's About Us button. Requirement 21.
+    Future<void> openAboutUs();
+    ```
+
+    *Source: `Menus and UI.md` → Decisions, which settles that the main menu carries four
+    buttons — Play Game, Theme, Settings, About Us — with About Us last and its position
+    explicitly provisional (*"for now we might move it in the future"*);
+    `P4-01-main-menu.md` req 23, which owns the button, states what it needs of this layer,
+    and marks the name a proposal to this PRD rather than a fact.*
+    **This PRD accepts that proposal as written** — the name, the `Future<void>` shape, and
+    the opaque-child-of-`/` treatment.
+
+    **Why opaque, and why under `/`.** Handoff screen `1c` is a full screen with its own back
+    control, not a sheet and not an overlay, so it does not take the non-opaque treatment
+    `/theme` gets under requirement 9 — nothing needs to stay painted behind it. And it is
+    reached only from the main menu, so it belongs under `/` and not under `/game/:gameId`;
+    requirement 18's structural argument applies here too, in that nothing in a game can reach
+    it. Returning from it is `dismissCurrent()`, which requirement 5 already covers.
+    *(The opaque/child-of-`/` reasoning is `P4-01` req 23's and this PRD's jointly; the handoff
+    is a read-only reference asset, not a Decision.)*
+
+    **The screen this route points at has no owner.** `P4-01-main-menu.md` owns the button and
+    this requirement owns the route, but no PRD owns `AboutUsScreen` — its content, its back
+    control, or whether the handoff's team photos are what ships. Recorded as Open Question 16
+    rather than absorbed here.
+
+    *Testable, wave 2:* `openAboutUs()` leaves the location `/about`; `/about` resolves as a
+    child of `/`; `dismissCurrent()` from `/about` returns to `/` with the main menu still
+    beneath. The route resolving does not require the screen widget to be more than a
+    placeholder — which is exactly the wave-2 posture, and here it is load-bearing rather than
+    incidental.
+
+### The delete-confirmation route
+
+22. **`openDeleteConfirmation(GameId id)` is an operation on `AppNavigator`, and it pushes
+    `/games/confirm-delete/:gameId` as a **non-opaque** page, a child of `/games`.** Same
+    `Future<void>` shape, same requirement 20 clear, dismissed by `dismissCurrent()` like every
+    other surface.
+
+    ```dart
+    // lib/navigation/app_navigator.dart — appended to the interface in requirement 3
+    /// The open-games list's delete confirmation, for one game. Requirement 22.
+    Future<void> openDeleteConfirmation(GameId id);
+    ```
+
+    *Source: `Menus and UI.md` → Decisions → Deleting an open game settles that the list
+    carries a delete action; `P4-02-open-games-list.md` req 28 owns the confirmation's
+    contents and proposed this operation, this path and the widget name
+    `DeleteGameConfirmation` as a fence while no host existed.*
+    **This PRD accepts that proposal**, with one change and one addition.
+
+    **The change: the id travels in the path.** `P4-02` proposed `/games/confirm-delete`; this
+    publishes `/games/confirm-delete/:gameId`. A `go_router` location is meant to be sufficient
+    to rebuild the screen — a route that needs an id but does not carry one cannot survive
+    restoration, cannot be rebuilt from its location, and forces the id to be smuggled through
+    state that requirement 1 keeps out of `lib/ui/` anyway. `/game/:gameId` already sets this
+    precedent (requirement 12). The widget takes it as a constructor argument, exactly as
+    `GameScreen` does.
+
+    **The addition: non-opaque is settled here, not left to Open Question 10.** A confirmation
+    must show what it is confirming against — the player is deciding about a specific row, and
+    the row is behind the modal. This is not the settings-surface question OQ-10 holds open,
+    where the handoff drew two things two ways; nothing draws this modal at all, and the
+    argument for keeping the list visible is intrinsic. *(This PRD's call, with reason, and
+    revisable if `P4-02` finds a reason to cover the list.)*
+
+    **This layer presents and dismisses; it never deletes.** The confirmation's Yes path calls
+    `P4-02-open-games-list.md`'s delete, which calls `P1-04-persistence.md` req 21's `delete`.
+    No `delete` call appears in `lib/navigation/` — requirement 16's scan asserts exactly that.
+
+    **Why a route was the right host, and what it cost.** This is the same
+    transient-dismissible-surface-over-a-list pattern the name prompt already uses at
+    `/games/new` (requirement 11), inside the same feature — so accepting it adds a row to the
+    route table and no new concept. The cost is the one requirement 3 now names: the modal
+    cannot report its outcome back to the list, which made a bullet in `P4-02` req 29
+    unimplementable until that PRD reordered the flow. That reordering is the correct fix and
+    it stands as the worked example.
+
+    *Testable, wave 2:* `openDeleteConfirmation(GameId('abc'))` leaves the location
+    `/games/confirm-delete/abc`; the route resolves as a child of `/games` and receives `abc`
+    as a path parameter; the list widget is still mounted beneath it; `dismissCurrent()`
+    returns to `/games`.
 
 ## Out of Scope
 
 Referenced by filename rather than specified here. This PRD moves between these surfaces and
 specifies none of them:
 
-- **The main menu** — its buttons, title, logo and styling → `P4-01-main-menu.md`.
-- **The open-games list and the name prompt's contents** — rows, the delete action, the cap,
-  the `ItSaMeMaRiO` default, the character limit, and the back button drawn on `1b` →
-  `P4-02-open-games-list.md`. Requirement 8 claims the prompt's *transitions* only.
+- **The main menu** — its buttons, title, logo and styling → `P4-01-main-menu.md`, including
+  the About Us button that calls requirement 21.
+- **The open-games list, the name prompt's contents, and the delete flow's contents** — rows,
+  the delete affordance and its reveal, the cap, the `ItSaMeMaRiO` default, the character
+  limit, the confirmation's copy and buttons, and the deletion itself →
+  `P4-02-open-games-list.md`, with the storage half in `P1-04-persistence.md`. Requirements
+  11, 13 and 22 claim the *transitions* only.
 - **The theme selection overlay** — its rows, highlight, labels and failure modal →
   `P4-03-theme-selection.md`.
 - **Settings and the in-game quick-actions surface** — the three toggles, what quick actions
   contains, and the exit control's own presentation → `P4-04-settings.md`.
-- **The game screen** → `P3-01-board-rendering.md`. **Move input and the pending selection** →
-  `P3-02-move-input.md`. **The game-over surface and rematch** →
-  `P3-04-game-over-rematch.md`.
-- **Storing, capping, creating, deleting and restoring open games** → `P1-04-persistence.md`.
+- **The game screen** → `P3-01-board-rendering.md`. **The pending selection itself** — what it
+  is, how a tap creates one, and every non-navigation way it clears → `P3-02-move-input.md`.
+  Requirement 20 calls that PRD's `clear()`; it defines no selection state of its own.
+- **The game-over result card** — that it carries two controls, what they read, how it is
+  presented over the board, and whether it can be dismissed → `P3-04-game-over-rematch.md`
+  req 5. Requirement 15 owns only what its back-to-main-menu control calls; requirement 17
+  records that its other control calls nothing here.
+- **The About Us screen (`1c`) itself — and it currently has no owner.** Requirement 21
+  specifies the **route**; the screen behind it is specified by nobody. No PRD owns
+  `AboutUsScreen`'s content, its back control, or whether the handoff's team photos ship —
+  `P5-02-asset-generation-replicate.md` records that real team photos are probably not an
+  asset-generation question at all. This is the one destination in the route table whose
+  widget has no home. See Open Question 16.
+- **Storing, capping, creating, deleting and restoring open games, and minting `GameId`** →
+  `P1-04-persistence.md`. This layer calls `count()` and carries ids; it writes nothing.
+- **Crash reporting, and any decision about whether recovered errors are reported** →
+  `P1-06-crash-reporting.md`, whose req 1 scopes its wave to unhandled errors and whose OQ-4
+  holds the recovered-error question open. Requirement 8 recovers and reports nothing; it
+  installs no handler, holds no sink, and invents no report path.
+- **The theme object and its slots** → `P1-03-theme-system.md`. Requirement 19 reads
+  `activeThemeProvider`; it defines nothing in it.
+- **Deep links and the URL bar.** `go_router` was chosen partly because it *"handles deep
+  links and the browser URL bar without rework"* (`Tech Design.md` → Decisions → Navigation
+  approach — go_router), and the route table above is therefore link-shaped. But no design doc
+  asks for an external entry point, the app is otherwise fully offline, and **no URL scheme,
+  universal link or iOS associated-domain configuration is specified here.** The capability is
+  retained; nothing is wired to it.
 - **The purchase flow and its host surface** → `P4-05-purchase-flow.md`. `Menus and UI.md` →
   Decisions → *Where the open-game slot unlock is sold* settles that a buying surface exists
   and that *"which screen it lives on is not decided"*; its Open Questions name the open-games
   list at the cap, the settings screen, or **a dedicated store surface** as candidates. Under
-  the third that is a destination this graph has no route to, and a global *Restore purchases*
-  affordance may be another. No route to either is specified here — same shape as the About Us
-  item below.
-- **The About Us screen (`1c`).** Drawn in the approved handoff, not listed in
-  `Menus and UI.md` → Screens (so far), and whether it exists at all is open in
-  `P4-01-main-menu.md`. No route to it is specified here.
+  the third that is a route this table does not carry, and a global *Restore purchases*
+  affordance may be another. No operation and no `GoRoute` for either is published here.
 - **A fuller Rules / How-to-Play screen.** `P3-05-how-to-play.md` owns the on-board legend and
-  hint, which need no route. `Menus and UI.md` → Open Questions holds open *"Is there also a
-  fuller Rules/How-to-Play screen"* and lists Rules/How to Play among future menu items; if one
-  appears it is another destination, and no route to it is specified here.
+  hint, which need no route — and its req 15 takes the same clearing rule from the strip's
+  side. `Menus and UI.md` → Open Questions holds open *"Is there also a fuller Rules/How-to-Play
+  screen"*; if one appears it is another route, and none is published here.
 - **Screen transition animations.** `Animations.md` → Scope For Now: *"We are **not**
-  animating the board, the layout, or transitions between screens yet."* Requirement 15
-  constrains what happens if a motion value is nonetheless introduced; it does not authorize
-  one. See Open Question 14.
+  animating the board, the layout, or transitions between screens yet."* Requirement 19
+  constrains any motion value that is nonetheless introduced; it does not authorize one. See
+  Open Question 14.
 - **A confirmation prompt on exiting a game.** Unsettled — Open Question 6. Nothing here
   designs one and nothing here rules one out.
 - **`Alternative Game Styles.md`** — declared parking lot; not what is being built.
@@ -295,29 +871,38 @@ specifies none of them:
 
 ### From the design docs — unresolved, worded as the docs word them
 
-1. **The routing approach.** `Tech Design.md` → Open Questions → *4. Navigation approach*:
+1. **The routing approach — CLOSED.** `Tech Design.md` → Decisions → *Navigation approach —
+   go_router* settles it: **`go_router`**, chosen as a long-term fit rather than a stopgap.
+   Requirements 1–5 are written against it, and the interface in requirement 3 did not change
+   when the answer landed. The former proposal to narrow this PRD's wave-2 deliverable to the
+   interface and the scans is **withdrawn** — the body is buildable, so the full layer ships in
+   wave 2. Kept as a numbered stub so the citations in sibling PRDs stay stable.
 
-   > The app has an explicit navigation layer (see Decisions → Navigation), but no Decision
-   > names how it's built — plain `Navigator` push/pop, `go_router`, or something else — and
-   > the dependency list has no router in it yet.
+2. **Pop or `go` on exit — now a one-line choice, and it resolves once for two callers.**
+   `Menus and UI.md` → Open Questions:
 
-   Requirements 1–3 are written to stand either way.
+   > … does exiting a game pop back to an existing main menu instance or push a fresh one?
 
-2. **Pop or push on exit.** `Menus and UI.md` → Open Questions:
+   In `go_router` terms, `exitGameToMainMenu()` is either:
+   - **`router.go('/')`** — replaces the stack, so the game route is gone and the **iOS
+     back-swipe cannot carry the player back into the game they just exited**; or
+   - **`router.pop()`** — unwinds one step to the menu route already beneath, leaving the game
+     route in the stack until it is popped, so the swipe **can** return them.
 
-   > **What is the routing/navigation approach**, and does exiting a game pop back to an
-   > existing main menu instance or push a fresh one?
-
-   This is where Requirement 11 stops. It also decides whether the iOS back-swipe can carry a
-   player back into the game they just exited — and iOS is the primary target
-   (`Tech Design.md` → Decisions → Primary target — Apple), so the gesture is present by
-   default.
+   That is the whole of requirement 15's remaining ambiguity. Note it now governs **both** the
+   mid-play exit and the game-over card's back-to-main-menu control, since both call the same
+   operation — so the swipe behaves identically whether the game was abandoned or finished,
+   which is probably what anyone would want but is worth stating rather than discovering.
 
 3. **Where each back affordance leads.** `Menus and UI.md` → Open Questions:
 
    > **Where does each back affordance lead** — the in-game back/exit action, and the iOS
    > back-swipe gesture — and can the swipe gesture carry a player back into a game they just
    > exited?
+
+   Open Question 2 is the in-game half. The swipe half follows from it: under `go_router` the
+   gesture pops whatever is on the stack, so the answer is decided by what each operation
+   leaves there rather than by any separate gesture handling.
 
 4. **Does the empty-state path show the name prompt?** `Menus and UI.md` → Play Game → Where
    It Takes You:
@@ -326,12 +911,16 @@ specifies none of them:
    > shows the opponent-name prompt, or skips it. "No intermediate screen" and the prompt
    > can't both be true on that path.
 
-   Requirement 5 stands either way; Requirement 8 covers the from-the-list path only. Also
-   carried by `P4-02-open-games-list.md` → Open Question 1.
+   Concretely: with `count() == 0`, does `playGame()` push `/games/new` or `/game/<id>`?
+   Requirement 7 stands either way. This is the same question as `P4-02-open-games-list.md` →
+   Open Question 1, and it decides whether `openNewGamePrompt()` has one caller or two.
 
 5. **Is the name prompt its own screen or an overlay?** `Menus and UI.md` → Screens (so far)
    → 3. New Game Name Prompt: *"Undecided whether it's its own screen or an overlay."*
-   One instance of Open Question 10, and it lands directly on Requirement 8.
+   Now a `pageBuilder` choice on the `/games/new` route — non-opaque leaves the list visible
+   beneath, opaque covers it. The route, the operation and every call site read the same
+   either way. (Requirement 22 settles the *delete* modal as non-opaque on its own argument;
+   that does not decide this one.)
 
 6. **Does leaving a game still need a confirmation prompt?** `Menus and UI.md` → Leaving a
    game mid-play:
@@ -339,84 +928,139 @@ specifies none of them:
    > Whether leaving still needs a confirmation prompt is undecided; the original reason for
    > one ("Leave game? Your score will be lost") no longer applies.
 
+   This is the mid-play exit only. The game-over card's exit has nothing to confirm.
+
 7. **Is quick actions the same settings screen as the main menu's?** `Menus and UI.md` → How
    you reach settings from gameplay:
 
    > Undecided: whether quick actions is the *same* settings screen as the main menu's, or a
    > trimmed-down in-game version with the exit option added.
 
-   Requirement 7 settles that there are two entry points, not that there are two surfaces;
-   Requirement 3 names an operation per entry point for the same reason. Also carried by
-   `P4-04-settings.md` → Open Question 1.
+   Requirement 10 settles that there are two entry points and two routes; whether the two
+   `GoRoute`s build the same widget is what remains. Also carried by `P4-04-settings.md` →
+   Open Question 1.
 
 ### Raised by PRD review across the existing PRDs — carried here, not answered
 
-8. **The open-games list draws a back button no design doc mentions.**
-   `P4-02-open-games-list.md` → Open Question 7: *"How does the player leave the list without
-   picking anything? `1b` draws a back button; no design doc mentions one, or says where back
-   goes."* Under Requirement 5 the list is reached from the main menu, but nothing settles
-   that back returns there rather than, say, into a game.
+8. **Where does back from the open-games list lead?** `P4-02-open-games-list.md` → Open
+   Question 7: *"How does the player leave the list without picking anything? `1b` draws a
+   back button; no design doc mentions one, or says where back goes."* Requirement 13 settles
+   that the operation exists — and that PRD now names it — but what remains is `router.pop()`,
+   unwinding one step, which is the main menu whenever the list was reached from it, versus
+   `router.go('/')`, which returns to the menu from anywhere the list might later be reached
+   from. The two differ only once a second path into the list exists.
 
 9. **No control is named for returning from the in-game settings surface to the game.**
-   `P4-04-settings.md` records that its Requirement 2 settles that reaching settings does not
-   abandon the game, *"but no doc names the control that returns you to it. The handoff gives
-   `1f` a close button and a 'Back to the game' action; the docs give it neither."*
-   Requirements 3 and 10 have the same hole: the operation is specified, its trigger is not.
+   `P4-04-settings.md` records that its req 2 settles that reaching settings does not abandon
+   the game, *"but no doc names the control that returns you to it. The handoff gives `1f` a
+   close button and a 'Back to the game' action; the docs give it neither."* Requirements 5
+   and 14 have the same hole: the operation is published and implemented, its trigger is not.
 
-10. **Is a modal or sheet a route, or an overlay?** The approved handoff draws `2b — Settings
-    page` as *"Full screen, not a sheet — this is the main-menu route; 1f stays the trimmed
-    in-game version"*, and draws `1f` as a bottom sheet. `P4-04-settings.md` → Open Question 1
-    holds this unresolved, and it is a navigation-layer question as much as a presentation one:
-    a route participates in the back stack and the back-swipe gesture, an overlay does not. It
-    decides what `dismissCurrent()` does. Requirement 6 settles it for theme selection only,
-    because a Decision covers that one case.
+10. **Is a modal or sheet drawn opaque or non-opaque?** The approved handoff draws `2b —
+    Settings page` as *"Full screen, not a sheet — this is the main-menu route; 1f stays the
+    trimmed in-game version"*, and draws `1f` as a bottom sheet. `P4-04-settings.md` → Open
+    Question 1 holds this unresolved. Under `go_router` it no longer changes the route table —
+    `/settings`, `/games/new` and `/game/:gameId/quick-actions` are routes either way — it
+    changes each one's `pageBuilder`, and therefore whether what is beneath stays painted.
+    Requirements 9, 21 and 22 settle it for theme selection, About Us and the delete
+    confirmation, because each of those has an argument of its own; the other three do not.
 
-11. **What happens to a pending move selection when a surface opens over the board?** The two
-    PRDs disagree about the status of this question, not just the answer:
-    `P4-04-settings.md` → Requirement 2 asserts as testable that the pending selection is
-    *"exactly as it was"* after dismissing the surface, while `P3-02-move-input.md` → OQ-1
-    lists it as open — *"whether opening the in-game settings / quick-actions modal (`1f`)
-    clears a pending selection or leaves it standing when the modal is dismissed."*
-    Requirement 10 deliberately does not take a side.
+11. **The pending selection when a surface opens over the board — CLOSED, and it does not go
+    the way this PRD expected.** `Game Board Design.md` → Decisions settles it: *"Any tap
+    outside the nine quadrants clears a pending, unconfirmed selection — including the
+    legend/how-to-play strip, the scoreboard, the settings button, and opening any menu or
+    sheet. One rule, uniformly applied."* It is **cleared**, not preserved. This PRD had
+    observed that the child-route structure made *preserved* the path of least resistance;
+    that was right about the mechanics and wrong about the outcome, which is why requirement 20
+    exists — nothing unmounts, so nothing clears it by accident. `P3-02-move-input.md` OQ-1,
+    `P3-05-how-to-play.md` req 15 and `P4-04-settings.md` OQ-5 land on the same answer. Kept as
+    a numbered stub so sibling citations stay stable.
 
-12. **Is the exit route live while the game-over surface is on screen?**
-    `P3-04-game-over-rematch.md` → OQ3: *"`Menus and UI.md` settles that settings must be
-    reachable *mid-game* and that it is also the way out; a finished game is not mid-game, and
-    the docs do not say whether that button keeps working, is hidden, or is the intended exit
-    route."* If it is not live, then at game over the only settled route out of a game
-    (Requirement 11) does not exist.
+12. **The game-over exit — CLOSED as it bore on this layer; a smaller half remains
+    elsewhere.** This PRD asked whether the settings button stays live over a finished game,
+    because if it did not, requirement 15 was the *only* settled way out and a player could be
+    stranded on a finished board. That is answered: `Menus and UI.md` → Decisions → *What
+    controls does the game-over result card carry?* settles **next game, and back to main
+    menu**, and `P3-04-game-over-rematch.md` req 5 specifies the card — cited here, not
+    restated. The card is self-sufficient, so no player depends on the settings button to leave
+    a finished game, and requirement 15 now has that control as a second caller.
+    **Still open, and not this layer's:** whether the top-right settings button renders and
+    responds while the card is on screen. It is a presentation question for
+    `P3-04-game-over-rematch.md` and `P3-03-scoreboard-turn-indicator.md`, and it no longer
+    strands anyone whichever way it goes.
 
-### Raised by round-2 review of this PRD — recorded, not answered
-
-13. **Does anything render before the main menu?** Requirement 4 makes the main menu the app's
-    first screen, and as written its testable would forbid two things nobody has ruled out: the
-    iOS launch screen the platform shows before the first frame, and any gate held while the
-    persisted theme is materialized — `Theming.md` → Why this matters for the build says
-    materialization happens *"at startup"*, and `Tech Design.md` → Open Questions → *2. Theme
-    loading* leaves open how many themes that covers. Whether a splash, a loading state, or
-    nothing at all precedes the menu is unstated.
+13. **Does anything render before the main menu?** Requirement 6 makes `/` the initial
+    location, and nobody has ruled out two things that would precede it: the iOS launch screen
+    the platform shows before the first frame, and any gate held while the persisted theme is
+    materialized — `Theming.md` → Why this matters for the build says materialization happens
+    *"at startup"*, and `Tech Design.md` → Open Questions → *2. Theme loading* leaves open how
+    many themes that covers. Whether a splash, a loading state, or nothing at all precedes the
+    menu is unstated. (`go_router` would express a gate as a `redirect`; none is specified
+    here.)
 
 14. **Do screen transitions animate at all, and does the Animations toggle apply to them?**
     `Animations.md` → Scope For Now says transitions between screens are not animated *yet*,
     while → Decisions → *Turn animations off — a global setting* and → *Animations off =
-    instant state change* describe a toggle that governs everything the game animates. If a
-    transition ever animates, whether its timing is a theme value (Requirement 15) and whether
-    the toggle switches it off are both unaddressed.
+    instant state change* describe a toggle that governs everything the game animates. This
+    now has a concrete surface: every transition page in requirement 2 takes a
+    `transitionDuration`, and requirement 19 says any such value is a theme value. Whether
+    those durations are zero, theme-supplied, or gated on the toggle is unaddressed. (Unchanged
+    by `Theming.md` → Decisions fixing spacing and padding in code — those are geometry, these
+    are motion.)
 
-15. **What does wave P2 build against?** Every testable in this PRD asserts a transition
-    between screens that waves P3 and P4 have not built yet, and the wave rule is that a lower
-    wave ships first. Whether this PRD ships the layer plus placeholder destinations, ships the
-    layer with its tests deferred, or is re-sequenced is not stated.
+15. **What does the player see when the open-game count cannot be read?** *(Author-raised —
+    no design doc addresses it.)* Requirement 8 recovers: nothing is pushed and the player
+    stays on the main menu, which from their side means **tapping Play Game appears to do
+    nothing** — the one outcome `Game Board Design.md` → Taps outside the legal quadrant
+    reserves for taps that are *deliberately* inert. A message, a retry affordance, or
+    accepting the silence are all consistent with what is written today. This is the sibling of
+    `P1-06-crash-reporting.md` → OQ-4, which asks whether such a recovered error is reported at
+    all; this one asks what, if anything, is shown.
 
-### Found while writing this PRD — gaps, flagged rather than answered
+16. **The About Us screen has no owner, and its content is unspecified.** *(Appended with
+    requirement 21 — recorded, not resolved.)* `Menus and UI.md` → Decisions settles that the
+    button ships; `P4-01-main-menu.md` owns the button; requirement 21 owns the route. Nobody
+    owns `AboutUsScreen` — not its copy, not its back control, not whether the team photos the
+    handoff draws are what ships, and `P5-02-asset-generation-replicate.md` records that real
+    team photos are probably not an asset-generation question at all. **The precedent is the
+    turn banner**, which four PRDs each deferred to another until none accepted it and it went
+    unbuilt until the user ruled. This layer will route to a screen that does not exist unless
+    a PRD claims it.
 
-16. **`P1-01-app-scaffold.md` does not create the directory this PRD depends on.** Its
-    Requirement 2 enumerates `main.dart`, `app.dart`, `engine/`, `storage/`, `theme/`,
-    `state/`, `ui/board/`, `ui/menus/` and calls that *"exactly the tree given in the doc"* —
-    which predates the amendment to `Tech Design.md` → Decisions → Project structure —
-    layer-first that added `navigation/`. As the two read today, wave 1 would not create the
-    directory Requirement 2 above places this layer in. The fix belongs to `P1-01`.
+### Recorded as closed — kept so they are not re-raised
 
-17. **The declared dependency set has no router in it.** `P1-01-app-scaffold.md` Requirement 12
-    enumerates the `pubspec.yaml` dependencies exhaustively. If Open Question 1 resolves to a
-    package, that requirement needs amending — and it is in an earlier wave.
+- **The routing approach.** Settled — `go_router`. See Open Question 1's stub.
+- **The pending selection across a navigation.** Settled — cleared, uniformly. See Open
+  Question 11's stub and requirement 20. `P3-02` has removed its competing mechanism, so this
+  path has one owner.
+- **How a player leaves a finished game.** Settled — the result card's own back-to-main-menu
+  control, calling requirement 15's operation. See Open Question 12, and
+  `P3-04-game-over-rematch.md` req 5 for the card.
+- **Where the delete confirmation lives.** Settled — requirement 22's
+  `openDeleteConfirmation(GameId)` and `/games/confirm-delete/:gameId`, non-opaque, dismissed
+  by `dismissCurrent()`. `P4-02-open-games-list.md` req 28's fence becomes a citation.
+- **Whether the presentation guard is a deny-list.** Settled — it is not. Requirement 1's
+  second scan bans the `show[A-Z]…` family by shape, after the name-based version was shown to
+  miss `showGeneralDialog` and `showAdaptiveDialog`.
+- **Where a failed count read gets reported.** Settled for this wave by scope, not by
+  preference: it is **not** reported, because `P1-06-crash-reporting.md` covers unhandled
+  errors only and publishes no reporting API for application code. Requirement 8 states this
+  and points at that PRD's OQ-4 as the question that would change it.
+- **How About Us is reached.** Settled — requirement 21's `openAboutUs()` and `/about`,
+  accepting `P4-01-main-menu.md` req 23's proposal as written. What that route *renders* is
+  Open Question 16 and is a different question.
+- **The router dependency.** `go_router` must join `P1-01-app-scaffold.md` req 14's exhaustive
+  dependency list. `Tech Design.md` names this consequence itself; it is routed separately and
+  is not an open question.
+- **What wave P2 builds against.** Settled by the posture in this PRD's header and the
+  per-requirement *Wave note* lines: the deliverable is the layer, its interface, its router
+  configuration, its seam and the scans; screen-level assertions are owned by the named P3/P4
+  requirements and run in their waves. Requirement 20 is the one requirement whose full
+  assertion waits on wave 3, and it says so.
+- **Where the layer lives.** Settled — requirement 2. `P1-01-app-scaffold.md` req 2 creates
+  `lib/navigation/` with a `.gitkeep` and states that its contents are this PRD's.
+- **The game id.** Settled by `P1-04-persistence.md` req 22 and recorded in its Open
+  Question 6a; requirement 3 is written against `GameId` today.
+- **The theme accessor.** Settled by `P1-03-theme-system.md` — `activeThemeProvider` in
+  `lib/theme/theme_providers.dart`, `read` in services and `watch` in widgets per its req 24.
+  Requirement 19 names it.

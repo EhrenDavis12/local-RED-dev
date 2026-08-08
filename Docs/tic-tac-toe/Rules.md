@@ -126,14 +126,27 @@ pass the first-move advantage — it stays where it was.
 That completes the turn order rule across games: first game → Player One; after a win →
 the winner; after a tie → whoever went first in the tied game.
 
+### Does a move that claims its own send target still send there?
+**The send is evaluated against the board *after* the claim.** Example: play the centre
+cell of quadrant 5, and that same move completes three in a row *in* quadrant 5, claiming
+it. The quadrant is dead by the time the send resolves, so the opponent gets a **free
+choice** of any still-open quadrant.
+
+This is not an exception to *Sent to a dead quadrant → free choice* above — it's the same
+rule applying. The send always resolves against the board as it stands after the move that
+triggers it, and a quadrant that move just claimed (or cat-gamed) is dead exactly the same
+as one that was already dead beforehand.
+
+### What happens if an illegal move reaches the engine?
+**The engine throws.** An illegal move, or any move applied to an already-finished game,
+raises rather than returning silently. *"I think failing loud and throwing an error is
+correct when in theory the UI should never allow it to begin with."*
+
+The UI already prevents illegal moves reaching the engine — locked cells absorb taps — so
+this is a defensive contract rather than a routine path. A throw surfaces a real defect
+loudly instead of silently returning stale state. The already-finished-game case is
+worth naming explicitly, since it is the one where a silent return risks counting a game
+twice.
+
 ## Open Questions
-- **A move that claims (or cat-games) the very quadrant it sends the opponent to — which
-  state does the send see, before or after the move?** Example: play the centre cell of
-  quadrant 5, and that same move completes three in a row *in* quadrant 5, claiming it.
-  The cell played sends the opponent to the center quadrant — but is the send evaluated
-  against quadrant 5's state *before* this move (in which case the opponent is sent to a
-  quadrant that, by the time they'd play, is already claimed — an illegal position unless
-  the free-choice rule kicks in), or *against its state after* this move (the quadrant is
-  already dead by the time the send happens, so the opponent gets free choice instead)?
-  This is reachable in normal play, not an edge case someone has to go looking for, and
-  reviewers flagged it as the most common defect in an ultimate-tic-tac-toe engine.
+<!-- Nothing outstanding on this doc right now. -->

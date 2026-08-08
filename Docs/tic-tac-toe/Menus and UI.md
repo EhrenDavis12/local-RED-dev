@@ -18,6 +18,7 @@ The game needs a main menu.
 - **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
 - **Settings** — opens the settings menu.
+- **About Us** — last in the list. See Decisions → Does the About Us screen ship?
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
 same visual weight as Play Game.
@@ -25,8 +26,8 @@ same visual weight as Play Game.
 **The main menu has a title and a logo.** Both, not just buttons.
 
 > 📝 *The main menu grew over the course of this brain dump: first "only a New Game
-> button," then + Theme, then + Settings. Recording the drift — three buttons is where it
-> currently stands.*
+> button," then + Theme, then + Settings, then + About Us. Recording the drift — four
+> buttons is where it currently stands.*
 
 ```
 ┌─────────────────────────┐
@@ -47,6 +48,10 @@ same visual weight as Play Game.
 │                         │
 │   ┌─────────────────┐   │
 │   │    SETTINGS     │   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
+│   │    ABOUT US     │   │
 │   └─────────────────┘   │
 │                         │
 └─────────────────────────┘
@@ -103,7 +108,7 @@ can't both be true on that path.
   don't peek" screen between turns. The handoff can be instant.
 
 ## Screens (so far)
-1. **Main Menu** — Play Game + Theme + Settings buttons.
+1. **Main Menu** — Play Game + Theme + Settings + About Us buttons.
 2. **Open Games List** — lists all open games, with New Game at the top of the list;
    reached from Play Game when open games exist.
 3. **New Game Name Prompt** — asks for the opponent's name when New Game is picked, with
@@ -114,6 +119,8 @@ can't both be true on that path.
    (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
 6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
+7. **About Us** — reached from the main menu (About Us button). See Decisions → Does the
+   About Us screen ship?
 
 Each of these now has an approved drawing in
 [Design Handoff](./design_handoff_game_ui/README.md):
@@ -128,8 +135,10 @@ Each of these now has an approved drawing in
 | Settings (main menu) | `2b — Settings page (from the main menu)` |
 | Settings (in game) | `1f — Modal: in-game settings / quick actions` |
 | Game over | `1g — Modal: winner`, `1h — Modal: draw` |
+| About Us | `1c — About Us` |
 
-The handoff also draws an **About Us** screen (`1c`) that this doc does not list.
+Content and PRD ownership for About Us are still unsettled — see Decisions → Does the
+About Us screen ship?
 
 ## Theme Selection
 Opened by the **Theme** button on the main menu. As already decided (see Decisions below and
@@ -173,23 +182,28 @@ Neon is shown highlighted because it's the currently active theme.
 
 That second one is the important requirement: settings must be available mid-game.
 
-**Contents so far — three toggles:**
+**Contents so far — four toggles:**
 
-| Setting | What it does |
-|---|---|
-| **Sound effects** | Global mute toggle. Separate from the theme — mute any theme. See [Theming](./Theming.md). |
-| **Vibrate on touch** | Haptic feedback on tap. Fires on every *valid* click. On/off. |
-| **Animations** | Turn animations on/off. See [Animations](./Animations.md). |
+| Setting | Sub-label | What it does |
+|---|---|---|
+| **Music** | Tunes while you play | Global mute toggle for background music. Separate from the theme — mute any theme's music. See [Theming](./Theming.md). |
+| **Sound effects** | Buzzes, pops and splats | Global mute toggle. Separate from the theme — mute any theme. See [Theming](./Theming.md). |
+| **Vibrate on touch** | A little buzz on every tap | Haptic feedback on tap. Fires on every *valid* click. On/off. |
+| **Animations** | Marks that pop and glow | Turn animations on/off. See [Animations](./Animations.md). |
 
-All three are **global**, **player-controlled**, and **not theme-defined** — a theme can't
-override them. All three are **remembered between sessions**.
+See Decisions → What are the settings toggle sub-labels? for these as settled copy.
+
+All four are **global**, **player-controlled**, and **not theme-defined** — a theme can't
+override them. All four are **remembered between sessions**.
 
 That's the pattern: the theme decides what things look like, sound like, and how they
-move; these three toggles let the player switch each of those channels off entirely.
+move; these four toggles let the player switch each of those channels off entirely.
 
 ```
 ┌─────────────────────────┐
 │        SETTINGS         │
+│                         │
+│  Music            [ON ] │
 │                         │
 │  Sound Effects    [ON ] │
 │                         │
@@ -252,24 +266,24 @@ not start a second open game. See Decisions → What does an open game hold? bel
 The winner of that game goes first in the rematch — or on a tie, whoever went first last
 time (see [Rules](./Rules.md) → Turn Order Across Games).
 
-Undecided: whether this is a full result screen, a banner, or an overlay on the finished
-board. ("Rematch is an option" implies at least one other choice sits next to it —
-presumably exiting to the main menu, which is also reachable via the top-right settings
-button.)
+This is a result card overlay — see Decisions → What does the player see when a game ends?
+below, and Decisions → What controls does the game-over result card carry? for what sits
+on it.
 
 ## Persistence
 | Thing | Persists? |
 |---|---|
 | **Selected theme** | ✅ Saved to device storage, restored on launch |
+| **Music toggle** | ✅ Remembered in whatever state it was left |
 | **Sound effects toggle** | ✅ Remembered in whatever state it was left |
 | **Vibrate on touch toggle** | ✅ Remembered in whatever state it was left |
 | **Animations toggle** | ✅ Remembered in whatever state it was left |
 | **Scoreboard** | ✅ Per game — each open game carries its own scoreboard, saved with that game |
 | **Game in progress** | ✅ Saved to device storage — resumable from the open-games list |
 
-So there are four persisted preferences — theme, sound, vibration, and animations — plus
-game state: every open game is saved, each with its own scoreboard. How that gets stored
-is settled in [Tech Design](./Tech%20Design.md) → Decisions — preferences in
+So there are five persisted preferences — theme, music, sound, vibration, and animations —
+plus game state: every open game is saved, each with its own scoreboard. How that gets
+stored is settled in [Tech Design](./Tech%20Design.md) → Decisions — preferences in
 `shared_preferences`, game state in Hive.
 
 ### Leaving a game mid-play
@@ -297,6 +311,24 @@ scoreboard increment** below.
 
 The rematch continues in the same open game, with the scoreboard intact — see **What does
 an open game hold?** below.
+
+### What does the player see when a game ends?
+**A result card drawn over the board, with the board dimmed behind it** — not a separate
+screen and not a banner. The finished position stays visible behind the card.
+
+This matches what the approved handoff draws. The scrim, the board-behind opacity, and the
+card's own fill/border/radius are all real values that need a home, because the overlay
+reading is the one that requires them.
+
+### What controls does the game-over result card carry?
+**The result card carries two buttons — one to start the next game, and one to go back to
+the main menu.** *"On game over result card we should have a button for next game as well
+as back to main menu."*
+
+This resolves a question that three PRDs were holding open from different angles — whether
+the settings button stays live over the result card, and whether the card needs its own
+exit. It does: the card is self-sufficient, so the player is never dependent on the
+settings button to leave a finished game.
 
 ### When does the scoreboard increment
 **At game end.** The winner's column, or Ties, increments as soon as the game is won or
@@ -357,6 +389,27 @@ hold?** above.
 — with a cap of 3 and a rematch staying in the same open game, nothing previously ever
 freed a slot.
 
+### How does a player delete an open game?
+**Swipe left on the row → a trash button appears → tap it → a modal asks whether to
+permanently delete this game, with Yes and No → Yes deletes, No dismisses the modal.** In
+the user's own words:
+
+> "It should be a slide left a trash button shows up, Click it, A modal pops up saying
+> permanently delete this game with Yes and No, On Yes delete the game, On no exit the
+> modal"
+
+The revealed control is a **trash button** — an icon, not a worded "Delete" label. The
+modal's buttons are **Yes and No**, not Cancel/Delete.
+
+The confirmation is there because deleting a game is the only irreversible action in the
+app — it destroys the game and its whole running scoreboard — and kids are a stated target
+audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform).
+
+Consequence for theming: this is the first affordance that needs a **destructive**
+treatment, which the theme schema currently holds as deferred, precisely because nothing
+had been drawn for it. The approved handoff draws no delete affordance at all on screen
+`1b` — this Decision is the source of the affordance, not the drawing.
+
 ### Do we support Dynamic Type?
 **Not for now.** *"Lets not do this as of yet."*
 
@@ -393,14 +446,63 @@ today nothing in these docs explains it anywhere. Whether there is also a fuller
 Rules/How-to-Play screen is left open — see Open Questions below, which already carries
 that as a future menu item.
 
+### When is a game written to storage?
+**After every confirmed move.** Nothing is ever lost to a crash or a force-quit.
+
+Weighed reasoning: each write is a single small record, the game is turn-based so writes
+are infrequent, and a game is saved specifically so it can be resumed — losing moves to a
+force-quit would undercut that.
+
 ### Where the open-game slot unlock is sold
 **The Settings screen.** The Settings screen gains a purchases section holding the $4.99
 open-game-slot unlock and a global **Restore purchases** control. This is the conventional
 iOS placement, it keeps one parental gate in one place, and it keeps the purchase flow off
 the other menu screens.
 
-This means the Settings screen now carries more than the three toggles specified in
+This means the Settings screen now carries more than the four toggles specified in
 **Settings Menu** above — it also holds the purchases section described here.
+
+### Is the turn banner built, and where does the free-choice cue live?
+**No — the turn banner is not built. The free-choice cue lives in the how-to-play strip
+below the board instead.** See [Game Board Design](./Game%20Board%20Design.md) → Decisions
+→ Where does the free-choice cue live.
+
+### Does the About Us screen ship?
+**Yes — About Us ships, and its button goes last in the main menu button list.** In the
+user's words:
+
+> "We want the about us but it can be the last button in the list for now we might move it
+> in the future but lets add it here."
+
+So the main menu carries four buttons, in order: Play Game, Theme, Settings, About Us. The
+position is explicitly provisional — the user said "for now we might move it in the
+future" — so a later reordering is expected rather than a reversal.
+
+Two things this doesn't settle:
+- The screen's **content** is not specified by any doc. The handoff draws team photos;
+  where those come from is not decided.
+- **No PRD currently owns the About Us screen.** The main-menu PRD covers the button; the
+  screen itself has no owner yet.
+
+### What are the settings on a fresh install?
+**All four toggles default to on** — music, sound effects, vibrate on touch, and
+animations — on a fresh install before the player has opened Settings. This matches the
+settings mock, which draws all four on: the game presents itself fully — music, sound,
+haptics and motion — with the player turning off whatever they do not want. The mock was a
+drawing rather than a decision until now, which is why this needed settling.
+
+### What are the settings toggle sub-labels?
+**Each of the four toggles carries a short playful sub-label**, matching the handoff's
+voice and the fact that children are a target audience. The four, verbatim:
+
+| Toggle | Sub-label |
+|---|---|
+| Music | Tunes while you play |
+| Sound Effects | Buzzes, pops and splats |
+| Vibrate on Touch | A little buzz on every tap |
+| Animations | Marks that pop and glow |
+
+These are settled strings — quote them exactly, don't paraphrase.
 
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
@@ -412,18 +514,6 @@ This means the Settings screen now carries more than the three toggles specified
 - **Is there also a fuller Rules/How-to-Play screen**, separate from the on-board legend
   and hint, or does the legend/hint fully cover "how to play" for this version? (Already
   listed above as a future menu item to consider.)
-- **Is the turn banner drawn above the board in the approved handoff actually built, and
-  does it carry the free-choice text cue (`Free choice — pick any board`)?** Right now the
-  scoreboard's name-highlight is the *only* whose-turn mechanism in these docs, but
-  [Game Board Design](./Game%20Board%20Design.md) says that cue must be "unmissable"
-  because both players share one phone — the turn banner is the redundancy the approved
-  design provides for exactly that case, stating whose turn it is in words. Three PRDs
-  each deferred the banner to another and none of them accepted it, so as things stand it
-  does not get built.
-- **Is the About Us screen (`1c`) in the approved handoff actually built, and does the main
-  menu carry a fourth button for it?** (See **Screens (so far)** above — the handoff draws
-  it, but the main menu in this doc only has three buttons, and either answer changes the
-  main menu's layout.)
 - **Which strip content belongs to which board state, and is the set of states exactly the
   three the handoff draws (`1d`, `1e`, `2d`)?** The board has more states than that — game
   over, and free choice after being sent to a dead quadrant — and it's not decided what,

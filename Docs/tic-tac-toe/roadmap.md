@@ -46,6 +46,7 @@ and how a session of many games hangs together.
 - Scoreboard lifetime
 - Player names
 - Single-player / AI opponent
+- Player-facing vocabulary: "board" vs. "quadrant"
 
 ## [Menus and UI](./Menus%20and%20UI.md)
 Menu structure, screen flow, theme selection, settings, persistence, and the game-over
@@ -71,6 +72,8 @@ rematch flow.
 - Should there be a mute button, and where does it live?
 - How do you get back to the main menu from a game?
 - What happens when a game ends?
+- What does the player see when a game ends?
+- What controls does the game-over result card carry?
 - Does the main menu need a title/logo?
 - Is theme selection its own screen or an overlay?
 - Is the main menu button "New Game" or "Play Game"?
@@ -83,10 +86,16 @@ rematch flow.
 - What does an open game hold?
 - How many open games do we keep?
 - Deleting an open game
+- How does a player delete an open game?
 - Do we support Dynamic Type?
 - Navigation and the back stack
 - How to play — the on-board legend and hint
+- When is a game written to storage?
 - Where the open-game slot unlock is sold
+- Is the turn banner built, and where does the free-choice cue live?
+- Does the About Us screen ship?
+- What are the settings on a fresh install?
+- What are the settings toggle sub-labels?
 
 ## [Rules](./Rules.md)
 The rules of play — setup, turn structure, placement rules, winning conditions, and edge
@@ -112,6 +121,8 @@ cases.
 **Decisions:**
 - Does the opening move send the opponent?
 - Who goes first after a tie?
+- Does a move that claims its own send target still send there?
+- What happens if an illegal move reaches the engine?
 
 ## [Game Board Design](./Game%20Board%20Design.md)
 The visual and interaction design of the board itself — layout, highlights, move input, and
@@ -142,9 +153,15 @@ haptics.
 - Responsive / Screen Size
 - Sketches & Notes
 - Haptic Rule
+- Decisions
 - Open Questions
 
-**Decisions:** none yet — this doc has no Decisions section.
+**Decisions:**
+- Where does the free-choice cue live?
+- Does a tap outside the board clear a pending move?
+- What does the board preview when the selected move would claim its own send target?
+- What do the scoreboard chips read?
+- Does the haptic fire on non-board controls?
 
 ## [Theming](./Theming.md)
 The theme system — what a theme is, how it inherits from Neon, and what it controls.
@@ -185,6 +202,13 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
 - Is anything distinguished by colour alone?
 - How a theme merges over Neon
 - What the theme's slots are derived from
+- How are themes discovered, and does a theme file carry its own name and description?
+- Do themes control the app's chrome icons?
+- Closing Neon's value gaps
+- Does a theme control spacing and padding?
+- Do all four toggles ship, and is music a theme concern?
+- Do non-board controls make a sound?
+- What are Classic Red vs Blue's colours?
 
 ## [Animations](./Animations.md)
 The animation vocabulary and how animations tie into the theme system.
@@ -205,6 +229,7 @@ The animation vocabulary and how animations tie into the theme system.
 - Open Questions
 
 **Decisions:**
+- Themes describe their animations; the runtime interprets them
 - Themes author their own animations — no shared library
 - Do themes inherit Neon's animations?
 - One animation at a time
@@ -235,8 +260,7 @@ release/distribution.
   - 1. Persisted data — versioning
   - 2. Theme loading
   - 3. Build and distribution
-  - 4. Navigation approach
-  - 5. Kids category — age rating questionnaire
+  - 4. Kids category — age rating questionnaire
 
 **Decisions:**
 - Framework — Flutter
@@ -264,6 +288,7 @@ release/distribution.
 - Do we add a test that fails on hardcoded theme values?
 - State management — Riverpod
 - Navigation
+- Navigation approach — go_router
 - The app icon
 - Online multiplayer is an intended future direction
 - Game state is immutable
@@ -275,6 +300,7 @@ release/distribution.
 - CI — local builds only
 - Release tooling — fastlane
 - Crash reporting — catch and build the report, don't send it
+- What does a crash report capture?
 - In-app purchases
 - Entitlements — Apple stores them, no backend needed
 - Kids category
