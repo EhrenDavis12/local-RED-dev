@@ -64,7 +64,13 @@ file.
 **Portrait only.** No landscape.
 
 ### Minimum iOS version
-**iOS 13.**
+**iOS 15.** The in-app purchase layer is built on StoreKit 2 —
+`Transaction.currentEntitlements`, `Transaction.updates` and `AppStore.sync()` — and those
+APIs require iOS 15. At an iOS 13 floor the purchase layer was unbuildable as specified,
+and the silent failure was worse than a build error: below iOS 15 the plugin falls back to
+StoreKit 1, which has no `currentEntitlements` and whose restore returns queue transactions
+that do not cleanly exclude revoked purchases — so a refunded player would keep permanent
+access.
 
 ### Is the game logic separate from Flutter?
 **Yes.** The rules engine — board state, legal moves, sending rule, win/cat-game detection,

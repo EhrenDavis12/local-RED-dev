@@ -11,24 +11,28 @@
 
 > **Why the stamp is not higher.** The mechanism is settled (`go_router`), so the route
 > table, the operation mapping and the layer's body are all specified below and buildable.
-> What remains are four **one-line variants** across two operations and two page builders:
-> Open Question 2 decides whether `exitGameToMainMenu()` is a `go` or a `pop`, Open
-> Question 8 the same for `leaveOpenGamesList()`, and Open Question 10 decides whether the
-> name prompt and the in-game quick actions are opaque or non-opaque pages. Both variants of
-> each are written out below, so nothing is left to invent — but they are the user's calls,
-> not an implementer's. One route (requirement 21) also points at a screen no PRD owns yet.
+> What remains are three **one-line variants** across one operation and two page builders:
+> Open Question 8 decides whether `leaveOpenGamesList()` is a `pop` or a `go`, and Open
+> Question 10 decides whether the name prompt and the in-game quick actions are opaque or
+> non-opaque pages. Both variants of each are written out below, so nothing is left to
+> invent — but they are the user's calls, not an implementer's. **Open Question 2 —
+> `exitGameToMainMenu()` — is now closed by the user: it is `router.go('/')`.** One route
+> (requirement 21) also points at a screen no PRD owns yet.
 
 > **Requirement numbering is load-bearing.** Four consumer PRDs cite requirements here by
 > number (`P4-01`, `P4-02`, `P4-03`, `P4-04`), and citation drift into this file has had to
 > be corrected once already. Requirements 1–19 have not moved; requirements 20, 21 and 22
-> were appended for exactly this reason, and anything further should be too.
+> were appended for exactly this reason, **as was requirement 23**, and anything further
+> should be too.
 
 **Dependencies:**
 
 - `P1-01-app-scaffold.md` — creates `lib/navigation/` (its req 2, with a `.gitkeep`), the
   single `runApp` call site and the `ProviderScope` above `MaterialApp` (its req 11), and
   leaves `MaterialApp`'s `home:` / routing configuration as the placeholder this PRD
-  replaces (its reqs 11 and 13). Riverpod without codegen is its req 12.
+  replaces (its reqs 11 and 13). Riverpod without codegen is its req 12. Its package name,
+  settled by the user, is `tic_tac_toe_extreme` — the `package:` URI requirement 3's snippet
+  imports.
 - `P1-03-theme-system.md` — `activeThemeProvider` in `lib/theme/theme_providers.dart`, the
   accessor requirement 19 reads any transition value from. Its req 24 makes `read` normative
   for services and `watch` for widgets.
@@ -39,7 +43,8 @@
 - `P3-02-move-input.md` — its req 24 publishes `pendingSelectionProvider` and its `clear()`
   entry point, which requirement 20 below calls. This is a **wave-3 PRD**, so requirement 20
   is specified here and lands when that provider exists; nothing else in this PRD waits on
-  it. See requirement 20 for why the call has to originate in this layer.
+  it. See requirement 20 for why the call has to originate in this layer, and requirement 23
+  for the one path that would have bypassed it.
 
 **Cross-PRD consequence of the routing decision.** `go_router` is a new package, and
 `P1-01-app-scaffold.md` req 14 declares the dependency set exhaustively, so that list must
@@ -86,6 +91,10 @@ Requirement 11 below claims them. A fifth arrived with the About Us button: `P4-
 had a control with nowhere to send the player, and requirement 21 gives it a route. A sixth
 arrived with the delete confirmation, which had no legal host at all until requirement 22.
 
+There is also a movement nobody specified because nobody *performs* it: the platform's own
+back gesture. It changes the screen without any PRD asking it to, and requirement 23 is where
+that is dealt with on the one route where it does damage.
+
 ## Goal
 
 The app has one explicit navigation layer, in one known place, built on `go_router`,
@@ -95,8 +104,8 @@ Play Game reaches either a new game or the list of open ones, the theme overlay 
 of a main menu that stays mounted, settings is reachable from both the main menu and mid-game
 without abandoning the game, and a player leaves a game — mid-play from quick actions, or
 finished from the result card — back to the main menu with the game intact and resumable.
-Screens call operations, never routes, so the four remaining back-stack choices land as edits
-inside this layer.
+Screens call operations, never routes, so the three remaining back-stack choices land as
+edits inside this layer.
 
 ## Requirements
 
@@ -139,6 +148,11 @@ screen contains.
    **Deliberately over-broad**, and the escape hatch is the point: a legitimate `show…` call
    lives in `lib/navigation/` like every other presentation mechanism. Note `showAboutDialog`
    is in the banned family — About Us is a route (requirement 21), not a platform dialog.
+
+   **Neither scan sees a gesture.** Both are about *calls*, and the platform back-swipe makes
+   none — it pops the route itself. That is why requirement 23 exists as a requirement rather
+   than as a line in this one: the hole it closes is the absence of a call, which no scan for
+   forbidden calls can find.
 
 2. **The layer lives in `lib/navigation/`, and the router is configured there and installed
    at `MaterialApp.router`.**
@@ -212,8 +226,11 @@ screen contains.
            ),
            GoRoute(
              path: Routes.game,
-             builder: (context, state) => GameScreen(          // P3-01
-               id: GameId(state.pathParameters['gameId']!),
+             // pageBuilder, not builder: the back-swipe is blocked here — requirement 23.
+             pageBuilder: (context, state) => NoBackGesturePage(
+               child: GameScreen(                          // P3-01
+                 id: GameId(state.pathParameters['gameId']!),
+               ),
              ),
              routes: [
                GoRoute(
@@ -239,7 +256,8 @@ screen contains.
    **The game-over result card is not in this table.** It is drawn over the board by
    `P3-04-game-over-rematch.md` rather than routed to; its two controls act on the game
    (next game) and on this layer (back to main menu, requirement 15). Nothing here presents
-   it.
+   it. Note this means the card sits inside the game route, so requirement 23's gesture block
+   covers it too.
    **Open Questions 5 and 10 reduce to a `pageBuilder` choice, not a route-table change.** A
    surface drawn as a sheet is the same `GoRoute` with a non-opaque page; drawn as a full
    screen it is the same `GoRoute` with an ordinary one. Neither answer moves a route or
@@ -284,7 +302,8 @@ screen contains.
      Future<void> openGame(GameId id);
 
      /// Leaving a game for the main menu — from quick actions mid-play, or from
-     /// the game-over result card. Requirement 15.
+     /// the game-over result card. The only way out of a game: requirement 23
+     /// blocks the back-swipe on that route. Requirement 15.
      Future<void> exitGameToMainMenu();
 
      /// Leaving the open-games list without picking anything. Requirement 13.
@@ -301,7 +320,8 @@ screen contains.
    **This block is not the closed set.** Requirements 21 and 22 add `openAboutUs()` and
    `openDeleteConfirmation(GameId)`, appended there rather than inserted here so the
    requirement numbers four consumer PRDs cite do not move. Read requirements 3, 21 and 22
-   together for the full interface.
+   together for the full interface. **Requirement 23 adds no operation** — it removes a way
+   of leaving one, which is why it is a route configuration rather than a method.
 
    **Each operation maps onto exactly one `go_router` call:**
 
@@ -313,8 +333,8 @@ screen contains.
    | `openSettings()` | `router.push('/settings')` | yes |
    | `openQuickActions()` | `router.push('/game/<id>/quick-actions')` | route yes; page opacity is OQ10 |
    | `openNewGamePrompt()` | `router.push('/games/new')` | route yes; page opacity is OQ5 / OQ10 |
-   | `openGame(id)` | `router.push('/game/${id.value}')` | yes |
-   | `exitGameToMainMenu()` | `router.go('/')` **or** `router.pop()` | **OQ2** |
+   | `openGame(id)` | `router.push('/game/${id.value}')` | yes — and the pushed route blocks the back-swipe, requirement 23 |
+   | `exitGameToMainMenu()` | **`router.go('/')`** | **yes — settled by the user, OQ2** |
    | `leaveOpenGamesList()` | `router.pop()` **or** `router.go('/')` | **OQ8** |
    | `dismissCurrent()` | `if (router.canPop()) router.pop();` | yes — requirement 5 |
    | `openAboutUs()` | `router.push('/about')`, ordinary opaque page | route yes — requirement 21 |
@@ -408,10 +428,12 @@ screen contains.
    **It is the single dismissal for every surface this layer presents:** the theme overlay
    (requirement 9), the name prompt (requirement 11), the in-game quick actions
    (requirement 14), About Us (requirement 21) and the delete confirmation (requirement 22).
-   Three of those have unresolved page kinds — Open Questions 5 and 10 — and because all are
+   Two of those have unresolved page kinds — Open Questions 5 and 10 — and because all are
    child routes, one `pop()` covers them regardless, so a later answer changes a `pageBuilder`
    and not this operation. It does **not** dismiss the game-over result card, which is not a
-   route — see requirement 2.
+   route — see requirement 2. **It is also not the way out of a game:** the game route is left
+   by `exitGameToMainMenu()` (requirement 15), and requirement 23 removes the gesture that
+   would otherwise have popped it.
    *Testable, wave 2:* on a router at `/` alone, calling it leaves the location `/` and
    nothing is popped; from `/theme` it returns to `/`; from `/games/new` to `/games`; from
    `/games/confirm-delete/abc` to `/games`.
@@ -552,6 +574,13 @@ screen contains.
     call site must not have to know.
     *Testable, wave 2:* the operation exists and records one invocation against the fake. Its
     resulting location is deliberately unasserted until Open Question 8 lands.
+    *Note the asymmetry with requirement 15, now that OQ 2 has landed:* the game exit is
+    settled as `go` and this one is not. They are separate questions — `go` was chosen for the
+    game exit on the strength of the back-swipe consequence, and the list has no equivalent
+    consequence to weigh, because nothing is lost by swiping back into it.
+    *And note the second asymmetry, with requirement 23:* the swipe is blocked on the game
+    route and is **not** blocked here. Whether it should be is Open Question 17, which this
+    requirement's answer does not decide either.
 
 14. **Opening the in-game settings / quick-actions surface does not leave the game.** It is a
     **child route of `/game/:gameId`**, so the game screen stays mounted beneath it, and
@@ -569,29 +598,44 @@ screen contains.
     cleared, and precisely because nothing unmounts here, this layer has to do the clearing.
     Whether the surface is drawn as a sheet or a full screen is Open Question 10 — again a
     `pageBuilder` choice.
+    **Requirement 23 does not reach this child route.** It blocks the gesture on
+    `/game/:gameId`; a swipe on `/game/:gameId/quick-actions` would pop back to the board,
+    which is what `dismissCurrent()` does anyway. Whether that should be blocked too is Open
+    Question 17.
 
-15. **`exitGameToMainMenu()` returns the player to the main menu, and it has two callers.**
-    Mid-play it is the quick-actions exit, available without finishing the game. At game over
-    it is the result card's **back to main menu** control. One operation serves both; neither
-    caller knows what it does underneath.
+15. **`exitGameToMainMenu()` returns the player to the main menu with `router.go('/')`, and
+    it has two callers.** Mid-play it is the quick-actions exit, available without finishing
+    the game. At game over it is the result card's **back to main menu** control. One
+    operation serves both; neither caller knows what it does underneath.
     *Source, mid-play: `Menus and UI.md` → Decisions → How do you get back to the main menu
     from a game? ("Via the settings button at the top right of the game screen. It opens quick
     actions, which include exiting the game. You don't have to finish a game to leave it");
     → How you reach settings from gameplay ("the settings button does double duty in-game").
     Source, game over: `Menus and UI.md` → Decisions → What controls does the game-over result
     card carry? — **next game, and back to main menu** — specified in
-    `P3-04-game-over-rematch.md` req 5, which is cited rather than restated here.*
-    *Testable:* after `exitGameToMainMenu()` the location is `/`, from either caller.
+    `P3-04-game-over-rematch.md` req 5, which is cited rather than restated here.
+    Source, the `go`-not-`pop` half: **settled by the user** — see Open Question 2. No design
+    doc states it; `Menus and UI.md` → Open Questions asks it and leaves it open.*
+    *Testable:* after `exitGameToMainMenu()` the location is `/`, from either caller, **and
+    `canPop()` is false there** — the game route is gone from the stack rather than sitting
+    beneath the menu.
     *Wave note:* the mid-play control is `P4-04-settings.md` reqs 4–5, wave 4; the game-over
     control is `P3-04-game-over-rematch.md` req 5, wave 3. The operation is identical for
-    both — which also means **Open Question 2 resolves once and applies to both**, rather than
+    both — which is why **Open Question 2 resolved once and applies to both**, rather than
     being answerable differently for a finished game than for a live one. That is the
     interface earning its keep.
-    *One line still open:* `router.go('/')` — which replaces the stack, so the iOS back-swipe
-    cannot return the player into the game they just left — or `router.pop()` back to the menu
-    route already beneath, which leaves the swipe able to. That is Open Question 2. Whether
-    the mid-play exit prompts for confirmation first is Open Question 6; the game-over exit
-    has nothing to confirm, since the game is over and already saved.
+    **The one line is settled: `router.go('/')`.** It **replaces the stack**, so the game route
+    is gone and **the iOS back-swipe cannot carry the player back into the game they just
+    exited** — the consequence the user accepted when settling this, and it holds identically
+    whether the game was abandoned mid-play or finished. `router.pop()` was the alternative and
+    is not taken.
+    **This is now one half of a settled pair, and the halves are independent.** Requirement 23
+    blocks the swipe in the other direction — *out of* a live game — on an argument that has
+    nothing to do with this one. Read requirement 23's asymmetry note before assuming either
+    answer implied the other; it is also what makes this operation the **only** way off the
+    game route rather than merely the intended one.
+    *Still open:* whether the mid-play exit prompts for confirmation first is Open Question 6;
+    the game-over exit has nothing to confirm, since the game is over and already saved.
 
 16. **Leaving a game discards nothing.** No part of this layer ends, resets, deletes or
     finalizes a game on the way out.
@@ -610,6 +654,9 @@ screen contains.
     `P1-04-persistence.md`'s `delete`, and no `delete` call appears in `lib/navigation/`.
     **Requirement 20's clear is not an exception either.** A pending selection is UI state that
     is never persisted (`P3-02-move-input.md` req 21), so clearing it discards nothing stored.
+    **Requirement 15's `go` is not an exception.** Replacing the stack drops a *route*, not a
+    record: the game is on disk after every confirmed move (`P1-04-persistence.md` req 6) and
+    is still in the open-games list afterwards.
     *Wave note:* the round-trip assertion — leave mid-board, reopen, board and score
     unchanged — is `P1-04-persistence.md` req 11's, and `P4-02-open-games-list.md` req 5
     asserts it from the list side.
@@ -666,6 +713,9 @@ screen contains.
     *Testable, wave 2:* the scan in `P1-05-theme-guard-test.md` passes over `lib/navigation/`
     with no baseline entries.
     Whether there is any transition motion to time at all is Open Question 14.
+    **Requirement 23's page introduces no value to theme** — suppressing a gesture is
+    behaviour, not appearance, and the page it needs carries no colour, radius or duration of
+    its own beyond whatever the other pages already carry.
 
 ### State this layer must clear
 
@@ -707,6 +757,19 @@ screen contains.
     router to know a navigation happened, and requirement 1's scan forbids importing
     `go_router` outside `lib/navigation/`. Moving the observation there would breach the one
     boundary this PRD exists to hold.
+
+    **"Every navigation" is now true on the game route, where it was previously aspirational.**
+    This requirement guarantees the clear over *operations* — it runs before each
+    `AppNavigator` call — while its heading claims *navigations*. Those two words coincide only
+    where no surface can appear or disappear without an operation, and on the board they did
+    not: the iOS back-swipe popped `/game/:gameId` through no operation at all, so
+    `_clearPendingSelection()` never ran and the stale selection survived the player leaving
+    the board — the exact outcome this requirement exists to prevent, reached by the one path
+    it could not see. **Requirement 23 closes it**, by blocking the gesture on that route, so
+    on the game route operations and navigations now coincide and the guarantee is literal.
+    Elsewhere the gesture is still live and the gap between the two words is still real; it is
+    harmless there only because a pending selection cannot exist off the board. Whether the
+    other routes should be treated the same way is Open Question 17.
 
     *Testable, wave 3* (when `pendingSelectionProvider` exists): with a selection pending on
     `/game/abc`, each of `openQuickActions()`, `openSettings()`, `openThemeSelection()`,
@@ -806,6 +869,75 @@ screen contains.
     as a path parameter; the list widget is still mounted beneath it; `dismissCurrent()`
     returns to `/games`.
 
+### The back-swipe on the game route
+
+23. **The iOS back-swipe gesture is disabled on `/game/:gameId`. A player cannot swipe out of
+    a game.** The only way off that route is the explicit exit control — requirement 15's
+    `exitGameToMainMenu()`, from quick actions mid-play or from the result card at game over —
+    which is also the only path that runs requirement 20's clear.
+    *Source: **settled by the user.** No design doc states it: `Menus and UI.md` → Open
+    Questions asks where each back affordance leads and whether the swipe can carry a player
+    back *into* a game they exited, and never asks about swiping *out of* one. The standing
+    principle the user reasoned from is `Game Board Design.md` → Decisions — **"One rule,
+    uniformly applied"** — the same sentence requirement 20 cites for the clear.*
+
+    **What made this necessary, because it is invisible in the route table.** `openGame` is
+    `router.push('/game/${id.value}')` (requirement 3's mapping), so under Flutter's
+    `CupertinoPageTransitionsBuilder` the edge-swipe pop is **live by default** on that route —
+    nobody enabled it and nothing in this PRD mentioned it. A gesture pop goes through **no
+    `AppNavigator` operation**: the router pops itself, `_clearPendingSelection()` never fires,
+    and a pending, unconfirmed selection survives the player leaving the board. That is exactly
+    the outcome requirement 20 exists to prevent, reached by the one route change requirement
+    20 cannot observe. **Requirement 1's scans do not catch it either** — nothing imports
+    `go_router` outside this layer and no widget calls anything, because the defect is the
+    *absence* of a call.
+
+    **The mechanism is a proposal; the property is the requirement.** The game route takes a
+    `pageBuilder` returning a page that declines to be popped by the platform — a `PopScope`
+    with `canPop: false` around `GameScreen` is the straightforward form, and requirement 2's
+    snippet names it `NoBackGesturePage`. Any mechanism satisfying the testables below is
+    acceptable. **What is not acceptable is the block living in `lib/ui/`:** the route's
+    presentation is this layer's (requirement 1), and a `PopScope` placed inside the game
+    screen widget would put a navigation decision back in a screen, where the next person to
+    read that screen has no reason to expect one.
+
+    **It is a property of the route, not of the game's state.** The block holds over a finished
+    game as well as a live one, because `/game/:gameId` is the same route either way. That
+    costs nothing: `P3-04-game-over-rematch.md` req 5's result card carries its own
+    back-to-main-menu control, so a finished game already has an exit that does not depend on
+    the gesture — and that PRD records the same point from its side.
+
+    **The asymmetry with requirement 15 is deliberate, and the two halves were settled
+    separately.** Stated together so neither is read as implying the other:
+    - **Out of a live game — blocked, here.** The swipe cannot take a player off the board,
+      because it would bypass the pending-selection clear.
+    - **Back into an exited game — impossible, under requirement 15.** `router.go('/')`
+      replaces the stack, so the game route is gone and a swipe on the main menu has nothing to
+      return to. That was settled earlier (Open Question 2), on a completely different
+      argument, and needed no gesture handling at all.
+
+    Both directions are now closed, for different reasons. Neither answer produced the other,
+    and neither would have been safe to infer from the other.
+
+    **The block is not selective about its input.** Whatever suppresses the iOS edge-swipe on
+    this route also suppresses the **Android system back** there, since both arrive as a route
+    pop. That is consistent with the rule — one explicit way out — but it is a consequence
+    rather than something the user was asked, and no design doc mentions the Android back
+    button anywhere. Recorded, not decided; it is part of Open Question 17.
+
+    *Testable, wave 2:* against the real router at `/game/abc`, a platform pop request
+    (the back-gesture / system-back path) leaves the location `/game/abc` and pops nothing;
+    `exitGameToMainMenu()` from that same location leaves `/` with `canPop()` false; the same
+    pop request at `/games`, `/settings` and `/about` is **not** suppressed, so the block is
+    demonstrably scoped to one route rather than installed app-wide; and a scan finds no
+    `PopScope`, `WillPopScope` or `NavigatorPopHandler` outside `lib/navigation/`.
+    *Testable, wave 3* (when `pendingSelectionProvider` exists): with a selection pending on
+    `/game/abc`, a pop request leaves both the location and the pending selection unchanged.
+    That is the assertion that ties this requirement to requirement 20's guarantee rather than
+    testing a gesture for its own sake.
+    *Wave note:* the game screen is `P3-01-board-rendering.md` and the pending selection is
+    `P3-02-move-input.md` req 24; neither has to change for this, and neither may implement it.
+
 ## Out of Scope
 
 Referenced by filename rather than specified here. This PRD moves between these surfaces and
@@ -824,17 +956,14 @@ specifies none of them:
   contains, and the exit control's own presentation → `P4-04-settings.md`.
 - **The game screen** → `P3-01-board-rendering.md`. **The pending selection itself** — what it
   is, how a tap creates one, and every non-navigation way it clears → `P3-02-move-input.md`.
-  Requirement 20 calls that PRD's `clear()`; it defines no selection state of its own.
+  Requirement 20 calls that PRD's `clear()`; it defines no selection state of its own, and
+  requirement 23's gesture block lives in this layer's `pageBuilder` rather than in either
+  screen.
 - **The game-over result card** — that it carries two controls, what they read, how it is
   presented over the board, and whether it can be dismissed → `P3-04-game-over-rematch.md`
   req 5. Requirement 15 owns only what its back-to-main-menu control calls; requirement 17
-  records that its other control calls nothing here.
-- **The About Us screen (`1c`) itself — and it currently has no owner.** Requirement 21
-  specifies the **route**; the screen behind it is specified by nobody. No PRD owns
-  `AboutUsScreen`'s content, its back control, or whether the handoff's team photos ship —
-  `P5-02-asset-generation-replicate.md` records that real team photos are probably not an
-  asset-generation question at all. This is the one destination in the route table whose
-  widget has no home. See Open Question 16.
+  records that its other control calls nothing here; requirement 23 covers the card only in
+  the sense that it sits inside the game route.
 - **Storing, capping, creating, deleting and restoring open games, and minting `GameId`** →
   `P1-04-persistence.md`. This layer calls `count()` and carries ids; it writes nothing.
 - **Crash reporting, and any decision about whether recovered errors are reported** →
@@ -864,7 +993,10 @@ specifies none of them:
   constrains any motion value that is nonetheless introduced; it does not authorize one. See
   Open Question 14.
 - **A confirmation prompt on exiting a game.** Unsettled — Open Question 6. Nothing here
-  designs one and nothing here rules one out.
+  designs one and nothing here rules one out. Note this is untouched by Open Question 2's
+  answer: *where* the exit lands is settled; whether it asks first is not. It is untouched by
+  requirement 23 too: blocking the gesture decides that the exit control is the only way out,
+  not what that control asks first.
 - **`Alternative Game Styles.md`** — declared parking lot; not what is being built.
 
 ## Open Questions
@@ -878,31 +1010,63 @@ specifies none of them:
    interface and the scans is **withdrawn** — the body is buildable, so the full layer ships in
    wave 2. Kept as a numbered stub so the citations in sibling PRDs stay stable.
 
-2. **Pop or `go` on exit — now a one-line choice, and it resolves once for two callers.**
+2. **Pop or `go` on exit — CLOSED by the user: `router.go('/')`.**
    `Menus and UI.md` → Open Questions:
 
    > … does exiting a game pop back to an existing main menu instance or push a fresh one?
 
-   In `go_router` terms, `exitGameToMainMenu()` is either:
+   In `go_router` terms, `exitGameToMainMenu()` was either:
    - **`router.go('/')`** — replaces the stack, so the game route is gone and the **iOS
      back-swipe cannot carry the player back into the game they just exited**; or
    - **`router.pop()`** — unwinds one step to the menu route already beneath, leaving the game
      route in the stack until it is popped, so the swipe **can** return them.
 
-   That is the whole of requirement 15's remaining ambiguity. Note it now governs **both** the
-   mid-play exit and the game-over card's back-to-main-menu control, since both call the same
-   operation — so the swipe behaves identically whether the game was abandoned or finished,
-   which is probably what anyone would want but is worth stating rather than discovering.
+   **The user chose `router.go('/')`, and accepted the consequence explicitly: the game route
+   is gone, so the iOS back-swipe cannot carry a player back into a game they just exited.**
+   `router.pop()` is not taken.
 
-3. **Where each back affordance leads.** `Menus and UI.md` → Open Questions:
+   It governs **both** the mid-play exit and the game-over card's back-to-main-menu control,
+   since both call the same operation — so the swipe behaves identically whether the game was
+   abandoned or finished, which was worth stating rather than discovering, and is what the one
+   operation bought.
+
+   **What this changes here:** requirement 3's mapping table reads `router.go('/')` and
+   "settled" rather than "OQ2"; requirement 15 states the call, its testable now also asserts
+   `canPop()` is false at `/`, and requirement 16 records that replacing the stack drops a
+   route rather than a record. **What it changes elsewhere:** `P3-04-game-over-rematch.md`
+   req 5 and `P4-04-settings.md` req 19 are the two call sites and neither has to change — that
+   is the point of them calling an operation. Open Question 3's swipe half follows from this
+   and is now answered with it. Kept as a numbered stub because requirements 3, 13, 15 and 23
+   and Open Question 3 all reference this number.
+
+   **Owed to the docs:** `Menus and UI.md` → Open Questions still asks this, and its
+   back-affordance question still asks whether the swipe can carry a player back into a game
+   they exited. Both are now answered. That doc edit is `forge-doc-writer`'s.
+
+3. **Where each back affordance leads — the in-game half and both swipe halves are CLOSED; the
+   list's back control is not.** `Menus and UI.md` → Open Questions:
 
    > **Where does each back affordance lead** — the in-game back/exit action, and the iOS
    > back-swipe gesture — and can the swipe gesture carry a player back into a game they just
    > exited?
 
-   Open Question 2 is the in-game half. The swipe half follows from it: under `go_router` the
-   gesture pops whatever is on the stack, so the answer is decided by what each operation
-   leaves there rather than by any separate gesture handling.
+   Open Question 2 was the in-game half and it is answered: the exit is `router.go('/')`. The
+   swipe half followed from it for the direction the doc asks about — under `go_router` the
+   gesture pops whatever is on the stack, so **the answer to the doc's last clause is no: the
+   swipe cannot carry a player back into a game they just exited.**
+
+   **The direction the doc does not ask about is now also settled, and separately.**
+   Requirement 23 disables the swipe *out of* a live game, on the user's settlement: a gesture
+   pop runs through no operation, so it would skip requirement 20's clear. That did **not**
+   follow from Open Question 2 — it is a different argument about a different direction, and it
+   is worth recording that this question's framing ("the answer is decided by what each
+   operation leaves on the stack") turned out to be true of one direction only. A gesture is
+   not always an operation's shadow.
+
+   **What remains under this heading** is the *other* back affordance — the open-games list's
+   back control — which is Open Question 8 and is still open. Answering it the other way would
+   not disturb anything settled here. Whether the swipe is blocked anywhere else is Open
+   Question 17.
 
 4. **Does the empty-state path show the name prompt?** `Menus and UI.md` → Play Game → Where
    It Takes You:
@@ -929,6 +1093,9 @@ specifies none of them:
    > one ("Leave game? Your score will be lost") no longer applies.
 
    This is the mid-play exit only. The game-over card's exit has nothing to confirm.
+   **Unaffected by Open Question 2's answer** — that settled where the exit lands, not whether
+   anything is asked before it — and unaffected by requirement 23, which settles that the exit
+   control is the only way out, not what it asks on the way.
 
 7. **Is quick actions the same settings screen as the main menu's?** `Menus and UI.md` → How
    you reach settings from gameplay:
@@ -949,6 +1116,10 @@ specifies none of them:
    unwinding one step, which is the main menu whenever the list was reached from it, versus
    `router.go('/')`, which returns to the menu from anywhere the list might later be reached
    from. The two differ only once a second path into the list exists.
+   **Open Question 2's answer does not decide this one.** The game exit took `go` on the
+   strength of a consequence this control does not have — there is nothing behind the list a
+   back-swipe could strand a player in — so the argument does not transfer, and this is still
+   the user's call.
 
 9. **No control is named for returning from the in-game settings surface to the game.**
    `P4-04-settings.md` records that its req 2 settles that reaching settings does not abandon
@@ -975,6 +1146,8 @@ specifies none of them:
     exists — nothing unmounts, so nothing clears it by accident. `P3-02-move-input.md` OQ-1,
     `P3-05-how-to-play.md` req 15 and `P4-04-settings.md` OQ-5 land on the same answer. Kept as
     a numbered stub so sibling citations stay stable.
+    **One path escaped that rule and has since been closed:** the back-swipe off the board went
+    through no operation, so nothing cleared the selection. Requirement 23 blocks it.
 
 12. **The game-over exit — CLOSED as it bore on this layer; a smaller half remains
     elsewhere.** This PRD asked whether the settings button stays live over a finished game,
@@ -1027,15 +1200,51 @@ specifies none of them:
     unbuilt until the user ruled. This layer will route to a screen that does not exist unless
     a PRD claims it.
 
+17. **Does any other route block the back-swipe, or is this game-route-only?** *(Appended with
+    requirement 23 — recorded, not resolved. The user settled the game route and said nothing
+    about the rest, and no design doc mentions the gesture except in the direction Open
+    Question 3 quotes.)* Requirement 23's argument is specific to the board: a gesture pop
+    skips requirement 20's clear, and a pending selection only exists on the board. **That
+    argument transfers to no other route**, which is why nothing else is blocked — but "no
+    argument to block it" is not the same as "settled that it stays live," and three groups are
+    currently unstated:
+    - **The child route over the game** — `/game/:gameId/quick-actions`. A swipe there pops
+      back to the board, which is what `dismissCurrent()` does anyway, so the outcome is
+      benign; it just happens without an operation.
+    - **The transient surfaces over something else** — `/games/new`,
+      `/games/confirm-delete/:gameId`, `/theme`. Same shape: a swipe dismisses them, matching
+      `dismissCurrent()`.
+    - **The ordinary screens** — `/games`, `/settings`, `/about`. A swipe unwinds one step,
+      which is `router.pop()`, and for the list that is one of the two answers Open Question 8
+      is still choosing between — so a live gesture there quietly implements one side of an
+      open question.
+
+    The question the docs do not answer: is *"you leave a surface by its own control"* a rule
+    of this app, or is it specifically that you may not leave **a game** by accident?
+    **A second half arrives with the same mechanism: Android's system back.** Whatever
+    suppresses the swipe suppresses it too (requirement 23), and no design doc mentions the
+    Android back button on any screen — not on the game route, where it is now blocked as a
+    side effect, and not anywhere else. Neither half is decided here.
+
 ### Recorded as closed — kept so they are not re-raised
 
 - **The routing approach.** Settled — `go_router`. See Open Question 1's stub.
+- **Where the game exit lands, and whether the back-swipe can return to a game.** Settled by
+  the user — `router.go('/')`, replacing the stack, so the swipe **cannot**. See Open
+  Question 2's stub, Open Question 3, and requirement 15. It applies to both callers because
+  both call one operation.
+- **Whether the back-swipe can carry a player *out of* a live game.** Settled by the user —
+  **no**, requirement 23 disables the gesture on `/game/:gameId`. Separate settlement, separate
+  argument: it exists to stop a gesture pop bypassing requirement 20's clear, not because of
+  anything about the stack. The two directions are now both closed and neither implied the
+  other. **Whether any other route gets the same treatment is Open Question 17 and is open.**
 - **The pending selection across a navigation.** Settled — cleared, uniformly. See Open
   Question 11's stub and requirement 20. `P3-02` has removed its competing mechanism, so this
-  path has one owner.
+  path has one owner, and requirement 23 closes the one path that bypassed it.
 - **How a player leaves a finished game.** Settled — the result card's own back-to-main-menu
   control, calling requirement 15's operation. See Open Question 12, and
-  `P3-04-game-over-rematch.md` req 5 for the card.
+  `P3-04-game-over-rematch.md` req 5 for the card. Requirement 23 makes that the only way out
+  of the route rather than merely the intended one.
 - **Where the delete confirmation lives.** Settled — requirement 22's
   `openDeleteConfirmation(GameId)` and `/games/confirm-delete/:gameId`, non-opaque, dismissed
   by `dismissCurrent()`. `P4-02-open-games-list.md` req 28's fence becomes a citation.
@@ -1056,7 +1265,8 @@ specifies none of them:
   per-requirement *Wave note* lines: the deliverable is the layer, its interface, its router
   configuration, its seam and the scans; screen-level assertions are owned by the named P3/P4
   requirements and run in their waves. Requirement 20 is the one requirement whose full
-  assertion waits on wave 3, and it says so.
+  assertion waits on wave 3, and it says so — as does requirement 23's second testable, for the
+  same reason and on the same provider.
 - **Where the layer lives.** Settled — requirement 2. `P1-01-app-scaffold.md` req 2 creates
   `lib/navigation/` with a `.gitkeep` and states that its contents are this PRD's.
 - **The game id.** Settled by `P1-04-persistence.md` req 22 and recorded in its Open

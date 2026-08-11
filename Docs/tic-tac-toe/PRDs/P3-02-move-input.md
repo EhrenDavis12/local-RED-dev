@@ -1,16 +1,18 @@
-**Build-readiness: 96**
+**Build-readiness: 94**
 
-# PRD: Move Input — Tap to Select, Tap Again to Confirm
-
-> **Why 96:** every requirement binds to a named symbol — `P1-02`'s `Board` API, `P3-01`'s
-> `BoardView`/`CellView`/`BoardKeys`, `P2-01`'s `AppNavigator`, `P2-02`'s `audioLayerProvider`,
-> `P2-03`'s `hapticServiceProvider` — this PRD publishes its own interface rather than describing
-> it, every verification can be written, and **OQ-2 closed this round**, which was the last
-> question of this PRD's own that an implementer could have guessed at. Nothing here is blocked
-> or unbuildable. The residue is two flags that change no requirement in this file: **OQ-3** is a
-> contradiction inside the read-only handoff and is `P3-01`'s to resolve, and **OQ-4** is a
-> wording ambiguity between two design docs where requirement 10 follows the explicit one.
-> Author's estimate, pending re-grade.
+> **Why 94:** every requirement binds to a named symbol — `P1-02`'s `Board` API, `P3-01`'s
+> `BoardView`/`CellView`/`BoardKeys`/`GameScreen`, `P1-04`'s `OpenGamesRepository`/`StoredGame`,
+> `P2-01`'s `AppNavigator`, `P2-02`'s `audioLayerProvider`, `P2-03`'s `hapticServiceProvider` —
+> this PRD publishes its own interface rather than describing it, and every verification can be
+> written. **OQ-2 closed earlier; OQ-9 arrived with the save, and OQ-10 arrived with it and has
+> since been closed**: requirements 35–36 take the confirmed-move save that `P1-04`'s call-site
+> table had left unclaimed, and that new territory carried two residues. One is gone — **who
+> stamps `updatedAt`** is settled by the user in `P1-04` req 21 (**the repository stamps**), so
+> OQ-10 is a closed stub. The other stands: **a failed save is reported into a sink nothing reads
+> in wave 1** (OQ-9). Neither blocks the build; both are stated rather than guessed. The older
+> residue is unchanged: **OQ-3** is a contradiction inside the
+> read-only handoff and is `P3-01`'s to resolve, and **OQ-4** is a wording ambiguity between two
+> design docs where requirement 10 follows the explicit one. Author's estimate, pending re-grade.
 
 > **Status:** Draft · Source docs read: `Game Board Design.md`, `Game Overview.md`, `Rules.md`,
 > `Menus and UI.md`, `Animations.md`, `Tech Design.md`, `Theming.md`, `roadmap.md`, plus the
@@ -21,19 +23,30 @@
 > **Wave:** P3 · **Depends on:** `P1-01-app-scaffold.md` (the `ProviderScope` above the root
 > widget, and `lib/state/`); `P1-02-engine-rules.md` (`Board`, `Move`, `legalMoves`,
 > `placementState`, `activeQuadrant`, `quadrantAt`, `applyMove`, `IllegalMoveError`);
-> `P3-01-board-rendering.md` (`BoardView`, `CellView`, `BoardKeys` — this PRD supplies its
-> `onCellTap` and all four pending parameters); and the three wave-2 channels this move
+> `P1-04-persistence.md` (`OpenGamesRepository.save`, `StoredGame`, `GameId` — its reqs 6, 21,
+> 22 and 28; requirements 35–36 below claim the confirmed-move write its Out-of-Scope table had
+> left unclaimed and now attributes to requirement 36); `P1-06-crash-reporting.md` (where a failed save surfaces — requirement
+> 36); `P3-01-board-rendering.md` (`BoardView`, `CellView`, `BoardKeys`, `GameScreen` — this PRD
+> supplies its `onCellTap` and all four pending parameters, and its req 54 seeds the two
+> providers requirement 29 and requirement 35 declare); and the three wave-2 channels this move
 > lifecycle fires into — `P2-02-audio.md` (`AudioLayer.play` for three of its five moments),
 > `P2-03-haptics.md` (`HapticService.validAction()`) and `P2-04-animations.md` (which must never
 > block input).
 > **Depended on by:** `P3-01-board-rendering.md` requirement 23 (draws the pending selection
-> this publishes, in all three of its states), `P2-01-navigation.md` requirement 20 (calls
-> requirement 24's `clear()` before every router call), `P3-05-how-to-play.md` (describes this
-> gesture in words; its requirement 15 depends on requirement 26 below).
-> **One inbound edit is owed:** `P2-02-audio.md` requirement 6's *Call-site owner* column still
-> reads **"none — see Out of Scope"** for `claimQuadrant` and `catGame`, and its header note
-> still says two of five moments have no caller. Requirements 32–33 below take both. That is
-> that PRD's line to change, not this one's; it is queued.
+> this publishes, in all three of its states) and its requirement 54 (calls requirement 29's
+> `replace` and requirement 35's `set` when the game screen opens), `P2-01-navigation.md`
+> requirement 20 (calls requirement 24's `clear()` before every router call),
+> `P3-04-game-over-rematch.md` requirement 6 (calls requirement 29's `replace` with the board
+> `startNextGame()` returns), `P3-05-how-to-play.md` (describes this gesture in words; its
+> requirement 15 depends on requirement 26 below).
+> **Two inbound edits were owed and have both landed** (recorded so neither is re-filed):
+> 1. `P2-02-audio.md` requirement 6's *Call-site owner* column now names **requirements 32–33**
+>    below for `claimQuadrant` and `catGame`, in place of its earlier "assigned, req not yet
+>    written".
+> 2. `P1-04-persistence.md` → Out of Scope → *Who calls save*, row 1 (*"After a confirmed
+>    move"*) and row 2 (*"At game end, carrying the increment"*) now name **requirement 36**,
+>    and its dependency note no longer says *"no requirement in that PRD mentions persistence"* —
+>    requirements 35–36 do. Its requirement 6's *"Testable, but not here"* has a home.
 
 > **Note on source status:** `Game Board Design.md` carries the house banner *"Nothing here is
 > settled"* and, until recently, had **no Decisions section at all** — its **Move Input — Tap
@@ -46,12 +59,12 @@
 
 > **Note on numbering.** Requirements **1–22 keep their numbers** — `P1-02` cites 21 and 22,
 > `P2-01` cites 24 and 30, `P2-03` cites 10, 14 and 15, `P2-02` cites 15, and `P3-01` cites 3,
-> 10, 19, 25, 26 and 27. Requirements **23–31** hold the published interface and commit safety,
-> **32–33** the commit's sounds, and **34** is the test requirement once numbered 23.
-> Open-question numbers are stable: **OQ-1, OQ-2, OQ-5, OQ-6, OQ-7 and OQ-8 are answered and
-> kept as closed stubs**, following `P1-02-engine-rules.md`, because siblings cite them by
-> number. Every cross-PRD number and quotation below was re-verified against that PRD's current
-> text this round.
+> 10, 19, 25, 26, 27 and 29. Requirements **23–31** hold the published interface and commit
+> safety, **32–33** the commit's sounds, **34** is the test requirement once numbered 23, and
+> **35–36** are the on-screen game's identity and the confirmed-move save — appended rather than
+> inserted for the same reason. Open-question numbers are stable: **OQ-1, OQ-2, OQ-5, OQ-6, OQ-7,
+> OQ-8 and OQ-10 are answered and kept as closed stubs**, following `P1-02-engine-rules.md`,
+> because siblings cite them by number.
 
 ## Problem
 
@@ -66,18 +79,27 @@ There is also no defined answer to what a tap on an illegal cell does, and until
 implementer will invent one — a shake, a toast, an error buzz — each of which contradicts the
 feedback system the docs actually describe.
 
+**And the move that lands never reaches disk.** `Menus and UI.md` → Decisions → *When is a game
+written to storage?* settles the timing — *"After every confirmed move. Nothing is ever lost to
+a crash or a force-quit"* — and `P1-04-persistence.md` req 6 states the obligation, then records
+that **no requirement anywhere claims the call site**. The commit path is here. Until it writes,
+every game in the app is in-memory only: the open-games list shows records that never advance,
+and a force-quit loses the session the storage layer exists to protect.
+
 ## Goal
 
 Placing a mark takes two taps on the same cell. The first tap selects without placing and the
 big board previews where confirming would send the opponent — one quadrant when the send lands
 somewhere, every still-open quadrant when the move kills its own destination. The second tap on
-that same cell commits the move, passes the turn, and makes whatever sound that move earned.
-Changing your mind needs no cancel button — tap another legal cell to reselect, or tap anywhere
-that is not a cell to clear. Taps on illegal cells do nothing at all, with no sound, no haptic
-and no error state, so the only thing that explains an illegal tap is the locked styling that
-should have prevented it — which makes it a hard requirement that the set of cells that accept a
-tap and the set of cells that *look* tappable are the same set. The pending selection ships as
-one named provider that `P3-01-board-rendering.md` draws from and nothing else writes.
+that same cell commits the move, passes the turn, makes whatever sound that move earned, and
+**writes the game to storage without the turn waiting on the disk**. Changing your mind needs no
+cancel button — tap another legal cell to reselect, or tap anywhere that is not a cell to clear.
+Taps on illegal cells do nothing at all, with no sound, no haptic and no error state, so the only
+thing that explains an illegal tap is the locked styling that should have prevented it — which
+makes it a hard requirement that the set of cells that accept a tap and the set of cells that
+*look* tappable are the same set. The pending selection, the board and the on-screen game's
+identity ship as three named providers that `P3-01-board-rendering.md` draws from and seeds, and
+that nothing else writes.
 
 ## Requirements
 
@@ -200,21 +222,48 @@ one named provider that `P3-01-board-rendering.md` draws from and nothing else w
    **Verification:** with a selection active, a tap in a cell gutter, in the quadrant padding,
    in a gap between quadrants, on the scoreboard, or on the legend strip each leave
    `pendingSelectionProvider` null and `boardProvider` unchanged.
-9. There is **no dedicated cancel control and no confirm control**, and a pending selection ends
-   in **exactly three ways**: **confirmed** (requirement 4), **replaced** (requirement 7), or
-   **cleared** by a tap that is not on a cell (requirement 8, bounded by requirement 26).
-   Confirming is one of the three — committing clears the selection as part of placing the mark,
-   because the cell it named now holds a committed mark and the preview describes something that
-   has already happened. *(Game Board Design → Changing your mind — "neither needs a dedicated
-   cancel button" — and → Confirming — "No separate Confirm button" — for the absent controls; →
-   Three highlights on screen at once, whose pending row means "where you'd send them **if you
-   confirm**" and which requires the provisional treatment to read as "clearly not yet
-   committed", for the clear-on-commit half.)*
-   **Verification:** immediately after a confirming tap, `pendingSelectionProvider` is null, so
-   `P3-01` requirement 23 draws no `BoardKeys.cellPending`, no `cellGhostMark`, no
-   `quadrantPendingDestination` and no `quadrantPendingFreeChoice`; and by requirement 13 a
-   game-ending move leaves nothing provisional under the game-over overlay. Requirement 30 is
-   the mechanism delivering the confirmed case.
+9. **There is no dedicated cancel control and no confirm control, and a pending selection ends
+   in exactly four ways — three the player performs, and one the app performs to them.** The
+   split matters, because only the first three are gestures and only the fourth can happen with
+   the player's hands off the screen:
+
+   | # | Ending | Cause | Requirement |
+   |---|---|---|---|
+   | 1 | **Confirmed** | second tap on the same cell | 4 |
+   | 2 | **Replaced** | tap on a different legal cell | 7 |
+   | 3 | **Cleared** | tap that is not on a cell, or any navigation | 8, 26 |
+   | 4 | **Invalidated** | the board underneath it was replaced — a rematch, a game loaded into the screen, any future undo | 29's `replace`, delivered by 30 |
+
+   **Endings 1 and 4 are one mechanism, which is why "three" was wrong and why the correction is
+   not cosmetic.** Requirement 30's `ref.listen(boardProvider)` fires on *any* board change, so
+   it delivers the confirmed case **and** the invalidated case through the same line of code.
+   Confirming is an ending because committing clears the selection as part of placing the mark:
+   the cell it named now holds a committed mark and the preview describes something that has
+   already happened. Invalidation is an ending because a selection is only meaningful against the
+   board it was computed from (requirement 3 publishes three facts read off a previewed
+   post-move board, and all three go stale together).
+
+   **Do not write two exhaustiveness tests.** An earlier draft of this requirement said *"exactly
+   three ways"* while requirement 30 delivered a fourth, which is enough for two test authors to
+   write mutually contradictory assertions — one asserting the set of endings has three members,
+   one asserting four — and for both to believe they are following the PRD. **The exhaustive set
+   is the four rows above.** The player-facing claim that survives, and the one the design doc
+   actually makes, is narrower: *there is no cancel control and no confirm control*, because
+   *"neither needs a dedicated cancel button"* and *"No separate Confirm button."*
+
+   *(Game Board Design → Changing your mind — "neither needs a dedicated cancel button" — and →
+   Confirming — "No separate Confirm button" — for the absent controls; → Three highlights on
+   screen at once, whose pending row means "where you'd send them **if you confirm**" and which
+   requires the provisional treatment to read as "clearly not yet committed", for the
+   clear-on-commit half. Row 4 is **derived, not stated** — see requirement 30's derivation
+   note.)*
+   **Verification:** one test per row, all four asserting `pendingSelectionProvider == null`
+   afterwards; plus a **negative** test that a rebuild changing no board state and dispatching no
+   tap leaves a pending selection intact, which is what stops row 4 being read as "the selection
+   clears whenever anything happens." Immediately after a confirming tap, `P3-01` requirement 23
+   draws no `BoardKeys.cellPending`, no `cellGhostMark`, no `quadrantPendingDestination` and no
+   `quadrantPendingFreeChoice`; and by requirement 13 a game-ending move leaves nothing
+   provisional under the game-over overlay.
 
 ### Illegal taps
 
@@ -234,9 +283,10 @@ one named provider that `P3-01-board-rendering.md` draws from and nothing else w
     and 26.
     **Verification:** with a selection held on a legal cell, tapping an illegal cell leaves
     `boardProvider` `identical()` and `pendingSelectionProvider` equal to its pre-tap value, and
-    records zero calls on both the overridden `HapticService` and `AudioLayer`. ("Clears
-    nothing" is the literal reading of *does nothing*; no doc addresses it separately.) The
-    absorption mechanism is requirement 19; the decision is requirement 25's first branch.
+    records zero calls on both the overridden `HapticService` and `AudioLayer`, **and zero calls
+    on the overridden `OpenGamesRepository`** (requirement 36). ("Clears nothing" is the literal
+    reading of *does nothing*; no doc addresses it separately.) The absorption mechanism is
+    requirement 19; the decision is requirement 25's first branch.
 11. **Legality is read from the engine, never re-derived in the UI.** The input layer reads
     `board.legalMoves` and `board.placementState`; it does not reimplement the sending rule,
     dead-quadrant handling, or occupancy checks. *(Tech Design → Decisions → Is the game logic
@@ -268,10 +318,11 @@ one named provider that `P3-01-board-rendering.md` draws from and nothing else w
     requirement 20.)*
     **Verification:** from a board whose `outcome != inProgress`, dispatch a tap to each of the
     81 cells; afterwards `boardProvider` is `identical()` to its pre-tap value,
-    `pendingSelectionProvider` is null, both overridden channels record zero calls, and no
+    `pendingSelectionProvider` is null, all three overridden channels record zero calls, and no
     `IllegalMoveError` is thrown — requirement 29's guard means `applyMove` is never reached, so
     the engine's `gameAlreadyFinished` path (`P1-02` requirement 42) is never exercised from the
-    UI.
+    UI. **No `save` fires either** (requirement 36): the game-ending move already wrote, and no
+    later tap writes again.
 
 ### What the taps trigger
 
@@ -296,7 +347,8 @@ one named provider that `P3-01-board-rendering.md` draws from and nothing else w
     requirement 26's clear should itself buzz is that PRD's OQ-4; the counts above encode
     today's answer, "no". **One buzz per valid tap regardless of how many sounds that tap
     causes** — requirement 32 can add a second sound to a commit; it never adds a second buzz,
-    because `P2-03` requirement 6 bans a distinct haptic per action type.
+    because `P2-03` requirement 6 bans a distinct haptic per action type. **A save is not a
+    tap** and adds no buzz either (requirement 36).
 15. **No sound on selection.** The pending selection gets **no sound of its own** — sound belongs
     to the confirmed move, not the preview, so the board does not chirp while someone browses
     options. `P2-02-audio.md` requirement 8 is the same rule from its side, and its requirement
@@ -320,9 +372,16 @@ one named provider that `P3-01-board-rendering.md` draws from and nothing else w
     Handoff — "The game switches the active player automatically after each move", "The handoff
     can be instant"; Design Handoff → Interactions & behavior — "Turn handoff is instant";
     `P1-02` requirement 38, which flips `currentPlayer` inside `applyMove`.)*
+    **This is the requirement requirement 36's save is shaped around.** Storage is asynchronous
+    (`P1-04` requirement 21: *"Every operation is asynchronous"*), so awaiting the write on the
+    commit path would put a disk round-trip between the confirming tap and the opponent's turn
+    and break this requirement on a slow device. The save is therefore **not awaited**.
     **Verification:** in the frame after the confirming tap settles, `boardProvider.currentPlayer`
     differs from its pre-tap value, `BoardView` is still the visible surface, and no route was
     pushed and no dialog, overlay or modal barrier entered the tree — the handoff adds nothing.
+    **Sharpened for the save:** with an overridden repository whose `save` returns a `Future` that
+    **never completes**, the turn still passes in that same frame and every other assertion above
+    still holds. That is the test that catches an accidental `await`.
 18. **Animations never block input.** Taps register normally while an animation plays, and the
     animation is neither interrupted nor skipped. *(Animations → Decisions → Animations don't
     block input; `P2-04-animations.md` requirement 15 — never block input — and requirement 16 —
@@ -389,10 +448,12 @@ one named provider that `P3-01-board-rendering.md` draws from and nothing else w
     *(Design Handoff → State — `pendingSelection // { quadrant, cell } | null (never
     persisted)`.)* **Caveat:** `Tech Design.md` annotates that state block as *"a design sketch,
     not a decision taken here"*, so this is sourced from the approved handoff rather than a
-    Decisions entry — see `P1-02` OQ-3. It is forced independently twice over: by requirement 30
-    (a selection is only valid against the board it was computed from, and a reload produces a
-    different `Board`) and by `P2-01` requirement 20 (leaving the board is a navigation, and
-    every navigation clears first), so nothing is ever alive to write.
+    Decisions entry — see `P1-02` OQ-3. It is forced independently three times over: by
+    requirement 30 (a selection is only valid against the board it was computed from, and a
+    reload produces a different `Board`), by `P2-01` requirement 20 (leaving the board is a
+    navigation, and every navigation clears first), and by requirement 36 (the only thing the
+    commit path writes is a `StoredGame`, whose five fields do not include it), so nothing is
+    ever alive to write and no writer could write it if it were.
     **Verification:** `PendingSelection` has no `toJson`/`fromJson` and is unreferenced under
     `lib/storage/`; after a save/restore round-trip through `P1-04-persistence.md` with a
     selection active before the save, the restored session has `pendingSelectionProvider == null`
@@ -499,18 +560,20 @@ requirement 12.
 
     | Condition | Behavior |
     |---|---|
-    | `!board.legalMoves.contains(move)` | **Nothing** — no state change, no haptic, no sound (requirement 10). |
-    | `state?.move == move` | **Confirm** — requirement 29's commit path, then requirement 32's sounds and one `HapticService.validAction()`. |
+    | `!board.legalMoves.contains(move)` | **Nothing** — no state change, no haptic, no sound, **no save** (requirement 10). |
+    | `state?.move == move` | **Confirm** — requirement 29's commit path, then requirement 36's save, requirement 32's sounds and one `HapticService.validAction()`. |
     | otherwise | **Select or replace** — compute requirement 3's preview once, publish all four `PendingSelection` fields from it, then `HapticService.validAction()` (requirements 2, 3, 7, 14). |
 
     The illegal branch is checked **first**, so an illegal tap can never be read as a confirm
     even if a stale selection named it. `legalMoves` is empty exactly when the game is over
     (`P1-02` requirement 19), so requirement 13 needs no separate branch. **One `applyMove` per
     select** — the destination, the state and the free-choice set all come from that single
-    previewed board, never from three separate calls or from the live board.
-    **Verification:** one test per branch asserting state, haptic count and sound sequence; plus
-    a fourth where `state?.move` names a cell that is no longer legal — that tap takes the first
-    branch, not the second.
+    previewed board, never from three separate calls or from the live board. **The select branch
+    writes nothing to storage:** a selection is not a move, and `Menus and UI.md` → Decisions
+    scopes the write to a *confirmed* move.
+    **Verification:** one test per branch asserting state, haptic count, sound sequence and
+    `save` count; plus a fourth where `state?.move` names a cell that is no longer legal — that
+    tap takes the first branch, not the second.
 26. **Any tap that is not on a cell clears the pending selection.** This is the settled scope of
     requirement 8's "outside", and it is **one uniform rule**:
 
@@ -587,12 +650,14 @@ requirement 12.
     converse), and the free-choice set that requirement 23's third row had no data source for is
     supplied here rather than recomputed there — the board must never substitute its own
     still-open quadrants, for the reason requirement 3 gives.
+    **`board` is whatever requirement 29 holds, which `P3-01` requirement 54 seeds before this
+    tree is built.** This snippet is the steady state; the seeding is that requirement's.
     **Verification:** a widget test drives a full select→confirm through `BoardView` with only
-    the theme, haptic and audio providers overridden; a selection whose confirmation would claim
-    its own send target renders with `cellPending` present, `quadrantPendingDestination` absent,
-    and `quadrantPendingFreeChoice` present on exactly the previewed open quadrants and **not**
-    on the quadrant being claimed; and a selection that would end the game renders the cell half
-    with no big-board treatment of either kind.
+    the theme, haptic, audio and repository providers overridden; a selection whose confirmation
+    would claim its own send target renders with `cellPending` present,
+    `quadrantPendingDestination` absent, and `quadrantPendingFreeChoice` present on exactly the
+    previewed open quadrants and **not** on the quadrant being claimed; and a selection that
+    would end the game renders the cell half with no big-board treatment of either kind.
 28. **Nothing outside `lib/state/` calls `applyMove`.** Widgets request an intent; notifiers
     change state.
     **Verification:** a source scan finds `applyMove(` only under `lib/state/` and
@@ -600,25 +665,59 @@ requirement 12.
 
 ### Commit safety and the pending selection's lifetime
 
-29. **The confirming tap re-checks legality against the current board immediately before
-    `applyMove`, and never catches `IllegalMoveError`.**
+29. **`BoardNotifier` publishes two mutators — `commit`, which applies one move, and `replace`,
+    which swaps the whole board. The confirming tap re-checks legality against the current board
+    immediately before `applyMove`, and never catches `IllegalMoveError`.**
 
     ```dart
     // lib/state/board_provider.dart
     final class BoardNotifier extends Notifier<Board> {
       @override
-      Board build() => Board.newSeries();          // P1-02 requirement 32
+      Board build() => Board.newSeries();          // P1-02 requirement 32 — see the note below
 
-      /// The UI layer's only writer of board state.
+      /// The UI layer's only *move* writer.
       void commit(Move move) {
         final board = state;
         if (!board.legalMoves.contains(move)) return;   // the guard
         state = applyMove(board, move);                 // may throw; never caught
       }
+
+      /// Swap the whole board. No legality check, no `applyMove`, no engine call —
+      /// the caller already holds a `Board` the engine produced.
+      /// Two callers: `P3-01` req 54 (a stored game loaded into the screen) and
+      /// `P3-04` req 6 (the board `Board.startNextGame()` returns).
+      void replace(Board board) => state = board;
     }
 
     final boardProvider = NotifierProvider<BoardNotifier, Board>(BoardNotifier.new);
     ```
+
+    **Why `replace` exists, and why one mutator was not enough — three independent callers, not
+    one.** A notifier publishing only `commit` can express *"apply this move"* and nothing else,
+    and three things in the family need to express *"the board is now this":*
+    - **`P3-01` requirement 54** loads a stored game when the game screen opens. Without
+      `replace` there is no way to get a `StoredGame.board` into this provider, and the screen
+      renders `build()`'s `Board.newSeries()` instead — **resuming a saved game silently shows a
+      new one.** That defect is what this mutator exists to fix.
+    - **`P3-04` requirement 6** says the next-game control *"calls `Board.startNextGame()`"* and
+      names no destination for the result. There was none.
+    - **This PRD's own requirement 30** verifies invalidation by *"replac[ing] the board via
+      `startNextGame()`"* — an assertion that was **unwritable against the published interface**
+      until now. A verification nobody can write is not a verification.
+
+    **`replace` performs no legality check by design.** Its argument is a `Board` the engine
+    produced — deserialized from storage by `P1-04`, or returned by `startNextGame()` — so there
+    is no move to validate and nothing for `legalMoves` to say. Requirement 22's rule is intact:
+    this still never mutates a `Board`, it assigns one.
+    **`replace` clears any pending selection for free**, through requirement 30's listener. That
+    is requirement 9's row 4, and it is the whole reason a selection cannot survive into a board
+    it was not computed against.
+
+    **`build()`'s `Board.newSeries()` is a pre-seed value, not a game.** With `replace` in place
+    it is what the provider holds before `P3-01` requirement 54 seeds it, and that requirement
+    is responsible for making sure it is never *rendered*. Left alone it is exactly the defect
+    above wearing a plausible face — a full, legal, empty board that looks like a correct new
+    game.
 
     `Rules.md` → Decisions → **What happens if an illegal move reaches the engine?** settles that
     the engine **throws** — *"failing loud and throwing an error is correct when in theory the UI
@@ -627,25 +726,27 @@ requirement 12.
     theory"*; the absent `catch` is deliberate, because swallowing the error would turn a loud
     contract violation into a tap that silently did nothing — indistinguishable, from the
     player's side, from requirement 10, and invisible to the report `P1-06-crash-reporting.md`
-    builds.
-    **`boardProvider` is declared here for want of an owner, and flagged.** No PRD in the family
-    names a game-state provider, yet `P3-01`, `P3-03-scoreboard-turn-indicator.md`,
+    builds. **Requirement 36 applies the same reasoning to a failed save.**
+    **`boardProvider` is declared here because this is the layer that writes it.** No design doc
+    names a game-state provider, and `P3-01`, `P3-03-scoreboard-turn-indicator.md`,
     `P3-04-game-over-rematch.md` and `P1-04-persistence.md` all read or seed it. This PRD
-    declares it because it is the only feature that *writes* the board; **seeding it from
-    storage, `startNextGame()` on rematch, and open-game identity are not specified here** and
-    belong to `P1-04` and `P3-04`. If either claims ownership, only the declaration moves — every
-    requirement here is written against the name.
+    declares it and publishes both mutators; **it does not own the lifecycle** — when a game is
+    loaded is `P3-01` requirement 54's, and when it is reset is `P3-04` requirement 6's. Each
+    calls a method published here.
     **Verification:** a board whose `legalMoves` excludes the pending move takes the guard and
-    calls `applyMove` zero times; a source scan of `lib/state/` and `lib/ui/board/` finds no
-    `catch` of `IllegalMoveError` and no bare `catch` around an `applyMove` call.
+    calls `applyMove` zero times; `replace` sets the provider to an `identical()` instance of its
+    argument and calls `applyMove` zero times; a source scan of `lib/state/` and `lib/ui/board/`
+    finds no `catch` of `IllegalMoveError` and no bare `catch` around an `applyMove` call; and no
+    notifier member beyond `commit` and `replace` exists.
 30. **Any change to `boardProvider` clears the pending selection — and that covers board changes
     only.** The `ref.listen` in requirement 24 fires when the *board* changes, which delivers
     three things: requirement 9's clear-on-commit; invalidation when the board underneath a
-    selection is **replaced** — a rematch's `startNextGame()`, a game loaded from the open-games
-    list, any future undo; and the guarantee that a published `PendingSelection` was computed
-    against exactly the board now in the provider. That last one is what makes requirement 3's
-    preview trustworthy, and it now covers three published facts rather than one: a selection
-    that outlived its board would show a stale destination **and** a stale free-choice set.
+    selection is **replaced** — requirement 29's `replace`, called by a rematch's
+    `startNextGame()` (`P3-04` req 6), by a game loaded into the screen (`P3-01` req 54), and by
+    any future undo; and the guarantee that a published `PendingSelection` was computed against
+    exactly the board now in the provider. That last one is what makes requirement 3's preview
+    trustworthy, and it now covers three published facts rather than one: a selection that
+    outlived its board would show a stale destination **and** a stale free-choice set.
 
     **It is not the general clearing mechanism, and must not be read as one.** Opening a menu or
     a sheet changes no board state, and `P2-01` requirement 2's child-route structure never
@@ -663,19 +764,22 @@ requirement 12.
     `IllegalMoveError` is the guard silently eating the player's tap. Marked derived in the house
     manner of `P2-02` requirement 2 and `P2-03` requirement 13; if another mechanism gives the
     same guarantee, this is negotiable.)*
-    **Verification:** select a cell, replace the board via `startNextGame()` —
-    `pendingSelectionProvider` is null with no tap; and a selection made before a rematch cannot
-    be confirmed by a second tap on the same cell afterwards, it selects afresh. The negative is
-    worth asserting too: with a selection pending, a rebuild that changes no board state leaves
-    it intact.
+    **Verification — now writable, which it was not before.** Select a cell, then
+    `ref.read(boardProvider.notifier).replace(board.startNextGame())` —
+    `pendingSelectionProvider` is null with no tap; and a selection made before that replacement
+    cannot be confirmed by a second tap on the same cell afterwards, it selects afresh. The same
+    assertion with a board loaded from a fake repository covers `P3-01` requirement 54's path.
+    The negative is worth asserting too: with a selection pending, a rebuild that changes no
+    board state leaves it intact.
 31. **The preview is pure and is discarded.** Requirement 3's `applyMove` call produces a board
     that must never be written to `boardProvider`, persisted, or handed to another layer; only
     its `placementState`, `activeQuadrant` and `legalMoves` are read, and only the three derived
     values are published. The engine is immutable and side-effect-free (`Tech Design.md` →
     Decisions → Game state is immutable), so computing it changes nothing.
     **Verification:** after any number of first taps and reselections, `boardProvider` is
-    `identical()` to its value before the first of them; and no previewed `Board` instance is
-    reachable from any provider.
+    `identical()` to its value before the first of them; no previewed `Board` instance is
+    reachable from any provider; and the overridden repository records zero `save` calls across
+    all of them.
 
 ### Sounds the committed move causes
 
@@ -712,6 +816,8 @@ cat caption but never learns when a move lands. This PRD does, so it takes them.
     final after = ref.read(boardProvider);
     if (identical(before, after)) return;                   // the guard rejected it: silent
 
+    _saveAfterConfirmedMove(after);                         // requirement 36 — not awaited
+
     final audio = ref.read(audioLayerProvider);             // P2-02 requirement 2
     audio.play(SoundMoment.placeMark);
 
@@ -726,8 +832,11 @@ cat caption but never learns when a move lands. This PRD does, so it takes them.
     ```
 
     The `identical(before, after)` early return matters: requirement 29's guard can reject a
-    stale move, and a commit that did not happen must make no sound, exactly as requirement 10
-    requires of an illegal tap.
+    stale move, and a commit that did not happen must make no sound **and no save**, exactly as
+    requirement 10 requires of an illegal tap. **The save's position in this sequence is
+    immaterial** — nothing awaits it, so it neither delays nor is delayed by the two channels
+    below it. It is written first because that is the order it reads in: the move happened, so
+    persist it.
     *(`Theming.md` → What a Theme Controls → Audio, which lists *"Winning a small board /
     claiming a quadrant"* and *"Cat game"* among the five; `Animations.md` → Where Animations
     Fire, which names the same two as **moments**; `P2-02` requirements 2 and 6; `P1-02`
@@ -766,15 +875,15 @@ cat caption but never learns when a move lands. This PRD does, so it takes them.
     that PRD's open question and the user's.
     **Verification:** a commit that both claims a quadrant and wins the game records
     `placeMark`, `claimQuadrant` and `winGame` on the same `FakeAudioLayer`, in one tap, with no
-    error and exactly one `validAction()` on the haptic fake.
+    error, exactly one `validAction()` on the haptic fake, and **exactly one `save`**.
     **Not carried across to motion.** `P2-04-animations.md` ships **only** `placeMark` as an
-    animation moment in its wave, deliberately, *"so the questions the docs leave open about the
-    other five are not answered by accident"* — its requirement 2 is still fenced on the
-    marker-only-vs-quadrant question. Taking the audio moments here implies nothing about the
-    animation ones, and no claim or cat animation is requested by this PRD. **This is the
-    symmetric-looking next step to avoid**: the audio and motion channels have different open
-    questions behind them, and firing an animation moment because the sound moment exists would
-    answer one of them by accident.
+    animation moment — **now as settled scope rather than a wave fence**: the user confirmed
+    animations are marker-only, and that PRD's `AnimationMoment` enum has one value. Taking the
+    audio moments here implies nothing about animation ones, and no claim or cat animation is
+    requested by this PRD. **This is the symmetric-looking next step to avoid**: five sounds and
+    one animation is the correct asymmetry, not an oversight, and firing an animation moment
+    because the sound moment exists would re-create the defect that PRD's requirement 28
+    records.
 
 ### Tests
 
@@ -782,13 +891,186 @@ cat caption but never learns when a move lands. This PRD does, so it takes them.
     golden image tests.** They run locally (`flutter test`); nothing runs them on a push. *(Tech
     Design → Decisions → Widget tests for the board — no golden tests — "Test that taps do the
     right thing and that the highlight states appear"; → CI — local builds only.)*
-    Every requirement carries a verification that can be written against named symbols. The five
+    Every requirement carries a verification that can be written against named symbols. The six
     that could not be written in earlier rounds are all closed: requirement 12's second set by
     `P3-01` requirement 45's `cellPlayable`, requirements 14–15's channel seams by `P2-03`
     requirement 15 and `P2-02` requirement 2, requirement 26's boundary by the tap-outside
-    Decision plus `P2-01` requirement 20, and requirement 3's free-choice row by the
-    self-claiming-preview Decision plus `P3-01`'s `quadrantPendingFreeChoice` key. **No
-    verification in this PRD is blocked.**
+    Decision plus `P2-01` requirement 20, requirement 3's free-choice row by the
+    self-claiming-preview Decision plus `P3-01`'s `quadrantPendingFreeChoice` key, and
+    **requirement 30's replacement assertion by requirement 29's `replace`**. **No verification
+    in this PRD is blocked.**
+    **The repository is the fourth injectable seam**, alongside haptics, audio and the theme:
+    tests override `openGamesRepositoryProvider` (`P1-04` requirement 28) with a fake that
+    records every `save` and can be told to fail. Requirement 36's assertions are written against
+    it, and requirement 17's never-completing-`Future` case needs it.
+
+### The on-screen game, and the write
+
+35. **`currentGameProvider` holds the identity of the game on screen, and it is declared here
+    because the commit path is the thing that cannot work without it.**
+
+    ```dart
+    // lib/state/current_game_provider.dart
+    import '../storage/stored_game.dart';   // StoredGame, GameId — P1-04 reqs 21, 22
+
+    /// The record the game screen is showing. Null before a game is opened.
+    /// Seeded by `P3-01` requirement 54; read by requirement 36.
+    final class CurrentGameNotifier extends Notifier<StoredGame?> {
+      @override
+      StoredGame? build() => null;
+
+      void set(StoredGame game) => state = game;
+    }
+
+    final currentGameProvider =
+        NotifierProvider<CurrentGameNotifier, StoredGame?>(CurrentGameNotifier.new);
+    ```
+
+    **Why it has to exist at all.** `P1-04` requirement 21's `save` takes a whole `StoredGame` —
+    `id`, `opponentName`, `board`, `createdAt`, `updatedAt` — and the commit path in
+    `lib/state/` can reach exactly one of those five. It holds a `Board` and nothing else: the
+    `GameId` lives on `P3-01`'s `GameScreen` constructor, and the opponent name and both
+    timestamps live only in storage. **Without this provider requirement 36 is unimplementable**,
+    and so is `P3-04` requirement 9's rematch write for the same reason.
+
+    **Why it holds the whole record rather than three fields.** The settlement allowed either the
+    `StoredGame` or `GameId` + `opponentName` + `createdAt`. The whole record is chosen because
+    `save` wants all five fields and a three-field subset would have to be re-widened the moment
+    `StoredGame` gains one — which it already did once, when Open Questions 7 and 8 added two
+    timestamps. It costs nothing: `P3-01` requirement 54 has the whole record in hand from
+    `readById`, so publishing a subset would be work rather than saving it.
+
+    **Why `lib/state/` and this PRD, rather than `P3-01`.** Three reasons, and the third is
+    decisive:
+    - **Layer.** `Tech Design.md` → Decisions → Project structure — layer-first puts app state in
+      `lib/state/`, which is this PRD's territory (requirement 20). `lib/ui/board/` is `P3-01`'s
+      and holds widgets.
+    - **Precedent.** This is exactly the `boardProvider` arrangement: declared here because this
+      is the layer that writes it, seeded and read by `GameScreen`. A second pattern for the same
+      shape would be the duplication requirement 29 already avoids once.
+    - **Need.** The **only** consumer that cannot do its job without it is requirement 36, and it
+      is in this file. `P3-01` writes it; nothing there reads it.
+
+    **The reviewer's finding this closes**, recorded verbatim because it is the whole
+    justification: *"One provider closes both gaps; neither closes without it."* The two gaps are
+    this PRD's save (requirement 36) and `P3-01`'s load (its requirement 54) — the same missing
+    artifact seen from the write side and the read side.
+
+    **No design doc mentions this provider, and no other PRD declares one. [PRD decision]**, in
+    the same remit requirement 29 used for `boardProvider`. `design_handoff_game_ui/README.md` →
+    *State* lists the game fields beside `pendingSelection` without naming an owner for the
+    record's identity, and `Tech Design.md` annotates that block as *"a design sketch, not a
+    decision taken here."*
+    **Verification:** a source scan finds `currentGameProvider.notifier` written only in
+    `P3-01`'s `game_screen.dart` and read only in `lib/state/`; the notifier has no member beyond
+    `set`; and with the provider null, requirement 36's save path performs no write (see its
+    fenced default).
+36. **The confirming tap writes the game to storage, fire-and-forget, and a failed write is not
+    swallowed. This requirement claims the call site `P1-04` had left unclaimed.**
+
+    ```dart
+    // lib/state/pending_selection_provider.dart — called from requirement 32's snippet
+    void _saveAfterConfirmedMove(Board board) {
+      final game = ref.read(currentGameProvider);          // requirement 35
+      if (game == null) return;                            // fenced — see below
+      // Not awaited, and deliberately not caught. Requirement 17 and the note below.
+      ref.read(openGamesRepositoryProvider)                // P1-04 requirement 28
+          .save(StoredGame(
+            id: game.id,
+            opponentName: game.opponentName,
+            board: board,                                  // the post-commit board
+            createdAt: game.createdAt,                     // preserved by the repository
+            updatedAt: game.updatedAt,                     // ignored by the repository
+          ));
+    }
+    ```
+
+    **The obligation is settled and its owner was not.** *"**After every confirmed move.**
+    Nothing is ever lost to a crash or a force-quit"* — `Menus and UI.md` → Decisions → **When is
+    a game written to storage?**, carried by `P1-04` requirement 6 as an app-level claim it
+    explicitly could not test: *"the assertion that a confirmed move reaches storage belongs to
+    whichever requirement claims the call site. Today none does."* Its Out of Scope table left
+    row 1 (*After a confirmed move*) and row 2 (*At game end, carrying the increment*)
+    unclaimed. **This requirement claims both, and that table now names it in both rows.** Row 2
+    needs nothing extra: a game-ending
+    move is a confirmed move, so the same write carries `P1-02` requirement 27's score increment,
+    which is exactly what `P3-04` requirement 9(a) asserts and what it says *"is that PRD's to
+    close in this wave."*
+    **It mirrors `P3-04` requirement 9's rematch write**, which took the third Unclaimed row by
+    the same reasoning and against the same interface. Between the two, every row in `P1-04`'s
+    table has an owner.
+
+    **The save is not awaited, and that is requirement 17's constraint, not a preference.**
+    `P1-04` requirement 21: *"Every operation is asynchronous. Both Hive and `shared_preferences`
+    are async on first open."* Awaiting here would put a disk round-trip between the confirming
+    tap and the opponent's turn, and requirement 17 fixes that gap at zero — *"the turn passes in
+    the frame after the confirming tap settles."* The board is already committed by the time this
+    is called (requirement 32's snippet), so the write races nothing: it persists a value that is
+    already the truth in memory.
+
+    **A failed write is reported, not swallowed — and the honest limit is stated rather than
+    implied. [PRD decision — default].** The returned `Future`'s error is **deliberately not
+    caught**, exactly as requirement 29 deliberately does not catch `IllegalMoveError`. With no
+    `runZonedGuarded` in the app (`P1-06` requirement 2), an uncaught asynchronous error reaches
+    `PlatformDispatcher.instance.onError`, which that PRD's requirements 2, 3 and 8 turn into
+    exactly one `CrashReport` in the sink `main()` installed, and continues rather than
+    terminating. So the failure **is** reported.
+
+    **What "reported" does not mean today.** Nothing reads that sink in wave 1: `P1-06`
+    requirement 4 keeps reports in memory, its requirement 13 installs **no application-facing
+    entry point** and explicitly forbids a global, a static instance and a provider, and
+    `main()` *"ignores the return value."* The tests that reach the sink are `P1-06`'s own, which
+    install their own instance. **So the player sees nothing, the move stands, and the game on
+    disk is one move stale.** This is a **forward-looking guarantee** — the report exists and has
+    a destination the day one is chosen — not a claim that a failed save is surfaced. Stating it
+    the other way round would be the more comfortable sentence and the false one.
+
+    **This does not decide `P1-06`'s OQ-4** (*unhandled errors only, or recovered errors too?*)
+    and must not be read as doing so. An unawaited failure that nothing catches is **genuinely
+    unhandled**, so it sits inside that PRD's requirement 1 scope as written and needs no
+    widening. **What would need OQ-4 answered is the other design** — catching the failure here
+    and reporting it deliberately, in order to also show the player a retry or a banner. That is
+    a real alternative and it is *not chosen here*; it is routed to that PRD as OQ-9 below.
+
+    **Neither timestamp is this call site's to supply — settled, and OQ-10 is closed.**
+    `P1-04` requirement 21 has `save` **stamp `updatedAt` itself, ignoring whatever the caller
+    passes, and preserve the stored `createdAt`, discarding an incoming one**. So the two fields
+    in the snippet above are constructor arguments the repository overwrites, not inputs: this
+    path passes the record it is holding and makes no choice at all. There is no
+    `updatedAt: DateTime.now()` anywhere on this path, and a code writer who adds one is writing
+    a value that is thrown away. `P3-04` requirement 9's rematch write is settled the same way by
+    the same requirement.
+
+    **Fenced, reversible: a null `currentGameProvider` writes nothing.** Reachable only if the
+    commit path runs before `P3-01` requirement 54 seeded the provider, which that requirement
+    is written to prevent — it does not render `BoardView`, and so cannot receive a tap, until
+    both providers are seeded. Returning silently rather than throwing is chosen because a
+    missing record is a wiring bug in a screen this PRD does not own, and crashing a confirmed
+    move over it would destroy the player's turn to report someone else's defect. **Reversible**
+    — asserting instead is one line, and OQ-11 records the choice.
+
+    *(Source: `Menus and UI.md` → Decisions → When is a game written to storage?;
+    `P1-04-persistence.md` requirements 6, 21, 22, 28 and its Out of Scope → *Who calls save*;
+    `P1-06-crash-reporting.md` requirements 1, 2, 3, 4, 8 and 13; `P3-04-game-over-rematch.md`
+    requirement 9 for the mirrored claim.)*
+    **Verification**, against an overridden `openGamesRepositoryProvider` holding a recording
+    fake:
+    - a confirming tap records exactly **one** `save`, whose `StoredGame` carries the post-commit
+      board, the same `GameId` as `currentGameProvider`, and the same `opponentName` and
+      `createdAt`;
+    - a first tap, a reselecting tap, a clearing tap, an illegal tap and every tap on a finished
+      board record **zero** `save` calls;
+    - a commit rejected by requirement 29's guard (`identical(before, after)`) records zero;
+    - the game-ending move records one `save` whose board reports the terminal `GameOutcome` and
+      whose `Score` shows the increment — `P3-04` requirement 9(a) asserts the same write from
+      the storage side;
+    - **with the fake's `save` returning a `Future` that never completes**, requirement 17's
+      frame assertion still holds and a second confirming move still commits and still saves;
+    - **with the fake's `save` returning a failed `Future`**, `boardProvider` still holds the
+      committed board, `pendingSelectionProvider` is null, and the commit path contains no
+      `catch`, no `.catchError` and no `onError` around the call — asserted by source scan,
+      because the report itself is `P1-06`'s to assert and its handlers are not installed in this
+      PRD's tests.
 
 ## Out of Scope
 
@@ -814,10 +1096,22 @@ Named so the boundary is explicit. Each is specified elsewhere; do not specify i
   draw detection, `applyMove` semantics, `IllegalMoveError`: `P1-02-engine-rules.md`.
   Requirements 3 and 32 read `legalMoves`, `placementState`, `activeQuadrant` and `quadrantAt`,
   and decide nothing.
-- **Seeding and resetting the game** — loading an open game into `boardProvider`, the rematch's
-  `startNextGame()`, the 3-game cap, open-game identity, and deleting a game:
-  `P1-04-persistence.md`, `P3-04-game-over-rematch.md` and `P4-02-open-games-list.md`.
-  Requirement 29 declares the provider; it does not own the lifecycle.
+- **The storage mechanism** — Hive, the box, the JSON shape, `GameId` minting, the 3-game cap,
+  `readAll` ordering, `create`, `delete`, and what `updatedAt` means **and which side stamps it**
+  (its req 21 — the repository): `P1-04-persistence.md`. Requirement 36 calls `save` with a
+  record built from values that layer published; it defines no storage of its own, adds no
+  repository method, and supplies neither timestamp.
+- **Loading a game into the screen** — reading a `StoredGame` by id and seeding requirement 29's
+  `boardProvider` and requirement 35's `currentGameProvider`: **`P3-01-board-rendering.md`
+  requirement 54**. This PRD publishes both providers and both setters; *when* they are seeded is
+  that requirement's, and the not-found and load-failure cases are its open questions, not these.
+- **Resetting the game** — the rematch's `startNextGame()`, its own write, and turn order across
+  games: `P3-04-game-over-rematch.md` requirements 6–9. It calls requirement 29's `replace`.
+- **Creating and deleting games** — `P4-02-open-games-list.md` requirements 7 and 10, via
+  `P1-04` requirement 28's notifier.
+- **Crash reporting** — `CrashReport`, the sink, the two handlers, what is captured and whether
+  recovered errors are ever reported: `P1-06-crash-reporting.md`. Requirement 36 relies on its
+  requirement 2 handler existing and reports nothing itself.
 - **Navigation, and the clear that rides on it** — routes, sheets, the router, and
   `GoRouterAppNavigator`'s unconditional `clear()` before every operation:
   `P2-01-navigation.md` requirement 20. Requirement 24 publishes the entry point it calls; this
@@ -911,4 +1205,43 @@ test?* Both siblings publish injectable seams and both name this question: `P2-0
 (`AudioLayer.play(SoundMoment)` behind `audioLayerProvider`), each overridable via
 `ProviderScope(overrides: [...])`. Requirements 14, 15 and 32 are written against those symbols,
 and requirement 14's reselection count is what `P2-03` requirement 3 now records as its
-assertion.
+assertion. **`P1-04` requirement 28's `openGamesRepositoryProvider` is the fourth seam** and is
+overridable the same way, which is what makes requirement 36 assertable.
+
+### New with the save — needs routing, and one needs the user
+
+**OQ-9 — Should a failed save be *caught and surfaced*, rather than merely reported?**
+*Routed to `P1-06-crash-reporting.md`; requirement 36 states a default and does not decide it.*
+Today a failed `save` is left uncaught, reaches that PRD's `PlatformDispatcher.instance.onError`
+handler, becomes one `CrashReport` in an in-memory sink, and **nothing reads that sink** — so the
+player is never told, and the game on disk is one move stale until the next successful write.
+Whether that is acceptable is a product question nobody has been asked: `Menus and UI.md` →
+Decisions is emphatic that *"Nothing is ever lost to a crash or a force-quit"*, which is an
+argument that a *silent* failure to write deserves more than a report nobody reads.
+
+**This is adjacent to `P1-06` OQ-4 and is deliberately not merged with it.** That question asks
+whether *recovered* errors should report at all; this one asks whether *this particular* error
+should be recovered in the first place, so that something could be shown. If the answer is
+"catch it and show the player something," `P1-06` OQ-4 has to be answered too, because the catch
+turns an unhandled error into a recovered one and its requirement 1 currently excludes those.
+**Not blocking:** requirement 36 is buildable and testable exactly as written, and the change if
+this is answered the other way is confined to that one call.
+
+**OQ-10 — CLOSED by the user: the repository stamps.** *Was: who stamps `updatedAt` on a save —
+the repository or the caller?* Settled one level down, in `P1-04-persistence.md` **requirement
+21**: `OpenGamesRepository.save` **stamps `updatedAt` itself, ignoring whatever the caller
+passes, and preserves the stored `createdAt`, discarding an incoming one** — with the reasoning
+recorded there and the settlement recorded under that PRD's Open Question 8. **Kept as a numbered
+stub because siblings cite these by number**, following this PRD's handling of OQ-1 and OQ-8.
+
+The consequence for this file is that requirement 36 makes **no** choice: it passes the record it
+holds and the repository overwrites both fields, so the `updatedAt: DateTime.now()` variant this
+question weighed is now wrong rather than optional. The same settlement closed `P3-04` OQ-10, the
+neighbouring question about the rematch write; that write moves its series to the top of `P1-04`
+requirement 29's most-recent-first order, which is `P1-04` req 29's and `P3-04` req 9's to state
+and not this PRD's — no write on this path is anything but a confirmed move.
+
+**OQ-11 — Fenced by this PRD:** a `null` `currentGameProvider` on the commit path writes nothing
+and does not throw (requirement 36). Reachable only through a wiring bug in `P3-01` requirement
+54, which is written to make it unreachable. Asserting instead of returning would surface that
+bug loudly at the cost of destroying a confirmed move; **reversible**, one line.

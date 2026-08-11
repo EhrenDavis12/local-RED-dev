@@ -13,28 +13,45 @@
 > `P1-07-entitlements.md`) lands inside the structure this PRD creates, so **this PRD ships
 > before the rest of its own wave** — see the exceptions below the table.
 
-## Pending confirmation — two literals, not two designs
+## Confirmed by the user — two literals, not two designs
 
-Both are needed before `flutter create` can run. Each carries a proposal so the PRD is
-executable the moment it is confirmed; neither changes anything else in this document.
+Both were needed before `flutter create` could run, and **both are now settled by the user**,
+each proposal accepted as written. Neither changes anything else in this document.
 
-1. **The Dart package name.** `Tic-Tac-Toe-Extreme` is the *repository* name and is not a
-   legal Dart package identifier (hyphens and capitals are not permitted), so Requirement 1
-   cannot run as the directory is named. **Proposed: `tic_tac_toe_extreme`** — the
-   lower_snake_case form of the app name *[Tech Design → Decisions → App name]*, matching the
-   bundle identifier's final segment. This cannot be deferred: every `package:` URI in the
-   codebase and every import in twenty-three downstream PRDs embeds it, and changing it later
-   is a whole-codebase rewrite.
-2. **`hive` or `hive_ce`.** *[Tech Design → Decisions → Game state storage — Hive]* names
-   "Hive" and `hive_flutter` and stops there, but the two options are different packages with
-   different names, different Flutter pairings (`hive_flutter` vs `hive_ce_flutter`) and
-   different imports. **Proposed: `hive_ce` + `hive_ce_flutter`**, on the reasoning that
+1. **The Dart package name is `tic_tac_toe_extreme`** — *settled by the user; the proposal
+   below was accepted as written.* It is the lower_snake_case form of the app name *[Tech
+   Design → Decisions → App name]*, matching the bundle identifier's final segment.
+   `Tic-Tac-Toe-Extreme` is the *repository* name and is not a legal Dart package identifier
+   (hyphens and capitals are not permitted), so Requirement 1 could not have run as the
+   directory is named. This could not be deferred: every `package:` URI in the codebase and
+   every import in twenty-three downstream PRDs embeds it, and changing it later is a
+   whole-codebase rewrite.
+2. **The Hive packages are `hive_ce` + `hive_ce_flutter`** — *settled by the user; the
+   `hive` + `hive_flutter` fallback is **not** taken.* *[Tech Design → Decisions → Game state
+   storage — Hive]* names "Hive" and `hive_flutter` and stops there, but the two options are
+   different packages with different names, different Flutter pairings (`hive_flutter` vs
+   `hive_ce_flutter`) and different imports. The reasoning the accepted proposal carried:
    `hive_ce` is the actively maintained community fork while `hive` has been dormant, and
    that the decision to store JSON with **no `TypeAdapter`s** *[Tech Design → Decisions →
    Serialization and the storage layer]* means the app uses only the box API the two share —
-   so the fork costs nothing and the maintenance risk sits with the other option. The
-   fallback is `hive` + `hive_flutter` exactly as the doc words it. `P1-04-persistence.md`
-   builds directly on whichever lands, so confirm before that PRD starts.
+   so the fork costs nothing and the maintenance risk sits with the other option.
+   `P1-04-persistence.md` builds directly on this and is unblocked.
+
+**Neither literal is recorded in a design doc.** No Decision names the Dart package name at
+all, and Tech Design → Decisions → *Game state storage — Hive* still says `hive_flutter`.
+Both settlements live in the PRDs until a doc edit lands them, and that edit is
+`forge-doc-writer`'s rather than this PRD's.
+
+**A third user settlement now lives in a requirement rather than here**, because it changes a
+requirement's content rather than supplying a literal: **the app is upright portrait only and
+does not rotate upside-down** — Requirement 7. It is likewise recorded in no design doc.
+
+**A fourth, and unlike the others it changed a live Decision rather than filling a gap: the
+minimum iOS version is raised from 13 to 15** — Requirement 8. **This one is recorded in a
+design doc**: `Tech Design.md` → Decisions → *Minimum iOS version* now reads **iOS 15** and
+carries the reasoning. The reason for the raise is `P4-05-purchase-flow.md`'s StoreKit 2
+dependency — at an iOS 13 floor that layer was unbuildable, and this requirement is what the
+floor is actually set by.
 
 ## Build order — the wave scheme
 
@@ -94,7 +111,7 @@ nothing from the earlier Flutter work carries over, so this is a greenfield crea
 
 A Flutter application exists at the src root with the layer-first `lib/` structure and asset
 folders the design docs specify, its build-level configuration set as decided (portrait only,
-iOS 13 minimum, bundle identifier `com.ehrendavis.tictactoeextreme`, display name "Tic Tac
+iOS 15 minimum, bundle identifier `com.ehrendavis.tictactoeextreme`, display name "Tic Tac
 Toe Extreme"), the decided dependency set declared with reproducible version constraints,
 `ProviderScope` wired in above the root widget, `go_router` installed with a placeholder
 route that `P2-01-navigation.md` replaces, the generated counter demo deleted, and `flutter
@@ -108,11 +125,12 @@ Each requirement carries a *Source* and a *Verification*. A requirement whose ve
 cannot be run as written is a defect — report it rather than guessing.
 
 1. **The app is a Flutter project written in Dart, created fresh at the src root**
-   (`src/Tic-Tac-Toe-Extreme`), with package name `tic_tac_toe_extreme` (**pending
-   confirmation** — see above). Nothing is carried over or refactored from earlier Flutter
+   (`src/Tic-Tac-Toe-Extreme`), with package name `tic_tac_toe_extreme` (**settled by the
+   user** — see above). Nothing is carried over or refactored from earlier Flutter
    work, and the existing `README.md` at that path is preserved.
    *Source: Tech Design → Decisions → Framework — Flutter; Language — Dart; Fresh build, not
-   a refactor. The README is observed repo state.*
+   a refactor. The package name itself is the user's settlement recorded above, not a doc
+   citation. The README is observed repo state.*
    *Verification:* `pubspec.yaml` exists with `name: tic_tac_toe_extreme`; `flutter pub get`
    succeeds; `README.md` is unmodified in the diff.
 
@@ -183,12 +201,15 @@ cannot be run as written is a defect — report it rather than guessing.
    `package:go_router/`. This scan is written by this PRD — the constraint is decided, the
    check was previously nobody's, and "discipline" is not a deliverable.
 
-5. **`hive_flutter` (or `hive_ce_flutter`) is never imported from `engine/`; `storage/` owns
-   it.** It is not pure Dart, so it cannot cross into the engine layer.
+5. **`hive_ce_flutter` is never imported from `engine/`; `storage/` owns it.** It is not pure
+   Dart, so it cannot cross into the engine layer.
    *Source: Tech Design → Decisions → Serialization and the storage layer — "`hive_flutter`
-   is not pure Dart, so it must never be imported from `engine/`."*
-   *Verification:* the same scan as Requirement 4, extended to fail on any `hive_flutter` /
-   `hive_ce_flutter` import under `lib/engine/`. One test file covers both requirements.
+   is not pure Dart, so it must never be imported from `engine/`." The doc names the `hive`
+   spelling; the package is `hive_ce_flutter` per the settlement recorded above, and the rule
+   is the same one.*
+   *Verification:* the same scan as Requirement 4, extended to fail on any import whose
+   package segment begins `hive` — which covers both `hive_flutter` and `hive_ce_flutter` —
+   under `lib/engine/`. One test file covers both requirements.
 
 6. **`storage/` is local persistence only, and no backend of ours — and no account system we
    operate — is introduced.** Nothing in the app talks to a server of ours: no HTTP client,
@@ -207,25 +228,86 @@ cannot be run as written is a defect — report it rather than guessing.
    the store layer lands in P4. The stricter form — "no networking API is reachable from
    `lib/`" — must **not** be built: it would fail the day `P4-05` ships, and that PRD has no
    way to know this check exists.
+
+   **The pattern set is the implementer's, and this PRD deliberately does not fix one.**
+   Stated because `P4-05-purchase-flow.md` reqs 230–234 build against this scan and would
+   otherwise be coding against a list that does not exist. There is no enumerated set of
+   banned symbols here — no design doc names one, and inventing a closed list in wave 1 would
+   either be incomplete (a package added in wave 4 that this list never heard of) or
+   over-broad (catching the store SDK's own transport and failing the day `P4-05` lands).
+   Instead:
+   - **The property is what is fixed**, not the regex: no HTTP client and no network target
+     other than the store SDK, over `lib/` only. An implementer chooses patterns that
+     establish it — `dart:io`'s `HttpClient` / `Socket` / `WebSocket`, `package:http`,
+     `package:dio` and the like are the obvious starting set, and that is a starting set
+     rather than the specification.
+   - **The acceptance condition is `P4-05` req 7 passing.** Whatever pattern set is written
+     here must still be green when the store layer lands, and that is the check that decides
+     whether it was drawn correctly. A set that fails then was wrong when it was written.
+   - **Widening it later is expected and is not a breach of this requirement.** Adding a
+     pattern when a new transport appears is ordinary maintenance; narrowing it to let a real
+     network call through is not.
+
    *Scope note:* the scan covers `lib/` only, so build-time tooling is outside it by
    construction — `P5-02-asset-generation-replicate.md`'s Replicate script lives in `tool/`,
    uses `dart:io`'s `HttpClient`, and resolves every path against its `--root` flag
    (defaulting to the package root) rather than the CWD, so neither its network use nor its
    writes reach the shipped app.
 
-7. **The app runs portrait only.** No landscape, at both the Flutter level and the iOS
-   project level.
-   *Source: Tech Design → Decisions → Orientation — portrait only.*
-   *Verification:* `main.dart` calls `SystemChrome.setPreferredOrientations` with the two
-   portrait values only; `ios/Runner/Info.plist` → `UISupportedInterfaceOrientations` lists
-   `UIInterfaceOrientationPortrait` and no landscape value; rotating the simulator does not
-   re-lay-out the app.
+7. **The app runs portrait only, and upright only — it does not rotate upside-down.** No
+   landscape and no 180° rotation, at both the Flutter level and the iOS project level.
+   *Source: Tech Design → Decisions → Orientation — portrait only, for the landscape half.
+   **The upright-only half is settled by the user** and is recorded in no design doc: that
+   Decision says "portrait only" and does not say whether portrait includes `portraitDown`.
+   Landing it in the doc is `forge-doc-writer`'s, not this PRD's.*
+   *Verification, four parts:*
+   - `main.dart` calls `SystemChrome.setPreferredOrientations` with
+     **`[DeviceOrientation.portraitUp]` alone** — `portraitDown` does not appear in the list,
+     and does not appear anywhere in `lib/`;
+   - `ios/Runner/Info.plist` → `UISupportedInterfaceOrientations` (the iPhone key) contains
+     `UIInterfaceOrientationPortrait` and **nothing else** — no landscape value, and
+     **`UIInterfaceOrientationPortraitUpsideDown` is absent**;
+   - **`UISupportedInterfaceOrientations~ipad`**, which `flutter create` writes as a separate
+     key containing `UIInterfaceOrientationLandscapeLeft` and
+     `UIInterfaceOrientationLandscapeRight` among its four values, is reduced to that **same
+     single value** — the upright-only rule applies to both key sets, not just the iPhone one;
+   - rotating the simulator through all four orientations does not re-lay-out the app,
+     **checked on an iPad simulator as well as an iPhone one**.
 
-8. **Minimum iOS deployment target is iOS 13.**
-   *Source: Tech Design → Decisions → Minimum iOS version.*
-   *Verification:* `ios/Podfile` declares `platform :ios, '13.0'` and the Xcode project's
-   `IPHONEOS_DEPLOYMENT_TARGET` is `13.0` for every configuration; `flutter build ios
+   **The two levels have to agree, and in the previous revision they did not.** That revision
+   asked for "the two portrait values" at the Flutter level while asking the plist for
+   portrait values with no landscape value — which a build could satisfy with `portraitUp` +
+   `portraitDown` in Dart and no `UIInterfaceOrientationPortraitUpsideDown` in the plist. That
+   combination is not a compromise between the two levels; it is dead code. **iOS never
+   delivers a rotation the plist does not list**, so the Flutter-level preference for
+   `portraitDown` could never take effect, while reading like a decision that the app rotates.
+   Both levels now name the upright orientation alone, so the requirement is verifiable at
+   either level and they cannot drift apart.
+
+   **Why the second key is named explicitly.** A build satisfying an iPhone-only reading of
+   this verification still permits landscape on iPad, because iOS reads the `~ipad` variant
+   there and the generated one allows both landscape orientations. The Flutter-level
+   `setPreferredOrientations` call masks this in most manual testing, which is what makes it
+   worth asserting in the plist rather than by rotating a device.
+   *Boundary:* this fixes the orientation lock on both key sets. It does **not** decide
+   whether iPad is a declared target device family at all — that stays open, see Open
+   Questions, and this requirement is written to hold whichever way it lands.
+
+8. **Minimum iOS deployment target is iOS 15** — *raised from iOS 13, settled by the user.*
+   *Source: Tech Design → Decisions → Minimum iOS version, **now "iOS 15"** — settled by the
+   user and since landed in the doc. Forced by `P4-05-purchase-flow.md` Requirements 4, 14 and 16,
+   which are built on `Transaction.currentEntitlements`, `Transaction.updates` and
+   `AppStore.sync()` — StoreKit 2 APIs that require iOS 15. At iOS 13 the purchase layer was
+   unbuildable on the project's own floor; `P4-05` records the conflict and the failure it
+   avoided.*
+   *Verification:* `ios/Podfile` declares `platform :ios, '15.0'` and the Xcode project's
+   `IPHONEOS_DEPLOYMENT_TARGET` is `15.0` for every configuration; `flutter build ios
    --no-codesign` succeeds.
+
+   > **This requirement is where the floor is actually set.** `P5-03-release-fastlane.md`
+   > Requirement 13 asserts the submitted build's target and cites this one;
+   > `P4-01-main-menu.md` Requirement 19 reasons from the floor to a layout width. Both were
+   > updated with this settlement.
 
 9. **The bundle identifier is `com.ehrendavis.tictactoeextreme`**, set for every build
    configuration.
@@ -298,11 +380,10 @@ cannot be run as written is a defect — report it rather than guessing.
 13. **The generated counter demo is deleted, and what replaces it renders nothing themeable.**
     `flutter create` scaffolds a counter app and a `test/widget_test.dart` that drives it.
     Both are removed. What ships instead is `main.dart`, `app.dart` and the placeholder route
-    per Requirement 11, whose placeholder surface contains **no** color, icon, font-size,
-    duration or asset-path literal, plus one smoke test that pumps the app and asserts it
-    builds. After this PRD the app launches to an empty placeholder surface — deliberately
-    not a screen. The first real screen is `P4-01-main-menu.md`, reached through
-    `P2-01-navigation.md`.
+    per Requirement 11, whose placeholder surface trips **none** of the rules
+    `P1-05-theme-guard-test.md` Requirement 6 defines. After this PRD the app launches to an
+    empty placeholder surface — deliberately not a screen. The first real screen is
+    `P4-01-main-menu.md`, reached through `P2-01-navigation.md`.
     *Source: derived, and the derivation matters — `P1-05-theme-guard-test.md` Requirement 8
     requires the committed baseline to ship with **zero** recorded violations, and its
     Requirement 3 exempts only `lib/theme/`. The generated demo contains `Colors.deepPurple`,
@@ -310,9 +391,41 @@ cannot be run as written is a defect — report it rather than guessing.
     scans for. Leaving it in place would either fail `P1-05` or force a non-empty baseline,
     contradicting Tech Design → Decisions → Do we add a test that fails on hardcoded theme
     values? ("the baseline starts at zero").*
-    *Verification:* a scan of `lib/` finds no `Colors.`, no `Icons.`, no `fontSize:`, no
-    `Color(0x` and no `Duration(`; the generated `test/widget_test.dart` is gone; `flutter
-    test` passes; `P1-05`'s guard passes with an empty baseline when it lands.
+
+    **The permitted placeholder surface, stated precisely.** An earlier revision of this
+    requirement named five patterns — `Colors.`, `Icons.`, `fontSize:`, `Color(0x` and
+    `Duration(` — which is **narrower than the guard it exists to satisfy**. `P1-05` req 6's
+    rule set is twelve rules, so a placeholder containing `FontWeight.w600`,
+    `BorderRadius.circular(12)`, `fontFamily: 'Inter'`, `CupertinoIcons.circle`,
+    `AssetSource('…')`, a literal `assets/…` path or a `.withOpacity(…)` call would satisfy
+    the old five-pattern check and **still break `P1-05`'s zero baseline** — the exact
+    failure this requirement exists to prevent, arriving through the gap between two lists.
+    The scan is therefore stated against that PRD's rule set rather than restated as a
+    shorter one of its own.
+
+    **All twelve rules apply**, by name, as `P1-05` req 6 defines them and with `lib/theme/`
+    the only exempt path (its req 3) — which the placeholder is not in: `color-hex`,
+    `color-palette`, `opacity-call`, `duration-literal`, `font-family-literal`,
+    `font-size-literal`, `font-weight-literal`, `radius-literal`, `asset-source`,
+    `asset-path`, `icon-constant` and `mark-glyph`. **`P1-05` owns the patterns; this
+    requirement owns only that the placeholder trips none of them.** If a rule's pattern
+    changes there, nothing here needs rewriting.
+
+    **Positively: what the placeholder may contain.** Layout and structural widgets with no
+    visual value of their own — a `Scaffold`, a `Center`, a `SizedBox`, a `Column` — plus
+    spacing and padding numbers, which are **code constants and not guard violations** per
+    `Theming.md` → Decisions → *Does a theme control spacing and padding?* and `P1-03`'s v7
+    removal of every spacing key. If it is genuinely empty it trips nothing by construction,
+    and that is the cheapest way to satisfy this.
+    *Verification:* the generated `test/widget_test.dart` is gone; `flutter test` passes; a
+    scan of `lib/` finds no construct matching any of the twelve rules above — including, at
+    minimum, no `Colors.`, no `Color(0x`, no `.withOpacity(`/`.withValues(alpha:`, no
+    `Duration(<unit>: <number>)`, no `fontFamily:`, no `fontSize:`, no `FontWeight.`, no
+    `BorderRadius.circular(`/`BorderRadius.all(`/`Radius.circular(`, no `AssetSource(`, no
+    literal `'assets/…'` path, and no `Icons.` / `CupertinoIcons.` / `PhosphorIcons*.`
+    reference; and `P1-05`'s guard passes with an empty baseline when it lands.
+    **The last clause is the real acceptance condition** — this list is a convenience for
+    building before `P1-05` exists, and `P1-05`'s own scan is what decides.
 
 14. **The dependency set declared in `pubspec.yaml` is exhaustive as of this wave**, and any
     later addition amends this requirement rather than being added silently:
@@ -322,7 +435,7 @@ cannot be run as written is a defect — report it rather than guessing.
     | `flutter_riverpod` | runtime | Tech Design → State management — Riverpod |
     | `go_router` | runtime | Tech Design → Navigation approach — go_router |
     | `shared_preferences` | runtime | Tech Design → Persistence package |
-    | `hive_ce` + `hive_ce_flutter` *(pending — see top)* | runtime | Tech Design → Game state storage — Hive |
+    | `hive_ce` + `hive_ce_flutter` | runtime | Tech Design → Game state storage — Hive, as settled by the user at the top of this PRD |
     | `freezed_annotation` | runtime | Tech Design → Serialization and the storage layer |
     | `json_annotation` | runtime | Tech Design → Serialization and the storage layer |
     | `audioplayers` | runtime | Tech Design → Audio package |
@@ -330,6 +443,16 @@ cannot be run as written is a defect — report it rather than guessing.
     | `freezed` | dev | Tech Design → Serialization and the storage layer |
     | `json_serializable` | dev | Tech Design → Serialization and the storage layer |
     | `flutter_lints` | dev | Tech Design → CI — local builds only (Requirement 15) |
+    | `flutter_test` (`sdk: flutter`) | dev | **Required by this PRD's own requirements** — see below |
+
+    **`flutter_test` is in the table because this PRD cannot be satisfied without it**, and
+    an "exhaustive" table that omitted it was wrong on its own terms. `flutter create`
+    generates the entry; the point of listing it is that it must not be *removed* as
+    unused-looking, and that a sibling PRD reading this table as the complete set finds it
+    there. It is provably required rather than assumed: Requirements 4, 5, 11 and 13 all
+    specify test files, and Requirement 15 requires `flutter test` to exit zero — none of
+    which compiles without it. It is declared as `sdk: flutter` rather than a version
+    constraint, which is why it carries no caret range under *Version constraints* below.
 
     **Amendments accepted after this wave** — recorded here so this table stays the single
     index, while each remains the amending PRD's to declare and own:
@@ -357,15 +480,23 @@ cannot be run as written is a defect — report it rather than guessing.
     **runtime** dependencies, not dev: the generated `toJson`/`fromJson` and union code
     imports them, so omitting them means the generated code does not compile. Both are pure
     Dart, so neither breaches Requirement 4.
+    **`cupertino_icons` is also generated by `flutter create` and is deliberately *not* in
+    this table — flagged, not decided.** See Open Questions: keeping it or dropping it is a
+    product call that rides on which icon set the app ships, and it interacts with `P1-05`
+    req 6's `icon-constant` rule, which bans `CupertinoIcons.` outside `lib/theme/`. This
+    requirement records the gap rather than closing it, so an implementer does not silently
+    delete a generated dependency or silently bless one.
     **Still unnamed:** the store SDK, added by `P4-05-purchase-flow.md`; and an icon package,
     if the bundled icon set ships as one — see Open Questions, which is now the last unnamed
     package and has a sibling waiting on it.
     **Version constraints:** every entry uses a caret range (`^x.y.z`) pinned to the version
     resolved at scaffold time, and `pubspec.lock` **is committed**, per Dart's guidance for
     application packages — without it, twenty-three downstream PRDs build against whatever
-    resolved that day.
+    resolved that day. The one exception is `flutter_test`, which is an SDK dependency and
+    takes `sdk: flutter`.
     *Verification:* `flutter pub get` resolves with no version conflict; `pubspec.lock` is
-    tracked in git; `dart run build_runner build` exits zero against an empty model set.
+    tracked in git; `dart run build_runner build` exits zero against an empty model set;
+    `flutter test` runs, which is what demonstrates `flutter_test` is declared.
 
 15. **`flutter analyze` and `flutter test` both run clean locally from the src root, and there
     is no CI.** The analyzer runs against the default `flutter_lints` rule set as the floor;
@@ -414,9 +545,10 @@ Requirement 2 creates for it:
   declares no fonts.
 - **The repository interface and its Hive implementation** (`lib/storage/`), preference
   storage, and the persisted model shapes → `P1-04-persistence.md`.
-- **The hardcoded-theme-value scan test** and its per-file baseline →
-  `P1-05-theme-guard-test.md`. Requirement 13 exists to make that PRD's empty baseline
-  achievable; the guard itself is not built here.
+- **The hardcoded-theme-value scan test**, its twelve rules and their patterns, and its
+  per-file baseline → `P1-05-theme-guard-test.md`. Requirement 13 exists to make that PRD's
+  empty baseline achievable and cites its rule set by name; the guard itself, and every
+  regex in it, is not built here.
 - **Error catching and the crash-report object** (`lib/diagnostics/`) →
   `P1-06-crash-reporting.md`. Requirement 11 guarantees a single wrappable `runApp` call site
   and nothing more.
@@ -428,7 +560,9 @@ Requirement 2 creates for it:
   handling → `P2-01-navigation.md`. This PRD declares the `go_router` dependency *[Tech Design
   → Decisions → Navigation approach — go_router]*, wires `MaterialApp.router`, and ships one
   placeholder route for that PRD to replace. It chooses nothing about routing beyond
-  installing the package the Decision names.
+  installing the package the Decision names. **Including whether the iOS back-swipe is
+  available on a given route** — that PRD's req 23 blocks it on the game route; nothing here
+  configures a gesture.
 - **Sound playback** (`lib/audio/`) → `P2-02-audio.md`. This PRD declares `audioplayers` and
   creates both `lib/audio/` and `assets/audio/`; the **`assets/audio/` declaration in
   `pubspec.yaml` belongs to `P5-02-asset-generation-replicate.md`**, which lands the first
@@ -456,11 +590,9 @@ Requirement 2 creates for it:
 Everything fenceable has been fenced into a requirement above. What remains genuinely needs a
 decision from outside this PRD.
 
-### Blocking — answered above as proposals, needing confirmation
+### Blocking — none
 
-- **The Dart package name** and **`hive` vs `hive_ce`** — see *Pending confirmation* at the
-  top. Both carry a proposal so the PRD executes on confirmation; neither is guessable by an
-  implementer without committing the whole codebase to the guess.
+Both items that stood here are answered. See *Closed since the last revision*.
 
 ### Non-blocking — owned elsewhere, recorded so they are not answered by accident
 
@@ -478,16 +610,64 @@ decision from outside this PRD.
   deadlock; naming the set is what remains. `P1-05-theme-guard-test.md` meanwhile wrote its
   `icon-constant` rule as a family match against `PhosphorIcons\w*` and flags the symbol name
   as **provisional** precisely because Requirement 14's table names no package.
+
+- **Does `cupertino_icons` stay in `pubspec.yaml`?** *(Raised by this PRD; needs a call that
+  is not this PRD's to make.)* `flutter create` generates the dependency, and Requirement 14
+  declares its table **exhaustive as of this wave** — so the table and the generated file
+  currently disagree, and an implementer resolves that disagreement silently in one of two
+  directions. Both are defensible and neither is free:
+  - **Drop it.** Nothing in any PRD reads `CupertinoIcons`, and `P1-05-theme-guard-test.md`
+    req 6's `icon-constant` rule
+    (`r'\b(?:Icons|CupertinoIcons|PhosphorIcons\w*)\.\w+'`) bans the symbol outside
+    `lib/theme/` anyway, so keeping a package whose only export is banned reads as dead
+    weight. Requirement 13 is written so the placeholder cannot use it either.
+  - **Keep it.** It is one small, first-party package, it is what `flutter create` ships, and
+    if the icon-set question above ever lands on Cupertino glyphs it is already there —
+    resolved inside `lib/theme/`, which is the one path `P1-05` req 3 exempts, so the ban is
+    not an argument against it.
+
+  **This is downstream of the icon-set question**, which is why it is recorded beside it
+  rather than fenced: answering that one probably answers this one. Requirement 14 leaves the
+  row out and says so explicitly, so nothing is decided by omission in either direction.
+
 - **Are the theme YAML files declared as assets in `pubspec.yaml`?** *[Tech Design → Open
   Questions → 2. Theme loading]*, worded as the doc words it. Requirement 3 fixes only that no
   declaration may name an empty directory; the question itself is `P1-03-theme-system.md`'s.
+
 - **Whether the iOS target device family includes iPad.** *[Tech Design → Decisions → Device
-  support]* orders iPhone first and iPad second but sets no build setting, and the portrait
-  lock in Requirement 7 applies to both. Left at the `flutter create` default rather than
-  narrowed, because narrowing it is a product call.
+  support]* orders iPhone first and iPad second but sets no build setting. Left at the
+  `flutter create` default rather than narrowed, because narrowing it is a product call.
+  **Requirement 7 no longer depends on the answer:** its verification now names the
+  `UISupportedInterfaceOrientations~ipad` key explicitly, so the portrait lock is asserted on
+  both key sets and holds whether or not iPad is ever a declared target. Only the device
+  family itself is open.
 
 ### Closed since the last revision
 
+- **The Dart package name — ANSWERED by the user: `tic_tac_toe_extreme`.** The proposal in
+  *Confirmed by the user* was accepted as written. **Requirement 1** now states it rather
+  than proposes it, as does the *Confirmed by the user* section above, and the twenty-three
+  downstream PRDs whose `package:` URIs embed it — `P1-06-crash-reporting.md` req 18 and
+  `P2-01-navigation.md` req 3 spell it out explicitly — are consistent with it as written.
+  *(An earlier revision of this entry also cited Requirement 14. That was wrong: Requirement
+  14 is the dependency table and states no package name. Corrected rather than silently
+  dropped, because a reader chasing the citation would have found nothing and had no way to
+  tell whether the requirement or the reference was at fault.)*
+- **`hive` vs `hive_ce` — ANSWERED by the user: `hive_ce` + `hive_ce_flutter`.** The proposal
+  was accepted as written and the `hive` + `hive_flutter` fallback is not taken. Requirements
+  5 and 14 state it — and Requirement 14's table does carry these two rows, so that citation
+  holds; `P1-04-persistence.md` is unblocked and its reqs 13–14 name the same packages.
+- **Does "portrait only" include upside-down? — ANSWERED by the user: no.** The app is
+  **upright portrait only**: `setPreferredOrientations` takes `DeviceOrientation.portraitUp`
+  alone, and `UIInterfaceOrientationPortraitUpsideDown` is absent from both
+  `UISupportedInterfaceOrientations` and `UISupportedInterfaceOrientations~ipad`.
+  **This also resolves a contradiction inside Requirement 7**, found in review: its previous
+  verification asked the Flutter level for two portrait values and the plist for one, which
+  no build could satisfy consistently and which left the `portraitDown` preference dead
+  whichever way an implementer went. Both levels now name the upright value alone.
+  **Owed to the docs:** Tech Design → Decisions → *Orientation — portrait only* says only
+  "portrait only" and does not address the 180° case; landing this there is
+  `forge-doc-writer`'s.
 - **Where error-handling code lives.** Closed by the doc amendment that added `diagnostics/`
   to Tech Design → Decisions → Project structure — layer-first, owned by
   `P1-06-crash-reporting.md`. Requirement 2 now creates it. This also closes that PRD's Open

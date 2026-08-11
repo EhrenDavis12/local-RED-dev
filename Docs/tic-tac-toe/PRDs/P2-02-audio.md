@@ -10,12 +10,13 @@ at a time:
 | `P4-03` | req 18 owns it | req 18 is the **haptic**; **req 25** is the sound, added when OQ-3 closed |
 | `P4-04` req 25 | real | **real** — both channels, six controls |
 | `P3-03` | req 12 wrong, use req 22 | **req 12 is correct** — that PRD states *"the call site of record is requirement 12 and not requirement 22; requirement 22 details the call and owns no site of its own"* |
-| `P4-02` req 30 | haptic only | **confirmed** — no `SoundMoment` anywhere in the file |
-| `P3-04` req 5 | neither | **confirmed**, and circular: its req 16 says *"Whether the two card controls fire `buttonTap` is `P2-02`'s to say, not this PRD's"* |
+| `P4-02` req 30 | haptic only | **superseded** — that PRD's req 30 now fires **both** channels on eight sites and names `SoundMoment.buttonTap` explicitly |
+| `P3-04` req 5 | neither | **superseded** — that PRD's req 16(b) now fires `buttonTap` on both card controls; the circular *"whether the two card controls fire `buttonTap` is `P2-02`'s to say"* is withdrawn there |
 
-So `buttonTap` is **4 of 6 sites owned, 2 unassigned** — not 2 of 6. The false supporting claim
-("each already fires the haptic on the same gesture") is deleted; it does not hold for `P3-04`
-req 5, which is the control inventory. The header no longer says every moment is owned.
+So `buttonTap` is **6 of 6 sites owned** — `P4-02` closed its row after the table above was
+first written, and `P3-04` req 16(b) closed the last. The false supporting claim ("each already
+fires the haptic on the same gesture") is deleted; it did not hold for `P3-04` req 5, which is
+the control inventory.
 
 **Also corrected in this pass:** `P1-04`'s `Settings` carries **four** fields and five
 persisted preferences, not three (reqs 5, 22); req 15's retention reason was a citation that
@@ -48,7 +49,10 @@ and in Out of Scope. That was fixed last round and is still right.
 - `P1-03-theme-system.md` — **req 15** is the schema (`sound`, seven keys, five playable,
   value shape `assetPath`); **req 8** is the merge rule, including null-as-clear; **req 24**
   publishes `activeThemeProvider` (`Provider<Theme>`, `lib/theme/theme_providers.dart`) and
-  makes `read`-at-use-time normative here. **Its Blocking item 1 holds music's key shape.**
+  makes `read`-at-use-time normative here. **Its Blocking item 1 is closed:** the user settled
+  music's key shape as **one `sound.music` key, app-wide, valued from the selected theme**, so
+  its req 17 now states the shape rather than deferring it. **Nothing in this layer changes** —
+  see Requirements 14 and 15.
 - `P1-04-persistence.md` — **req 26** declares `soundEffectsEnabledProvider`, a
   `Provider<bool>` in **`lib/state/settings_providers.dart`**, resolving an absent stored
   value to `true`; **req 27** makes a setter's new value visible to the next `read` in the
@@ -62,14 +66,19 @@ and in Out of Scope. That was fixed last round and is still right.
 > a plain Riverpod object rather than a `ThemeExtension`, naming this signature as the
 > decisive reason.
 
-**Depended on by:** `P3-02-move-input.md` req 15 and its forthcoming claim/cat requirement,
+**Depended on by:** `P3-02-move-input.md` reqs 15, 32 and 33 (`placeMark`, and the claim/cat
+pair its req 32 now fires),
 `P3-03-scoreboard-turn-indicator.md` req 12, `P3-04-game-over-rematch.md` reqs 16–17,
-`P4-01-main-menu.md` req 24, `P4-03-theme-selection.md` req 25, `P4-04-settings.md` req 25
-(whose **fourth** toggle is Music, a layer this PRD does not own), `P5-01-classic-theme.md`,
-`P5-02-asset-generation-replicate.md` reqs 3, 7–9, which cites reqs 17–19.
+`P4-01-main-menu.md` req 24, `P4-02-open-games-list.md` req 30, `P4-03-theme-selection.md`
+req 25, `P4-04-settings.md` req 25 (whose **fourth** toggle is Music, a layer this PRD does not
+own), `P5-01-classic-theme.md`, `P5-02-asset-generation-replicate.md` reqs 3, 7–9, which cites
+reqs 17–19.
 
-**Three call sites are still unassigned** — `claimQuadrant`, `catGame`, and two of the six
-`buttonTap` sites. See Requirement 6 and Out of Scope; none is this PRD's to write.
+**Every call site now has an owner.** The three that were unassigned closed in wave 3:
+`claimQuadrant` and `catGame` to `P3-02-move-input.md` req 32, and the game-over card's two
+controls — the last `buttonTap` site, and the one that was circular — to
+`P3-04-game-over-rematch.md` req 16(b). See Requirement 6 and Out of Scope; none of the three
+was this PRD's to write, and none was written here.
 
 **What is assertable when.** Wave 2 ships the layer and everything observable at its own
 seams: Requirements 2–7, 11, 14, 16, 17, 20, 21(a), 22, 23, 25 and 26. Requirements 8, 9, 10
@@ -302,7 +311,8 @@ Neon's buzz and Classic's splat unchanged the day those files land.
      null reachable even though req 15 marks the five slots `required` — `required` there
      means *Neon must hold a value*, not *the Dart type is non-nullable*. **If `Theme.sound`
      exposes non-nullable strings, Requirement 11 cannot be implemented as written.** Routed
-     to `P1-03`; not worked around here.
+     to `P1-03`; not worked around here. *(Unchanged by music's shape landing — that settled
+     `sound.music`, a slot this layer never reads.)*
    - **`ref.read` for the two *value* sources, never `ref.watch`.** `P1-03` req 24 makes this
      normative — *"Widgets `watch`. Services `read` at use time, never captured in a
      constructor"* — and names this layer directly. `watch` would make `audioLayerProvider` a
@@ -354,20 +364,23 @@ Neon's buzz and Classic's splat unchanged the day those files land.
    | Moment | `SoundMoment` | Theme slot | Call-site owner |
    |---|---|---|---|
    | Placing a mark | `placeMark` | `sound.placeMark` | `P3-02` req 15 |
-   | Winning a small board / claiming a quadrant | `claimQuadrant` | `sound.claimQuadrant` | `P3-02` — assigned, req not yet written |
-   | Cat game | `catGame` | `sound.catGame` | `P3-02` — assigned, req not yet written |
+   | Winning a small board / claiming a quadrant | `claimQuadrant` | `sound.claimQuadrant` | `P3-02` req 32 |
+   | Cat game | `catGame` | `sound.catGame` | `P3-02` req 32 |
    | Winning the whole game | `winGame` | `sound.winGame` | `P3-04` req 16 |
-   | Button taps / menu navigation | `buttonTap` | `sound.buttonTap` | four owned, two unassigned — below |
+   | Button taps / menu navigation | `buttonTap` | `sound.buttonTap` | six sites, all owned — below |
 
    **`claimQuadrant` and `catGame` belong to the commit path.** Both are consequences of a
    *committed move*, not rendering events: `P3-02-move-input.md` already fires `placeMark`
    there and owns the commit, while `P3-01-board-rendering.md` draws the claim veil and the
    cat caption without knowing when a move lands. Like `placeMark`, both fire on the
    **confirm** tap and never on the preview (Requirement 8).
-   ⚠ **Assigned but not yet written.** `P3-02`'s req 15 verification still says *"whether the
-   same commit also produces `claimQuadrant`, `catGame` or `winGame` is not this PRD's"*, and
-   its Out of Scope still routes those three here. Until that flips the two documents point at
-   each other, so this PRD names the owner and no requirement number.
+   **Written, and the two documents no longer point at each other.** `P3-02` **req 32** takes
+   both call sites, detecting each by comparing `quadrantAt(move.quadrant)` across the commit
+   rather than re-deriving a claim, and its **req 33** states the co-occurrence case — one
+   confirming tap producing `placeMark`, `claimQuadrant` and `winGame` — which is the
+   call-site half OQ-1 below asks for. Its req 15 no longer routes the three moments here; its
+   Out of Scope now says it owns exactly these three call sites and nothing about playback.
+   What those calls *sound like* when they land together is still this PRD's, and still OQ-1.
 
    **`buttonTap` is one moment and one sound file, not a family.** *"**Yes — one tap sound,
    everywhere.** Every button, row and toggle plays the same short tap sound: menu buttons,
@@ -381,7 +394,7 @@ Neon's buzz and Classic's splat unchanged the day those files land.
    board sound moments** and that **an invalid tap stays silent in both channels**, which is
    Requirement 9 from the doc's side.)*
 
-   **The six `buttonTap` sites, four owned and two not:**
+   **The six `buttonTap` sites, all six owned:**
 
    | Site | Owner |
    |---|---|
@@ -389,16 +402,16 @@ Neon's buzz and Classic's splat unchanged the day those files land.
    | Theme rows, close, failure-modal dismiss | **`P4-03` req 25** — its req 18 is the haptic half |
    | Four toggles, exit, dismiss | **`P4-04` req 25** |
    | The in-game settings gear | **`P3-03` req 12** — that PRD records req 12 as the site of record, req 22 as the detail |
-   | The open-games list — rows, New Game, trash, Yes/No, Cancel, back | **none.** `P4-02` req 30 fires the haptic on eight sites and names no sound |
-   | The game-over card's two controls | **none, and circular.** `P3-04` req 16 says *"Whether the two card controls fire `buttonTap` is `P2-02`'s to say, not this PRD's"* — while this PRD holds that a call site is the caller's. Someone must break the tie |
+   | The open-games list — rows, New Game, trash, Yes/No, Cancel, back | **`P4-02` req 30** — eight gestures, both channels, with its own exactly-once assertion against `FakeAudioLayer` |
+   | The game-over card's two controls | **`P3-04` req 16(b)** — one `buttonTap` per press of either control, mirroring its req 15's haptic. The circularity is gone: that PRD's earlier *"whether the two card controls fire `buttonTap` is `P2-02`'s to say"* is withdrawn, and it now cites `Theming.md` → Decisions → *Do non-board controls make a sound?*, which names those controls explicitly |
 
    *Wave note, following `P2-03` req 1's:* assertable **here** as *one `play(...)` produces at
    most one sink call, never two* (Requirement 16 names the seam). That a given event reaches
    `play` exactly once is a **call-site fact, owned by each calling PRD** — which is why the
-   four owners above each carry their own exactly-once assertion, and why the two unowned rows
-   cannot be closed by writing anything in this file. **Stated because the equivalent note in
+   six owners above each carry their own exactly-once assertion, and why no row here could
+   have been closed by writing anything in this file. **Stated because the equivalent note in
    `P2-03` is what told `P4-03` its assertion was its own to write**, and that PRD added
-   req 25 in response.
+   req 25 in response; `P4-02` req 30 and `P3-04` req 16(b) followed the same route.
 
    *(`Theming.md` → What a Theme Controls → Audio, which lists these five plus background
    music; slot names and shapes from `P1-03` req 15 → `sound`.)*
@@ -417,6 +430,9 @@ Neon's buzz and Classic's splat unchanged the day those files land.
    iterable list of playable assets"* — and cites this PRD's reqs 6 and 7.)*
    *Testable (wave 2):* no sink call ever carries `signature`'s or `music`'s value, including
    on a fixture theme whose `music` slot is populated.
+   *Note the count is now stable:* the user settled music as a single app-wide `sound.music`
+   key rather than a `music.<context>` map (`P1-03` req 17), so `sound` stays at seven keys
+   and this requirement's arithmetic does not move.
 
 8. **The pending selection gets no sound of its own.** Sound belongs to the **confirmed**
    move — `placeMark` fires on the second (confirm) tap only, and so do `claimQuadrant` and
@@ -477,7 +493,9 @@ Neon's buzz and Classic's splat unchanged the day those files land.
     `Theming.md` → Decisions → *Do all four toggles ship, and is music a theme concern?*
     settles that **all four toggles ship and a theme supplies its own music**, reversing
     *One-shot sound effects only, for now*, which that doc now marks superseded and keeps as
-    history.
+    history. **The key's shape is settled too** — the user chose **one `sound.music` key,
+    app-wide, valued from the selected theme**, closing `P1-03` Blocking item 1, and that PRD's
+    req 17 now states it.
 
     **What changes: nothing in this layer.** What changes is why. It is no longer *"no music
     in this version"* — it is that **`void play(SoundMoment)` cannot model music**, and that
@@ -487,8 +505,9 @@ Neon's buzz and Classic's splat unchanged the day those files land.
     moment. Every one of those needs state and a second verb, and Requirement 2 deliberately
     has neither. Adding a `SoundMoment.music` would produce a value that plays once and stops,
     which is not what a theme's music means. **`P1-03` req 17 states the same conclusion from
-    the schema side** — *"Music is not a one-shot … so whatever shape wins, it is never
-    another `SoundMoment`."*
+    the schema side** — *"Music is not a one-shot … so it is never another `SoundMoment`"* —
+    and the settled shape does not change that: one app-wide track is still a lifecycle, not a
+    moment.
 
     So: **`SoundMoment` gains no music value, `sound.music` is never read here, and the layer
     never starts a looping or continuous track**, whatever a theme's `music` slot holds.
@@ -507,9 +526,11 @@ Neon's buzz and Classic's splat unchanged the day those files land.
 
     **The music layer is a sibling of this one, not an extension of it, and it does not exist
     yet.** The fourth toggle ships in wave 4 (`P4-04-settings.md`) while the thing it switches
-    does not — `P1-03` req 17 records that `sound.music` stays `deferred` precisely because
-    there is a confirmed consumer of the **setting** and none of the **asset**, with its
-    **Blocking item 1** holding the key's shape open between two incompatible candidates.
+    does not. **What has changed since this note was written:** `P1-03` Blocking item 1 is
+    closed — the key is a single app-wide `sound.music`, settled by the user — so a music layer
+    now has a slot with a fixed shape to read. What it still does not have is a **value**:
+    Neon ships an explicit `null`, no theme names an audio file, and *whether music loops* and
+    *where the audio comes from* remain open in `Theming.md` → Open Questions.
 
     Whoever builds that layer inherits three things from this one and none of its interface:
     the theme-driven rule (Requirement 3), the settings-gate shape (Requirement 16, against
@@ -655,9 +676,9 @@ Neon's buzz and Classic's splat unchanged the day those files land.
     blind. **Recorded as an untested path**, which is honest and cheap, rather than as a test
     that passes vacuously.
 
-22. **The test doubles are published here, and these are they.** `P3-02` req 15, `P3-04`
-    reqs 16–17, `P4-01` req 24, `P4-03` req 25, `P4-04` req 25 and `P3-03` req 12 all code
-    against `FakeAudioLayer`; Requirements 5, 6, 11, 16 and 21(a) code against
+22. **The test doubles are published here, and these are they.** `P3-02` reqs 15 and 32–33,
+    `P3-04` reqs 16–17, `P4-01` req 24, `P4-02` req 30, `P4-03` req 25, `P4-04` req 25 and `P3-03`
+    req 12 all code against `FakeAudioLayer`; Requirements 5, 6, 11, 16 and 21(a) code against
     `RecordingOneShotSink`; Requirements 23, 25 and 26 code against the player and session
     doubles.
 
@@ -712,8 +733,8 @@ Neon's buzz and Classic's splat unchanged the day those files land.
     `FakeAudioLayer` sees *which moments the call site requested* — this is the one every
     call-site PRD in Requirement 6 wants, board and controls alike; `RecordingOneShotSink`
     sees *what survived the gate and the path check*; `FakeOneShotPlayer` sees *what the sink
-    did to a player*. `P3-04` req 16 and `P4-01` req 24 both carry this distinction from their
-    side and name `FakeAudioLayer` explicitly.
+    did to a player*. `P3-04` req 16, `P4-01` req 24 and `P4-02` req 30 all carry this
+    distinction from their side and name `FakeAudioLayer` explicitly.
     ⚠ Under `overrideWithValue` a provider's own body does not run — see Requirement 23.
 
     **On a fresh install the game makes noise, and this layer does not decide that.**
@@ -842,7 +863,9 @@ Neon's buzz and Classic's splat unchanged the day those files land.
       one** — it is the conventional behavior for a casual game.
     - **The player's own music keeps playing.** The app never interrupts or ducks another
       app's audio. Note this now also constrains the future music layer (Requirement 15):
-      the session is process-wide, so both must agree.
+      the session is process-wide, so both must agree — and with music settled as one
+      app-wide track rather than per-screen, that layer is a single long-lived player sharing
+      this one session.
 
     *(**This PRD's call.** `audioplayers` requires an explicit `AudioContext` on iOS, the
     primary target (`Tech Design.md` → Decisions → Primary target — Apple), and **the plugin's
@@ -858,25 +881,28 @@ Neon's buzz and Classic's splat unchanged the day those files land.
 
 - **Who calls play.** This PRD owns *what plays and under what rules*, not the call sites.
   Detection is not the gap — the engine detects a claim, a cat game and a win
-  (`P1-02-engine-rules.md`). The gap is which PRD's requirement *invokes this layer*, and
-  **three sites are still open**:
+  (`P1-02-engine-rules.md`). The gap was which PRD's requirement *invokes this layer*, and
+  **every site now has an owner** — the last three closed in wave 3:
 
   | Moment / site | Call-site owner |
   |---|---|
   | `placeMark` | **Owned** — `P3-02` req 15 |
-  | `claimQuadrant`, `catGame` | **Assigned to `P3-02`** — fires on the commit; requirement not yet written there |
+  | `claimQuadrant`, `catGame` | **Owned** — `P3-02` req 32, on the commit; its req 33 states the three-sounds-on-one-tap case |
   | `winGame` | **Owned** — `P3-04` req 16 |
   | `buttonTap` — menu, theme, settings, gear | **Owned** — `P4-01` req 24, `P4-03` req 25, `P4-04` req 25, `P3-03` req 12 |
-  | `buttonTap` — open-games list | **Unassigned** — `P4-02` req 30 fires the haptic on eight sites and names no sound |
-  | `buttonTap` — game-over card controls | **Unassigned, and circular** — `P3-04` req 16 routes the question here; this PRD holds that a call site belongs to its caller |
+  | `buttonTap` — open-games list | **Owned** — `P4-02` req 30, eight gestures, both channels |
+  | `buttonTap` — game-over card controls | **Owned** — `P3-04` req 16(b), one per press of either control; the circular routing that once sat here is withdrawn on that side |
 
-  **A gap declared closed is worse than a gap declared open**, which is why the two `buttonTap`
-  rows say *unassigned* rather than being folded into the four that are real. None of the three
-  can be closed by writing anything in this file: a requirement here would specify another
-  PRD's surface.
-- **Music — the layer, the key shape, the assets, and the fourth toggle's behavior.**
-  Requirements 14 and 15 state only that this layer does not play it and cannot model it.
-  Shape is `P1-03` Blocking item 1; the toggle is `P4-04-settings.md`; provenance is `P5-02`.
+  **A gap declared closed is worse than a gap declared open**, which is why these rows read
+  *unassigned* for as long as they were, rather than being folded in with the real ones. None
+  of them could be closed by writing anything in this file — a requirement here would specify
+  another PRD's surface — and none of them was: `P3-02` wrote req 32 and `P3-04` wrote
+  req 16(b), each citing the design-doc Decision rather than this PRD's assignment.
+- **Music — the layer, the assets, and the fourth toggle's behavior.** Requirements 14 and 15
+  state only that this layer does not play it and cannot model it. **The key shape is settled**
+  — one app-wide `sound.music`, `P1-03` req 17 — so what is left is the layer (nobody's), the
+  toggle (`P4-04-settings.md`), and provenance (`P5-02`, if the answer to *where the audio
+  comes from* turns out to be "generated"; that question is still open in `Theming.md`).
 - **The theme mechanism, the sound slots' definition, and the theme accessor** — `P1-03`
   reqs 15, 17, 24, including the Dart nullability Requirement 5 fences.
 - **The settings surface** — `P4-04-settings.md`.
@@ -895,14 +921,23 @@ Neon's buzz and Classic's splat unchanged the day those files land.
 
 ### Closed since the last round
 
-**`claimQuadrant` and `catGame` are assigned to `P3-02-move-input.md`** — both are consequences
-of a committed move rather than rendering events, so they belong with the commit path that
-already fires `placeMark`. Requirement 6 and Out of Scope record the owner; neither cites a
-requirement number, because `P3-02` has not written one yet.
+**Music's key shape is settled** — the user chose **one `sound.music` key, app-wide, valued
+from the selected theme**, closing `P1-03` Blocking item 1. **Nothing in this layer changes:**
+Requirement 14's argument was never "no music in this version" but "`void play(SoundMoment)`
+cannot model a lifecycle", and one app-wide track is still a lifecycle. Requirements 7, 14, 15
+and 26 record the consequence; the music *layer* remains unowned and unspecified here.
 
-**Four of the six `buttonTap` sites are owned** — `P4-01` req 24, `P4-03` req 25, `P4-04`
-req 25 and `P3-03` req 12, each carrying its own exactly-once assertion. `P4-03` added req 25
-in direct response to Requirement 6's wave note, which is the note working as intended.
+**`claimQuadrant` and `catGame` are owned by `P3-02-move-input.md` req 32** — both are
+consequences of a committed move rather than rendering events, so they belong with the commit
+path that already fires `placeMark`. The assignment was recorded here before that PRD had
+written the requirement; **it has, so Requirement 6 and Out of Scope now cite the number.**
+
+**All six `buttonTap` sites are owned** — `P4-01` req 24, `P4-02` req 30, `P4-03` req 25,
+`P4-04` req 25, `P3-03` req 12 and, closing the last and once-circular row, `P3-04`
+**req 16(b)**, each carrying its own exactly-once assertion. `P4-03` added req 25 in direct
+response to Requirement 6's wave note and `P4-02` req 30 added the sound channel alongside its
+haptic, which is that note working as intended; `P3-04` req 16(b) is the same pattern reaching
+the last row.
 
 **Earlier rounds:** `P1-01` req 2 now creates `lib/audio/` and names this PRD as its owner;
 `Theming.md` → Decisions → *Do non-board controls make a sound?* closed OQ-3 and the
@@ -914,8 +949,10 @@ gained its `test:` narrowing.
 ### From the design docs, worded as the docs word them
 
 - Which values, concretely, does Classic Red vs Blue override? *Owned by `P5-01`.*
-- Whether music loops, whether it differs by screen, and where the audio comes from.
-  *(`Theming.md` → Open Questions.)* **Not this PRD's** — routed to `P1-03` Blocking item 1.
+- Whether music loops, and where the audio comes from. *(`Theming.md` → Open Questions.)*
+  **Not this PRD's** — the third of that doc's three sub-questions, *whether it differs by
+  screen*, is now answered (it does not: one app-wide track), and the remaining two sit with
+  the user and with whichever PRD eventually owns playback.
 
 ### Needs the user — a coding agent cannot settle these
 
@@ -929,9 +966,10 @@ gained its `test:` narrowing.
   significant, or queue them. **Requirement 24's note ships "play all" as the default** so
   nothing is decided by accident — the risk being that the player-instance choice answers it
   silently, one reused player shipping *"last sound wins"* with no decision recorded.
-  **Now named from the call-site side too:** with `claimQuadrant` and `catGame` assigned to
-  `P3-02`, that PRD is expected to state the case where one tap produces three sounds, so
-  *three sounds on one tap* reads as designed rather than as a defect.
+  **Now named from the call-site side too, and that half is written:** `P3-02` **req 33**
+  states the case where one tap produces three sounds — and that claim and cat are mutually
+  exclusive on one commit — so *three sounds on one tap* reads as designed rather than as a
+  defect. What it should *sound* like is still this question, and still the user's.
 - **OQ-2 — What does a *tie* sound like?** `catGame` is the *small*-board case
   (`Game Overview.md` → Terminology); `Rules.md` → Edge Cases names the big-board case a
   **straight draw**, and no slot exists for it. **Downstream default already in place:**
@@ -940,15 +978,16 @@ gained its `test:` narrowing.
 - **OQ-3 — CLOSED.** *Which controls count as buttons, and is `buttonTap` one sound or
   several?* Answered by `Theming.md` → Decisions → *Do non-board controls make a sound?*:
   **one tap sound, everywhere** — see Requirement 6. Kept as a stub for citers. Note this
-  closed the *policy*; two of the six call sites are still unassigned, which is a coordination
-  matter rather than an open question.
+  closed the *policy*; the last unassigned call site was a coordination matter rather than an
+  open question, and `P3-04` req 16(b) has since taken it.
 - **OQ-4 — Is `ambient` + `mixWithOthers` the policy?** **The only item genuinely with the
   user.** Requirement 26 ships it as the default, so this is a ruling on stated behavior
   rather than a gap. It commits to: a silenced phone silences the game regardless of the
   in-app toggle, and the player's music is never interrupted. `playback` inverts both. The
   plugin's default is not neutral, so it cannot be left unset — and the result is
   audible-only, so no automated test will catch a wrong choice before someone hears it.
-  **Now also binds the future music layer**, which shares the process-wide session.
+  **Now also binds the future music layer**, which shares the process-wide session — and with
+  music settled as one app-wide track, that layer is one long-lived player under this policy.
 - **OQ-5 — Does muting stop a sound already in flight?** **Fenced structurally by
   Requirements 2, 5 and 25:** no `stop` exists above the sink, so in-flight one-shots finish
   and muting governs the next sound only. A one-shot is short enough that the difference may

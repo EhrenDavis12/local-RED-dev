@@ -34,6 +34,10 @@
 > Renumbering would silently repoint all of them. **Requirement 13 is the interface contract
 > and should be read first**; Requirements 15 and 16 are what keep the four call sites
 > correct, and a reader who stops before them will ship the two bugs those requirements name.
+>
+> **Requirement 17 was appended later still**, under the same rule. It is the parental gate's
+> settled design — the content Requirement 12 deferred — and it is last by numbering
+> convention, not by importance.
 
 **Depends on:**
 
@@ -100,6 +104,46 @@ restore, listens for transactions that resolve out of band, and **commits everyt
 learns to memory and disk together** so nothing a player paid for survives only until the
 next launch. Apple is the record of truth and is queried at runtime, so there is no receipt
 server, no backend of our own and no account system we operate.
+
+## The minimum OS version this layer forces — settled, and it moved
+
+**The minimum iOS version is now iOS 15, raised from iOS 13. This PRD is why.**
+
+Three of this document's requirements are built on **StoreKit 2 APIs, which require iOS 15**:
+
+| Requirement | API it depends on |
+|---|---|
+| Requirement 4 | `Transaction.currentEntitlements` |
+| Requirement 14 | `Transaction.updates`, and transaction finishing |
+| Requirement 16 | issuing a fresh `currentEntitlements` read on demand |
+| Requirement 5 | `AppStore.sync()` |
+
+`Tech Design.md` → Decisions → *Minimum iOS version* settled the floor at **iOS 13**, so
+**this layer was unbuildable on the project's own floor** — and no PRD had noticed. **The user
+has settled it: the minimum is raised to iOS 15.**
+
+> **The failure this avoided, stated concretely.** On iOS 13 and 14 a StoreKit-2-shaped plugin
+> falls back to **StoreKit 1**, where there is no `currentEntitlements` at all, and restore
+> instead returns **queue transactions that do not cleanly exclude revoked ones**. A player who
+> was refunded would therefore keep permanent access — **exactly the outcome Requirement 4
+> exists to forbid**, and the case its "`currentEntitlements`, not `Transaction.all`" note is
+> written against. The bug would not have shown up in any test in this PRD, because every one
+> of them runs against a store double that behaves like StoreKit 2.
+
+**Where the floor is actually set:** `P1-01-app-scaffold.md` Requirement 8 (`platform :ios,
+'15.0'`, `IPHONEOS_DEPLOYMENT_TARGET` `15.0`). `P5-03-release-fastlane.md` Requirement 13
+asserts it on the submitted build. `P4-01-main-menu.md` Requirement 19 reasons from it to a
+layout width and has been re-fenced, because **which devices iOS 15 reaches is unverified** and
+this PRD asserts nothing about it.
+
+**The design doc now agrees, so this is a citation and not a divergence.** `Tech Design.md` →
+Decisions → *Minimum iOS version* has been updated to **iOS 15** and carries the same StoreKit
+2 reasoning and the same refunded-player failure. That edit was `forge-doc-writer`'s; this PRD
+records the requirement side of it.
+
+**What this does not settle:** *which* plugin sits behind `StoreGateway` — Open Question 4.
+Raising the floor removes the blocker that no compliant plugin could have been used at all; it
+does not choose one.
 
 ## Requirements
 
@@ -277,6 +321,24 @@ server, no backend of our own and no account system we operate.
    Decision that added a purchases section. **Those keys must be promoted to `required`
    before this layer's UI can satisfy this requirement**, and no slot is named anywhere for
    the parental gate's own surface. Flagged, not resolved — the slot list is that PRD's.
+
+   > **The gate half of that finding is now a sentence, not a blocker.** The finding stands as
+   > written — `P1-03-theme-system.md` still names no slot for the gate — but the **settled**
+   > gate design (Requirement 17) needs none. It draws a prompt, a numeric field and buttons,
+   > so it resolves entirely through keys that are already **`required`** in that PRD's
+   > Requirement 15: `surfaces.input.{fill, radius, focusBorder, caret, valueStyle, labelStyle,
+   > counterStyle}`, authored for the name prompt at `2c`, and
+   > `surfaces.button.{primary, secondary}`. **Zero new theme keys.** *(User settlement.)*
+   >
+   > **What is still blocking is the purchases trio above**, which is a different problem with
+   > a different owner. Do not read this note as closing it.
+   >
+   > **One pre-existing qualification, not introduced by the gate.**
+   > `surfaces.button.{primary, secondary}` is `required` but **its sub-keys are not
+   > enumerated** — no fill, border, radius or label style — unlike `surfaces.input` beside it
+   > in the same table. `P4-04-settings.md` Open Question 3 and its Requirement 19 record this,
+   > and three PRDs already read the key. It is `P1-03`'s to close. **"Zero new keys" remains
+   > true**; the gate inherits this gap rather than adding to it.
    *Testable:* the hardcoded-theme-value test (`P1-05-theme-guard-test.md`) passes over this
    layer's source with the baseline at zero; every visual value resolves through a named key
    off `activeThemeProvider`; a source scan finds no `Theme.of(context)` in this layer.
@@ -355,8 +417,11 @@ server, no backend of our own and no account system we operate.
     > point, and **this surface implements no parental gate of its own**", with a testable
     > that scans its own files for any gate widget and expects none. **Enforcement sits here.**
 
-    *Not specified here:* the concrete challenge, whether a pass is per-invocation or
-    per-session, and whether restore is gated. See Open Question 5.
+    **The gate's design is now settled by the user — Requirement 17** specifies the challenge,
+    its lifetime, and that restore is not gated. **This requirement is unchanged by that
+    settlement**: enforcement still sits inside `PurchaseService.purchase`, which is what its
+    testable asserts and what `P4-04-settings.md` Requirement 21 and
+    `P5-03-release-fastlane.md` defer to.
 
 ### The interface
 
@@ -518,6 +583,61 @@ server, no backend of our own and no account system we operate.
     argument equals a full `currentEntitlements` snapshot rather than a set derived from that
     transaction alone.
 
+### The gate's design
+
+> **Numbered 17 for the append-only reason at the top of this document**, not because it is
+> peripheral. It is the content Requirement 12 deferred and Open Question 5 held open.
+
+17. **The gate challenges with a word-form arithmetic problem answered numerically; a pass is
+    good for that invocation only; and restore is not gated.** All three axes are **settled by
+    the user**. Concretely:
+
+    - **The challenge is an arithmetic problem stated in words, with a numeric answer** — e.g.
+      *"Enter the answer: seven times eight."* **The operands are spelled out as words, not
+      digits**, which is the load-bearing part: it defeats pre-readers and early readers alike,
+      where a digit form would be solvable by a child who can count.
+    - **The problem is randomised per invocation.**
+    - **Three attempts, then the gate dismisses** without reaching the store.
+    - **Lifetime is per-invocation.** A pass authorises the one purchase it was raised for and
+      nothing else; there is no remembered pass. *Rationale the user gave:* it avoids having to
+      define "session" at all — cold launch, foreground return, and surface dismissal are three
+      different answers and none of them is obviously right — and it matches what Requirement
+      12's testable already assumes, since that testable expects a direct invocation of
+      `PurchaseService.purchase` to reach no store double.
+    - **Restore is not gated.** Restore spends no money.
+
+    *(**User settlement.** No design doc describes a challenge; `Tech Design.md` → Decisions →
+    *Kids category* requires only that a gate exist and be non-trivial for a young child, and
+    states that "what the gate looks like and how it challenges is a PRD's job, not this
+    doc's". This is that PRD.)*
+
+    > **The restore axis also closes a contradiction with a sibling.**
+    > `P4-04-settings.md` Requirement 21 already states, in a shipping requirement, that
+    > ***"Restore is not gated"*** — reasoning that Requirement 12 scopes the gate to the
+    > purchase operation and that a restore makes no charge. So the open bullet here
+    > contradicted a settled sibling requirement rather than merely being unanswered. **The
+    > settlement agrees with `P4-04` Requirement 21; both now say the same thing**, and no edit
+    > to that PRD is needed.
+
+    **Theming:** this needs no new theme keys — see Requirement 8's note. It is UI, so
+    Requirement 8 applies to it in full.
+
+    *Testable — the challenge is injectable, which is what makes this deterministic:* the
+    problem generator is a seam the tests replace with a fixed problem, so a test can supply
+    *"seven times eight"* and assert on `56`.
+    - Correct answer → the gate passes and `PurchaseService.purchase` proceeds to
+      `StoreGateway`.
+    - Wrong answer three times → the gate dismisses, `StoreGateway` is never reached, and no
+      entitlement is committed.
+    - A second call to `PurchaseService.purchase` **immediately after a passed one** raises the
+      gate again — this is the per-invocation assertion, and it fails on any implementation
+      that caches a pass.
+    - Across many generations with the seam unreplaced, the rendered problem varies (the
+      randomisation assertion) and **contains no digit in its operands**.
+    - `PurchaseService.restore()` completes with the gate never raised.
+
+    *Not settled here — how the gate is presented.* See Open Question 9.
+
 ## What this does and does not change about "fully offline"
 
 **Changes:** the app makes network calls (StoreKit needs them to query, purchase and
@@ -593,24 +713,38 @@ Requirement 7 states it.
   every Flutter plugin surfaces all four. Requirement 11's seam makes the choice swappable,
   but **something has to sit behind it on day one**. **This is the largest single thing
   standing between this PRD and a build.**
+
+  **One obstacle under it has been removed, and it is not the question itself.** The minimum
+  iOS version is now **15** (see *The minimum OS version this layer forces*), so a plugin
+  using StoreKit 2 is no longer asking for something the project's own floor forbids — which
+  it was. **The plugin is still unchosen**, and this question stays open.
 - **What the player is shown for each of Requirement 10's four outcomes.** Pending most needs
   copy, because the player is told to wait for someone else — and under the Kids Category
   that is the common case, not the rare one.
 
-### 5. With the user — the parental gate: challenge, lifetime, and whether restore is gated
+### 5. Answered — the parental gate: challenge, lifetime, and whether restore is gated
 
-Requirement 12 requires the gate, settles that this PRD owns it, and — since
-`P4-04-settings.md` Requirement 21 was corrected to defer here — settles that **enforcement
-sits inside the purchase operation**. Three things remain:
+**Closed. All three axes are settled by the user, and they are now Requirement 17.**
 
-- **What the challenge is.** No design doc describes one; Apple requires that a gate exist and
-  be non-trivial for a young child, not that it take a particular form.
-- **Whether a pass is per-invocation or per-session.**
-- **Whether restore is gated.** Restore spends no money, which argues no; it is a purchases
-  control on the same section, which argues yes.
+- **What the challenge is** → a **word-form arithmetic problem with a numeric answer**
+  (*"Enter the answer: seven times eight."*), operands spelled out rather than in digits,
+  randomised per invocation, three attempts then dismiss.
+- **Whether a pass is per-invocation or per-session** → **per-invocation.** This also avoids
+  defining "session", which had no obvious answer, and matches what Requirement 12's testable
+  already assumed.
+- **Whether restore is gated** → **not gated.**
 
-> **Closed since an earlier revision:** *where enforcement sits.* `P4-04-settings.md` now
+> **The restore bullet was not merely open — it contradicted a sibling.**
+> `P4-04-settings.md` Requirement 21 already shipped the words *"Restore is not gated"*. The
+> settlement lands on that side, so the two PRDs now agree and neither needs a correction.
+
+> **Also closed since an earlier revision:** *where enforcement sits.* `P4-04-settings.md`
 > states it "implements no parental gate of its own" and invokes this one's gated entry point.
+> Requirement 12 keeps enforcement inside `PurchaseService.purchase`, and Requirement 17 does
+> not move it.
+
+**What this does not close:** *how* the gate is presented from a context-free service — Open
+Question 9.
 
 ### 6. Related, and with the user on `P1-07-entitlements.md`: does the first frame wait?
 
@@ -632,8 +766,11 @@ this PRD does not resolve it locally.
   one would buy — the sequence number is currently this layer's private concern rather than
   part of the hand-off.
 - **`surfaces.settingsCard.purchases.*` is still `deferred`** in
-  `P1-03-theme-system.md` Requirement 15, and no slot exists for the parental gate's surface
-  at all. Requirement 8 cannot be satisfied until those are promoted.
+  `P1-03-theme-system.md` Requirement 15. Requirement 8 cannot be satisfied until those three
+  keys are promoted. **The gate half of this gap is closed:** no slot exists for the parental
+  gate's surface and **none is needed** — the settled gate (Requirement 17) resolves through
+  `surfaces.input.*` and `surfaces.button.*`, both already `required`. **The purchases trio is
+  unaffected and still blocks.**
 - **The handoff's paywall rationale quotes a superseded decision**, and draws the *Restore
   purchases* link on the theme overlay, which `Menus and UI.md` has since moved to Settings.
   The handoff is read-only, so this PRD records the drift rather than correcting it.
@@ -643,10 +780,41 @@ this PRD does not resolve it locally.
 **`P5-03-release-fastlane.md`** states, at its Requirement 27 and Open Question F, that
 "neither of those PRDs mentions a parental gate or the Kids Category at all, so nothing
 currently schedules the work." **Requirement 12 here schedules it**, this PRD's Problem
-section names the Kids Category directly, and Requirement 14 exists because of it. Open
-Question F can be narrowed to what is genuinely unscheduled — the gate's challenge design,
-its lifetime, and whether restore is gated (Open Question 5).
+section names the Kids Category directly, and Requirement 14 exists because of it.
+
+**This has narrowed again.** Open Question F previously had three unscheduled items to point
+at — the gate's challenge design, its lifetime, and whether restore is gated. **All three are
+now settled in Requirement 17**, so what is left genuinely unscheduled is only Open Question 9:
+how the gate is presented. `P5-03-release-fastlane.md` needs a revision routed to it either
+way; the revision is smaller than it was.
+
+**A second staleness in the same PRD, from the other settlement:** its Requirement 13 stated
+the submitted build's floor as iOS 13. **Updated to iOS 15** as part of this change.
 
 > **Resolved since an earlier revision:** `P4-04-settings.md` no longer claims this PRD has no
 > parental-gate requirement, and its two bad *"`P4-05`, per requirement 21"* self-citations
 > are gone.
+
+### 9. Open — how a context-free service presents the gate
+
+**Requirement 17 settles what the gate asks. It does not settle how it gets on screen, and
+that is a real unresolved mechanism question, not a wording gap.**
+
+The tension is between two requirements that are each individually settled:
+
+- **Requirement 12** puts enforcement **inside `PurchaseService.purchase`**, and its testable
+  depends on that — a direct invocation must reach no store double. Every consumer PRD
+  (`P4-04-settings.md` Requirement 21, `P5-03-release-fastlane.md`) defers here on that basis.
+- **Requirement 8** records that `PurchaseService` is *"a service with no `BuildContext`"*,
+  which is why it takes the `ref.read` form of theme access rather than `watch`.
+
+A service with no `BuildContext` cannot push a widget, await an answer from it and dismiss it.
+So something has to bridge the two, and **nothing in this PRD or any sibling names what.** The
+shapes an implementer would otherwise pick between — a navigator key held by the service, a
+gate-presenter interface injected into it, or moving presentation to the caller and passing a
+proof of passage inward — are not equivalent: the last one weakens Requirement 12's guarantee
+from *enforced* to *conventionally observed*, which is exactly what Requirement 12 exists to
+prevent.
+
+**Recorded, not answered.** Whatever resolves it must keep Requirement 12's testable passing as
+written. This is the remaining blocker on Requirement 17.

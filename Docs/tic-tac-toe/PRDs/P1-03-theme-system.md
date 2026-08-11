@@ -15,11 +15,31 @@
 > **Revised** after `Theming.md` → *Closing Neon's value gaps*, `Animations.md` → *Themes
 > describe their animations*, `Game Board Design.md` → *Where does the free-choice cue
 > live?*, `Theming.md` → *Does a theme control spacing and padding?* (no — every spacing key
-> removed in v7), *Do all four toggles ship, and is music a theme concern?* (yes; shape open,
-> Blocking 1), `Menus and UI.md` → *How does a player delete an open game?* (`icons.trash`
-> added in v8), and user answers on discovery and chrome icons.
+> removed in v7), *Do all four toggles ship, and is music a theme concern?* (yes; **the
+> key's shape is now settled by the user — one app-wide `sound.music`**, Blocking 1 closed),
+> `Menus and UI.md` → *How does a player delete an open game?* (`icons.trash` added in v8),
+> and user answers on discovery and chrome icons.
 >
-> **Schema version 8.** The last open contradiction with `Tech Design.md` closed when its
+> **Revised again for two user settlements.** **(1) Animation scope is marker-only**, which
+> demotes the five non-marker moments to `deferred` and is **schema version 9** —
+> Requirements 13, 15 and 18 carry it, Requirement 37 records it, and Requirement 12 records
+> the second deliberate drift from `neon.theme.json` that it creates. **(2) Every theme is
+> materialized at startup**, confirming what Requirements 8, 24 and 32.4 already assumed —
+> Blocking item 4 is closed and **no requirement changed**.
+>
+> **Revised again for a third user settlement — `*Style` is an inline object.** A `*Style`
+> key under `surfaces.*` **carries its own colour** and is **not** a `type.scale` reference.
+> Requirement 15's `surfaces` tables now carry a **Shape column** with a declared shape for
+> every key, the `textStyle` shape is defined there, and the `ref` shape is **withdrawn** from
+> the shapes legend — it had no referent. This is **schema version 10** (Requirement 37).
+> **This closes a defect four independent reviews each identified as the root cause of most
+> of this project's deadlocks**, and it was a genuine impossibility rather than an
+> untidiness: under the `ref` reading, roughly twenty text elements across five PRDs had no
+> reachable colour key at all, because `type.scale` carries no colour and Requirement 15
+> forbids a component reading a palette key. Downstream: `P3-03` req 16 and `P4-02` req 8 are
+> corrected; `P3-05`, `P4-01`, `P4-04` and `P5-01` are affected and unedited.
+>
+> **Schema version 10.** The last open contradiction with `Tech Design.md` closed when its
 > guard table dropped the "inside board widgets" scoping; Requirement 25 and that doc now
 > agree.
 
@@ -68,6 +88,13 @@ consumer with nowhere to read from either writes a literal — which the guard c
 binds to the nearest existing key, which it does not. And when a component needs **N**
 variants and is handed one style object, it does the third thing: a hardcoded switch among
 style objects, which is bare Dart and invisible to the guard entirely.
+
+**A fourth has now bitten once, in the other direction: a key that exists is read as a
+commitment to build it.** Five `animation.<moment>` keys were transcribed into the schema
+from a stub in `neon.theme.json`, and `P2-04-animations.md` reasonably read six `required`
+moments as six moments the game animates — against three design docs that all say the
+marker is the only thing that moves. Requirement 18 records the correction. **Naming a key
+does not decide its value, and it does not decide that anything reads it.**
 
 **Not every gap is the same weight, and the difference decides priority.** An unauthored
 *value* is debt: a control rendered with a plain fill is ugly but legal, and it ships.
@@ -123,6 +150,15 @@ value the approved design defines, plus the short list the design settled withou
    recursively."*
    *(`Theming.md` → Decisions → How a theme merges over Neon; `Tech Design.md` → Decisions
    → Fallback to Neon — merge, not resolve)*
+   **"At startup" means *every* theme, not just the selected one — confirmed by the user.**
+   Blocking item 4 asked whether materialization is eager or lazy, and the answer is eager:
+   every discovered theme is materialized during the catalog build, so a `ThemeCatalogEntry`
+   carries a complete `Theme` from the moment it exists. **This ratifies the requirements as
+   written rather than changing them** — Requirement 24's published `ThemeCatalogEntry` type
+   already carries a materialized `Theme` per entry, Requirement 32.4 already builds it that
+   way, and Requirement 33's "readable without making it active" is only true if it is.
+   Recorded so a later reader does not mistake the eagerness for an implementation accident
+   and "optimise" it into a lazy path that breaks Requirement 33.
    **Consequence:** Neon ships `sound.music` as an explicit `null` — a deliberate clear, not
    an unfilled slot; Requirement 11's check treats it as defined.
    **A list is a leaf.** A theme naming a list **replaces it whole**. *PRD-author judgment:
@@ -131,7 +167,9 @@ value the approved design defines, plus the short list the design settled withou
    **Testable:** a theme overriding `color.ground` alone materializes with all 42 other
    `color.*` keys at Neon's values; `sound.buttonTap: null` yields no button-tap sound; a
    theme overriding `surfaces.legend.swatchStyle.locked` alone keeps Neon's other five;
-   a theme omitting `meta.name` fails to load rather than inheriting `"Neon"`.
+   a theme omitting `meta.name` fails to load rather than inheriting `"Neon"`; and after
+   startup **every** entry in `themeCatalogProvider` resolves every `required` key without a
+   further load.
 9. A theme file may define **only** what it wants to be different — beyond `meta` — and must
    still materialize complete.
 10. Animations and sounds merge by the same rule as every other value.
@@ -147,11 +185,39 @@ value the approved design defines, plus the short list the design settled withou
     `const List<String>` of every `required` key path. One test iterates it and asserts each
     resolves in Neon's materialized theme, **counting an explicit null as defined**. A second
     asserts list and schema agree.
+    **The manifest shrank in v9.** It carries `animation.placeMark.*` and **no other
+    `animation.<moment>` path**: the five non-marker moments are `deferred` (Requirement 15),
+    and the manifest lists `required` keys only. A `deferred` key appearing in
+    `required_keys.dart` is a defect — it would fail the first test against a Neon that
+    correctly does not author it.
+    **And it grew in v10.** Each `*Style` key is now a `textStyle` **object**, so it
+    contributes its required sub-fields as separate leaf paths — `…hintStyle.size`,
+    `…hintStyle.weight`, `…hintStyle.color` — where it previously contributed one. Roughly
+    twenty `*Style` keys become roughly sixty entries. **`color` is the one that matters**:
+    it is the field that did not exist before v10, and listing it is what makes "Neon has a
+    colour for every piece of text it draws" a runnable assertion rather than a hope. The
+    optional three — `tracking`, `lineHeight`, `uppercase` — are **not** manifest entries,
+    since the manifest lists `required` paths only.
 12. **`assets/themes/neon.yaml` is the authoritative Neon definition.** `neon.theme.json`
     stays as it is and is a **reference**: *"the two can drift, and the YAML is authoritative
     where they differ."* **Do not "correct" the YAML back toward the JSON** — the JSON now
     carries three spacing keys the schema no longer has.
-    *(`Theming.md` → Decisions → Closing Neon's value gaps)*
+
+    **Two deliberate drifts now, and the second is the larger one.** Recorded together so
+    nobody reconciles either by hand:
+
+    | # | Drift | Since |
+    |---|---|---|
+    | 1 | The JSON carries `board.outerGap`, `board.quadrantPadding` and `board.innerGap`; the schema does not | v7 — spacing is code, not theme |
+    | 2 | The JSON's `animation` block carries **six** moments; the YAML authors **one**, `placeMark` | v9 — animation scope is marker-only (Requirement 18) |
+
+    The second drift matters more than its size suggests, because it is the one that already
+    caused a defect in the other direction: the five extra moments were transcribed *out* of
+    that stub and into the schema, and were then read downstream as six moments the game
+    animates. The JSON is a starting-value reference and `Animations.md` → Where Animations
+    Fire says so in as many words — *"Starting values, in the handoff's own words — not
+    decisions."* Transcribing from it is Requirement 13(a)'s job **only for keys the schema
+    still carries**.
 13. **What `assets/themes/neon.yaml` must contain — and the two ways a value gets there.**
 
     **(a) Transcribed — the large majority.** Every value the approved design draws *that the
@@ -159,11 +225,27 @@ value the approved design defines, plus the short list the design settled withou
 
     | Source | What comes from it |
     |---|---|
-    | `neon.theme.json` | `id`, and every key in `color`, `marks`, `type`, `radius`, `sound`; the `board` keys the schema retains; and `animation`'s durations, easings and loop flags |
+    | `neon.theme.json` | `id`, and every key in `color`, `marks`, `type`, `radius`, `sound`; the `board` keys the schema retains; and **`animation.placeMark`'s duration and easing only** |
     | `README.md` and `themes.catalog.json` | everything drawn in the token tables, board sections and screens `1a`–`2d` that the JSON does not carry — the pending-move colour and its rings, grid-line opacity and glow, the claimed and cat-game glows, the cat caption, the modal and sheet surfaces, the scrims, the settings card, the game rows and chips, the theme rows and badges, the menu, the buttons, the input field, the legend typography and its six swatches, the free-choice cue, the scoreboard chips, the five drawn chrome icons, and Neon's `name` and `blurb` |
+
+    **The JSON's other five `animation` moments are not transcribed** — `claimQuadrant`,
+    `catGame`, `winGame`, `activeQuadrant`, `lastMove`. They are `deferred` (Requirement 15)
+    and Requirement 12's second drift is exactly this. **Do not author them "for
+    completeness":** Requirement 18 records what happened the last time they were treated as
+    content rather than as a stub.
 
     **No value is invented, altered or rounded.** Composites are restructured per
     Requirement 35 and motion re-expressed per Requirement 18.
+
+    **New in v10 — every `*Style` key is authored as a `textStyle` object, colour included.**
+    A `*Style` leaf is a map, not a style name (Requirement 15 → `surfaces`), so each one
+    needs `size`, `weight` **and `color`** transcribed. The colours are drawn and were always
+    available — `1d`'s legend greys, `2a`'s sheet header, `1a`'s wordmark, `2c`'s field
+    labels, the chip label and value colours — they simply had **no key to land in** until
+    v10, which is the whole of the defect this version closes. **This adds no new source:**
+    they come from the same README and `themes.catalog.json` row of the table above.
+    Requirement 15's legend and scoreboard tables quote several of them inline so the
+    transcriber has a starting point rather than a search.
 
     **(b) Authored — a short, named list.** Some `required` keys have **no drawn source at
     all**: the design settled the affordance without the handoff ever drawing it. These are
@@ -173,7 +255,7 @@ value the approved design defines, plus the short list the design settled withou
     |---|---|---|
     | `icons.trash.*` | Handoff `1b` predates the delete decision; no trash glyph is drawn anywhere | `Menus and UI.md` → How does a player delete an open game? |
     | `surfaces.destructive.*` | Same drawing, same gap — the revealed control's panel and the modal's Yes button | as above |
-    | `animation.<moment>.tracks[].keyframes[].value` | The handoff gives durations, easings and loop flags but never says *how far* | `Animations.md` → Themes describe their animations |
+    | `animation.placeMark.tracks[].keyframes[].value` | The handoff gives a duration and an easing but never says *how far* the mark grows | `Animations.md` → Themes describe their animations |
 
     **Everything else `required` is transcribed.**
     **`icons.trash` is the urgent one, and not for aesthetic reasons.** The other two are
@@ -189,10 +271,12 @@ value the approved design defines, plus the short list the design settled withou
     | Key | Why |
     |---|---|
     | `surfaces.settingsCard.purchases.*` | Nothing drawn, and no Decision describes what the section *is* — *Blocking* item 7 |
-    | Music beyond `sound.music`'s placeholder null | A theme supplies its music, but the key's final **shape** is open — *Blocking* item 1 |
+    | `sound.music`'s **value** | The key's shape is settled (Requirement 17) and Neon ships an explicit `null`; **what audio goes there** is not this PRD's — *"where the audio comes from"* is still open in `Theming.md` → Open Questions, alongside Neon's five `"TODO"` one-shots (*Blocking* item 2) |
+    | `animation.{claimQuadrant,catGame,winGame,activeQuadrant,lastMove}.*` | **New in v9.** Animation scope is the player's marker only, settled by the user. `Animations.md` → Where Animations Fire lists these as *"the obvious moments"* and hedges them as *"not yet decided in detail"*, so the moments are kept in the contract by name and authored by nobody. See Requirement 18 |
 
     **Testable:** every leaf in `neon.yaml` traces to a source in (a) or appears in (b)'s
-    table, and Requirement 11's manifest resolves completely.
+    table, Requirement 11's manifest resolves completely, and `neon.yaml` contains **no**
+    `animation` key other than `animation.placeMark`.
 14. Neon's UUID is `b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40`, and Neon is both the base theme
     and the default active theme.
     *(`neon.theme.json` → `id`; `themes.catalog.json` → `baseThemeId`, `defaultThemeId`;
@@ -201,15 +285,22 @@ value the approved design defines, plus the short list the design settled withou
 ### Requirement 15 — the schema
 
 15. **This is the theme schema. Every key a consumer reads is named here, with its value
-    shape and its status.** Naming a key does not decide its value.
+    shape and its status.** Naming a key does not decide its value, **and it does not decide
+    that anything reads it** — see Requirement 18.
 
     **Status:** `required` — Neon must hold a value; transcribed unless Requirement 13(b)
     lists it as authored. `deferred` — in the contract, nothing drawn and nothing settled.
     `undecided` — **do not implement**, pending *Blocking*.
 
     Shapes: `color` = `#rrggbb` or `rgba(r,g,b,a)`; `dp` = logical pixels; `ms` = integer
-    milliseconds; `assetPath` = a path under `assets/`, or null; `ref` = a `type.scale` style
-    name.
+    milliseconds; `assetPath` = a path under `assets/`, or null; `textStyle` = **an inline
+    object carrying its own colour**, defined in the `surfaces` section below.
+
+    **The `ref` shape is withdrawn in v10.** Earlier drafts listed `ref` = *a `type.scale`
+    style name* in this legend, and **no key in this schema ever used it** — it was a
+    vocabulary entry with no referent, and every consumer that met a `*Style` key had to
+    guess which reading applied. The `surfaces` section now declares a shape for every key,
+    which is what closes the guess. See *Why `*Style` is an inline object* there.
 
     #### The boundary: what a theme does *not* control
 
@@ -231,7 +322,7 @@ value the approved design defines, plus the short list the design settled withou
     | Key path | Shape | Notes |
     |---|---|---|
     | `meta.id` | UUID string | the theme's identity |
-    | `meta.schemaVersion` | integer — **8** | Requirement 37 |
+    | `meta.schemaVersion` | integer — **10** | Requirement 37 |
     | `meta.name` | string | the display name. `P4-03` req 6 renders it |
     | `meta.blurb` | string | the one-line description. `P4-03` req 6 renders it |
 
@@ -313,7 +404,7 @@ value the approved design defines, plus the short list the design settled withou
     | `board.pendingCellRing`, `.pendingQuadrantRing` | ring object | 2d |
     | `board.pendingGhostOpacity`, `.pendingQuadrantWash` | number / color | 2d |
     | `board.claimedMarkGlow`, `.catMarkGlow` | shadow list | README |
-    | `board.catCaption.{size,weight,tracking,color}` | `dp` / int / number / color | README |
+    | `board.catCaption` | **`textStyle`** — the same object; it was already spelled `{size, weight, tracking, color}` longhand here before v10 named the shape | README |
 
     `outerGap`, `quadrantPadding` and `innerGap` are **not here** — fixed in code.
 
@@ -321,16 +412,32 @@ value the approved design defines, plus the short list the design settled withou
 
     `sound.{placeMark,claimQuadrant,catGame,winGame,buttonTap}` (`assetPath`, **required**,
     values are prose `"TODO"` today); `sound.signature` (string, **metadata, never played**);
-    `sound.music` (`assetPath` or null — the placeholder, its final shape open per *Blocking*
-    item 1). See Requirement 17.
+    `sound.music` (`assetPath` or null — **one track for the whole app, settled by the
+    user**; Neon ships an explicit `null`). See Requirement 17.
+
+    **The sound moments and the animation moments are no longer the same list, and that is
+    deliberate.** Five sounds, one animation. `P3-02-move-input.md` reqs 32–33 fire
+    `claimQuadrant` and `catGame` as *sounds* on a commit; nothing fires them as motion.
+    A reader who notices the asymmetry and "fixes" it is re-creating the v9 defect from the
+    other end — `P3-02` req 33 states the same warning from its side.
 
     #### `animation` — a motion **description**, not a behaviour name
 
+    **One moment is in scope: `placeMark`.** Animations apply to **the player's marker** and
+    to nothing else, settled by the user. Four independent sources say so and none says
+    otherwise: `Animations.md` → Scope For Now (*"animations apply to **the player's
+    marker**… The marker is the thing that moves"*), `Theming.md` → What a Theme Controls →
+    Animation (*"The animation set applied to the player's marker"*), `Game Board Design.md`
+    → Animation & Juice (*"currently scoped to the player's marker"*), and the approved
+    handoff's own summary — `design_handoff_game_ui/README.md` → *Interactions & behavior*:
+    *"**Animations** (from `Animations.md`): poppy, **marker-only**, one at a time, never
+    blocking input."*
+
     | Key path | Shape | Status |
     |---|---|---|
-    | `animation.<moment>.duration` | `ms` | **required** |
-    | `animation.<moment>.repeat.{count,mode}` | integer \| `infinite` / `restart` \| `reverse` | **required** |
-    | `animation.<moment>.tracks` | list of track objects, ≥ 1 | **required** |
+    | `animation.placeMark.duration` | `ms` | **required** |
+    | `animation.placeMark.repeat.{count,mode}` | integer \| `infinite` / `restart` \| `reverse` | **required** |
+    | `animation.placeMark.tracks` | list of track objects, ≥ 1 | **required** |
     | `…tracks[].{property,easing}` | closed set (Req 18) / easing string | **required** |
     | `…tracks[].delay` | `ms` | optional |
     | `…tracks[].keyframes` | list of ≥ 2 `{at, value}` | **required** |
@@ -338,38 +445,132 @@ value the approved design defines, plus the short list the design settled withou
     | `…keyframes[].value` | number, or `color` | **required — authored** |
     | `…keyframes[].easing` | overrides the track's for the segment ending here | optional |
 
-    `<moment>` ∈ `placeMark`, `claimQuadrant`, `catGame`, `winGame`, `activeQuadrant`,
-    `lastMove`.
+    `<moment>` ∈ `placeMark`.
+
+    **The five non-marker moments are `deferred`, not deleted:** `claimQuadrant`, `catGame`,
+    `winGame`, `activeQuadrant`, `lastMove`. They keep the same shape as `placeMark` if they
+    are ever authored, Neon authors none of them (Requirement 13), Requirement 11's manifest
+    lists none of them, and **`P2-04-animations.md` plays none of them** — its
+    `AnimationMoment` enum has one value. They stay named because `Animations.md` → Where
+    Animations Fire still lists them as *"the obvious moments"* under an explicit *"Not yet
+    decided in detail"* hedge, so deleting them would assert a closure the docs have not
+    made. Promoting one later is a `required` status change, a Neon authoring pass, an
+    `AnimationMoment` value and a `meta.schemaVersion` bump under Requirement 37 — a known,
+    bounded change, not a redesign.
 
     #### `surfaces`
 
-    | Key path | Status | Drawn in / consumer |
+    **Why `*Style` is an inline object — settled by the user, and the root cause of most of
+    this project's deadlocks.** Every `*Style` key under `surfaces.*` is an **inline object
+    that carries its own colour**. It is **not** a `type.scale` style name.
+
+    The two readings were live for nine schema versions, and the `ref` reading is not merely
+    uglier — it is **impossible**, by this PRD's own Appendix A.2 triage rule:
+
+    - `type.scale.<style>` carries `{size, weight, tracking, lineHeight, uppercase}` and
+      **no colour field**. It never had one; the `type` section above is the whole of it.
+    - This section's own rule forbids the escape: *"A component reads its own `surfaces.*`
+      or `icons.*` key, never a palette key that happens to hold the same value."* So a
+      component may not reach `color.text` to colour a `*Style` either.
+    - Therefore, under `ref`, roughly **twenty text elements across five PRDs have no
+      reachable colour key at all** — the legend's five styles, the sheet header's two, the
+      four toggle-row labels, the game row's title and time, the menu's four, the input's
+      three, and the scoreboard chips' label and value. That is *impossible*, not *ugly*:
+      there is no implementation an author could write that both renders text and passes
+      the build. Only that class blocks (Appendix A.2).
+
+    **Two things inside this PRD already assumed inline**, which is the strongest evidence
+    that `ref` was a drafting slip rather than a decision: the legend table below annotates
+    `surfaces.legend.freeChoiceCueStyle` as *"12/400 `#4fc3ff`"* — a colour a `type.scale`
+    name cannot carry — and `board.catCaption` is spelled out longhand as
+    `{size, weight, tracking, color}`, which is exactly this shape under another name.
+
+    **The `textStyle` shape.** Every key below whose Shape reads `textStyle` is this object:
+
+    | Field | Shape | Required |
     |---|---|---|
-    | `surfaces.modal.{fill,border,radius,shadow,winnerBorder}` | **required** | `1f`–`1h` / `P3-04` reqs 10, 13; **reused by the delete confirmation** |
-    | `surfaces.sheet.{fill,radius}` | **required** | `1f`, `2a`, `2c` |
-    | `surfaces.sheet.header.{titleStyle,subStyle,closeControl}` | **required** | `2a` / `P4-03` req 3 |
-    | `surfaces.scrim.{modal,settings,themeSelect,namePrompt}` | **required** | `1f`–`1h`, `2a`, `2c` |
-    | `surfaces.settingsCard.{fill,border,radius}` | **required** | `2b` / `P4-04` reqs 6, 16 |
-    | `surfaces.settingsCard.toggleRow.{labelStyle,subLabelStyle}` | **required** | `2b` — four rows, one of them Music |
-    | `surfaces.settingsCard.switch.{trackOn,trackOff,knobOn,knobOff,glowOn}` | **required** | `1f`, `2b` |
-    | `surfaces.settingsCard.purchases.{sectionDivider,priceRow,restoreControl}` | **deferred** | nothing drawn, no Decision on treatment |
-    | `surfaces.gameRow.{fill,radius,titleStyle,timeStyle,chip,chipYouOutline,chevron}` | **required** | `1b` / `P4-02` reqs 4, 17, 18 |
-    | `surfaces.themeRow.{fill,radius,previewTile,activeRing,lockedPreviewOpacity}` | **required** | `2a` / `P4-03` reqs 6, 8, 13 |
-    | `surfaces.badge.{free,owned,active,priceAction}` | **required** | `2a`, `themes.catalog.json` |
-    | `surfaces.menu.{background,kickerStyle,wordmarkStyle,wordmarkGlow,taglineStyle,footerStyle}` | **required** | `1a` / `P4-01` reqs 7, 13 |
-    | `surfaces.menu.logo` | **required** slot; asset is a placeholder | `1a` / art by `P5-02` |
-    | `surfaces.menu.dimBehindOverlay` | **required** | `2a` (35%) |
-    | `surfaces.button.{primary,secondary}` | **required** | `1a`, `2c` / `P4-01` reqs 4, 6 |
-    | `surfaces.input.{fill,radius,focusBorder,caret,valueStyle,labelStyle,counterStyle}` | **required** | `2c` / `P4-02` reqs 8, 9, 17 |
-    | `surfaces.placeholder.{border,radius,glow}` | **required** | `1a`'s logo **and** `1c`'s avatars |
-    | `surfaces.focusRing` | **required** | README → *Interactions & behavior* |
+    | `size` | `dp` | **yes** |
+    | `weight` | integer — one of `type.weights.*`'s values | **yes** |
+    | `color` | `color` | **yes** — the field the `ref` reading could not supply |
+    | `tracking` | number, em | optional |
+    | `lineHeight` | number, multiplier | optional |
+    | `uppercase` | bool | optional |
+
+    A `textStyle` **duplicates** the numbers a `type.scale` entry would have carried, and
+    that duplication is deliberate and permanent: Requirement 35 fixes that this schema has
+    **no alias or reference type**, so a hand-duplicated derivation is the only mechanism
+    available. `type.scale.*` does not disappear — it stays the published type ramp, read
+    directly by the consumers that read it directly (`P3-01`'s marks, `P4-03`'s modal), and
+    it is the **documentation** of where a `textStyle`'s numbers came from. It is not a
+    lookup a `*Style` performs at runtime.
+    **Consequence for `P5-01`:** a `textStyle`'s `color` is a colour leaf, so it is inside
+    that PRD's Requirement 6 derivation walk like any other.
+
+    | Key path | Shape | Status | Drawn in / consumer |
+    |---|---|---|---|
+    | `surfaces.modal.{fill,border,winnerBorder}` | `color` | **required** | `1f`–`1h` / `P3-04` reqs 10, 13; **reused by the delete confirmation** |
+    | `surfaces.modal.radius` / `.shadow` | `dp` / shadow list | **required** | as above |
+    | `surfaces.sheet.fill` / `.radius` | `color` / `dp` | **required** | `1f`, `2a`, `2c` |
+    | `surfaces.sheet.header.{titleStyle,subStyle}` | **`textStyle`** | **required** | `2a` / `P4-03` req 3, `P4-02` req 8 |
+    | `surfaces.sheet.header.closeControl` | `{fill, radius, size: dp}` | **required** | `2a` / `P4-03` req 3 |
+    | `surfaces.scrim.{modal,settings,themeSelect,namePrompt}` | `color` | **required** | `1f`–`1h`, `2a`, `2c` |
+    | `surfaces.settingsCard.{fill,border}` / `.radius` | `color` / `dp` | **required** | `2b` / `P4-04` reqs 6, 16 |
+    | `surfaces.settingsCard.toggleRow.{labelStyle,subLabelStyle}` | **`textStyle`** | **required** | `2b` — four rows, one of them Music |
+    | `surfaces.settingsCard.switch.{trackOn,trackOff,knobOn,knobOff}` | `color` | **required** | `1f`, `2b` |
+    | `surfaces.settingsCard.switch.glowOn` | shadow list | **required** | `1f`, `2b` |
+    | `surfaces.settingsCard.purchases.{sectionDivider,priceRow,restoreControl}` | — | **deferred** | nothing drawn, no Decision on treatment |
+    | `surfaces.gameRow.fill` / `.radius` | `color` / `dp` | **required** | `1b` / `P4-02` reqs 4, 17, 18 |
+    | `surfaces.gameRow.{titleStyle,timeStyle}` | **`textStyle`** | **required** | `1b` / `P4-02` req 27 |
+    | `surfaces.gameRow.chip` | `{fill, border, radius: dp, labelStyle: textStyle}` | **required** | `1b` / `P4-02` req 18 |
+    | `surfaces.gameRow.chipYouOutline` / `.chevron` | `color` / `color` | **required** | `1b` |
+    | `surfaces.themeRow.fill` / `.radius` | `color` / `dp` | **required** | `2a` / `P4-03` reqs 6, 8, 13 |
+    | `surfaces.themeRow.previewTile` | `{radius: dp, border}` | **required** | `2a` |
+    | `surfaces.themeRow.activeRing` | ring object (Req 35) | **required** | `2a` |
+    | `surfaces.themeRow.lockedPreviewOpacity` | number | **required** | `2a` |
+    | `surfaces.badge.{free,owned,active,priceAction}` | `{fill, border, radius: dp, labelStyle: textStyle}` | **required** | `2a`, `themes.catalog.json` |
+    | `surfaces.menu.background` | gradient (Req 35) | **required** | `1a` / `P4-01` reqs 7, 13 |
+    | `surfaces.menu.{kickerStyle,wordmarkStyle,taglineStyle,footerStyle}` | **`textStyle`** | **required** | `1a` / `P4-01` reqs 7, 13 |
+    | `surfaces.menu.wordmarkGlow` | shadow list | **required** | `1a` |
+    | `surfaces.menu.logo` | `assetPath` — **required** slot; asset is a placeholder | **required** | `1a` / art by `P5-02` |
+    | `surfaces.menu.dimBehindOverlay` | `color` | **required** | `2a` (35%) |
+    | `surfaces.button.{primary,secondary}` | `{fill, border, borderWidth: dp, radius: dp, labelStyle: textStyle, glow, innerGlow}` | **required** | `1a`, `2c` / `P4-01` reqs 4, 6 |
+    | `surfaces.input.{fill,focusBorder,caret}` | `color` | **required** | `2c` / `P4-02` reqs 8, 9, 17 |
+    | `surfaces.input.radius` | `dp` | **required** | `2c` |
+    | `surfaces.input.{valueStyle,labelStyle,counterStyle}` | **`textStyle`** | **required** | `2c` / `P4-02` reqs 8, 9 |
+    | `surfaces.placeholder.border` / `.radius` / `.glow` | `color` / `dp` / shadow list | **required** | `1a`'s logo **and** `1c`'s avatars |
+    | `surfaces.focusRing` | ring object (Req 35) | **required** | README → *Interactions & behavior* |
+
+    **`surfaces.button.{primary,secondary}`'s shape answers a question `P4-01` raised and
+    could not close.** Its Open Questions record that the tiers need, per tier, *"border
+    colour and width (2pt vs 1px), text colour and size (20pt vs 15pt, **neither in
+    `type.scale`**), a `radius.*` reference, an **outer** glow **and** a separate **inset**
+    glow"* — and that three consumers read the key. The sub-keys above are that list, and the
+    parenthetical *"neither in `type.scale`"* is independent confirmation that a button's
+    label size was never reachable by dereferencing a style name.
+    **What stays open there:** the two tiers' *values*, and the pressed/focused states, which
+    `P4-01` req 21 routes to `surfaces.focusRing`. Naming a shape does not author a value.
+
+    **Two tiers of authority in the table above — do not read them as one.** The Shape column
+    is new in v10 and not everything in it has the same standing:
+
+    | Tier | Which rows | Standing |
+    |---|---|---|
+    | **Settled by the user** | every row whose Shape reads **`textStyle`** | The settlement is *`*Style` keys are inline objects carrying their own colour*. These rows are the settlement written out, and the `textStyle` field table is its normative form |
+    | **PRD-author judgment — flagged, reversible** | the **composite** rows: `sheet.header.closeControl`, `gameRow.chip`, `themeRow.previewTile`, `badge.*`, and `button.{primary,secondary}`'s non-`labelStyle` fields | No Decision and no handoff table decomposes these. They had to be given *some* shape for the Shape column to be complete, and an under-specified composite is the same deadlock this section exists to end. `button.*` is the best-sourced of them (`P4-01`'s Open Question lists its fields); the other four are inference from what their consumers draw |
+
+    A reviewer who disagrees with a composite row is disagreeing with **me**, not with the
+    user, and changing one costs a version bump and nothing else. A reviewer who disagrees
+    with a `textStyle` row is re-opening a settled question.
+    **Recorded because this PRD has been bitten by the opposite mistake** — Requirement 18(a)
+    and Appendix A.1b both record a case where transcribed material was later read as intent.
 
     **Destructive — `required`, authored (Requirement 13(b)), and reshaped in v8.**
 
-    | Key path | Carries |
-    |---|---|
-    | `surfaces.destructive.action.{fill,radius}` | the **panel revealed by swiping a row left**, behind `icons.trash` |
-    | `surfaces.destructive.confirmAccept.{fill,labelStyle,border,radius}` | the modal's **Yes** button |
+    | Key path | Shape | Carries |
+    |---|---|---|
+    | `surfaces.destructive.action.fill` / `.radius` | `color` / `dp` | the **panel revealed by swiping a row left**, behind `icons.trash` |
+    | `surfaces.destructive.confirmAccept.{fill,border}` / `.radius` | `color` / `dp` | the modal's **Yes** button |
+    | `surfaces.destructive.confirmAccept.labelStyle` | **`textStyle`** | the word **Yes** on that button |
 
     **What changed and why.** The action key previously carried `labelStyle` and `icon`. Both
     are gone: the Decision specifies *"a trash button — an icon, not a worded 'Delete'
@@ -383,25 +584,49 @@ value the approved design defines, plus the short list the design settled withou
 
     **Legend and how-to-play strip.**
 
-    | Key path | Status | Notes |
-    |---|---|---|
-    | `surfaces.legend.hintStyle` | **required** | the two-tap hint — `1d`, 12/400 |
-    | `surfaces.legend.labelStyle` | **required** | the legend entry's text — `1d`, 10.5/400 |
-    | `surfaces.legend.swatchStyle.<state>` | **required** | **a map keyed by state**, six entries |
-    | `surfaces.legend.ringExplanationStyle` | **required** | `1e`, `2d` |
-    | `surfaces.legend.freeChoiceCueStyle` | **required** | `1d` — 12/400 `#4fc3ff` |
+    | Key path | Shape | Status | Notes |
+    |---|---|---|---|
+    | `surfaces.legend.hintStyle` | **`textStyle`** | **required** | the two-tap hint — `1d`, 12/400 `#75798c` |
+    | `surfaces.legend.labelStyle` | **`textStyle`** | **required** | the legend entry's text — `1d`, 10.5/400 `#595d6c` |
+    | `surfaces.legend.swatchStyle.<state>` | `{fill, border, radius: dp, glow}` — **a map keyed by state**, six entries | **required** | `1d` / `P3-05` req 18 |
+    | `surfaces.legend.ringExplanationStyle` | **`textStyle`** | **required** | `1e`, `2d` — 12/400 `#b2b6ca` |
+    | `surfaces.legend.freeChoiceCueStyle` | **`textStyle`** | **required** | `1d` — 12/400 `#4fc3ff` |
 
     `<state>` ∈ `open`, `locked`, `catGame`, `lastMove`, `activeQuadrant`, `pending`.
 
+    **`swatchStyle` is the one `*Style` key that is not a `textStyle`, and it is not an
+    exception to the settlement.** A swatch is a drawn tile, not a run of text, so it carries
+    `fill`, `border` and `glow` rather than `size`, `weight` and `color` — but it is still an
+    **inline object carrying its own colour**, which is the settlement. Read the settlement as
+    *"a `*Style` key is an inline object that carries its colour,"* not as *"a `*Style` key is
+    a `textStyle`."* Its six-entry shape is `P3-05` req 18's, which spells it out and gives
+    the reason one flat style cannot serve six treatments: the alternative is a hardcoded
+    switch, which is bare Dart and invisible to the guard (Appendix A.1).
+    **The three legend colours above are transcribed**, from `P3-05` req 18's own Neon table.
+    They are quoted here because a `textStyle` now *has* a colour field and Requirement 13(a)
+    must know what goes in it — under the `ref` reading these three values had no slot at all,
+    which is the impossibility this section records.
+
     **Scoreboard chips — per player, because the states are not shared.**
 
-    | Key path | Status | Notes |
-    |---|---|---|
-    | `surfaces.scoreboard.chip.playerOne.active.{fill,border,glow,labelStyle,valueStyle}` | **required** | `1d` |
-    | `surfaces.scoreboard.chip.playerOne.inactive.{fill,border,labelStyle,valueStyle}` | **required** | `1d`/`1e` |
-    | `surfaces.scoreboard.chip.playerTwo.active.{…}` / `.inactive.{…}` | **required** | `1e` |
-    | `surfaces.scoreboard.chip.ties.{fill,border,labelStyle,valueStyle}` | **required** | **No active variant, by design** |
-    | `surfaces.scoreboard.radius` | **required**, `dp` | `1d` |
+    | Key path | Shape | Status | Notes |
+    |---|---|---|---|
+    | `…chip.playerOne.active.{fill,border}` | `color` | **required** | `1d` — fill is `rgba(255,61,113,0.14)` |
+    | `…chip.playerOne.active.glow` | shadow list | **required** | `1d` — **`active` only**; `inactive` has no `glow` |
+    | `…chip.playerOne.active.{labelStyle,valueStyle}` | **`textStyle`** | **required** | `1d` — label 9/0.1em, value 22/600 |
+    | `…chip.playerOne.inactive.{fill,border}` | `color` | **required** | `1d`/`1e` |
+    | `…chip.playerOne.inactive.{labelStyle,valueStyle}` | **`textStyle`** | **required** | `1d`/`1e` |
+    | `…chip.playerTwo.active.{…}` / `.inactive.{…}` | as playerOne | **required** | `1e` |
+    | `…chip.ties.{fill,border}` / `.{labelStyle,valueStyle}` | `color` / **`textStyle`** | **required** | **No active variant, by design** — `P3-03` req 7 |
+    | `surfaces.scoreboard.radius` | `dp` | **required** | `1d` |
+
+    **The chip `textStyle`s are why `P3-03` req 16 could be made decidable.** That
+    requirement compares the active and inactive treatments field-wise to prove the turn
+    highlight is not a no-op. Under the withdrawn `ref` reading its two type comparisons had
+    to dereference a style name, so a chip whose highlight is carried **by label colour
+    alone** — a perfectly good highlight, and a cheap one — compared *equal* and the
+    requirement **rejected a working theme**. With `color` inside the `textStyle`, the
+    comparison sees it. `P3-03` req 16 is rewritten to match.
 
     #### Not in the schema
 
@@ -413,26 +638,39 @@ value the approved design defines, plus the short list the design settled withou
     | `surfaces.scoreboard.turnBanner` | **removed in v5** — the banner is not built |
     | `surfaces.scoreboard.turnIndicator` | **removed in v6** — no reader |
     | `surfaces.deleteDialog.*` | never existed — the confirmation reuses `surfaces.modal` |
-    | a `music.<context>` map | **not yet** — *Blocking* item 1 |
+    | a `music.<context>` map | **not taken** — the user settled music as **one `sound.music` key, app-wide**, so a per-screen map is ruled out rather than deferred. Requirement 17 |
     | haptics | Never theme-driven — Requirement 29 |
     | ownership, price | Never in a theme definition — Requirement 31 |
+
+    The five non-marker `animation` moments are **not** in this table: they are `deferred`,
+    which is a different thing. A row here is ruled out; a `deferred` key is named, shaped
+    and unauthored.
 
 16. **Marks are asset slots on the theme, not shapes drawn in board code.**
     *(`Tech Design.md` → Decisions → Marks — image or icon; `P3-01` req 17)* Neon authors a
     third kind, `glyph` — see *Blocking*.
 17. **Five playable one-shot moments, plus `signature` (metadata, never played) and
-    `music`.** A consumer must not treat `sound.*` as an iterable list of playable assets.
+    `music` — one track, app-wide.** A consumer must not treat `sound.*` as an iterable list
+    of playable assets.
 
     **Music is a theme concern**, per `Theming.md` → Decisions → *Do all four toggles ship,
     and is music a theme concern?*, which **supersedes** *One-shot sound effects only, for
-    now*. The Decision establishes ownership, not shape: `sound.music` stays the minimal
-    placeholder, no key is added or re-shaped, and the choice is *Blocking* item 1.
+    now*. That Decision established ownership and left the shape open.
+
+    **The shape is now settled by the user: a single `sound.music` key, app-wide, whose value
+    comes from the selected theme.** One track for the whole app. Today's placeholder shape is
+    therefore retained exactly as it stands — `sound.music` is `assetPath` or null, no key is
+    added, nothing is re-shaped, and Neon's explicit `null` (Requirement 8) stays. The
+    per-screen `music.<context>` alternative is **not taken**, and Requirement 15's *Not in the
+    schema* table records it as ruled out rather than deferred.
     **Music is not a one-shot** — a one-shot fires and ends; music loops and has a lifecycle —
-    so whatever shape wins, it is never another `SoundMoment`.
+    so it is never another `SoundMoment`, which the settled shape does not change.
     **Nothing plays it**, but the *setting* has a consumer: `P4-04` ships a fourth toggle
-    controlling it. A confirmed consumer of the setting and none of the asset is why this is
-    `deferred` rather than removed.
-    *(`Theming.md` → What a Theme Controls → Audio; `P2-02` reqs 6, 7.)*
+    controlling it, and `P1-04` req 26 publishes `musicEnabledProvider`. The key now has a
+    settled shape and no value: what audio goes in it, and whether it loops, are still open in
+    `Theming.md` → Open Questions and are not this PRD's to answer.
+    *(`Theming.md` → What a Theme Controls → Audio; the shape is the user's settlement
+    recorded here, not a doc citation; `P2-02` reqs 6, 7, 14.)*
 18. **A theme describes its motion; the runtime interprets the description.** Each moment is
     a **duration, a repeat rule and a list of tracks**.
     *(`Animations.md` → Decisions → Themes describe their animations; → Duration lives in the
@@ -443,18 +681,50 @@ value the approved design defines, plus the short list the design settled withou
     | Moment | Was | Becomes | Transcribed | Authored |
     |---|---|---|---|---|
     | `placeMark` | `grow-shrink`, 220ms, `cubic-bezier(.34,1.56,.64,1)` | one `scale` track | duration, easing | scale magnitudes |
-    | `claimQuadrant` | `grow-shrink-glow`, 420ms | `scale` + `glowRadius` | duration | both magnitudes |
-    | `catGame` | `shrink-fade`, 300ms | `scale` + `opacity` | duration | scale magnitude |
-    | `winGame` | `glow-pulse`, 900ms | one `glowRadius` track | duration | pulse magnitude |
-    | `activeQuadrant` | `glow-pulse`, 1600ms, `loop` | `glowRadius`, `repeat: {infinite, reverse}` | duration, loop | pulse magnitude |
-    | `lastMove` | as above | as above | duration, loop | pulse magnitude |
 
-    **The interpreter is `P2-04`'s.**
+    **The other five rows were withdrawn in v9, and the reasoning is worth keeping because it
+    was mispriced twice.**
+
+    **(a) They were transcribed from a stub, not authored as intent.** The v2 pass read
+    `neon.theme.json → animation`'s six entries as content and re-expressed all six under
+    Requirement 13(a). But every design doc that describes animation scope says the same
+    thing — the marker is the only thing that moves (Requirement 15's `animation` section
+    lists all four sources). **The exceedance came from the same handoff whose own prose says
+    marker-only**, three lines away from the block it was transcribed out of. `Animations.md`
+    → Where Animations Fire labels that block *"Starting values, in the handoff's own words —
+    not decisions."*
+
+    **(b) Carrying all six was not free, and `P2-04` req 28's claim that it was is
+    withdrawn.** That requirement said playing a further moment needed "no interface change
+    and no interpreter change." Two of the five break that:
+
+    - **`activeQuadrant` and `lastMove` ship `repeat: {count: infinite, mode: reverse}`.** An
+      infinitely repeating animation never ends, so it never calls `AnimationCoordinator.end`
+      — and `P2-04` req 7's coordinator holds exactly one `AnimationMoment?` slot. Under that
+      PRD's req 38 (a moment arriving while one plays is *dropped*) the highlight would hold
+      the slot forever and **`placeMark` would never play again**. That is not a wrapper
+      change; it is a second concurrency class the coordinator does not have.
+    - **`winGame` is not one widget.** A win is a line of *three* claimed quadrants, so the
+      moment would need three concurrent `ThemedAnimation` wrappers playing one moment —
+      which `P2-04` req 14 forbids by construction and its req 38 would resolve by dropping
+      two of the three.
+
+    **(c) What it closes for free.** With no infinitely repeating moment in the schema,
+    nothing contradicts `Animations.md` → Decisions → **One animation at a time**. That
+    contradiction was `P2-04`'s second blocking question and it is closed by (b) rather than
+    by a ruling on the Decision's wording.
+
+    **The interpreter is `P2-04`'s**, and it stays general: it must execute any description
+    the schema can express — every property, any track count, any repeat rule — because
+    Requirement 9's bar is about what a theme can *describe*, not about how many moments the
+    game plays. **Scope and generality are independent axes**; collapsing them re-creates the
+    closed list `Animations.md` → Decisions → *Themes describe their animations* rules out.
 19. **A theme supplies its own font** — `type.family`. Inter 400/500/600 is bundled as
     **Neon's font choice, not an app-wide font constant**.
 20. The last-move, active-quadrant and pending-move treatments are **separately addressable
     keys**; the legend's six swatches are the same rule applied to the strip that explains
-    them.
+    them. **These are static treatments** — `P3-01-board-rendering.md` draws all three and
+    none of them animates (Requirement 18).
 21. **The schema supports distinguishing things by shape, icon, outline style and motion —
     and *not* by fill pattern or texture.** `P5-01` req 12's pattern permission has no
     backing here.
@@ -489,6 +759,10 @@ value the approved design defines, plus the short list the design settled withou
       `void play(SoundMoment)`, which has none.
     - **Widgets `watch`. Services `read` at use time.**
     - **`ThemeCatalogEntry`** — `id`, `name`, `blurb`, `assetKey`, `theme`.
+    - **`ThemeCatalogEntry.theme` is materialized, never a promise.** The user confirmed
+      startup materialization for every theme (Requirement 8), so this field is a `Theme` and
+      not a `Future<Theme>` or a lazily-built getter. That was already the published type;
+      the confirmation ratifies it.
     - **Overriding `activeThemeProvider` is the test seam.**
 
     **PRD-author judgment**, following `P1-04` req 26's precedent.
@@ -507,6 +781,10 @@ value the approved design defines, plus the short list the design settled withou
     - It cannot see a switch over hardcoded style objects — hence per-state key shapes.
     - **Where it works perfectly is icons**, now that its rule covers the whole scan root:
       that is what turned a missing `trash` slot from an oversight into a build failure.
+    - **An interpolation magnitude living in Dart is a theme value that escaped.** Stated for
+      motion specifically because `animation.placeMark.tracks[].keyframes[].value` is
+      unauthored (Requirement 13(b)), and the tempting fix is a literal scale factor in
+      `lib/animation/`. `P2-04` req 33 is that PRD's half.
 26. **Adding a new theme requires zero changes to game, board or menu code** — only dropping
     a theme file into `assets/themes/`.
 
@@ -537,6 +815,8 @@ value the approved design defines, plus the short list the design settled withou
     3. Each file is validated: well-formed YAML, an understood `meta.schemaVersion`, non-empty
        `meta.id`, `meta.name`, `meta.blurb`.
     4. A **catalog entry** is `{id, name, blurb, assetKey}` plus the materialized theme.
+       **Materialized then, for every entry, not on demand** — Requirement 8, confirmed by
+       the user. The catalog build is where the merge cost is paid.
     5. Entries are ordered **by asset key**; display order is `P4-03`'s.
 
     | Failure | Result |
@@ -550,7 +830,8 @@ value the approved design defines, plus the short list the design settled withou
     **PRD-author judgment, flagged:** the duplicate-id and reserved-base-id rules are not in
     any design doc.
 33. **A non-active theme's values are readable without making it active** — via
-    `themeCatalogProvider`.
+    `themeCatalogProvider`. This is the requirement startup materialization exists to serve;
+    a lazy catalog would make it a load rather than a read.
 34. **A theme that fails to load must not take the app down with it.**
 
 ### Encoding, dependencies and versioning
@@ -563,7 +844,7 @@ value the approved design defines, plus the short list the design settled withou
     - **colors stay strings**, parsed at load.
 36. **YAML parsing uses the `yaml` package, declared in `pubspec.yaml` by `P1-01`, and
     `assets/themes/` is declared as a directory.** **PRD-author judgment on both.**
-37. **The schema is versioned. `meta.schemaVersion` is now `8`.**
+37. **The schema is versioned. `meta.schemaVersion` is now `10`.**
 
     | Version | What changed |
     |---|---|
@@ -575,9 +856,54 @@ value the approved design defines, plus the short list the design settled withou
     | 6 | `surfaces.destructive` promoted to required (authored); `swatchStyle` per-state; `legend.labelStyle` added; `turnIndicator` removed |
     | 7 | all spacing and padding keys removed |
     | 8 | `icons.trash` added; `surfaces.destructive.action` reshaped to `{fill, radius}` |
+    | 9 | **animation scope settled as marker-only**: `animation.{claimQuadrant,catGame,winGame,activeQuadrant,lastMove}` demoted from `required` to `deferred`; Neon authors `placeMark` alone; Requirement 18's table loses five rows |
+    | 10 | **`*Style` settled as an inline object carrying its own colour**: the `surfaces` tables gain a **Shape column**, the `textStyle` shape is defined, and the `ref` shape is withdrawn from the legend |
 
-    **No bump for the music Decision** — it changed what `sound.music` means without changing
-    a key path, and its real shape is still open.
+    **v9 is a demotion, not a removal**, and it bumps for the same reason v3's `turnBanner`
+    deferral did: `required` is a contract with Requirement 11's manifest and with Neon's
+    contents, and both changed. A consumer compiled against v8 would look for five keys Neon
+    no longer holds.
+
+    **v10 bumps, and the call is worth showing rather than asserting**, because it is the
+    first bump for something that could be argued as a *clarification* — nothing was ever
+    authored under the `ref` reading, so arguably nothing changed. It bumps anyway, under
+    this requirement's own established rule: **a bump is owed when a key path, a value shape
+    or a status changes; it is not owed when only a meaning does.**
+
+    | Precedent | Bumped? | Why |
+    |---|---|---|
+    | v9 — animation demotion | **yes** | status changed, so Requirement 11's manifest and Neon's contents changed |
+    | the music Decision | no | *"changed what `sound.music` means without changing a key path"* |
+    | music's shape settlement | no | *"kept the key path it already had"* |
+    | startup materialization | no | *"changed no key, no shape and no status"* |
+    | `glyph` as a third mark `kind` | no | the set was already written that way — no structural change |
+    | **v10 — `*Style` as inline object** | **yes** | **shape**, squarely |
+
+    **It is a shape change, not a meaning change, and the distinction is mechanical.** Under
+    `ref`, `surfaces.legend.hintStyle` is a **string** — one YAML scalar, one leaf. Under
+    `textStyle` it is a **map** with three required sub-fields. Neon's `neon.yaml` is
+    materially different text under the two readings, and Requirement 11's
+    `required_keys.dart` gains roughly sixty leaf paths that did not exist as paths before
+    (`…hintStyle.size`, `…hintStyle.weight`, `…hintStyle.color`, and the same for every other
+    `textStyle`). That is precisely the v9 test — *a contract with Requirement 11's manifest
+    and with Neon's contents, and both changed* — and it is met twice over.
+    **The clarification argument is real and still loses.** Its strongest form is that no file
+    exists to migrate. But v9 had no file to migrate either and bumped regardless, because the
+    version is a contract with *consumers*, not a migration counter. Seventeen PRDs cite this
+    schema and several quote a version number in prose; a bump is the only mechanism that
+    makes them re-read rather than trust a stale quote. `P5-01`'s own Open Questions call that
+    decay out by name — *"this PRD's schema references decay silently"* — and this pass found
+    exactly that, twice (`P5-01` at 8, `P3-03` at 8, against a live 9).
+    **The cheaper error is available here and was declined:** not bumping saves nothing, since
+    no migration exists either way, and costs the one signal that tells five downstream PRDs
+    their quoted key shapes are stale.
+    **Still no migration**, for the reason below: Neon's file is written fresh this wave.
+    **No bump for the music Decision, and none for the user's settlement of its shape** — the
+    Decision changed what `sound.music` means without changing a key path, and the settlement
+    kept the key path it already had. Had the `music.<context>` alternative won, this would
+    have been a bump plus a migration; it did not.
+    **No bump for the startup-materialization confirmation** either — it changed no key, no
+    shape and no status, and Requirement 8 already said "at startup."
     **There is no migration:** the only theme file in existence is Neon's, and Requirement 13
     writes it fresh this wave.
 
@@ -587,10 +913,16 @@ value the approved design defines, plus the short list the design settled withou
 - **The delete flow itself** — the swipe gesture, the trash button's behaviour, the modal's
   copy, and what deleting does to storage: `P4-02`. This PRD supplies the glyph slot and the
   two destructive treatments.
-- **Playing music** — no PRD owns it yet.
+- **Playing music** — no PRD owns it yet. The key's shape is settled here (Requirement 17);
+  the layer that starts, loops and stops a track is nobody's, and `P2-02` req 15 records what
+  such a layer inherits from the audio layer.
 - **The settings screen and its four toggles** — `P4-04`.
 - **All spacing and layout numbers**, now code constants.
 - **The animation interpreter** — `P2-04`. **The audio layer** — `P2-02`.
+- **Which moments the game animates.** This PRD says what a theme may *describe* and what
+  Neon *authors*; `P2-04` req 2 holds the marker-only scope on the runtime side and its
+  `AnimationMoment` enum is the executable form of it. The two must agree, and Requirement 18
+  records what happened when they did not.
 - **The how-to-play strip** — `P3-05`. **The scoreboard** — `P3-03`.
 - **The About Us screen's own surface keys** — `1c` ships but no PRD names what it reads.
 - **The Classic theme** — `P5-01`. **Assets and the real logo** — `P5-02`.
@@ -623,12 +955,24 @@ in false negatives elsewhere, and it is more persuasive as an observed case than
 prediction: the missing `trash` slot was found *because* the guard would have stopped the
 workaround.
 
+### A.1b The near-miss the guard cannot see at all — a key nobody should have read
+
+Every row above is a consumer reading the *wrong* key. v9 records the opposite failure: a
+consumer reading a key that resolves perfectly, holds a faithfully transcribed value, and
+**should never have been read**. Five `animation.<moment>` keys were `required`, Neon
+authored them, `required_keys.dart` would have asserted them, and every test would have been
+green — while the app animated five things three design docs say it does not animate.
+
+No scan catches this, because there is nothing wrong with the code. The only defence is the
+one Requirement 15's header now states outright: **naming a key does not decide that anything
+reads it.** A `required` status is a claim about Neon's completeness, not a work item.
+
 ### A.2 Authored, not transcribed — and the two weights of "missing"
 
 Requirement 13(b) is the normative list. The distinction worth carrying: **`icons.trash` is a
 deadlock, the other two are debt.** An unauthored `surfaces.destructive` fill renders as
-something and ships; unauthored animation magnitudes leave motion looking flat. A missing
-glyph has no legal implementation at all — no slot to read, no literal permitted.
+something and ships; unauthored animation magnitudes leave the mark's pop looking flat. A
+missing glyph has no legal implementation at all — no slot to read, no literal permitted.
 
 **The triage rule this produces, for every future `deferred` call:** ask whether the absence
 is *ugly* or *impossible*. Ugly can wait for a design pass — the feature ships, looks wrong,
@@ -637,38 +981,113 @@ and the consumer already reads it. Impossible cannot wait at any price: there is
 implementation an author could write that both satisfies the requirement and passes the
 build, so the feature does not ship at all and no amount of scheduling helps. **Only the
 second kind blocks.** Applied to what is open now: `surfaces.settingsCard.purchases.*` is
-ugly — `P4-04` can render its section unstyled — and music's shape is neither, because nothing
-plays it yet.
+ugly — `P4-04` can render its section unstyled — music's remaining gap is neither, because
+nothing plays it yet and its key now exists with a settled shape, and the five deferred
+animation moments are neither, because nothing requests them.
+
+**The largest instance of *impossible* this rule has caught was not a missing key — it was an
+ambiguous shape, and it went unnoticed for nine versions.** `icons.trash` was one glyph in one
+PRD and was found in a single pass. The `*Style` ambiguity (v10) was roughly twenty text
+elements across five PRDs, and it hid because **every individual key existed**: a reader
+checking completeness found `surfaces.legend.hintStyle` present and `required` and moved on.
+Only when the two readings were written out side by side did it become visible that one of
+them left no colour anywhere — `type.scale` has no colour field, and this section's own rule
+bars the palette fallback. **Four separate reviews reached that conclusion independently**,
+which is the strongest signal available that it was structural rather than a matter of taste.
+**The rule this adds to A.2's triage:** ask *impossible or ugly* about a key's **shape**, not
+only about its presence. A key that exists but cannot express what its consumer must draw is
+in the impossible class, and completeness checks — including Requirement 11's manifest — are
+blind to it by construction, because they assert that a path resolves and never that the
+value at it is sufficient. Appendix A.1b makes the neighbouring point from the other side: a
+path resolving is not evidence that anything should read it.
 
 ---
 
 ## Open Questions
 
-**None of the below blocks a landed consumer from compiling against this PRD.** Items 1 and 7
-are the closest: nothing plays music, and `P4-04` can build its purchases section but has no
-styling source for it. Both are *ugly*, not *impossible*, by A.2's rule.
+**None of the below blocks a landed consumer from compiling against this PRD.** Item 7 is the
+closest: `P4-04` can build its purchases section but has no styling source for it. It is
+*ugly*, not *impossible*, by A.2's rule.
 
 ### Blocking — needs the user
 
-1. **What shape does a theme's music take?** The Decision settles ownership and explicitly
-   leaves open *"whether music loops, whether it differs by screen, and where the audio comes
-   from."* The per-screen half decides the key:
+1. **CLOSED — what shape does a theme's music take?** **Answered by the user: a single
+   `sound.music` key, app-wide, whose value comes from the selected theme.** In the user's
+   words: *"ONe sound.music app wide baised on selected theme."* That is the first of the two
+   candidates this item carried — today's placeholder shape, retained — and the per-screen
+   `music.<context>` map is **not** taken.
 
-   | Shape | Reading | Cost if wrong |
+   | Shape | Reading | Outcome |
    |---|---|---|
-   | `sound.music: assetPath \| null` — today's placeholder | one track for the whole app | every theme authored against it needs re-authoring, plus a version bump and a migration |
-   | `music.<context>: assetPath \| null` | per-screen tracks | provisions keys nothing reads today |
+   | `sound.music: assetPath \| null` — today's placeholder | one track for the whole app | **chosen** |
+   | `music.<context>: assetPath \| null` | per-screen tracks | not taken |
 
-   **Not picked here** — the question is cheap for the user and both wrong answers are
-   expensive.
+   **What this changes here:** Requirement 17 states the shape rather than deferring it,
+   Requirement 15's `sound` section drops its "final shape open" qualifier, Requirement 15's
+   *Not in the schema* table records `music.<context>` as ruled out rather than "not yet",
+   Requirement 13's deferred table now defers the *value* rather than the shape, and
+   Requirement 37 confirms there is no version bump and no migration — which is exactly the
+   cost this item said the other answer would have carried. **What it changes elsewhere:**
+   `P2-02-audio.md` and `P5-01-classic-theme.md` both routed their music questions here.
+   Kept as a numbered stub because both cite this item by number.
+
+   **Still open, and not settled by this answer:** *whether music loops* and *where the audio
+   comes from* — both worded as `Theming.md` → Open Questions words them. *Whether it differs
+   by screen* **is** answered: it does not.
+   **Owed to the docs:** `Theming.md` → Decisions → *Do all four toggles ship, and is music a
+   theme concern?* still leaves all three sub-questions open; one of them is now closed. That
+   doc edit is `forge-doc-writer`'s.
 2. **What goes in Neon's five `"TODO"` sound values.**
 3. **What counts as "fails to load" beyond Requirement 32's table, and what happens if
    *Neon* fails?**
-4. **Are all themes materialized at startup, or only the selected one?**
+4. **CLOSED — are all themes materialized at startup, or only the selected one?**
+   **Confirmed by the user: all of them, at startup.** This is what the requirements already
+   assumed, so **nothing changed** — the item is recorded as a ratification rather than an
+   amendment.
+
+   | Requirement | Why it already depended on the eager answer |
+   |---|---|
+   | 8 | *"Each theme is materialized into a complete theme **at startup**… at runtime every lookup hits a complete theme and there is no fallback step"* |
+   | 24 | `ThemeCatalogEntry` carries a `Theme`, not a `Future<Theme>` and not a lazy getter — one materialized theme per catalog entry |
+   | 32.4 | the catalog entry *is* `{id, name, blurb, assetKey}` **plus the materialized theme**, built during the scan |
+   | 33 | "readable without making it active" is a read, not a load — which is only true if the merge already happened |
+
+   **What the lazy answer would have cost, recorded so the closure is legible:** Requirement
+   24's published type becomes `Future<Theme>` or a lazy getter, which reaches `P4-03`'s
+   theme-selection list — it renders every non-active theme's preview from
+   `themeCatalogProvider`, so a lazy catalog turns a build into an async load with a loading
+   state per row. Requirement 33 would have needed rewording rather than merely holding.
+   Kept as a numbered stub because Requirement 8 and this PRD's header both cite it.
+
+   **What this does not settle:** *when* the catalog build runs relative to first frame, and
+   what the app shows if it is slow. Nothing measures it and no doc raises it; recorded as an
+   observation, not a question.
 5. **Does the animation property set need an eighth member?** `P2-04` reports **shadowbox has
    no obviously right property** — it maps onto `glowRadius`/`glowColor`, but a drop shadow
    that lifts the marker off the board is *directional and offset*.
-6. **Is `glyph` a third mark `kind`?** The docs say *image or icon*; Neon authors `glyph`.
+   **Unaffected by v9, and slightly sharper because of it.** Shadowbox is a *marker*
+   treatment — `Animations.md` → The Animation Vocabulary → Shadowbox describes it as lifting
+   the marker off the board — so it sits squarely inside the settled marker-only scope. It is
+   one of the five vocabulary items a theme is meant to be able to compose for `placeMark`,
+   and it is the one the closed property set cannot express as drawn.
+6. **CLOSED — is `glyph` a third mark `kind`?** **Confirmed by the user: yes. The closed set
+   is `glyph | icon | image`, exactly as Requirement 15's `marks` section already writes
+   it**, and Neon's three marks — `✕`, `○`, `Ø` — stay drawable as glyphs. Requirement 16's
+   "Neon authors a third kind" is therefore **ratified rather than provisional**.
+
+   **What this changes here: nothing structural.** The schema already carried the three-member
+   set, so there is no key change, no shape change, and **no version bump** (Requirement 37) —
+   the same reasoning item 1 records for the music settlement. Requirement 15's `marks` row
+   and Requirement 16 both point at *Blocking*, so this item is kept as a numbered stub rather
+   than renumbered away.
+   **What it changes elsewhere:** `P1-05-theme-guard-test.md`'s `mark-glyph` rule needed no
+   adjustment — the compliant read is `marks.<slot>.value`, an expression, and the rule matches
+   only a literal. `P3-01-board-rendering.md` req 17's per-`kind` size table already treats
+   `glyph` as one of the three.
+   **Owed to the docs:** `Tech Design.md` → Decisions → *Marks — image or icon, supplied by the
+   theme* still says *"an image or an icon"* and does not carry the third kind; `Theming.md` →
+   Decisions → *Marks beyond X and O* is settled by that same Decision and inherits the gap.
+   Those doc edits are `forge-doc-writer`'s.
 7. **Should `surfaces.settingsCard.purchases.*` become `required` (authored)?** It sits where
    `surfaces.destructive` sat — a required reader and a settled placement, but nothing drawn,
    and no Decision describes what the section *is*.
@@ -676,8 +1095,27 @@ styling source for it. Both are *ugly*, not *impossible*, by A.2's rule.
 ### From the design docs — carried, not resolved
 
 - **What form does the legibility contract take?** Unfalsifiable as written.
-- **Which values does Classic Red vs Blue override?** Owned by `P5-01`; it will need a music
-  position the day Blocking 1 lands, and its req 12 needs revisiting against Requirement 21.
+- **What does an absent `tracking`, `lineHeight` or `uppercase` resolve to?** **Raised by
+  `P3-03` req 16 and still open — v10 sharpens it rather than answering it.** Requirement
+  15's `textStyle` table declares all three optional and states **no fallback for any of
+  them**, exactly as the `type.scale` entry did before it. `P3-03` compares them as nullables
+  (*absent equals absent; absent never equals an explicit value*) because that is decidable
+  today, and explicitly records that *"absent == 1.0" is not derivable from any document*.
+  **The gap is not the comparison — it is paint time:** a renderer handed a `textStyle` with
+  no `lineHeight` still has to pass Flutter *something*, and what that something is is
+  unstated. Deliberately not answered here; picking a default would settle by accident the
+  question `P3-03` was careful to leave open. Note this is now a **`surfaces.*` question as
+  well as a `type.*` one**, since v10 puts the same three optional fields on every
+  `textStyle`.
+- **Which values does Classic Red vs Blue override?** Owned by `P5-01`; the music position it
+  was holding open now has a key shape to write against (Blocking 1 is closed), though not a
+  value, and its req 12 needs revisiting against Requirement 21. **v9 shrinks its animation
+  surface**: a theme that wants its own motion personality now overrides one moment, not six.
+- **Where animations fire, beyond the marker.** `Animations.md` → Where Animations Fire lists
+  claiming a quadrant, cat game, winning the game and the two highlights as *"the obvious
+  moments"* under an explicit *"Not yet decided in detail."* The marker-only settlement fixes
+  the **scope of this version**; it does not rule on whether those moments are ever animated.
+  Requirement 15 keeps all five `deferred` for exactly that reason.
 - **Unknown or misspelled keys inside a valid theme file** — Requirement 32 catches malformed
   files and bad versions, not bad keys inside a good one.
 - **Resolved earlier:** spacing and padding (v7), the three lookup paths (Requirement 24), the
@@ -685,12 +1123,31 @@ styling source for it. Both are *ugly*, not *impossible*, by A.2's rule.
   and the `Tech Design.md` guard-table scoping — its table now reads *"`Icons.*` anywhere
   outside the theme layer"*, so nothing is outstanding against Requirement 25.
 - **The exact slot schema.** Requirement 15 is this PRD's answer, structure ratified. Writing
-  it, the chrome-icon Decision and the spacing boundary into `Theming.md` is
-  `forge-doc-writer`'s to route.
+  it, the chrome-icon Decision, the spacing boundary and now the settled music shape into
+  `Theming.md` is `forge-doc-writer`'s to route.
 
 ### Contradiction between docs — flagged, not resolved
 
 - **How many themes the selection list shows** — the handoff's *2a* draws four,
   `Theming.md` says two. `P4-03` → OQ 1 carries it; Requirement 32 is indifferent.
 - **`P2-02-audio.md` reqs 14 and 15 were written under a superseded stance** — "no background
-  music in this version" no longer holds. Being reconciled by that PRD.
+  music in this version" no longer holds. That PRD has since reconciled reqs 14 and 15 against
+  the music Decision, so this flag is stale and can be dropped on the next pass.
+- **The handoff's `neon.theme.json` still draws six animation moments** and its own prose
+  still says marker-only. That contradiction is *inside a read-only reference asset* and is
+  not edited: Requirement 12 records it as a deliberate drift and Requirement 13(a) scopes
+  transcription so nobody re-imports it. Flagged rather than reconciled because the file is a
+  reference, not a source.
+
+### Owed to the design docs — `forge-doc-writer`'s, not this PRD's
+
+- **`Animations.md` → Scope For Now** now describes a **settled** scope rather than a
+  starting one. Its Decisions section carries nine entries and marker-only is not among them,
+  yet the whole doc, `Theming.md`, `Game Board Design.md` and the handoff agree on it and the
+  user has confirmed it. It reads as a hedge and is not one.
+- **`Animations.md` → Decisions → One animation at a time** is no longer in tension with
+  anything, because the repeating moments left the schema. Worth recording there that the
+  tension existed and how it closed.
+- **`Theming.md` → What a Theme Controls → Animation** and **`Game Board Design.md` →
+  Animation & Juice** both state marker-only in passing, in body prose, with no Decision
+  behind either. Same treatment.

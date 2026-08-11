@@ -270,8 +270,13 @@ a written checklist rather than memory.
     So this PRD plans for iPhone **and** iPad (Requirement 22's sizes follow). **Narrowing to
     iPhone-only is reversible until first submission** and remains the user's call.
 
-13. **The submitted build's minimum deployment target is iOS 13**, as set by the scaffold.
-    *[Tech Design → Decisions → Minimum iOS version]*
+13. **The submitted build's minimum deployment target is iOS 15**, as set by the scaffold.
+    *[Tech Design → Decisions → Minimum iOS version, **now "iOS 15"** — raised from iOS 13 by
+    user settlement and since landed in the doc.
+    `P1-01-app-scaffold.md` Requirement 8 is where the target is actually set and carries the
+    reasoning: `P4-05-purchase-flow.md` Requirements 4, 14 and 16 depend on StoreKit 2
+    (`Transaction.currentEntitlements`, `Transaction.updates`, `AppStore.sync()`), which
+    requires iOS 15.]*
 
 36. **Fence — the first release is version `1.0.0`, and the build number is incremented by
     the `release` lane** via `increment_build_number` (Requirement 32), not by hand. *[No doc

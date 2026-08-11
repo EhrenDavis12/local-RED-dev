@@ -9,14 +9,14 @@
 > *2d — Board, pending move*). `Alternative Game Styles.md` is a declared parking-lot doc
 > and was read only to confirm it is out of scope — no requirement here comes from it.
 >
-> **What remains open, and with whom:** one value — the concrete haptic call — is
-> **proposed for ratification** at the top of this document, so the PRD executes the moment
-> it is confirmed. Genuinely with the user: what happens on a device with no haptic engine
-> (OQ-3 — **answering it changes the published interface, not one line**), whether non-tap
-> game events buzz (OQ-4b), and the vibrate-off no-signal case (OQ-5). Carrying a **fenced
-> default** rather than a question: tap-outside-to-clear does not buzz (OQ-4a).
-> **Closed:** the scope of the rule — it is **app-wide** (OQ-2), the vibrate value and its
-> publisher (OQ-7), who asserts requirement 3 (OQ-8), and the `lib/` layer this lives in
+> **What remains open, and with whom:** genuinely with the user — what happens on a device
+> that produces no haptic (OQ-3 — **answering it changes the published interface, not one
+> line**), whether non-tap game events buzz (OQ-4b), and the vibrate-off no-signal case
+> (OQ-5). Carrying a **fenced default** rather than a question: tap-outside-to-clear does not
+> buzz (OQ-4a).
+> **Closed:** the concrete haptic call — **`HapticFeedback.selectionClick()`**, settled by
+> the user (OQ-1), the scope of the rule — it is **app-wide** (OQ-2), the vibrate value and
+> its publisher (OQ-7), who asserts requirement 3 (OQ-8), and the `lib/` layer this lives in
 > (OQ-6).
 >
 > **There are four settings toggles, not three** — Music, Sound Effects, Vibrate on Touch,
@@ -61,7 +61,10 @@
 > part of what "off" means — so it is a wave-4 consumer of this feature, not a dependency of
 > it.
 
-**Depended on by:**
+**Depended on by** — the complete call-site census. **Seven PRDs, across waves 3 and 4.**
+Two of these were missing from earlier revisions of this list while already citing this
+PRD's requirement 1 as having delegated their assertions to them, so the census is now
+stated as the authoritative one and any count elsewhere in this file is derived from it:
 
 - `P3-02-move-input.md` — owns the two-tap select-then-confirm gesture and what counts as a
   legal cell, and calls `HapticService.validAction()` on each valid tap. Requirement 15
@@ -69,14 +72,25 @@
   including the reselection assertion this PRD's requirement 3 needed, and imports the fake
   named in requirement 15.
 - `P3-01-board-rendering.md` — owns the locked/dimmed quadrant styling constrained by the
-  *Design notes* section below. This PRD specifies no visuals.
+  *Design notes* section below. This PRD specifies no visuals. *(A constrained party rather
+  than a caller — it fires nothing.)*
 - **The non-board callers, settled rather than provisional** (see OQ-2):
-  `P3-04-game-over-rematch.md` req 15 (Rematch), `P4-03-theme-selection.md` req 18 (selecting
-  a theme), `P3-03-scoreboard-turn-indicator.md` req 12 (the in-game settings gear) and
-  `P4-01-main-menu.md` req 24 (all four menu buttons) all fire this layer, ratified by
-  `Game Board Design.md` → Decisions → *Does the haptic fire on non-board controls?*
-- `P4-04-settings.md` req 8 owns the *switch* for vibrate on touch and none of the behavior
-  behind it. Its own controls buzz like any others, per the same Decision.
+  - `P3-04-game-over-rematch.md` **req 15** — the result card's two controls.
+  - `P4-03-theme-selection.md` **req 18** — selecting a theme.
+  - `P3-03-scoreboard-turn-indicator.md` **req 12** — the in-game settings gear.
+  - `P4-01-main-menu.md` **req 24** — all four menu buttons.
+  - **`P4-02-open-games-list.md` req 30 — eight call sites** (a row tap that resumes a game,
+    New Game, the trash button, Yes, No, Cancel, Start playing, and the back control), which
+    fires `validAction()` alongside `play(SoundMoment.buttonTap)` and cites this PRD's
+    requirement 1 as having delegated the exactly-once assertion to it.
+  - **`P4-04-settings.md` req 25 — six controls** (the four switches, the exit control and
+    the dismiss control; on `QuickActionsSurface`, the two switches, exit and dismiss), on
+    the same both-channels pattern and citing the same delegation.
+
+  All ratified by `Game Board Design.md` → Decisions → *Does the haptic fire on non-board
+  controls?*
+- `P4-04-settings.md` req 8 also owns the *switch* for vibrate on touch and none of the
+  behavior behind it. Its own controls buzz like any others, per the same Decision.
 
 **A wording trap two callers have already hit, recorded so the next one does not.** A
 call-site requirement phrased *"invokes `playGame()` exactly once and nothing else"* reads as
@@ -99,22 +113,26 @@ doc, restated in `Menus and UI.md` → Settings Menu (*"Fires on every valid cli
 elsewhere"*, and drawn into the approved handoff. Nothing here comes from a single
 unsupported mention.
 
-## Pending confirmation — one value, not a design
+## Settled by the user — one value, not a design
 
-It is needed before a line of this can run, and it is not guessable without committing the
-app to the guess. It carries a proposal, following `P1-01-app-scaffold.md` → *Pending
-confirmation* and `P1-04-persistence.md` req 25, so this PRD is executable the moment it is
-confirmed. It changes nothing else in this document.
+It was needed before a line of this could run, and it was not guessable without committing the
+app to the guess. It carried a proposal, following `P1-01-app-scaffold.md` → *Confirmed by the
+user* and `P1-04-persistence.md` req 25, and **the user has now settled it, accepting that
+proposal as written**. It changes nothing else in this document.
 
-**Which concrete haptic the "small, subtle buzz" is.** An implementer must emit exactly one
-call, and no fence substitutes for it. **Proposed: `HapticFeedback.selectionClick()`** from
-`package:flutter/services.dart`. Reasoning, all from requirement 6's sources: it is the
-lightest thing the Flutter surface offers and the only one whose name and platform meaning
-are *"a selection changed"* — which is what `Menus and UI.md` → Vibrate on Touch asks for,
-*"enough to confirm 'you selected that,' nothing more."* The impact family (`lightImpact` /
-`mediumImpact` / `heavyImpact`) carries a collision metaphor, and `vibrate()` is the rumble
-that same section rules out. Stated in executable form as requirement 18; recorded as
-unsettled at OQ-1.
+**Which concrete haptic the "small, subtle buzz" is: `HapticFeedback.selectionClick()`** from
+`package:flutter/services.dart` — *settled by the user*. An implementer must emit exactly one
+call, and no fence substitutes for it. The reasoning the accepted proposal carried, all from
+requirement 6's sources: it is the lightest thing the Flutter surface offers and the only one
+whose name and platform meaning are *"a selection changed"* — which is what `Menus and UI.md`
+→ Vibrate on Touch asks for, *"enough to confirm 'you selected that,' nothing more."* The
+impact family (`lightImpact` / `mediumImpact` / `heavyImpact`) carries a collision metaphor,
+and `vibrate()` is the rumble that same section rules out. Stated in executable form as
+requirement 18; recorded as closed at OQ-1.
+
+**No design doc names this call.** It is the user's settlement recorded in this PRD, not a
+citation — `Menus and UI.md` → Vibrate on Touch specifies only the feel. Landing it in a
+design doc, if that is wanted, is `forge-doc-writer`'s.
 
 ## Problem
 
@@ -127,8 +145,8 @@ The docs answer that with feedback the player feels rather than reads, and they 
 without an error state: nothing shakes, flashes, or tells the player off. That only works if
 the rule holds everywhere and without exception — a buzz that fires on an illegal tap, or
 fails to fire on a legal one, inverts the signal and makes the board less trustworthy than
-having no haptic at all. Today no such rule is implemented anywhere, and six PRDs across
-three waves call into a layer that has no name, no signature, and no seam a test can hold.
+having no haptic at all. Today no such rule is implemented anywhere, and **seven PRDs across
+waves 3 and 4** call into a layer that has no name, no signature, and no seam a test can hold.
 
 ## Goal
 
@@ -139,17 +157,16 @@ error message, no shake and no flash to explain itself. The buzz is gated only b
 setting, lives at the application-setting level, is identical under every theme, and reaches
 its callers through one named, injectable entry point that owns the gate.
 
-Two conditions on that sentence, stated rather than smoothed over:
+One condition on that sentence, stated rather than smoothed over:
 
 - **With the setting off there is no validity signal at all.** Requirement 5 and the
   *Design notes* forbid any substitute, so a legal tap and an illegal tap become
   indistinguishable to a player who is not watching the screen. That follows from the docs;
   whether it is the intended outcome is with the user — see OQ-5.
-- **One value is proposed, not decided** — the concrete haptic call. See *Pending
-  confirmation*.
 
-The scope question that stood here through three revisions is closed: the rule is **app-wide**
-(OQ-2). OQ-4a records a smaller, still-fenced instance of the same shape.
+Two things that stood here through earlier revisions are closed: the scope question — the rule
+is **app-wide** (OQ-2) — and the concrete haptic call, **`HapticFeedback.selectionClick()`**,
+settled by the user (OQ-1). OQ-4a records a smaller, still-fenced instance of the scope shape.
 
 ## Requirements
 
@@ -170,9 +187,22 @@ The scope question that stood here through three revisions is closed: the rule i
    design.
    *Wave note:* assertable here as *one call to `validAction()` produces at most one platform
    message, never two* (requirement 15 names the message). That a valid **tap** reaches
-   `validAction()` exactly once is a call-site fact, owned by each calling PRD —
-   `P3-02-move-input.md` req 14 for the board, and reqs 15 / 18 / 12 / 24 of `P3-04`,
-   `P4-03`, `P3-03` and `P4-01` for the non-board controls.
+   `validAction()` exactly once is a call-site fact, owned by each calling PRD. **All seven
+   owners, matching the census under *Depended on by*:**
+   - `P3-02-move-input.md` **req 14** — the board's two-tap gesture;
+   - `P3-03-scoreboard-turn-indicator.md` **req 12** — the in-game settings gear;
+   - `P3-04-game-over-rematch.md` **req 15** — the result card's two controls;
+   - `P4-01-main-menu.md` **req 24** — the four menu buttons;
+   - `P4-02-open-games-list.md` **req 30** — **eight** call sites on the list and its two
+     modals;
+   - `P4-03-theme-selection.md` **req 18** — selecting a theme;
+   - `P4-04-settings.md` **req 25** — **six** controls across the settings screen and the
+     in-game quick-actions surface.
+
+   The last two were absent from earlier revisions of this note while both already cited this
+   requirement as the thing that delegated the assertion to them — a delegation naming nobody
+   on one side. The census is the fix; **what each of those PRDs owns is stated in
+   requirement 10's wave note, which is narrower than "the call-site half" used to suggest.**
 
 2. **The first tap of a two-tap move fires it**, because selecting a legal cell is itself a
    valid action. The confirming second tap, being a valid action too, fires it as well.
@@ -270,7 +300,7 @@ The scope question that stood here through three revisions is closed: the rule i
    *Wave note:* fully assertable in this wave — it is a property of requirement 14's
    implementation, not of any screen. "No distinct haptic per action type" is enforced
    structurally: `validAction()` takes no argument, so no caller can ask for a different one.
-   Which concrete call it is, is requirement 18 and OQ-1.
+   Which concrete call it is, is requirement 18, settled by the user.
 
 ### Where it lives
 
@@ -293,9 +323,14 @@ The scope question that stood here through three revisions is closed: the rule i
    the same under every theme"); → the theme-boundary table (Haptics / vibration: ❌ No — app
    setting).*
    *Testable, wave 2 — the structural form, which is the normative one.* Both overrides and
-   both assertions below are required:
+   both assertions below are required, **and the test runs under an initialized test
+   binding** — see the note after the snippet:
 
     ```dart
+    // Required: validAction() reaches a real platform channel when the gate is open.
+    // Requirement 14a — without this the channel call has no binary messenger.
+    TestWidgetsFlutterBinding.ensureInitialized();
+
     final container = ProviderContainer(overrides: [
       // Required: resolving hapticServiceProvider builds settingsProvider, whose
       // build() fires unawaited(_seed()) → ref.read(preferencesRepositoryProvider).
@@ -358,12 +393,52 @@ The scope question that stood here through three revisions is closed: the rule i
     *Source: `Game Board Design.md` → Haptic Rule ("Subject to the vibrate-on-touch setting
     being on"); `Menus and UI.md` → Settings Menu ("**Vibrate on touch** — Haptic feedback on
     tap. Fires on every *valid* click. On/off").*
-    *Testable:* with a `VibrateOnTouchSource` returning `false`, `validAction()` emits zero
-    platform messages on the channel requirement 15 names; returning `true`, exactly one.
+    *Testable:* **under an initialized test binding** (requirement 14a), with a
+    `VibrateOnTouchSource` returning `false`, `validAction()` emits zero platform messages on
+    the channel requirement 15 names; returning `true`, exactly one.
     "Anywhere in the app" is now a settled scope rather than a bounded one (OQ-2), and
     requirement 13 is what makes it enforceable rather than a promise about future callers.
-    *Wave note:* fully assertable in this wave. The call-site half — that a real control fires
-    nothing with the setting off — belongs to each calling PRD.
+
+    *Wave note — **this requirement is assertable only here, and that is the whole of it.***
+    An earlier revision of this note said the call-site half — *"a real control fires nothing
+    with the setting off"* — belonged to each calling PRD. **That was unimplementable as
+    written, and five sibling requirements are split 3–2 on it**, so it is restated rather
+    than left to be discovered at test-writing time.
+
+    **Why a calling PRD cannot assert it.** The gate lives inside `PlatformHapticService`
+    (requirement 13), and requirement 15's *sanctioned* mechanism for a call-site test is
+    overriding `hapticServiceProvider` with **`FakeHapticService`** — which implements
+    `HapticService` and **has no gate**. Under that override, a call-site test with vibrate
+    off records **1**, not 0, because the setting is not in the object under test. The only
+    mechanism that could observe zero at a call site is **channel interception**, and
+    requirement 15 explicitly forbids that outside this layer (*"a widget test that overrides
+    `hapticServiceProvider` … with no mock method-call handler and no `SystemChannels`
+    interception anywhere in that test"*). So the assertion has no legal implementation at a
+    call site: written the sanctioned way it fails a correct implementation, and written the
+    way that would pass it breaks a different requirement.
+
+    **What this layer owns:** that `validAction()` emits one platform message with the gate
+    open and zero with it closed — the testable above, in
+    `test/haptics/haptic_service_test.dart`. **Nothing else in the app asserts the
+    vibrate-off case for the haptic channel.**
+
+    **What a calling PRD owns**, and the correct wording for it: that its control **calls
+    `validAction()` exactly once per valid activation, unconditionally, without reading the
+    setting** — counted against `FakeHapticService`. That count is the *same* with vibrate on
+    and off, and asserting it is so is a legitimate and useful call-site test: it is what
+    proves the call site holds no gate of its own (requirement 13).
+
+    **Siblings currently divergent — reported, not edited from here.** `P4-01-main-menu.md`
+    req 24 and `P4-03-theme-selection.md` req 18 already take the correct reading.
+    `P3-04-game-over-rematch.md` req 15 (*"with it off, none"*) and `P4-04-settings.md`
+    reqs 8 and 25 (*"with the respective setting off, that channel records zero"*) take the
+    unimplementable one. Those are their PRDs' lines to change, not this one's; this note is
+    what they should be re-pointed at.
+    *Not in scope of this note:* the **audio** channel's equivalent. `P2-02-audio.md` req 6
+    gates inside `ThemedAudioLayer` and publishes `RecordingOneShotSink`, which sits *below*
+    its gate — so a sound-off assertion may well be implementable there by a mechanism this
+    layer does not have. Whether a given sibling's sound-off clause holds is that PRD's
+    question, and nothing here should be read as answering it.
 
 11. **The setting is a global player setting, not a theme property**, and its stored value is
     what governs — this feature reads it and never owns, defaults or writes it.
@@ -399,13 +474,16 @@ The scope question that stood here through three revisions is closed: the rule i
 
 ### The published interface
 
-> Six PRDs across three waves call into this layer. Everything in this section is normative:
-> these are the names and signatures they may code against. The **names** are an engineering
-> call, not a doc citation — no design doc names an API; the docs settle meaning, not
-> signatures. The **mechanism** is fixed by `Tech Design.md` → Decisions → State management —
-> Riverpod and by `P1-01-app-scaffold.md` reqs 11–12 (plain providers, no `@riverpod`
-> codegen, no legacy `StateNotifier`). The symbols this section uses but does not define —
-> `vibrateOnTouchEnabledProvider`, `settingsProvider`, `SettingsNotifier`,
+> **Seven PRDs, across waves 3 and 4, call into this layer** — the census under *Depended on
+> by* is the authoritative list, and this count is derived from it. *(Earlier revisions said
+> six, here and at OQ-3, while `P4-02-open-games-list.md` req 30 and `P4-04-settings.md`
+> req 25 were already coding against this interface.)* Everything in this section is
+> normative: these are the names and signatures they may code against. The **names** are an
+> engineering call, not a doc citation — no design doc names an API; the docs settle meaning,
+> not signatures. The **mechanism** is fixed by `Tech Design.md` → Decisions → State
+> management — Riverpod and by `P1-01-app-scaffold.md` reqs 11–12 (plain providers, no
+> `@riverpod` codegen, no legacy `StateNotifier`). The symbols this section uses but does not
+> define — `vibrateOnTouchEnabledProvider`, `settingsProvider`, `SettingsNotifier`,
 > `preferencesRepositoryProvider`, `PreferencesRepository`, `activeThemeProvider`,
 > `themeCatalogProvider`, `activeThemeIdProvider` — are declared by `P1-04-persistence.md`
 > reqs 21, 26 and 28 and `P1-03-theme-system.md` req 24. Nothing below is a forward reference
@@ -426,10 +504,15 @@ The scope question that stood here through three revisions is closed: the rule i
     requirement 10 depend on every future caller remembering, and a caller that forgets breaks
     it invisibly. That risk grew with the Decision, which multiplied the call sites. This
     mirrors `P2-02-audio.md` req 2, which takes the same shape for sound.)*
+    **This is also what makes requirement 10's wave note come out the way it does:** putting
+    the gate inside the layer is precisely what puts the vibrate-off assertion inside the
+    layer's own test and out of every call site's reach. The two are the same decision seen
+    from two ends.
     *Testable:* a call site that invokes the layer unconditionally produces one platform
     message with the setting on and zero with it off, without the call site reading the
     preference; a source scan finds no `HapticFeedback.` call and no platform-channel haptic
-    invocation anywhere in `lib/` outside `lib/haptics/`.
+    invocation anywhere in `lib/` outside `lib/haptics/`. **The first clause is asserted in
+    this layer's own test, standing in for a call site** — see requirement 10's wave note.
 
 14. **The public surface is named, and these are the names.**
 
@@ -487,15 +570,22 @@ The scope question that stood here through three revisions is closed: the rule i
     );
     ```
 
+    **The import path for the settings provider family is `'../state/settings_providers.dart'`
+    — `lib/state/`, not `lib/storage/`.** `P1-04-persistence.md` req 26 declares
+    `vibrateOnTouchEnabledProvider` there. Stated because `P2-02-audio.md` req 5 records that
+    this PRD *"shipped an import path pointing at the wrong one for this provider family"*;
+    that accusation is **stale** — the line above is correct as written, and correcting the
+    record is that PRD's edit, not this one's.
+
     **Why the platform future is caught at all, stated accurately.**
     `HapticFeedback.selectionClick()` returns `Future<void>` over `SystemChannels.platform`,
     which is implemented by the **Flutter engine itself, not by a plugin** — so
-    `MissingPluginException` there is effectively unreachable on a real device, and on the
-    iPad that OQ-3 is about **the call succeeds and does nothing**. The catch is therefore
-    *not* a device-capability fence and must not be read as one; an earlier revision of this
-    PRD claimed it was, and that claim was wrong. It is here because a bare call makes a
-    rejection — from a future platform port, an engine change, or a test harness — an
-    **unhandled async error**, which `P1-06-crash-reporting.md` req 2 routes to
+    `MissingPluginException` there is effectively unreachable on a real device, and on
+    hardware that produces no haptic (OQ-3) **the call succeeds and does nothing**. The catch
+    is therefore *not* a device-capability fence and must not be read as one; an earlier
+    revision of this PRD claimed it was, and that claim was wrong. It is here because a bare
+    call makes a rejection — from a future platform port, an engine change, or a test harness
+    — an **unhandled async error**, which `P1-06-crash-reporting.md` req 2 routes to
     `PlatformDispatcher.instance.onError` and turns into a `CrashReport`. Catching costs one
     line and keeps this layer inside `P1-06` req 1's scope, which reports **unhandled** errors
     only.
@@ -539,14 +629,18 @@ The scope question that stood here through three revisions is closed: the rule i
     requirement 17, which requires the same instance to reflect the new value with nothing
     captured at construction. The closure captures `ref`, not the `bool`, so each fire
     re-reads the current value — which is what requirement 12 asks for, with no rebuild.
-    *Testable — the seam:* a unit test constructs `PlatformHapticService` with a fake source
-    and asserts both branches; a source scan finds exactly one class in `lib/` implementing
-    `HapticService`, and no construction of it outside the provider.
+    *Testable — the seam:* **under an initialized test binding (requirement 14a)**, a unit
+    test constructs `PlatformHapticService` with a fake source and asserts both branches; a
+    source scan finds exactly one class in `lib/` implementing `HapticService`, and no
+    construction of it outside the provider.
     *Testable — the `read`/`watch` constraint.* **The scan is what holds this line: a source
     scan of `lib/haptics/` finds no `ref.watch`.** A behavioral test is possible but must be
     written exactly one way, with every variable below pinned:
 
     ```dart
+    // Required — see requirement 14a. validAction() reaches a real channel here.
+    TestWidgetsFlutterBinding.ensureInitialized();
+
     // _NullPreferencesRepository is this PRD's own stub — requirement 15's table.
     final container = ProviderContainer(overrides: [
       preferencesRepositoryProvider.overrideWithValue(_NullPreferencesRepository()),
@@ -575,6 +669,35 @@ The scope question that stood here through three revisions is closed: the rule i
     bug it exists to catch**, while the "still reflects the new value" half fails a *correct*
     implementation. An earlier revision of this PRD specified that recipe; it was wrong.
 
+14a. **Every test in this PRD that lets a real platform call through runs under an
+     initialized test binding.** `TestWidgetsFlutterBinding.ensureInitialized()` is called
+     before any test that invokes `validAction()` with the gate **open**, and before any test
+     that installs a mock method-call handler.
+     *(**Derived, not cited** — no design doc discusses test harnesses. It is a property of
+     the mechanism requirement 14 chose: `HapticFeedback.selectionClick()` sends over
+     `SystemChannels.platform`, and a channel send needs a binary messenger, which only the
+     binding provides. `TestDefaultBinaryMessenger.setMockMethodCallHandler` — requirement
+     15's interception mechanism — is reached through
+     `TestWidgetsFlutterBinding.instance.defaultBinaryMessenger` and does not exist without
+     it.)*
+     **Which tests this covers, named so none is missed:** requirement 6's "one platform
+     message" assertion, requirement 8's element walk (its `validAction()` call fires the real
+     channel with the gate open, since `_NullPreferencesRepository` leaves the seed at the
+     `true` default), requirement 10's both-branches gate test, requirement 13's
+     one-message/zero-message pair, requirement 14's seam test and its `read`/`watch` recipe,
+     requirement 17's mutable-source sequence, and requirement 18's call assertion.
+     **The numbering is deliberate.** This is appended as `14a` rather than as requirement 20
+     so that the eight requirement numbers sibling PRDs cite into this file — and the
+     interface block at requirement 14 they are written against — do not shift.
+     **This does not make the layer depend on `flutter_test` at runtime.** The binding is a
+     test-only concern; requirement 16's dependency claim is unchanged, since `flutter_test`
+     is a dev dependency `P1-01-app-scaffold.md` req 14 already declares.
+     *Testable:* `test/haptics/haptic_service_test.dart` calls
+     `TestWidgetsFlutterBinding.ensureInitialized()` before its first test, and the suite
+     passes from a cold `flutter test` with no other test file having run first — which is the
+     failure mode this exists to prevent, since a binding initialized by an unrelated test
+     makes the omission invisible locally and reappear in isolation.
+
 15. **The entry point is injectable, and that is what makes it observable — and these are the
     test names.** A widget or unit test replaces the whole service through
     `ProviderScope(overrides: [hapticServiceProvider.overrideWithValue(FakeHapticService())])`.
@@ -586,19 +709,19 @@ The scope question that stood here through three revisions is closed: the rule i
 
     | Name | Shape | Where | Why pinned |
     |---|---|---|---|
-    | `FakeHapticService` | `implements HapticService`; records each `validAction()` and exposes **`int get count`** — and nothing else | `test/haptics/fake_haptic_service.dart` — **public, not private to a test file** | `P3-02-move-input.md` req 14 imports it by this exact name and asserts `→ 1`, `→ 2`, `→ 3` in wave 3, and the non-board callers ratified at OQ-2 do the same. Naming it differently, scoping it privately, **or exposing the tally under a different member** each break a test that is already written. `int get count` is the member those assertions read. |
+    | `FakeHapticService` | `implements HapticService`; records each `validAction()` and exposes **`int get count`** — and nothing else | `test/haptics/fake_haptic_service.dart` — **public, not private to a test file** | `P3-02-move-input.md` req 14 imports it by this exact name and asserts `→ 1`, `→ 2`, `→ 3` in wave 3, and the six non-board callers ratified at OQ-2 do the same. Naming it differently, scoping it privately, **or exposing the tally under a different member** each break a test that is already written. `int get count` is the member those assertions read. **It carries no gate** — which is why the vibrate-off case cannot be asserted through it; see requirement 10's wave note. |
     | `_NullPreferencesRepository` | `implements PreferencesRepository` (`P1-04` req 21) — **all ten members**: the five reads (`readSelectedThemeUuid` → `Future<String?>`; `readMusicEnabled` / `readSoundEffectsEnabled` / `readVibrateOnTouchEnabled` / `readAnimationsEnabled` → `Future<bool?>`) each return `null`; the five writes accept and discard | private to `test/haptics/haptic_service_test.dart` | Requirements 8 and 14 both depend on the null-returning reads, and `setVibrateOnTouch` calls a write, so a read-only stub fails at runtime. **Ten, because there are five preferences** — theme, music, sound effects, vibrate, animations (`Menus and UI.md` → Settings Menu, four toggles; plus the theme UUID). Earlier revisions said three reads and then eight members; both predate `Theming.md` → Decisions → *Do all four toggles ship…* and neither compiles. *No PRD declares a shared in-memory `PreferencesRepository` fake — `P1-04` req 13 mentions its providers "can be overridden with an in-memory fake" but names no type, path or behavior. If `P1-04` ever publishes one, delete this stub and use it.* |
-    | `haptic_service_test.dart` | this layer's own tests — requirements 6, 8, 10, 13, 14, 17, 18 | `test/haptics/haptic_service_test.dart` | — |
+    | `haptic_service_test.dart` | this layer's own tests — requirements 6, 8, 10, 13, 14, 14a, 17, 18 | `test/haptics/haptic_service_test.dart` | — |
 
     **Where channel interception *is* legitimate, and what to intercept.** This layer's own
     tests are the one place `HapticFeedback` is the unit under test rather than a sibling's
     internals. The target, named once here so requirements 1, 6, 10 and 13 all inherit it:
     **`SystemChannels.platform`** (the `flutter/platform` channel), method call
     **`HapticFeedback.vibrate`** with argument **`'HapticFeedbackType.selectionClick'`** —
-    that is what `HapticFeedback.selectionClick()` sends. Intercept it with
-    `TestDefaultBinaryMessenger.setMockMethodCallHandler` and count matching calls. If OQ-1
-    ratifies a different call, the *method* stays `HapticFeedback.vibrate` and only the
-    argument string changes, so every count above survives the change — see requirement 18.
+    that is what `HapticFeedback.selectionClick()` sends, and requirement 18 is now settled on
+    that call, so this target is fixed rather than provisional. Intercept it with
+    `TestDefaultBinaryMessenger.setMockMethodCallHandler` and count matching calls, **under
+    the binding requirement 14a requires.**
     *Testable:* a widget test that overrides `hapticServiceProvider` observes every call the
     widget under test makes, with no mock method-call handler and no `SystemChannels`
     interception anywhere in that test.
@@ -611,7 +734,8 @@ The scope question that stood here through three revisions is closed: the rule i
     wave** and requires any later addition to amend that requirement rather than appear
     silently. This requirement is the amendment that does not happen: the table gains no row
     for haptics. `dart:async` is a core library, not a pub package, so it is not a table
-    entry either.)*
+    entry either, and `flutter_test` — which requirement 14a's binding comes from — is
+    already a dev entry in that table.)*
     *Testable:* `pubspec.yaml` is unchanged by this feature; a scan of `lib/haptics/` finds
     no import outside `dart:async`, `package:flutter/`, `package:flutter_riverpod/`, and this
     project's own `lib/state/settings_providers.dart` — the allow-list requirement 5's
@@ -634,29 +758,32 @@ The scope question that stood here through three revisions is closed: the rule i
     bootstrap — is `P1-01-app-scaffold.md`'s `main.dart` territory. Nothing in this layer
     changes either way, though the window now covers menu taps too (OQ-2), which is a reason
     for `P1-01` to take the mitigation rather than a change here.
-    *Testable, and this is requirement 12's wave-2 assertable form:* build the service with a
-    mutable fake — `var enabled = true; final s = PlatformHapticService(() => enabled);` —
-    call `validAction()` (one platform message), set `enabled = false`, call again (zero),
-    set it back to `true`, call again (one), with no rebuild and no reconstruction of the
-    service in between. (A captured variable is correct **here**, where the fake *is* the
-    source and Riverpod is not involved — unlike requirement 14's provider-level test, where
-    it silently defeats the assertion.)
+    *Testable, and this is requirement 12's wave-2 assertable form:* **under an initialized
+    test binding (requirement 14a)**, build the service with a mutable fake —
+    `var enabled = true; final s = PlatformHapticService(() => enabled);` — call
+    `validAction()` (one platform message), set `enabled = false`, call again (zero), set it
+    back to `true`, call again (one), with no rebuild and no reconstruction of the service in
+    between. (A captured variable is correct **here**, where the fake *is* the source and
+    Riverpod is not involved — unlike requirement 14's provider-level test, where it silently
+    defeats the assertion.)
 
 ### The concrete haptic, and the version it is written against
 
 18. **`validAction()` emits exactly one `HapticFeedback.selectionClick()`.**
-    ***Proposed for ratification — see Pending confirmation.*** No design doc names a platform
+    ***Settled by the user — see Settled by the user, above.*** No design doc names a platform
     call; requirement 6 constrains only the character ("small, subtle", "not a rumble", one
-    per action), and OQ-1 records that the mapping is unsettled. This requirement states the
-    proposal in executable form so that an implementer emits the agreed line rather than
-    picking one silently, and so that changing it later is a one-line edit at a single call
-    site — which is what requirement 13 buys.
+    per action), and this value is the user's settlement rather than a citation. It is stated
+    in executable form so that an implementer emits the agreed line rather than picking one
+    silently, and changing it later remains a one-line edit at a single call site — which is
+    what requirement 13 buys.
     *Testable:* `lib/haptics/haptic_service.dart` contains exactly one `HapticFeedback.`
-    call; no other file in `lib/` contains any.
-    *Cost of ratifying differently:* one line here and one argument string in requirement
-    15's interception target. No count, no test structure and no other requirement changes.
-    **This cheapness is specific to OQ-1** and does not extend to OQ-3, which changes the
-    interface — the two are priced separately for that reason.
+    call; no other file in `lib/` contains any. The behavioral half — that one
+    `validAction()` with the gate open sends that exact method call — runs under requirement
+    14a's binding.
+    *Cost of ever revisiting it:* one line here and one argument string in requirement 15's
+    interception target. No count, no test structure and no other requirement changes.
+    **This cheapness was specific to OQ-1** and does not extend to OQ-3, which changes the
+    interface — the two were priced separately for that reason.
 
 19. **The Riverpod major is pinned at 2.x for this layer's tests.** Requirement 8's element
     walk uses `ProviderContainer.getAllProviderElements()` and `ProviderElement.origin`;
@@ -695,16 +822,18 @@ Named so the boundary is explicit. Each is specified elsewhere; do not specify i
   actions; it does not define them, and that PRD's reqs 10 and 14 own the board-level
   assertions that requirements 2–4 here state as rules.
 - **Which non-board controls exist, and their own call sites** — `P3-03`, `P3-04`, `P4-01`,
-  `P4-03`, `P4-04`. The Decision at OQ-2 settles that they buzz; each PRD owns the call and
-  its assertion.
+  `P4-02`, `P4-03`, `P4-04`. The Decision at OQ-2 settles that they buzz; each PRD owns the
+  call and its exactly-once count. **It does not own the vibrate-off assertion** —
+  requirement 10's wave note.
 - **Locked, dimmed, claimed and cat-game quadrant visuals, and the three highlights** —
   `P3-01-board-rendering.md`. The *Design notes* record a constraint on that work, nothing
   more.
 - **The settings screen and sheet, the four toggle controls, and their layout** —
   `P4-04-settings.md`, whose req 8 owns the vibrate switch.
 - **The music toggle, and music itself** — `Theming.md` → Decisions → *Do all four toggles
-  ship, and is music a theme concern?* makes music a theme channel;
-  `P1-04-persistence.md` stores it and publishes `musicEnabledProvider`, which has no
+  ship, and is music a theme concern?* makes music a theme channel, and the user has since
+  settled its shape as a single app-wide `sound.music` key (`P1-03-theme-system.md` req 17);
+  `P1-04-persistence.md` stores the toggle and publishes `musicEnabledProvider`, which has no
   consumer yet. None of it is a haptics concern, and this layer reads only the vibrate
   provider.
 - **Storing the preferences, declaring `settingsProvider` / `vibrateOnTouchEnabledProvider` /
@@ -719,7 +848,9 @@ Named so the boundary is explicit. Each is specified elsewhere; do not specify i
   `P1-06-crash-reporting.md`. Requirement 14 only decides what this layer hands to that path.
 - **Sound effects and the audio package** — `P2-02-audio.md`. Sound is theme-driven and fires
   on different events; the two channels are specified separately and must not be wired
-  together.
+  together. **Whether a sound-off assertion is implementable at a call site is that PRD's
+  question**, not this one's — its gate and its doubles are shaped differently, so
+  requirement 10's wave note does not carry across.
 - **Animations and the animations toggle** — `P2-04-animations.md`.
 - **Anything from `Alternative Game Styles.md`.** That is a declared parking-lot doc and
   explicitly not the game being built.
@@ -727,20 +858,28 @@ Named so the boundary is explicit. Each is specified elsewhere; do not specify i
 ## Open Questions
 
 Everything fenceable has been fenced into a requirement or a default above, and the one value
-that could not be fenced carries a proposal at the top. Numbers are stable; answered ones are
+that could not be fenced has been settled by the user. Numbers are stable; answered ones are
 kept as closed stubs, following `P1-02-engine-rules.md` and `P3-02-move-input.md`.
 
-### OQ-1 — Which concrete haptic does "small, subtle buzz" map to?
+### OQ-1 — Closed: the concrete haptic is `HapticFeedback.selectionClick()`
 
-*(Answered above as a proposal, needing confirmation — *Pending confirmation* and
-requirement 18.)*
+**Answered by the user**, accepting this PRD's proposal as written — see *Settled by the user*
+at the top and requirement 18.
 
 `Menus and UI.md` → Vibrate on Touch specifies the *feel* — "a **small, subtle buzz**",
-"deliberately subtle", "not a rumble" — and no doc names a platform API or intensity. iOS is
-the primary target (`Tech Design.md` → Decisions → Primary target — Apple). A fence does not
-substitute here: an implementer must emit one line, so the choice is made either by the user
-or by whoever types it. Requirement 18 records the reversal cost: one line, one argument
-string, nothing else.
+"deliberately subtle", "not a rumble" — and no doc names a platform API or intensity, so this
+could never have been closed by reading. iOS is the primary target (`Tech Design.md` →
+Decisions → Primary target — Apple). A fence did not substitute here: an implementer must emit
+one line, so the choice was made either by the user or by whoever typed it, and it was made by
+the user.
+
+**What this changes here:** requirement 18 states the call rather than proposing it, and
+requirement 15's interception target — method `HapticFeedback.vibrate` with argument
+`'HapticFeedbackType.selectionClick'` — is fixed rather than conditional. Nothing else in this
+PRD moves. Kept as a stub because requirements 6, 15 and 18 reference this number.
+
+**Owed to the docs:** no design doc records the call. `forge-doc-writer`'s to land, if it is
+wanted there.
 
 ### OQ-2 — Closed: the rule is app-wide
 
@@ -759,39 +898,57 @@ records that the board is one instance of the rule and not its extent, and requi
 "anywhere in the app" is enforceable in the plain sense. **What it changed elsewhere:** nothing
 was deleted. `P3-04` req 15, `P4-03` req 18 and `P3-03` req 12 are ratified; `P4-03` has
 dropped its conditional; and `P4-01-main-menu.md` added req 24, firing the buzz on all four
-menu buttons. Two of those PRDs also had to narrow "and nothing else" to "no other
+menu buttons. `P4-02-open-games-list.md` req 30 and `P4-04-settings.md` req 25 are the same
+Decision's consequence on two more surfaces — see the census under *Depended on by*, which now
+names them. Two of those PRDs also had to narrow "and nothing else" to "no other
 **navigation** operation" — see the wording-trap note near the top of this file.
 
-Kept as a stub because four requirements and four sibling PRDs reference this number. The
+Kept as a stub because four requirements and six sibling PRDs reference this number. The
 escalation table it carried is deleted — it did its job.
 
-### OQ-3 — What happens on a device with no haptic engine?
+### OQ-3 — What happens on a device that produces no haptic?
 
-No doc addresses it. `Tech Design.md` → Decisions → Device support names iPhone first, iPad
-second, Android far future — and iPad has no Taptic Engine, so this is reachable inside the
-stated support ordering, not a hypothetical.
+No doc addresses it. **Two ways to reach this state, and the second is on the primary target:**
+
+- **Hardware with no haptic engine.** `Tech Design.md` → Decisions → Device support names
+  iPhone first, iPad second, Android far future — and iPad has no Taptic Engine, so this is
+  reachable inside the stated support ordering, not a hypothetical.
+- **An iPhone with iOS *System Haptics* switched off**, in the OS's own Sounds & Haptics
+  settings. The hardware is present and capable; the system simply does not play the feedback.
+  **This produces the identical silent no-op while the app's own Vibrate on Touch toggle still
+  reads ON** — so the question is reachable on the *primary* target, on ordinary hardware, and
+  is not confined to iPad. An earlier revision framed it as an iPad case only, which
+  understated both how often it occurs and how confusing it is: a player who has the app's
+  switch on and feels nothing has no way to tell that a different switch is responsible.
 
 **What actually happens today, stated precisely.** `HapticFeedback.selectionClick()` goes over
-`SystemChannels.platform`, which the Flutter engine implements directly. On hardware with no
-haptic engine the call **succeeds and does nothing** — it does not reject, and requirement 14's
-`catchError` is *not* what handles it. So the current behavior is a silent no-op, and it is a
-no-op by default rather than by design.
+`SystemChannels.platform`, which the Flutter engine implements directly. In both cases above
+the call **succeeds and does nothing** — it does not reject, and requirement 14's `catchError`
+is *not* what handles it. So the current behavior is a silent no-op, and it is a no-op by
+default rather than by design.
 
 **The consequence, which this PRD is the right place to record: there is no observable signal
 anywhere in this design by which this question could be answered.** Nothing in the app can
-currently distinguish "buzzed" from "did nothing" on a device that cannot buzz. That makes the
-reversal more expensive than an earlier revision of this PRD claimed:
+currently distinguish "buzzed" from "did nothing" on a device or in a system configuration
+that will not buzz. That makes the reversal more expensive than an earlier revision of this
+PRD claimed:
 
 - *"Fall back to a system vibration"* — a change to requirement 14's single line. Cheap.
+  Note it does not help the System-Haptics-off case, where the OS is the thing declining.
 - *"Hide the toggle on hardware that cannot buzz"* (`P4-04-settings.md`) — **not cheap, and
   not a line.** It needs capability *detection*, and `HapticService` has exactly one member
   returning `void`, pinned there by requirement 5 precisely so an illegal tap can call
   nothing. Answering this way means **a second member on the published interface** — something
   like `bool get isSupported` — plus requirement 5's testable, requirement 15's
   `FakeHapticService`, and `P4-04`'s switch. It is an interface change, and the sooner it is
-  known the cheaper it is: six PRDs code against this interface today.
+  known the cheaper it is: **seven PRDs code against this interface today.**
+- *"Do nothing and accept the silent no-op"* is also an answer, and is what ships until this
+  is decided. It is named so that shipping it is a choice rather than an omission.
 
-Needed before `P4-04-settings.md` decides whether the toggle is drawn on iPad.
+Needed before `P4-04-settings.md` decides whether, and when, the toggle is drawn.
+**Settling OQ-1 does not touch this.** The concrete call is now fixed; what a device or a
+system configuration without haptics does with it is a separate question and is still with the
+user.
 
 ### OQ-4a — Tap-outside-to-clear: **fenced default, no buzz**
 
@@ -838,6 +995,9 @@ acknowledges that state, so it is unclear whether it is an accepted trade-off or
 The PRD does not choose: requirements 1, 5 and 10 are all explicitly scoped to the setting's
 state, so an implementer cannot invent a substitute signal by accident. This one needs the
 user's intent.
+*Note the overlap with OQ-3:* a player whose OS-level System Haptics are off reaches the same
+no-signal state **without having turned anything off in this app**, which is the harder half
+of the same question.
 
 ### OQ-6 — Closed: which `lib/` layer does this live in
 
@@ -864,7 +1024,9 @@ path.
   which is why requirement 15's stub implements ten members.
 - **Still nobody's, and stubbed rather than claimed:** a shared in-memory
   `PreferencesRepository` fake. See requirement 15's table.
-- **The parallel case:** `P2-02-audio.md` req 5 names `soundEffectsEnabledProvider`.
+- **The parallel case:** `P2-02-audio.md` req 5 names `soundEffectsEnabledProvider`, from the
+  same `lib/state/settings_providers.dart`. Requirement 14 imports that path and always has —
+  see the note under its snippet.
 
 ### OQ-8 — Closed: nothing asserts requirement 3
 

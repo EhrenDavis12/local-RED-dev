@@ -4,8 +4,9 @@ self-containment 18/20 (was 88, 79, and 49 three rounds ago). **Nothing blocks t
 What holds it under a clean pass, none of it fixable from inside this file: the two button
 **labels** are deliberately unwritten (copy is a separate ask — OQ-2), the `winGame`
 animation moment is fenced out of wave 2 by `P2-04` req 27 (OQ-9), five theme values plus
-one shape change are requested but not yet **authored** into `P1-03`'s schema (req 13), and
-the confirmed-move save call is still unclaimed in `P3-02` req 4 (req 9).*
+one shape change are requested but not yet **authored** into `P1-03`'s schema (req 13). *The
+fourth item is resolved: the confirmed-move save call req 9 depended on is **claimed by
+`P3-02-move-input.md` req 36**, on the commit path its req 4 defines.*
 
 # PRD: Game Over → Rematch
 
@@ -29,11 +30,14 @@ the confirmed-move save call is still unclaimed in `P3-02` req 4 (req 9).*
 
 - `P1-02-engine-rules.md` — owns outcome detection, series state, the score and its
   increment, and turn order across games. This PRD codes against its `Board`,
-  `GameOutcome` (its reqs 22, 37), `PlacementState.gameOver` (req 36), `Score` and
-  `Board.startNextGame()` (req 34). It re-derives none of it.
+  `GameOutcome` (its reqs 22, 37), `PlacementState.gameOver` (req 36), `Score`,
+  `Board.startNextGame()` (req 34) and **`winningLine` (its req 43, added by user
+  settlement — see the OQ-5 closure)**. It re-derives none of it.
 - `P1-04-persistence.md` — owns `OpenGamesRepository`, `StoredGame` and `GameId` (its reqs
   21–25) and the save timing (its req 6). Requirement 9 codes against those and claims one
-  call site its Out-of-Scope table left unclaimed.
+  call site its Out-of-Scope table left unclaimed. **Its req 21 also owns both timestamps:
+  `save` stamps `updatedAt` itself and preserves the stored `createdAt`**, which is what
+  closed OQ-10.
 - `P1-03-theme-system.md` — owns the theme schema (`meta.schemaVersion` **8**). Requirement
   13 binds to its `surfaces.modal.*`, `surfaces.scrim.modal` and `surfaces.button.*` keys —
   all three unchanged across the v3→v8 bumps — and requests five values plus one shape
@@ -131,7 +135,9 @@ and replay nothing.
    (requirement 1); this requirement governs only how `GameOutcome.tie` is presented.
    *Testable:* a board reporting `GameOutcome.tie` with five quadrants claimed by one
    player, three by the other, and empty cells remaining inside claimed quadrants, reaches
-   the draw presentation and never the winner presentation.
+   the draw presentation and never the winner presentation. On that same board
+   `winningLine` is null (`P1-02` req 43), so the draw presentation has nothing to draw a
+   line from and must not look for one.
 
 4. **The score increments on the move that ends the game — once, ever.** The winner's
    column, or the **Ties** column on a straight draw, goes up by exactly one as part of
@@ -194,6 +200,12 @@ and replay nothing.
    does not answer that — it removes what made it urgent. The exit path at game over is the
    card's own control, so the settings button's liveness is now a plain UI choice with no
    dead end behind it. `P2-01` has closed its OQ-12 against this requirement.
+   **The exit control is now also the *only* way out of the game route at game over**, in a
+   stronger sense than when this was written: `P2-01-navigation.md` req 23 disables the iOS
+   back-swipe on `/game/:gameId`, and that block is a property of the route rather than of
+   the game's liveness, so it holds over a finished board too. Nothing here changes — the
+   card was already self-sufficient — but the claim that a player depends on no other
+   affordance is now structural rather than a courtesy.
 
 ### Taking the rematch — the next-game control
 
@@ -209,7 +221,8 @@ and replay nothing.
    requirement 6 calls taking the rematch") and req 26.*
    *Testable:* after the next-game control is pressed, the board equals what
    `startNextGame()` returns — cells, quadrants, `lastMove` null, `placementState`
-   `freeChoice` — and the three counters are identical to their values immediately before.
+   `freeChoice`, `winningLine` null — and the three counters are identical to their values
+   immediately before.
 
 7. **The rematch continues in the same open game.** It does not create a second open game;
    the `GameId`, the opponent name and the running `Score` are the same record before and
@@ -242,9 +255,10 @@ and replay nothing.
    - **The game-ending move** is a confirmed move, so it is covered by the settled rule
      that a game is written **after every confirmed move** (`P1-04-persistence.md` req 6,
      sourced to `Menus and UI.md` → Decisions → When is a game written to storage?). The
-     call site is the move-commit path, `P3-02-move-input.md` req 4 — which **still has no
-     requirement claiming the call** (`P1-04` → Out of Scope → *Who calls save*, row 1).
-     This PRD names that gap and does not fill it; it is that PRD's to close in this wave.
+     call site is the move-commit path, and **`P3-02-move-input.md` req 36 claims it** —
+     `P1-04` → Out of Scope → *Who calls save* now names that requirement in rows 1 and 2.
+     This PRD named the gap and did not fill it; that PRD closed it in this wave, which is
+     what makes testable (a) below assertable from both sides.
    - **Pressing next-game is not a move**, so no existing rule covers it. `P1-04`'s
      call-site table marks that row *"**Unclaimed** — `P3-04-game-over-rematch.md` req 9's
      territory."* **[PRD decision] This requirement claims it: the rematch path calls
@@ -266,8 +280,26 @@ and replay nothing.
    `Score` shows the increment exactly once and its board reports the terminal
    `GameOutcome`; (b) press next-game, rebuild the store from disk without playing a move,
    `readById` — the record has the same `GameId`, a board equal to `startNextGame()`'s
-   result, and unchanged counters; (c) press the exit control instead and the stored record
-   is byte-identical to what (a) produced; (d) `readAll().length` is unchanged throughout.
+   result, unchanged counters, an **unchanged `createdAt`**, and an **`updatedAt` later
+   than the one the game-ending move's save wrote**; (c) press the exit control instead and
+   the stored record is byte-identical to what (a) produced; (d) `readAll().length` is
+   unchanged throughout.
+
+   **What this write does to `updatedAt` is settled — OQ-10 is closed.** The user has
+   settled that `StoredGame` carries **both `createdAt` and `updatedAt`**, that the
+   open-games list is ordered **most-recent-first on `updatedAt`** (`P1-04-persistence.md`
+   → Open Question 8, and its reqs 21 and 29), and — closing what this requirement raised —
+   that **`OpenGamesRepository.save` stamps `updatedAt` itself, ignoring whatever the
+   caller passes, and preserves the stored `createdAt`** (`P1-04` req 21). **This call site
+   therefore makes no choice at all**: it passes the record carrying `startNextGame()`'s
+   board, and the repository stamps. Neither timestamp is an argument this surface
+   supplies, and the `createdAt` half follows from requirement 7 writing back the same
+   record.
+   **The player-visible effect, stated because it is a real behaviour of this control:**
+   taking the rematch moves that game to the **top** of the open-games list, before a move
+   is played in the new game. That falls out of the storage settlement rather than being
+   decided here, and `P4-02-open-games-list.md` renders it unchanged — it sorts nothing
+   (its req 2).
 
 ### What the game-over surface is, and what it communicates
 
@@ -494,14 +526,28 @@ reverses it.
     *Testable:* the delta is present on the ending move's presentation and absent on the
     same game's result after a store rebuild.
 
-20. **Player-facing copy uses the design docs' vocabulary, and omits what the engine cannot
-    supply.** The draw is described as a tie / straight draw, never as a "cat game" (OQ-4),
-    and no string names *which* line won, because `GameOutcome` does not expose it (OQ-5).
-    **This default governs the result's descriptive copy, not the two button labels** —
-    those are unwritten by instruction (requirement 5, OQ-2). Reversed by a copy decision
-    in the docs, or by a new engine requirement.
-    *Testable:* no string in this feature contains "cat game"; no string describes a row,
-    column or diagonal.
+20. **Player-facing copy uses the design docs' vocabulary, and omits what nothing supplies.**
+    The draw is described as a tie / straight draw, never as a "cat game" (OQ-4), and no
+    string in the shipped copy names *which* line won.
+    **The second half is now a copy fence rather than a capability limit, and the change is
+    worth stating.** It previously read *"because `GameOutcome` does not expose it"* — that
+    reason is gone. **The user has settled that the engine publishes the winning line**:
+    `P1-02-engine-rules.md` req 43's `List<int>? get winningLine` returns the three
+    big-board quadrant indices on a won game and null otherwise, so the handoff's *"Three
+    boards in a row, straight down the middle"* is implementable as drawn. What remains
+    unwritten is the **copy**, which is a separate ask under requirement 5 and OQ-2 — this
+    default ships the docs' vocabulary until that copy lands, rather than inventing a
+    sentence to spend the new value on.
+    **Reading `winningLine` correctly, for whoever writes that copy:** branch on `outcome`
+    (`P1-02` req 37) and read the line only inside the two winning branches. Null means
+    *in progress* on one board and *tie* on another, and this accessor cannot tell them
+    apart — `P1-02` req 43 states that explicitly. And when one claim completes two lines at
+    once the engine returns exactly one of them (`P1-02` OQ-8), which a sentence naming
+    "the" line would quietly assume away.
+    Reversed by a copy decision in the docs. **No engine requirement is needed any more.**
+    *Testable, as this default stands:* no string in this feature contains "cat game"; no
+    string describes a row, column or diagonal. The second assertion lapses the moment the
+    copy decision lands and is not evidence that the line is unavailable.
 
 21. **Only the two card controls give feedback; nothing else on this surface does.** No
     other element fires a haptic or a sound.
@@ -516,17 +562,22 @@ reverses it.
 
 ## Out of Scope
 
-- **Outcome detection, legal moves, the score as data, the increment, and turn order** —
-  `P1-02-engine-rules.md` (reqs 20–22, 25–27, 34, 36–37). Requirement 4 states *when* the
-  increment lands because this surface depends on it, not because this layer performs it.
+- **Outcome detection, legal moves, the score as data, the increment, turn order, and the
+  winning line** — `P1-02-engine-rules.md` (reqs 20–22, 25–27, 34, 36–37, 43). Requirement 4
+  states *when* the increment lands because this surface depends on it, not because this
+  layer performs it; requirement 20 reads `winningLine` and does not compute it.
 - **The persistent scoreboard strip and turn indicator** —
   `P3-03-scoreboard-turn-indicator.md`.
 - **The repository, the Hive box, and the confirmed-move write's call site** —
-  `P1-04-persistence.md` and `P3-02-move-input.md` req 4. Requirement 9 claims only the
-  rematch write.
+  `P1-04-persistence.md` and `P3-02-move-input.md` **req 36**, on the commit path its req 4
+  defines. Requirement 9 claims only the rematch write.
+- **`StoredGame`'s two timestamp fields, their semantics, which side stamps them on a save,
+  and the list's sort order** — `P1-04-persistence.md` reqs 21 and 29, settled at its Open
+  Question 8 and the stamping settlement recorded there. This PRD defines none of it;
+  requirement 9 states the consequence for this call site and OQ-10 is closed against it.
 - **Routing itself** — `P2-01-navigation.md`. Requirement 5 states that the exit control
-  goes to the main menu; how the route is performed, and what the main menu shows on
-  arrival, is that PRD's.
+  goes to the main menu; how the route is performed, what the main menu shows on arrival,
+  and whether the back-swipe is available on the game route (its req 23) are that PRD's.
 - **The open-games list, its cap, the delete action and its confirmation** —
   `P4-02-open-games-list.md`, with the storage half in `P1-04-persistence.md` and the cap
   in `P1-07-entitlements.md`. That flow reuses `surfaces.modal` and `surfaces.scrim.modal`;
@@ -542,11 +593,13 @@ reverses it.
 - **`placeMark` and `claimQuadrant`** — `P3-02-move-input.md`'s call sites, even on the
   move that ends the game.
 - **The animation machinery and what a `winGame` animation would be** —
-  `P2-04-animations.md`. This PRD fires no animation moment — OQ-9.
+  `P2-04-animations.md`. This PRD fires no animation moment — OQ-9. **The engine now
+  publishes the winning quadrants (`P1-02` req 43), which makes a winning-line highlight
+  expressible; it does not schedule or design one, and neither does this PRD.**
 - **Board and cell rendering and the two-tap gesture** — `P3-01-board-rendering.md`,
   `P3-02-move-input.md`. Requirement 13 requires only that the board stay rendered behind
-  the card; how it is drawn — including the free-choice highlight it may be showing — is
-  that PRD's.
+  the card; how it is drawn — including the free-choice highlight it may be showing, and
+  anything it might one day draw from `winningLine` — is that PRD's.
 - **The on-board legend and hint** — `P3-05-how-to-play.md`.
 - **Anything from `Alternative Game Styles.md`.**
 
@@ -585,6 +638,12 @@ the ask.
 >   longer a fence. This also removes a circular gap: an earlier draft of requirement 16
 >   said `buttonTap` was `P2-02`'s to say while `P2-02` req 6's table named this PRD, so
 >   neither fired it.
+> - *Can the winner copy name which line won* — **yes, the value now exists.** Settled by
+>   the user as `P1-02-engine-rules.md` req 43. See OQ-5, kept as a closed stub because
+>   requirement 20 and `P1-02` both cite it.
+> - *Does the rematch write stamp `updatedAt`* — **the caller does not choose; `save`
+>   stamps.** Settled by the user one layer down, in `P1-04-persistence.md` req 21. See
+>   OQ-10, kept as a numbered stub.
 
 > **Flagged contradiction — the approved handoff still carries the losing reading.**
 > `design_handoff_game_ui/README.md` → *Interactions & behavior* states: **"REMATCH resets
@@ -636,12 +695,31 @@ Requirement 20 fences this — the shipped copy uses the docs' vocabulary — an
 is read-only, so the wording question stays with the docs.
 `P3-05-how-to-play.md` raises the same vocabulary split for player-facing copy generally.
 
-### OQ-5 — The winner modal's copy names *which* line won
+### OQ-5 — CLOSED by the user: the engine exposes the winning line
+
+*Was: the winner modal's copy names* which *line won, and the engine cannot supply it.*
 
 `design_handoff_game_ui/README.md` → *1g* draws *"Three boards in a row, straight down the
-middle."* `P1-02-engine-rules.md` reqs 22 and 37 expose only `GameOutcome`, never the
-winning triple, so that copy is not implementable as drawn. Requirement 20 omits it. If it
-is wanted, `P1-02` needs a requirement to expose the winning line.
+middle."* This PRD recorded that as unimplementable, because `P1-02-engine-rules.md` reqs 22
+and 37 exposed only `GameOutcome` and never the winning triple, and noted that naming the
+line would need a new engine requirement.
+
+**The user has settled it: `P1-02-engine-rules.md` req 43 adds `List<int>? get winningLine`
+to the engine's published surface** — the three big-board quadrant indices of the completed
+line on a won game, and **null** otherwise, including on a straight draw and on any
+in-progress board. It lands in wave 1 alongside the rest of the engine, so it is available
+before this surface is built rather than after.
+
+**What this changes here:** requirement 20's omission of the line is now a **copy** fence
+(the copy is unwritten — OQ-2) rather than a capability limit, and it says so; requirement 3
+records that a drawn board's `winningLine` is null, so the draw presentation must not go
+looking for one; the dependency list and Out of Scope name the accessor. **What it does not
+change:** no string in this feature names a line today, and nothing here decides that one
+should. Whoever writes the copy inherits two cautions `P1-02` req 43 states — null is
+ambiguous between *in progress* and *tie* so the branch is on `outcome`, and a claim that
+completes two lines at once yields exactly one of them (`P1-02` OQ-8).
+
+**Kept as a numbered heading** because requirement 20 and `P1-02` req 43 both cite it.
 
 ### OQ-7 — What does a *tie* sound and look like?
 
@@ -686,6 +764,12 @@ What still blocks it:
   mark, the score chip — so a requirement to "fire the `winGame` animation" would still not
   tell an implementer what to wrap. **This is the one part that is this PRD's to answer**,
   and it should be answered when the moment is unfenced rather than guessed now.
+  **One candidate target is no longer this PRD's at all**, and that is new: with
+  `P1-02` req 43 publishing the winning quadrants, an animation that highlights **the
+  winning line on the board** is expressible, and the board is `P3-01-board-rendering.md`'s
+  surface rather than this card's. The user records that highlight as the likely consequence
+  of the settlement. **Nothing is designed here or there** — it is recorded so that whoever
+  unfences the moment knows the target may not live on this card.
 - **The magnitudes are not authored.** `P1-03` req 13(b) lists
   `animation.<moment>.tracks[].keyframes[].value` in its **authored** table — *"the handoff
   gives durations, easings and loop flags but never says how far."*
@@ -693,3 +777,29 @@ What still blocks it:
 Requirement 14's animations-off path is unaffected and stays testable: with the toggle off
 the behavior is identical to `lib/animation/` being absent, which is today's state. The
 sound half (requirement 16) is blocked by none of this and ships now.
+
+### OQ-10 — CLOSED by the user: `save` stamps `updatedAt`, so a rematch moves to the top
+
+*Was: does the rematch write stamp `updatedAt`, or carry the stale value?*
+
+Raised because `P1-04-persistence.md` → Open Question 8 settled the two fields and the sort
+order while leaving the first **non-move** write to decide what happened to `updatedAt`, and
+requirement 9 is that first caller.
+
+**The user settled it one layer down, which removes the choice rather than making it.**
+`OpenGamesRepository.save` **stamps `updatedAt` itself, ignoring whatever the caller
+passes**, and **preserves the stored `createdAt`**, discarding an incoming one
+(`P1-04-persistence.md` req 21). Neither timestamp is an argument this or any other call
+site supplies, so there is no per-caller answer to give.
+
+**What that means here:** the rematch write stamps, so **taking the rematch moves that game
+to the top of the open-games list** (`P1-04` req 29's most-recent-first order) before a move
+is played in the new game. That is the "stamp now" reading of the two this question set out
+— reached by the repository owning the field rather than by this surface choosing.
+Requirement 9 states the consequence, and its testable (b) now asserts the advanced
+`updatedAt` and the unchanged `createdAt` rather than being written to be indifferent.
+`P4-02-open-games-list.md` is unaffected: it sorts nothing (its req 2) and renders whatever
+order `readAll()` returns.
+
+**Kept as a numbered stub** because requirement 9 and `P1-04-persistence.md` → Open
+Question 8 both cite this number.

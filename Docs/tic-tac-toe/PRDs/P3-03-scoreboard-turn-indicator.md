@@ -378,17 +378,49 @@ its visibility.
     `active.fill != inactive.fill || active.border != inactive.border || active.labelStyle !=
     inactive.labelStyle || active.valueStyle != inactive.valueStyle`. A theme that sets all
     four alike and leans on `glow` fails — deliberately.
-    **The two type comparisons dereference the style name** and compare the resolved
-    `type.scale` entry across **all five fields — `size`, `weight`, `tracking`, `lineHeight`,
-    `uppercase`**, so two names resolving identically count as equal.
+    **The two type comparisons are field-wise over the inline object, and `color` is one of
+    the compared fields.** `labelStyle` and `valueStyle` are **`textStyle` objects that carry
+    their own colour** — settled by the user and normative in `P1-03` req 15 → `surfaces`
+    (**schema v10**). There is no style name to dereference and no `type.scale` lookup at
+    comparison time. Two `textStyle`s are equal when **all six fields** are equal:
+
+    | Field | Required | Compared |
+    |---|---|---|
+    | `size` | yes | yes |
+    | `weight` | yes | yes |
+    | **`color`** | **yes** | **yes — and this is the field that makes the check correct** |
+    | `tracking` | optional | yes, as a nullable |
+    | `lineHeight` | optional | yes, as a nullable |
+    | `uppercase` | optional | yes, as a nullable |
+
+    **Why this had to change, and it is not a tidying.** Under the withdrawn reading a
+    `*Style` key was a `type.scale` **style name**, and dereferencing it yielded
+    `{size, weight, tracking, lineHeight, uppercase}` — **no colour**. So a theme that
+    highlights the active player **by label colour alone**, leaving the size and weight
+    alone, resolved both states to the *same* `type.scale` entry and compared **equal** on
+    both type fields. If that theme also shared `fill` and `border` and leaned on colour, this
+    requirement **failed it** — and it is a perfectly good highlight, arguably the cheapest
+    and most obvious one an author would reach for. **The check was rejecting a working
+    theme**, which is the opposite of its purpose: it exists to catch a highlight that is a
+    literal no-op (requirement 6's only whose-turn signal), not to dictate *which* of the
+    shared fields carries the difference. With `color` inside the object the check sees the
+    difference and passes it.
+    **The `ref` reading also had no legal way to colour these chips at all** — `P1-03` req 15
+    bars a component from reading a palette key that happens to hold the same value, so there
+    was no `color.*` fallback either. That is the impossibility `P1-03` v10 records; this
+    requirement is one of roughly twenty text elements it reached.
     **Optionals compare as nullable values: absent equals absent, and absent never equals an
     explicit value.** An earlier draft said "an absent optional equals its documented
     default" — there is no documented default. `P1-03` req 15 declares `tracking`,
-    `lineHeight` and `uppercase` optional and gives none of them a stated fallback, so
-    "absent == 1.0" is not derivable from any document today. Comparing them as nullables is
-    decidable now and stays correct if defaults are later written down; **flagged to `P1-03`**
-    as a gap worth closing, since a renderer still has to pick something at paint time and
-    that choice is currently unstated too.
+    `lineHeight` and `uppercase` optional on a `textStyle` and gives none of them a stated
+    fallback, so "absent == 1.0" is not derivable from any document today. Comparing them as
+    nullables is decidable now and stays correct if defaults are later written down;
+    **flagged to `P1-03`**, which now carries it as an open item, since a renderer still has
+    to pick something at paint time and that choice is unstated too. **v10 widened that gap
+    rather than closing it** — the same three optionals now sit on every `surfaces.*`
+    `textStyle`, not only on `type.scale` entries.
+    **`color` is not optional and therefore never compares as null**, which is what keeps the
+    six-field comparison decidable today.
 
 17. **The scoreboard fits above the board on a portrait phone with the whole 9x9 board still
     visible and no zoom or scrolling, and its height is derived from its content rather than

@@ -392,10 +392,22 @@ reqs 14–16 and 23, and `P2-02-audio.md` req 6 and `P2-03-haptics.md` req 1 bot
     which is the same hazard behind a slower operation.
 
 19. **The screen is portrait-only and lays out without overflow from 320 pt wide upward.**
-    Portrait is settled app-wide; the width floor follows from the settled minimum OS version.
-    *Source: `Tech Design.md` → Decisions → Orientation — portrait only, and → Minimum iOS
-    version (**iOS 13**, which reaches the 320 pt-wide iPhone SE 1st generation);
-    `P1-01-app-scaffold.md` req 7 holds the lock.*
+    Portrait is settled app-wide. **The minimum OS version is iOS 15** — *raised from iOS 13
+    by user settlement*; `P1-01-app-scaffold.md` req 8 sets the target and carries the
+    StoreKit 2 reasoning.
+    *Source: `Tech Design.md` → Decisions → Orientation — portrait only;
+    `P1-01-app-scaffold.md` req 7 holds the lock, req 8 holds the floor.*
+
+    > **The 320 pt floor is retained, and its derivation is now unverified.** The earlier
+    > wording justified 320 pt by asserting that the OS floor "reaches the 320 pt-wide iPhone
+    > SE 1st generation". **That device-reach claim has not been verified against iOS 15 and
+    > is not restated here as fact** — which devices iOS 15 actually reaches needs checking
+    > before anything is derived from it.
+    > *PRD-author judgment, reversible:* 320 pt stays as the **layout** floor regardless,
+    > because it is the conservative direction — a screen that lays out at 320 pt also lays
+    > out wider. If verification shows iOS 15's narrowest device is wider, the floor may be
+    > **raised**, which relaxes this requirement rather than tightening it. Nothing else in
+    > this PRD depends on the narrowest supported device.
     *Testable:* pumped at 320×568 and at 402×874, no overflow is reported and all four buttons
     and both title elements are hit-testable. Requirement 13's fidelity assertions apply at
     402×874 only.
@@ -596,3 +608,13 @@ and now cites the key path instead.
   decision is scoped to the board by its own title. If goldens are off everywhere, requirement
   13's element-by-element assertions are the fallback and are already written that way — this
   decides cost, not buildability.
+
+### Needs verification, not a decision — which devices iOS 15 reaches
+
+- **The 320 pt layout floor in requirement 19 no longer has a verified derivation.** The
+  minimum OS version is now **iOS 15** (`P1-01-app-scaffold.md` req 8, user settlement, raised
+  from iOS 13). The old justification — that the floor reaches the 320 pt-wide iPhone SE 1st
+  generation — was written against iOS 13 and **has not been checked against iOS 15**. This is
+  research rather than a product call: someone confirms the narrowest device iOS 15 supports.
+  Requirement 19 is written to hold either way, so this blocks nothing; it is recorded so the
+  stale reasoning is not inherited as fact.

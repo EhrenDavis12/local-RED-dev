@@ -22,11 +22,32 @@
 > failure scenario stops being hypothetical. Schema realigned to **version 8** (`icons.trash`
 > added, `surfaces.destructive.action` reshaped).
 >
+> **Revised again — music has a key shape.** The user settled `P1-03` Blocking item 1: music
+> is **one `sound.music` key, app-wide, valued from the selected theme**. Classic's recorded
+> position now has a shape to be written against; what it still lacks is a value, because
+> *where the audio comes from* is open. See the note after Requirement 9.
+>
+> **Revised again — Classic is the inheritance proof, settled by the user.** *"It will
+> mostly be an example and Proof of how it inherits from Neon."* The Goal now carries this,
+> and it changes what "done" means here: Classic must override enough to demonstrably differ
+> and inherit the rest, rather than authoring ~147 colour leaves to a shipping standard.
+> **It lowers the bar without dissolving the inversion problem** — Classic's ground is
+> near-white against Neon's near-black, so the text ramp and every other ground-relative
+> token must be **overridden, not inherited**; Requirement 6's *inversion exception* records
+> why Requirements 5, 6 and 12 all pass a Classic that ships near-white on near-white.
+> **`meta.schemaVersion` corrected `8` → `10`**, re-verified against `P1-03` req 37 rather
+> than carried forward: v9 settled animation scope and v10 settled `*Style` as an inline
+> object. Requirement 3 says what a stale one costs.
+>
+> **Not yet reflected here — `P1-03` v10's `*Style` change.** Requirement 5's override set
+> and Requirement 6's walk are both affected (a `textStyle`'s `color` is a colour leaf), and
+> that edit is deliberately **not** made in this pass; it is reported as blast radius.
+>
 > **Why 86:** the values now have a starting point that an agent can author from, and
 > Requirement 6's check has three concrete anchors a reviewer can run by eye on a diff
 > instead of an abstract rule. Not higher because Requirement 15 (legibility) still has no
-> assertable form, and three questions under *Going to the user* still gate content — the
-> splat's slots, the marks, and Classic's music.
+> assertable form, and questions under *Going to the user* still gate content — the splat's
+> slots and the marks — with Classic's music value waiting on provenance rather than on shape.
 
 **Wave:** P5 · **File:** `P5-01-classic-theme.md`
 
@@ -35,7 +56,11 @@
 - `P1-03-theme-system.md` — the Requirement 15 schema this file is authored against, the
   UUID identity, the deep-merge rule, and the complete Neon base. This PRD authors a theme
   *file*; it defines none of the mechanism. **Every key path below is quoted from that
-  schema at `meta.schemaVersion: 8`.**
+  schema at `meta.schemaVersion: 10`** — and Requirement 3's warning applies to that number
+  too: re-read `P1-03` req 37 before authoring rather than trusting this line.
+  **This PRD is the only proof `P1-03` req 8 will get.** Deep merge, null-clears, recursive
+  nested-map merge, list-as-leaf and `meta`-never-merges are all specified there and
+  exercised nowhere, because Neon is the base and cannot inherit. See the Goal.
 - `P2-02-audio.md` — plays the sound slots this theme names.
 - `P2-04-animations.md` — interprets the motion descriptions this theme inherits.
 - `P5-02-asset-generation-replicate.md` — produces the splat sound file and any art this
@@ -81,22 +106,55 @@ guard no matter what is in it.**
 ## Goal
 
 `assets/themes/classic.yaml` exists: a partial override over Neon, authored against the
-`P1-03` Requirement 15 schema at version 8, built from Classic's three settled palette
+`P1-03` Requirement 15 schema at version 10, built from Classic's three settled palette
 anchors and everything correctly derived from them, inheriting every value it does not
 name, and requiring no Dart change to exist. When it is done, the app has demonstrated
 `Theming.md`'s claim that switching to a visually unrelated theme requires no change to
 game, board or menu code — and adding a theme is, literally, dropping one file into a
 folder.
 
+**Classic is the inheritance proof, not a second designed theme — settled by the user.** In
+the user's words: *"still build out the Red vs Blue theme with some minor changes to the
+schema to represent the Red Vs Blue theme. But it will mostly be an example and Proof of how
+it inherits from Neon."*
+
+**This reframes what "done" means for this PRD, so read it before Requirements 5, 6 and 14.**
+Classic exists primarily to **demonstrate that `P1-03` req 8's inheritance and deep-merge
+actually work**. It is the only second theme, therefore the only exercise of that machinery
+that will ever exist before launch: Neon is the base and *cannot* inherit from anything, so
+every claim `P1-03` req 8 makes — key absent inherits, key present wins, explicit null
+clears, nested maps merge recursively, a list is a leaf, `meta` never merges — is untested
+until Classic tests it. **Classic is not required to be a fully-designed, shipping-quality
+theme.** It must override enough to *demonstrably differ*, and inherit the rest visibly and
+on purpose.
+
+**Corroborated by the handoff.** `design_handoff_game_ui/themes.catalog.json` marks Classic
+`"status": "preview-only — overrides not yet authored"`, with `"overrides": ["color", "art"]`
+and `"inherits": ["sound (except the splat)", "animation", "everything else"]`. The reference
+asset and the user's settlement say the same thing: this is a demonstration of inheritance,
+described by what it *inherits* as much as by what it overrides.
+
+**What this lowers, and it is a real reduction in scope.** Requirement 6's derivation
+obligation reaches, on the broad reading, on the order of **147 colour-shaped leaves**, and
+the design docs supply source values for **three** of them. Authoring the other ~144 by hand
+to a shipping standard was never sourced from any Decision — it was the consequence of
+reading Classic as a designed theme. It is not that. Classic needs enough overrides to prove
+inheritance and to differ demonstrably; the rest may inherit.
+
+**What this does *not* lower — one real problem survives intact, and Requirement 15 carries
+it.** "Inherit the rest" is exactly what breaks for the text ramp, because Classic **inverts
+the ground** rather than tinting it. See Requirement 6's *The inversion exception*.
+
 **Two success conditions, and they are not the same one.** `Theming.md` → Why this matters
 for the build says a theme "as small as *black → white, neon green → red*" is a complete,
 working theme, and that remains true of **completeness** — the merge leaves no `required`
-key unset. It is *not* a claim about **legibility**, and it predates both the
-consumer-derived surface inventory and the Decision that every other Classic value *derives
-from* its three anchors. A theme setting three colours is complete against that inventory
-and unreadable on it. Completeness is assertable today (Requirement 12); legibility is
-blocked (Requirement 15); **derivation is now assertable too, and that is new**
-(Requirement 6).
+key unset. It is *not* a claim about **legibility**. A theme setting three colours is
+complete against the surface inventory and unreadable on it. Completeness is assertable
+today (Requirement 12); legibility is blocked (Requirement 15); **derivation is assertable**
+(Requirement 6). **The user's settlement resolves the tension these three were in** — it
+says the small theme *is* the deliverable, which is what `Theming.md` claimed all along and
+what the consumer-derived surface inventory appeared to refute. The inventory was never
+wrong about the *number* of leaves; it was wrong to treat every one of them as owed.
 
 ## Requirements
 
@@ -121,7 +179,7 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
    | Key path | Value | Why it is declared, not inherited |
    |---|---|---|
    | `meta.id` | `3d1a8b52-9c47-4b16-8f2e-7a5d0c9e1b34` | The theme's identity; what gets persisted and matched, never the name |
-   | `meta.schemaVersion` | `8` | See below — omitting it, or holding a stale one, is a load failure |
+   | `meta.schemaVersion` | `10` | See below — omitting it, or holding a stale one, is a load failure |
    | `meta.name` | Classic's own display name | Inheriting would make Classic call itself "Neon" in the selection list |
    | `meta.blurb` | Classic's own one-line description | Same |
 
@@ -138,9 +196,25 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
    it drops Classic from the list or routes it to the failed-to-load modal and back to Neon
    (`P1-03` reqs 27, 32, 34) — **a player picks Classic and gets Neon**, the precise failure
    the Problem section exists to end.
-   **This number tracks `P1-03` req 37 and has moved five times** (3 → 8, across the icons,
-   name/blurb, banner, destructive, spacing and trash revisions). It is the first thing to
-   re-read before authoring, not a constant.
+   **This number tracks `P1-03` req 37 and has moved seven times** (3 → 10, across the icons,
+   name/blurb, banner, destructive, spacing, trash, animation-scope and `*Style`-shape
+   revisions). It is the first thing to re-read before authoring, not a constant. *(The music
+   settlement did **not** move it — `P1-03` req 37 records no bump, because the settled shape
+   kept the key path it already had.)*
+
+   **This PRD had fallen behind by two versions, and the fix was verified rather than
+   assumed.** It read `8` while `P1-03` was at `9` (v9, animation scope settled as
+   marker-only) and is now at **`10`** (v10, `*Style` settled as an inline object carrying its
+   own colour). **`10` is read off `P1-03` req 37's table as it stands after that settlement,
+   not carried forward from a report** — this requirement's own warning is that the number
+   decays in prose, so trusting a quoted one is the failure it describes.
+   **This is not a cosmetic staleness.** By this requirement's own text, a stale
+   `meta.schemaVersion` is rejected before the merge (`P1-03` reqs 32, 37) and Classic is
+   dropped from the catalog or routed to the failed-to-load modal: **a player picks Classic
+   and gets Neon** — the precise failure the Problem section exists to end, reintroduced by a
+   number in a table. **Under the "proof of inheritance" settlement it is worse than that:**
+   a Classic that never loads demonstrates nothing about deep-merge, so a stale version does
+   not degrade this PRD's deliverable, it **voids** it.
    *Testable:* `classic.yaml` appears in the catalog with no entry in the loader's failure
    report, and its literal `schemaVersion` equals `P1-03` req 37's current value.
 
@@ -165,7 +239,7 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
    This is the source sentence. Requirements 5 and 6 are what it means in key paths and
    values.
 
-5. **The override set, fenced.** *"The art and colors"* reads two ways against the version-8
+5. **The override set, fenced.** *"The art and colors"* reads two ways against the version-10
    schema, and the two produce different products:
 
    | Reading | What it touches | What ships |
@@ -213,6 +287,8 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
    The boundary is narrower than "no numbers": **grid-line width and inset and the mark
    sizes stay themeable**, so Classic can change the board's line weight and its mark art
    substantially. What it cannot do is move things apart.
+   **`sound.music` is not in this set today** — it is a slot with a settled shape and no
+   value anywhere. See the note after Requirement 9.
 
    **PRD-author judgment on the *scope*, and reversible.** No Decision picks between the
    narrow and broad readings in key-path terms. The values, however, are no longer a
@@ -275,6 +351,52 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
    those tints in the override set. This is the one check that can tell a correct Classic
    from a three-line one.
 
+   #### The inversion exception — what the "proof, not a designed theme" settlement does *not* lower
+
+   **The text ramp must be overridden, not inherited, and this is not a quality bar — it is
+   the one place where "inherit everything else" produces an unusable app.** Classic's
+   `previewColors.ground` is **`#f3f5fe`**, near-white; Neon's is **`#161826`**, near-black.
+   **Classic is a light theme.** Neon's ramp — `color.text` `#e9e9ed` and its four dimmer
+   siblings `textMuted`, `textSubtle`, `textDim`, `textFaint` — was chosen to sit on
+   near-black. Against `#f3f5fe` it does not read dimmer or wrong-hued; it **inverts**, and
+   ships near-white text on a near-white ground. Unusable, not ugly.
+
+   **The general form, because `color.text` is only the clearest case:** *any token whose
+   correctness depends on its **relationship** to the ground — contrast, not hue — must be
+   overridden when the ground inverts.* Tinting a ground keeps those relationships; inverting
+   one destroys every last one of them. On the evidence in `P1-03` req 15's `color` table
+   that is at least the five `text*` keys, the five veils and scrims (`veilLocked`,
+   `veilClaimed`, `veilCat`, `scrim`, `scrimHeavy` — alphas tuned to darken a dark ground),
+   the two `hairline` keys, and the `*Glow` family, whose whole visual premise is luminance
+   above a dark field. **Hue-defined tokens are different** — `color.playerOne` is red because
+   red is the design, not because of what is behind it — which is why the three anchors are
+   anchors.
+
+   **Two mechanisms let this ship green, and both are in this PRD.**
+   - **Requirement 5's comment escape hatch.** Its testable accepts a key that is *"either set
+     or explicitly justified as inherited in a comment in the file."* A comment is not a
+     check. `# inherits Neon's text ramp` satisfies it exactly as well as a correct override
+     does.
+   - **Requirement 6's own check only collects the triples Classic *overrides*.** It walks for
+     survivals of `22,24,38`, `255,61,113` and `45,255,158`. If Classic never overrides
+     `color.text`, then `233,233,237` is **not in the collected set**, so near-white text on a
+     near-white ground is not a survival of anything the check is looking for. **It passes.**
+     Requirement 12 passes too — the key resolves. Requirement 13's walk is a human reading a
+     screen, and is the only thing between this and shipping.
+
+   **So the settlement's "inherit the rest" is safe for most of the ~144 and unsafe here**,
+   and the difference is mechanical rather than aesthetic: an inherited hue is *off-palette*,
+   which is what a proof-of-inheritance theme is allowed to look like; an inherited
+   ground-relative token is *invisible*, which no demonstration can be. **A theme whose text
+   cannot be read does not demonstrate that inheritance works — it demonstrates the
+   opposite**, which is why this survives a settlement that lowered the bar everywhere else.
+
+   *Testable, and deliberately narrow:* `classic.yaml` sets all five `color.text*` keys
+   explicitly, and none of them is `null` (a null clears, per `P1-03` req 8, which is worse
+   than inheriting). **Beyond those five this PRD states the rule and does not enumerate the
+   list** — which tokens are ground-relative is a judgment about Neon's values that no design
+   doc has made, and a wrong enumeration here would read as settled. Open Question 4.
+
 7. **Marks, board geometry and the type scale are not part of the override set by default.**
    Classic inherits `marks.*` (kind, value, font, weight), all `radius.*`, all `type.*` and
    every retained non-colour `board.*` key.
@@ -320,24 +442,34 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
    **This makes the metadata-only write of Requirement 8 the correct *interim* state — and a
    defect the day `P5-02-asset-generation-replicate.md` produces the file.**
 
-> **Music — a position recorded, not yet a requirement.** `Theming.md` → Decisions settles
-> that **all four toggles ship and music belongs to the theme**: a theme supplies its own
-> music the way it supplies its sounds, which reverses the earlier *one-shot effects only*
-> stance. **Classic's position is that it overrides music too** — for the same reason it
-> overrides the splat, since inheriting Neon's would hand a clean, classic theme an electric
-> soundtrack.
+> **Music — a position recorded, still not a requirement, and now for a different reason.**
+> `Theming.md` → Decisions settles that **all four toggles ship and music belongs to the
+> theme**: a theme supplies its own music the way it supplies its sounds, which reverses the
+> earlier *one-shot effects only* stance. **Classic's position is that it overrides music
+> too** — for the same reason it overrides the splat, since inheriting Neon's would hand a
+> clean, classic theme an electric soundtrack.
 >
-> **It is not a requirement, and not in Requirement 5's override set, because there is no
-> key shape to write against.** `sound.music` exists as a placeholder that predates the
-> Decision; `P1-03` Blocking item 1 sets out two incompatible candidates — a single
-> `sound.music` `assetPath`, or a `music.<context>` map keyed by screen — and declines to
-> pick, because whether music loops, whether it differs by screen, and where the audio comes
-> from are all with the user. Stating an override against the wrong shape would have to be
-> re-authored the day the real one lands.
+> **The shape is settled.** The user closed `P1-03` Blocking item 1: music is **one
+> `sound.music` key, app-wide, whose value comes from the selected theme** — today's
+> placeholder shape retained, and the per-screen `music.<context>` map not taken. So the
+> reason this position was not a requirement — *"there is no key shape to write against"* —
+> **no longer holds**, and `classic.yaml` would write `sound.music: <path>` under
+> Requirement 5's override set with no re-authoring risk and no version bump (`P1-03`
+> req 37).
 >
-> Recorded so that Classic's silence on music reads as **pending, not as an oversight**.
+> **What still stops it being a requirement is the value, not the shape.** Neon ships
+> `sound.music` as an explicit `null` (`P1-03` req 8), no audio file exists, and *where the
+> audio comes from* — and whether it loops — are still open in `Theming.md` → Open Questions.
+> Writing an override means naming a path to a file nobody has produced, which is
+> Requirement 9's situation one slot over, and Requirement 9's answer is to inherit rather
+> than to invent. **Classic therefore sets no `sound.music` key today**, and this becomes a
+> requirement the day a Classic music track exists.
+>
+> Recorded so that Classic's silence on music reads as **pending on an asset, not as an
+> oversight, and no longer pending on a schema question**.
 > *(`Theming.md` → Decisions → Do all four toggles ship, and is music a theme concern?;
-> `P1-03-theme-system.md` req 15 → `sound`, req 17, Blocking item 1)*
+> `P1-03-theme-system.md` req 15 → `sound`, req 17; the shape itself is the user's
+> settlement recorded in that PRD's Blocking item 1 stub)*
 
 ### Animation and chrome
 
@@ -395,10 +527,12 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
     instead of Neon's; every `required` key resolves, counting an explicit null as defined.
     **Scoped to `required` keys deliberately.** Over *all* schema keys this fails by
     construction and would fail for Neon too: `surfaces.settingsCard.purchases.*` is
-    `deferred` with nothing drawn, and music beyond the `sound.music` placeholder is deferred
-    with it (`P1-03` Appendix A.2, Blocking items 1 and 7). Three former members have left
-    that list — `surfaces.destructive.*`, `icons.trash.*` and the animation magnitudes are
-    now `required` and authored in Neon (`P1-03` req 13(b)).
+    `deferred` with nothing drawn (`P1-03` Blocking item 7). **`sound.music` is no longer in
+    that company on shape grounds** — its shape is settled and Neon holds an explicit `null`,
+    which `P1-03` req 11's check counts as *defined*; what is deferred there now is the
+    value, not the key. Three former members have left that list —
+    `surfaces.destructive.*`, `icons.trash.*` and the animation magnitudes are now `required`
+    and authored in Neon (`P1-03` req 13(b)).
     **What it asserts, and what it does not.** Deep-merge makes absence impossible, so this
     passes for any file that parses and declares an understood version. It asserts the merge
     works — not that the merged result is usable, and not that anything was derived.
@@ -453,13 +587,24 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
 
     **The failure it is meant to catch is no longer hypothetical — it is the path of least
     resistance.** Now that the three anchors are settled, the cheapest thing an author can do
-    is set exactly those three and stop. That theme satisfies Requirements 12, 13 and 14 and
-    is unusable: Neon's inherited `color.text: "#e9e9ed"` on Classic's `#f3f5fe` ground is
-    near-white on near-white, and every veil, scrim and glow inherited from Neon is an rgba
-    tuned for `#161826`. Complete, passing, unreadable. Requirement 6 now catches the
-    *derivation* half of that failure mechanically; what it cannot catch is a recomputed
-    value that is derived correctly and still illegible. That gap is this requirement, and
-    it stays open.
+    is set exactly those three and stop — **and the user's "proof, not a designed theme"
+    settlement makes that cheapest path more attractive, not less.** That theme satisfies
+    Requirements 12, 13 and 14 and is unusable: Neon's inherited `color.text: "#e9e9ed"` on
+    Classic's `#f3f5fe` ground is near-white on near-white, and every veil, scrim and glow
+    inherited from Neon is an rgba tuned for `#161826`. Complete, passing, unreadable.
+
+    **A correction, because this paragraph previously overstated Requirement 6's reach.** It
+    said Requirement 6 *"catches the derivation half of that failure mechanically."* **For the
+    text ramp it does not catch it at all.** That check collects the Neon triples of the
+    tokens Classic **overrides** and asserts none survives. If Classic never overrides
+    `color.text`, then `233,233,237` is never collected, and near-white text on a near-white
+    ground is not a survival of anything under test — **Requirement 6 passes it.** The check
+    catches a *recoloured player with inherited pink chips*, which is the failure the design
+    doc names; it is blind to a *wholly inherited* token, which is the failure the ground
+    inversion causes. Requirement 6's *inversion exception* is the response, and it is a
+    stated authoring obligation with one narrow testable rather than a mechanical check.
+    What remains for this requirement is what neither reaches: a value overridden correctly,
+    derived correctly, and still illegible. That gap is this requirement, and it stays open.
 
 ### Code boundary and free tier
 
@@ -499,7 +644,10 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
 > colors to feel coherent. Worth checking once it's real; not a problem to solve now.
 > **Two settlements sharpen this rather than changing it:** music (see after Requirement 9)
 > and one tap sound everywhere (Requirement 8), which together mean the inherited audio is
-> now heard on nearly every interaction rather than only on the board.
+> now heard on nearly every interaction rather than only on the board. **Music's shape
+> landing narrows it further:** one app-wide track means the mismatch, if Classic never
+> overrides `sound.music`, is one track heard on every screen rather than a per-screen
+> patchwork.
 
 ## Out of Scope
 
@@ -521,8 +669,9 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
   that Classic is free and is labelled so.
 - **Audio playback** — loading and firing sound assets, `audioplayers`, the global mute, and
   where the one tap sound fires: `P2-02-audio.md`. This PRD names slots; it plays nothing.
-- **Playing music, and the shape of the music key** — no PRD owns playback yet, and the key
-  shape is `P1-03` Blocking item 1.
+- **Playing music** — no PRD owns playback yet. **The key's shape is settled** (one app-wide
+  `sound.music`, `P1-03` req 17); what is missing is a layer that starts and loops a track
+  and an audio file for it to name. See the note after Requirement 9.
 - **The animation interpreter** — `P2-04-animations.md`. Neon's magnitudes are `P1-03` req
   13(b)'s, not Classic's.
 - **Entitlement state and paid themes** — `P1-07-entitlements.md` and
@@ -539,8 +688,7 @@ blocked (Requirement 15); **derivation is now assertable too, and that is new**
 
 ### Going to the user
 
-These three gate the remaining **values** in `classic.yaml`; the palette itself no longer
-does.
+These gate the remaining **values** in `classic.yaml`; the palette itself no longer does.
 
 1. **What form does the legibility contract take — a contrast floor, a review step,
    something else?** *(verbatim from `Theming.md` → Open Questions.)* **What a Theme
@@ -562,16 +710,33 @@ does.
    question about what Classic *looks* like: `Theming.md` → Decisions → Marks beyond X and O
    allows a theme its own mark art but does not say Classic uses it. Requirement 7 defaults
    to inheriting.
+4. **Which tokens beyond the five `color.text*` keys are ground-relative, and therefore must
+   be overridden rather than inherited?** **Raised by the light/dark inversion**, and not
+   answerable by reading: it is a judgment about which of Neon's values encode a
+   *relationship to the ground* rather than a hue. Requirement 6's *inversion exception*
+   states the rule and names the five text keys as the certain case, then lists the veils and
+   scrims, the two hairlines and the `*Glow` family as **candidates on the evidence**, not as
+   a settled set. **This is the question the "proof, not a designed theme" settlement makes
+   sharper rather than softer:** the smaller the override set, the more load each remaining
+   inheritance carries, and the more it matters which ones are safe. **How much is at stake:**
+   if the answer is "the five text keys," Classic is close to the three-anchor theme the
+   settlement describes; if it is "every alpha tuned against `#161826`," it is most of the
+   veils, scrims and glows too, and the honest override set is materially larger than three
+   colours plus text. Nothing in this PRD decides between those, and nothing should.
 
-**Also waiting on `P1-03`, not on the user directly:** Classic's music value, once Blocking
-item 1 lands a key shape (position recorded after Requirement 9). The three sub-questions
-behind that shape — whether music loops, whether it differs by screen, where the audio comes
-from — are already with the user in `Theming.md` → Open Questions.
+**No longer waiting on `P1-03`: music's key shape.** Blocking item 1 is closed — the user
+settled **one `sound.music` key, app-wide, valued from the selected theme** — so Classic's
+recorded position (after Requirement 9) has a shape to be written against and would need no
+re-authoring later. **What Classic's music value is remains open, and it is not a schema
+question:** *whether music loops* and *where the audio comes from* are still with the user in
+`Theming.md` → Open Questions, and no audio file exists. That is the same shape as
+Requirement 9's splat, and it is handled the same way — inherit rather than invent.
 
 **Answered since the last revision, and folded in:** whether `previewColors` are Classic's
 real values — **yes**, all three, with everything else deriving from them (Requirement 6);
-and whether non-board controls make a sound — **yes, one tap sound everywhere**
-(Requirement 8, question 2).
+whether non-board controls make a sound — **yes, one tap sound everywhere** (Requirement 8,
+question 2); and what shape a theme's music key takes — **one app-wide `sound.music`**
+(`P1-03` Blocking item 1, settled by the user).
 
 ### From `Theming.md` → Open Questions — carried, not resolved
 
@@ -583,7 +748,8 @@ and whether non-board controls make a sound — **yes, one tap sound everywhere*
 sound" predates both music being themed and the three anchors being settled. Requirement 5
 answers the key-path half as a reversible judgment, Requirement 6 answers the value half for
 the three anchors and states the obligation for everything derived from them, and what
-remains is the marks, the splat's slots and music. Carried unresolved because the doc's
+remains is the marks, the splat's slots, and music's *value* — its key path is now settled and
+sits inside Requirement 5's set the day a track exists. Carried unresolved because the doc's
 framing — "an exact list will fall out when it's actually built" — is now due, and this PRD
 is where it falls out.
 
@@ -599,8 +765,11 @@ is where it falls out.
   `P5-01-classic-theme.md` under *"Depended on by (each ships with placeholders until
   then)"* and states "All of those ship in earlier waves, without assets, by design."
   `P5-01` is the **same** wave. If the answer to *where music comes from* is "generated,"
-  music joins its scope too.
+  music joins its scope too — and with the key shape settled, that is now the only thing
+  standing between Classic and a music override.
 - **This PRD's schema references decay silently.** Five version bumps have landed between
   revisions, and one left Requirement 3 fencing a stale `schemaVersion` that no test here
   would have caught, because it lives in prose. Whatever authors `classic.yaml` should
   re-read `P1-03` req 15 and req 37 first rather than trusting the key paths quoted here.
+  *(The music settlement is the counter-case: it changed meaning without changing a key path
+  or a version, so nothing here decayed — but that was luck of which candidate won.)*

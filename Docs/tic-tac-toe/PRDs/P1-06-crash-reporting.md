@@ -13,18 +13,20 @@ and the `lib/` tree including `lib/diagnostics/` must exist. That PRD ships befo
 of its own wave; this one runs after it. Parallel-safe with everything else in wave 1.
 
 > **Numbering is frozen and append-only.** Requirements 1–16 keep the numbers and meanings
-> they had in the previous revision; 17 and 18 are appended. Open Questions keep their
+> they had in the previous revision; 17, 18 and 19 are appended. Open Questions keep their
 > numbers too — answered ones are marked **Answered** in place rather than removed, so
 > inbound citations keep resolving. See the redirect note at the head of *Open Questions*.
 
 > **Why 90.** Both blockers are gone. **Open Question 1 (the field set) is answered** — a
-> report holds the error, the stack trace and a timestamp, and nothing else (Requirement 17).
-> **Open Question 2 (where the code lives) is closed** — `Tech Design.md` → Decisions →
-> Project structure — layer-first now carries `diagnostics/ ← crash catching/reporting, owned
-> by P1-06-crash-reporting`, and `P1-01` Requirement 2 creates it. `CrashReport` is
-> constructible, so every testable in this PRD is now writable. What remains open (Questions
-> 3–7) is fenced by a requirement with an interim answer, so nothing blocks execution; each
-> is a decision that would *change* behaviour, not one that is missing before work can start.
+> report holds the error, the stack trace and a timestamp, and nothing else (Requirement 17),
+> and `Tech Design.md` now carries that Decision. **Open Question 2 (where the code lives) is
+> closed** — `Tech Design.md` → Decisions → Project structure — layer-first now carries
+> `diagnostics/ ← crash catching/reporting, owned by P1-06-crash-reporting`, and `P1-01`
+> Requirement 2 creates it. `CrashReport` is constructible, so every testable in this PRD is
+> now writable. Requirement 19 is what keeps Requirement 17 true *through* the `error` field
+> rather than only beside it. What remains open (Questions 3–7) is fenced by a requirement
+> with an interim answer, so nothing blocks execution; each is a decision that would *change*
+> behaviour, not one that is missing before work can start.
 
 ## Problem
 
@@ -133,6 +135,9 @@ handler.
    The names and the signature are this PRD's, so that `forge-code-writer` and
    `forge-test-author` — which never see each other's output — build against the same surface
    instead of two invented ones.*
+   **`error` is `Object`, which is why Requirement 19 exists:** the field holds the thrown
+   object itself, so what a rendered report *says* is decided by that object's `toString()`,
+   not by this class.
 
 4. **The installed sink is `InMemoryCrashReportSink`, and it is the observation point every
    test uses.**
@@ -318,7 +323,7 @@ handler.
     or asset paths — but it must stay that way for the guard's day-one-zero baseline to hold.
 
 16. **The transport scan — owner, files, root, rules, exemptions, failure output.** This is
-    the check Requirement 6 is verified by, written in the shape
+    the check Requirements 6 and 17 are verified by, written in the shape
     `P1-05-theme-guard-test.md` uses for its guard, because prose patterns are a coin flip.
 
     **Owner:** this PRD. **Files:**
@@ -336,6 +341,16 @@ handler.
     | `transport-member` | A **declaration** — method, getter, setter or field — whose name is exactly `send`, `upload`, `post`, `flush`, `transmit`, `dispatch`, `endpoint`, `destination`, or `url` | `postGameReport`, `sendable`, or any name that merely contains one of these as a substring |
     | `report-to-network` | A `CrashReport` (or the `reports` list) passed as an argument to any member of a network client, or to `HttpClient`, `Socket`, `WebSocket`, `dart:io`'s network surface, or the store SDK | Passing a report to `CrashReportSink.add` or to `List.add` |
     | `network-import` | An import of `dart:io`, `dart:html`, `package:http`, or any store SDK from a file in the root | Nothing — this feature imports none of them |
+    | `report-field-count` | An **instance field declared on `class CrashReport`** whose name is not exactly `error`, `stackTrace` or `timestamp`. A *field*, for this rule, is an instance variable declaration (`final`, `var`, `late`) **or** a `this.`-initializing constructor parameter | `static` members and `static const`s; getters and methods, which compute from the three fields and carry nothing new; the two named constructors of Requirement 14 and their non-`this.` parameters; local variables; fields on any other class in the root, including `InMemoryCrashReportSink`'s |
+
+    **`report-field-count` is the mechanism that enforces Requirement 17's field set, and it
+    is the only one.** Requirement 6 already records why: Flutter does not support
+    `dart:mirrors`, so **no runtime unit test can enumerate `CrashReport`'s members** — a test
+    asserting "exactly three fields" is not writable at all. Requirement 17 therefore declares
+    no second check, and there is no unit-test half to look for.
+    **What it does not reach, so nobody reads it as more than it is:** it counts fields **on**
+    `CrashReport`. It says nothing about what is reachable **through** `error`, which is
+    Requirement 19's subject.
 
     **Exempt contexts, so the check is not a coin flip:** matches inside `//` and `///`
     comments, inside `/* */` blocks, and inside string literals are ignored, so
@@ -346,12 +361,15 @@ handler.
     would leave the feature no legal implementation.
 
     **Failure output** names the file, line, matched identifier and rule id, in the shape
-    `P1-05` Requirement 6 uses. **No suppression convention** — no comment that switches a
+    `P1-05` Requirement 6 uses — for `report-field-count`, the line of the offending field
+    declaration and its name. **No suppression convention** — no comment that switches a
     rule off. If a rule is wrong, change the rule table.
     *Testable:* the scanner is called with inline fixture strings — a legal
     `InMemoryCrashReportSink`, a `void send(CrashReport r)` declaration, an
-    `httpClient.post(report)` call, an `import 'package:http/http.dart'`, and the string
-    `'// don't send this'` — and reports violations for exactly the middle three.
+    `httpClient.post(report)` call, an `import 'package:http/http.dart'`, the string
+    `'// don't send this'`, a legal three-field `CrashReport`, and a `CrashReport` carrying a
+    fourth field `final String route;` — and reports violations for exactly the three
+    transport fixtures and the four-field one.
 
 ### What the report holds
 
@@ -359,30 +377,39 @@ handler.
     No game state, no board position, no screen or route, no device or user identifier, and
     **specifically no opponent name — no text a player has typed.**
 
-    *Source: the user's answer, relayed 2026-08-07, closing this PRD's Open Question 1. The
-    reasoning, which is the part that generalises and is why it belongs in the requirement
-    rather than only in a changelog: the app is in Apple's **Kids category** at a **4+**
-    rating (`Tech Design.md` → Decisions → Kids category), and in a 4+ app **transmitting
-    personal data is itself the regulated act**, not something a privacy label merely
-    declares. Capturing nothing personal means that if a destination is ever chosen, **no
-    consent flow is required** — the decision keeps a future option open rather than only
-    satisfying today's rules.*
-    ⚠️ **`Tech Design.md` does not yet record this.** Its *Crash reporting* Decision still
-    stops at "catch and build the object, don't send it" and says nothing about contents. The
-    answer above is the user's and is being built from; **a `forge-doc-writer` edit is owed**
-    so the doc carries it. Flagged, not fixed — design docs are not this PRD's to edit.
+    *Source: `Tech Design.md` → Decisions → **What does a crash report capture?** — "**The
+    error, the stack trace, and a timestamp. Nothing else.** No game state, no screen, and
+    specifically no opponent name — no text a player has typed," which also carries the
+    reasoning and the accepted cost below. The answer originated as the user's, relayed
+    2026-08-07, closing this PRD's Open Question 1; the doc now records it, so this
+    requirement cites the doc.*
+    **The reasoning, which is the part that generalises and is why it belongs in the
+    requirement rather than only in a changelog:** the app is in Apple's **Kids category** at
+    a **4+** rating (`Tech Design.md` → Decisions → Kids category), and in a 4+ app
+    **transmitting personal data is itself the regulated act**, not something a privacy label
+    merely declares. Capturing nothing personal means that if a destination is ever chosen,
+    **no consent flow is required** — the decision keeps a future option open rather than only
+    satisfying today's rules.
 
     **The accepted cost, recorded so it is not rediscovered as a defect:** a bug that depends
     on board position or on which screen the player was on becomes harder to reproduce,
-    because the report will not say. That was named and accepted when the decision was taken.
+    because the report will not say. That was named and accepted when the decision was taken,
+    and `Tech Design.md` records it in the same Decision.
 
     **This requirement is the durable one.** A field added later is not a free change: it must
-    clear the same test, and any field carrying player-entered text reopens the consent
+    clear the same rule, and any field carrying player-entered text reopens the consent
     question above.
-    *Testable:* `CrashReport` declares exactly three fields — `error`, `stackTrace`,
-    `timestamp` — and the scanner in Requirement 16 fails if a fourth is declared. A unit test
-    constructs a report through both constructors in Requirement 14 and asserts the error and
-    stack round-trip and the timestamp is set.
+    **The field set is enforced by Requirement 16's `report-field-count` rule — not by a unit
+    test**, which `dart:mirrors`' absence makes unwritable (Requirement 6). Earlier revisions
+    of this requirement claimed a scanner rule that did not exist in Requirement 16's table;
+    the rule now exists and is named.
+    *Testable:* the scanner's `report-field-count` rule passes on `crash_report.dart` as
+    written and fails on a fixture declaring a fourth field. A unit test constructs a report
+    through both constructors in Requirement 14 and asserts the error and stack round-trip and
+    the timestamp is set.
+    **What this requirement cannot see, and Requirement 19 covers:** `error` is an `Object`,
+    so a report holding three fields can still *render* a board position if the object in that
+    field prints one.
 
 18. **`CrashReport` is a plain Dart class — not a `freezed` model, and not
     `json_serializable`.** No generated file, no `build_runner` step for this feature.
@@ -394,6 +421,44 @@ handler.
     by preference; if a destination or persistence later needs serialization, that work adds
     it then.*
     *Testable:* no `*.g.dart` or `*.freezed.dart` file exists under `lib/diagnostics/`.
+
+19. **The one error type that carries game state renders none of it:
+    `IllegalMoveError.toString()` prints the reason and the `Move`, and never the `Board`.**
+
+    Requirement 3 stores `final Object error` — **the error object itself** — so every way a
+    report is ever rendered as text goes through that object's `toString()`. The engine's
+    `IllegalMoveError` (`P1-02-engine-rules.md` req 42) carries the offending `Move` **and the
+    `Board` it was applied to**, and it is the one object reachable from a `CrashReport` that
+    holds an 81-cell board position. An unconstrained `toString()` on it is what would put
+    that position inside a report whose field set (Requirement 17) exists to exclude it —
+    through a field Requirement 16's `report-field-count` rule cannot see, because the leak is
+    *inside* `error` rather than beside it.
+
+    **Settled by the user, as the resolution of the contradiction both PRDs previously
+    flagged.** The error object **keeps** its `Board` field — that is the debugging value
+    `P1-02` req 42 was written for, and it stays readable from a debugger attached in process
+    — and **nothing renders it into text**: `toString()` returns the `IllegalMoveReason` and
+    the `Move`'s two indices, and nothing drawn from the board.
+    *Source: the user's settlement, recorded here and in `P1-02-engine-rules.md` req 42, which
+    carries the same contract from the throwing side. The field set it protects is Requirement
+    17's, whose citation is `Tech Design.md` → Decisions → What does a crash report capture?*
+
+    **The residual, recorded so it is not rediscovered later as a defect.** This is a contract
+    on a **string**, not an invariant on the object. The `Board` is still on the error, so any
+    route that renders or copies a report *other than* `toString()` re-leaks the position: a
+    `toJson` added to the error or to `CrashReport`, a **persisted** report (Open Question 5),
+    a reflective or code-generated serializer walking `error`, or a debugger dump written to a
+    file. **Whoever adds persistence or a destination owns closing that**, and Open Question 5
+    now carries it as a stated constraint rather than as a discovery waiting to happen.
+    Nothing here designs either.
+
+    *Testable, from the consuming side:* a `CrashReport` built through either Requirement 14
+    constructor from an `IllegalMoveError` thrown on a board with a distinctive position
+    renders — via `'${report.error}'` — a string that contains the reason and both of the
+    move's indices, and that contains neither `board.toString()` nor any of the field names a
+    `freezed` `Board.toString()` prints (`cells`, `quadrants`, `score`).
+    *The assertion on the error type itself is `P1-02-engine-rules.md` req 42's*, written in
+    the engine's own suite; this one asserts the path a report actually takes.
 
 ## Inbound claims that do not match this PRD
 
@@ -425,8 +490,11 @@ Flagged, not fixed — these live in other PRDs and are theirs to correct.
   Not to be confused with Requirement 16, which is this PRD's.
 - **Creating `lib/diagnostics/` and the rest of the tree** — `P1-01-app-scaffold.md`
   Requirement 2. This PRD writes the files inside it.
+- **`IllegalMoveError` itself — its type, its two reasons and its payload** —
+  `P1-02-engine-rules.md` req 42. Requirement 19 constrains only what that error *renders*,
+  which is this PRD's business because Requirement 3 holds the object.
 - **Persistence mechanics** — `P1-04-persistence.md`. Whether a report survives a restart is
-  Open Question 5.
+  Open Question 5, which Requirement 19's residual now constrains.
 - **Release tooling and App Store Connect** — `P5-03-release-fastlane.md`.
 - **Symbolication and dSYM handling** — pointed at `P5-03-release-fastlane.md`, the right
   destination if it ever becomes anyone's, but **that PRD declines the delegation and nothing
@@ -452,7 +520,10 @@ Flagged, not fixed — these live in other PRDs and are theirs to correct.
    future field: in a Kids-category 4+ app, transmitting personal data is the regulated act,
    so capturing nothing personal keeps a future destination free of a consent flow. The
    accepted cost — position- and screen-dependent bugs get harder to reproduce — is recorded
-   there too. **`Tech Design.md` does not yet carry this decision; a doc edit is owed.**
+   there too. **`Tech Design.md` now carries this decision** as Decisions → *What does a crash
+   report capture?*, with both the Kids-category reasoning and the named cost, so Requirement
+   17 cites the doc and no doc edit is owed. (Earlier revisions of this PRD flagged one; that
+   flag is stale and has been removed.)
 
 2. **~~Where does this code live, and what shape is `CrashReport`?~~ Answered — see
    Requirements 15 and 18.** `Tech Design.md` → Decisions → Project structure — layer-first
@@ -489,6 +560,13 @@ Flagged, not fixed — these live in other PRDs and are theirs to correct.
    there is nothing to redact, so persistence carries no privacy question — only the ordinary
    ones about where and in what shape. Recorded so the caution is not left standing
    unexamined and treated as a reason to hesitate.
+   **One constraint this answer inherits, from Requirement 19.** Persisting a report means
+   writing `error` down somehow, and `error` may be an `IllegalMoveError` holding a whole
+   `Board`. Requirement 19's contract binds `toString()` and nothing else, so a persistence
+   design that serializes the error object by any other route — a `toJson`, a reflective or
+   generated serializer — re-leaks the board position Requirement 17 excludes. Whatever
+   answers this question has to say which rendering of `error` reaches the store. Named as a
+   constraint on the answer; not designed here.
 
 6. **Is 50 the right retention cap?** Requirement 5 states 50 as this PRD's interim call so
    nothing is blocked. Any number, or "unbounded is fine," replaces it in one place.

@@ -14,5 +14,18 @@
   "stack": "Flutter / Dart",
   "parkingLotDocs": [
     "Alternative Game Styles.md"
-  ]
+  ],
+  "testing": {
+    "command": "flutter test",
+    "prefer": [
+      "Fast isolated tests over pure logic — the rules engine, win and draw detection, send-to-quadrant, save/load round-trips. These hold most of the risk and are the cheapest to test.",
+      "Property/invariant tests for the rules engine: play many random legal games and assert what must never happen, rather than hand-picking boards.",
+      "Rendered-component tests only where a wrong guess is expensive — a tap changing game state, not how it looks."
+    ],
+    "avoid": [
+      "Pixel-snapshot (golden) tests. Theming is still changing constantly, so every theme edit would invalidate them wholesale.",
+      "End-to-end tests on a simulator, until late. One smoke test once the app runs is worth more than a suite of them.",
+      "Any assertion about spacing, colour, easing, or feel — those are checked by running the app."
+    ]
+  }
 }

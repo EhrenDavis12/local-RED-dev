@@ -10,13 +10,23 @@
 > comes from it.)
 >
 > **What remains open, and with whom:** which store holds entitlement state (OQ 5),
-> whether a game id is ever player-visible (OQ 6b), persisted-data versioning (OQ 1), and
-> whether `StoredGame` gains a timestamp — which is one answer with `P4-02`'s OQ 4 and
-> settles list ordering too (requirement 29, OQ 7). One cross-PRD gap: the save trigger is
-> settled in timing but **no requirement in `P3-02-move-input.md` yet claims the call**
-> (Out of Scope → *Who calls save*). One flagged risk with a named mitigation: the settings
-> seed window (requirement 27). One provider ships with no consumer yet, by design:
-> `musicEnabledProvider` (requirement 26).
+> whether a game id is ever player-visible (OQ 6b), and persisted-data versioning (OQ 1).
+> **Closed this revision: the timestamp's shape and the sort direction (OQ 8)** — the user
+> settled that `StoredGame` carries **both `createdAt` and `updatedAt`**, and that the
+> open-games list sorts **most-recent-first, on `updatedAt`**. Requirement 21 carries both
+> fields; requirement 29's comparator is now settled rather than proposed. (OQ 7, answered
+> in the previous revision, is what put a timestamp on the record at all.)
+> **Also settled by the user, and it closes a question that had been handed to a caller:
+> `save` stamps `updatedAt` itself and preserves the stored `createdAt`** — the repository
+> owns both fields, the caller supplies neither, and `P3-04-game-over-rematch.md` → Open
+> Question 10 is answered as a consequence (requirement 21), as is that PRD's own Open
+> Question 10. **The cross-PRD gap this file carried is closed:** the save trigger was settled
+> in timing with no requirement claiming the call, and **`P3-02-move-input.md` req 36 now
+> claims it** — with `P3-04-game-over-rematch.md` req 9 taking the rematch write and
+> `P3-01-board-rendering.md` req 54 the resume read (Out of Scope → *Who calls save*, which now
+> carries a read table beside the write one). One flagged risk with a named
+> mitigation: the settings seed window (requirement 27). One provider ships with no consumer
+> yet, by design: `musicEnabledProvider` (requirement 26).
 
 **Wave:** P1 — ships in the first wave, parallel-safe with the other P1 PRDs.
 
@@ -24,8 +34,10 @@
 
 - `P1-01-app-scaffold.md` creates the `lib/storage/` and `lib/state/` directories this PRD
   fills, as part of the layer-first tree (its req 2), states the `engine/`-purity rules from
-  the scaffold side (its reqs 4–5), and fixes the no-codegen Riverpod idiom requirements 26
-  and 28 follow (its req 12). Same wave.
+  the scaffold side (its reqs 4–5), fixes the no-codegen Riverpod idiom requirements 26
+  and 28 follow (its req 12), and — **settled by the user** — declares the Hive packages as
+  **`hive_ce` + `hive_ce_flutter`** and the Dart package name as `tic_tac_toe_extreme`
+  (its *Confirmed by the user* section and req 14). Same wave.
 - `P1-02-engine-rules.md` owns the domain models this layer serializes. Its **req 29**
   settles that `Board` is the whole-game-plus-series state — 81 cells, 9 quadrant states,
   placement state and active quadrant, current player, last completed move, outcome, series
@@ -50,7 +62,14 @@
   defines, and its req 4's snippet calls `openGamesRepositoryProvider` — declared by
   requirement 28.
 - `P3-02-move-input.md` owns the move-commit path (its req 4) that must call `save` after
-  every confirmed move — see requirement 6 and Out of Scope → *Who calls save*. Wave 3.
+  every confirmed move, and **its reqs 35–36 now claim that call** — req 35 declaring the
+  `currentGameProvider` that holds the record `save` needs, req 36 making the write. See
+  requirement 6 and Out of Scope → *Who calls save*. Wave 3.
+- `P3-01-board-rendering.md` req 54 owns the **read** side of a resume: `GameScreen` calls
+  `readById` in `initState` (requirements 21 and 28) and seeds `P3-02`'s `boardProvider` and
+  `currentGameProvider` from the record before rendering the board. It also owns what the
+  screen does when that read returns null or throws. See Out of Scope → *Who calls save* →
+  **Reads**. Wave 3.
 - `P4-02-open-games-list.md` consumes this layer directly — its reqs 5, 7, 10, 19, 21 and
   25 call `readAll`, `create` and `delete`, carry `GameId`, and watch the list provider
   requirement 28 declares. It owns the list UI and the delete affordance.
@@ -79,13 +98,13 @@ The app has a `storage/` layer that is the single place local persistence happen
 publishes a concrete Dart interface the rest of the app codes against: five preferences in
 `shared_preferences` under five named keys, open games in a named Hive box as JSON behind a
 repository, whatever `P1-07-entitlements.md` decides the player owns written down so it
-survives a restart, a watchable open-games list that refreshes itself after every write, and
-four synchronously-readable settings providers that resolve the first-launch default in
-exactly one place. A player can quit mid-move — or lose the app to a force-quit — relaunch,
-pick the same game out of the open-games list, and find the board, the last move played,
-whose turn it is, and the series scoreboard exactly as they left them, because every
-confirmed move was written as it happened. Meanwhile `engine/` stays pure Dart and no caller
-outside `storage/` knows Hive exists.
+survives a restart, a watchable open-games list that refreshes itself after every write and
+comes back in a stable order, and four synchronously-readable settings providers that resolve
+the first-launch default in exactly one place. A player can quit mid-move — or lose the app to
+a force-quit — relaunch, pick the same game out of the open-games list, and find the board,
+the last move played, whose turn it is, and the series scoreboard exactly as they left them,
+because every confirmed move was written as it happened. Meanwhile `engine/` stays pure Dart
+and no caller outside `storage/` knows Hive exists.
 
 ## Requirements
 
@@ -151,6 +170,12 @@ outside `storage/` knows Hive exists.
    implementer chose to model, so it does not by itself catch a missing field —
    requirement 7 carries the field-level check — and it is **green even if nothing ever
    calls `save`**.
+   *One exception to "equal to the one written", and it is deliberate:* the two timestamps.
+   Requirement 21 makes `save` stamp `updatedAt` and preserve the stored `createdAt`, so a
+   record read back matches what was written **except** on those two fields, whose values
+   are the repository's answer rather than the caller's input. A test asserting whole-record
+   equality across a `save` must construct its expectation from the record the repository
+   returns on read, not from the one it passed in.
 
    **App level (settled, owned elsewhere):** a game is written to storage **after every
    confirmed move**, so nothing is lost to a crash or a force-quit. The write happens on
@@ -160,16 +185,18 @@ outside `storage/` knows Hive exists.
    reasoning that each write is a single small record, the game is turn-based so writes are
    infrequent, and a game is saved specifically so it can be resumed.*
    *Testable, but not here:* the assertion that a confirmed move reaches storage belongs to
-   whichever requirement claims the call site. Today none does — the commit path is
-   `P3-02-move-input.md` req 4 and it does not mention persistence. See Out of Scope →
-   *Who calls save*. This PRD states the obligation and names the gap; it cannot close it
-   from inside a wave-1 file.
+   whichever requirement claims the call site, and **`P3-02-move-input.md` req 36 now does** —
+   on the commit path its req 4 defines, fire-and-forget, with its own recording-fake
+   assertions that a confirming tap records exactly one `save` and that a first, reselecting,
+   clearing or illegal tap records none. See Out of Scope → *Who calls save*. This PRD states
+   the obligation and named the gap; closing it was that wave-3 file's to do, and it did.
 
 7. **A stored open game carries a whole series, not one board's worth of cells.** What a
    stored record holds: the `Board` — which per `P1-02-engine-rules.md` req 29 already
    carries the cells, quadrant states, active quadrant, current player, **the most recent
    completed move**, the outcome, the series score and who went first — plus this layer's
-   own record id and the opponent name the game is titled with in the open-games list.
+   own record id, the opponent name the game is titled with in the open-games list, and
+   the **two timestamps** requirement 21 adds.
    *Source: `Menus and UI.md` → Decisions → What does an open game hold? and → What does
    each row in the open-games list show?; `Game Overview.md` → Decisions → Scoreboard
    lifetime and → Session Structure; `Tech Design.md` → Decisions → Game state storage —
@@ -188,7 +215,10 @@ outside `storage/` knows Hive exists.
    still drawn on the same cell after a resume — is `P3-01-board-rendering.md`'s to assert
    (its reqs 19–20). Nothing in wave 1 can run a rendering check, so it is named here as
    the defect this requirement exists to prevent, and owned there as a test.
-   *What it does **not** carry:* any timestamp. See requirement 29 and Open Questions 7.
+   *Both timestamps are part of the record:* Open Questions 7 settled that `StoredGame`
+   carries a timestamp, and Open Questions 8 settled that it carries **two** — `createdAt`
+   and `updatedAt`. Requirement 21 carries both fields, states which operation writes each,
+   and requirement 29 is what reads `updatedAt`.
 
 8. **A rematch continues in the same stored open game, and does not itself change the
    score.** Taking the rematch resets the board for the next game; the series score is
@@ -208,6 +238,12 @@ outside `storage/` knows Hive exists.
    requirement as its persistence boundary and was written against "whatever save point
    `P1-04` defines" — **that save point is now defined** (requirement 6), so its testable
    can be written concretely: the write lands on the confirmed move that ends the game.
+   *The timestamp consequence, now settled in both halves:* the same `GameId` means the same
+   record, so a rematch save keeps its `createdAt` unchanged — and, because **`save` stamps
+   `updatedAt` itself** (requirement 21, settled by the user), that save also moves the game
+   to the top of requirement 29's most-recent-first order. The caller does not choose: it
+   passes the record and the repository stamps. This closes what
+   `P3-04-game-over-rematch.md` req 9 had recorded as its Open Question 10.
 
 9. **The persisted series carries enough state to resume turn order across games
    correctly** — after a win the winner goes first; after a tie whoever went first in the
@@ -282,27 +318,32 @@ outside `storage/` knows Hive exists.
     values are JSON maps.
 
 13. **Only `storage/` knows the store is Hive.** No file outside `storage/` imports
-    `hive` or `hive_flutter`, and callers depend on the interfaces in requirement 21 —
+    `hive_ce` or `hive_ce_flutter`, and callers depend on the interfaces in requirement 21 —
     reached through the providers in requirement 28 — not on their implementations.
     *Source: `Tech Design.md` → Decisions → Serialization and the storage layer ("who is
-    allowed to know it is Hive").*
-    *Testable:* an import scan over `lib/` outside `lib/storage/` finds no `hive` import;
-    every provider in requirement 28 can be overridden with an in-memory fake in tests with
-    no Hive initialized.
+    allowed to know it is Hive"). Which Hive packages those are is settled by the user and
+    recorded in `P1-01-app-scaffold.md` → Confirmed by the user and its req 14:
+    **`hive_ce` + `hive_ce_flutter`**, not `hive` + `hive_flutter`.*
+    *Testable:* an import scan over `lib/` outside `lib/storage/` finds no import whose
+    package segment begins `hive` — which catches both spellings, so the scan survives even
+    if the choice is ever revisited; every provider in requirement 28 can be overridden with
+    an in-memory fake in tests with no Hive initialized.
 
 14. **All persistence access lives in `lib/storage/`, and `engine/` imports nothing
-    Flutter-dependent — specifically not `hive_flutter` and not `shared_preferences`.**
+    Flutter-dependent — specifically not `hive_ce_flutter` and not `shared_preferences`.**
     Both stores are reached only through requirement 21's interfaces. The providers in
     requirement 26 live in `lib/state/` and reach storage the same way every other consumer
     does — through `PreferencesRepository` — so no persistence package is imported outside
     `lib/storage/`.
     *Source: `Tech Design.md` → Decisions → Serialization and the storage layer
-    ("`hive_flutter` is not pure Dart, so it must never be imported from `engine/`"); →
+    ("`hive_flutter` is not pure Dart, so it must never be imported from `engine/`" — the
+    doc names the `hive` spelling; the package is `hive_ce_flutter` per the user's
+    settlement in `P1-01-app-scaffold.md`, and the rule is unchanged); →
     Is the game logic separate from Flutter? ("pure Dart with zero Flutter imports"); →
     Project structure — layer-first, which places local persistence in `storage/` and
     Riverpod providers in `state/`. Stated from the scaffold side as
     `P1-01-app-scaffold.md` reqs 4–5.*
-    *Testable:* an import scan finds `shared_preferences` and `hive_flutter` imported only
+    *Testable:* an import scan finds `shared_preferences` and `hive_ce_flutter` imported only
     under `lib/storage/`, and zero Flutter-dependent imports under `lib/engine/`.
 
 15. **Serialization lives with the model: `storage/` persists what the models' generated
@@ -311,6 +352,10 @@ outside `storage/` knows Hive exists.
     *Source: `Tech Design.md` → Decisions → Serialization and the storage layer
     ("`toJson`/`fromJson` are generated into `engine/` by json_serializable ... while the
     Hive box, adapters-free, lives in `storage/`").*
+    *Boundary, because `StoredGame` is not one of those models:* the rule binds the
+    **engine's** types — `Board` and everything inside it. `StoredGame`, `GameId` and the
+    two timestamps are this layer's own (requirement 21), and their encoding is specified
+    there rather than generated in `engine/`.
     *Testable:* a save/load round trip returns an object equal to the original for every
     persisted type.
 
@@ -428,9 +473,12 @@ outside `storage/` knows Hive exists.
 ### The published interface
 
 > Seven PRDs across four waves call into this layer. Everything in this section is
-> normative: these are the names and signatures they may code against. Nothing here is
-> provisional — the aggregate type is `Board` per `P1-02-engine-rules.md` req 29, and
-> `CreateGameResult` (requirement 25) is ratified.
+> normative: these are the names and signatures they may code against. **Nothing here is
+> provisional** — the aggregate type is `Board` per `P1-02-engine-rules.md` req 29,
+> `CreateGameResult` (requirement 25) is ratified, and the record's **two timestamp fields,
+> which side writes each of them, and the order they produce are settled by the user**
+> (Open Questions 7 and 8, and the stamping settlement recorded under 8). The
+> proposal marker earlier drafts carried on the timestamp is gone.
 
 21. **The storage layer exposes exactly three repositories, split by store**, all in
     `lib/storage/`, all abstract interfaces with one implementation each. They are separate
@@ -446,7 +494,11 @@ outside `storage/` knows Hive exists.
         required String opponentName,
         required Board board,
       });
+
+      /// Writes [game] under its own id. Stamps `updatedAt` from the clock and
+      /// preserves the stored `createdAt` — both timestamps on [game] are ignored.
       Future<void> save(StoredGame game);
+
       Future<void> delete(GameId id);
       Future<int> count();
     }
@@ -477,10 +529,22 @@ outside `storage/` knows Hive exists.
         required this.id,
         required this.opponentName,
         required this.board,
+        required this.createdAt,
+        required this.updatedAt,
       });
       final GameId id;
       final String opponentName;
       final Board board;
+
+      /// Set once, by `create`, and never written again for the life of the record.
+      /// `save` preserves the stored value and discards an incoming one.
+      /// UTC. Settled by the user — Open Questions 8.
+      final DateTime createdAt;
+
+      /// Stamped by `save` itself, which ignores whatever the caller passes, and
+      /// requirement 29's primary sort key. UTC.
+      /// Settled by the user — Open Questions 8.
+      final DateTime updatedAt;
     }
     ```
 
@@ -499,9 +563,73 @@ outside `storage/` knows Hive exists.
     opponent name and record id." Earlier drafts of this file proposed a separate
     `GameSeries` aggregate; that name is **withdrawn** — there is one type, it is `Board`,
     and a second name for it would be exactly the duplication req 29 exists to prevent.
-    **The opponent name and the id are storage's**, not the engine's — no design doc puts
-    either in game state — so they sit on `StoredGame` alongside the `Board`.
-    **`StoredGame` carries no timestamp** — see requirement 29 and Open Questions 7.
+    **The opponent name, the id and both timestamps are storage's**, not the engine's — no
+    design doc puts any of them in game state — so they sit on `StoredGame` alongside the
+    `Board`.
+    **`StoredGame` carries both `createdAt` and `updatedAt`, settled by the user.** Open
+    Questions 7 settled that the record gains a timestamp; Open Questions 8 settled that it
+    gains **both**, not one or the other. **The user's stated reason for carrying both:** it
+    leaves the sort key a *display* choice rather than a *schema* one — a list that wanted
+    creation order, or a row that wanted "started on", can be served later without an Open
+    Questions 1 migration.
+
+    **The repository owns both timestamps; the caller supplies neither. Settled by the
+    user.** `create` mints them — both set, and equal on a freshly created record
+    (requirement 25). Then, on every `save`:
+
+    - **`updatedAt` is stamped by `save` itself**, from the clock at the moment of the
+      write. Whatever value the passed `StoredGame` carries in that field is **ignored**.
+    - **`createdAt` is preserved from the record already stored under that `GameId`.** An
+      incoming `createdAt` is **discarded**, whatever it is.
+
+    So a caller passes the record it happens to be holding, and the two timestamps that come
+    back are the repository's answer rather than its input.
+    **Why the repository and not the caller, recorded so nobody re-derives it.** Two reasons,
+    and they are the same shape as requirement 28's argument for structural refresh:
+    - *Keeping `updatedAt` current stops being a rule anyone can forget.* Requirement 6's
+      write happens after every confirmed move, and the call sites are spread across four
+      PRDs (Out of Scope → *Who calls save*) — one of which did not exist when this was
+      settled. A field each of them had
+      to remember to stamp is a field that goes stale at whichever one forgets, and the
+      symptom is a silently mis-ordered list rather than a failing test.
+    - *`createdAt`'s immutability becomes enforceable rather than conventional.* The field's
+      contract is "written once and never changes", but `StoredGame`'s constructor takes it
+      as an ordinary argument, so any caller can construct a record with any `createdAt` at
+      all. Nothing else in this layer could stop that value reaching disk. Having `save`
+      preserve the stored one closes it at the only choke point there is.
+
+    **Both timestamps are UTC, and both are encoded as ISO-8601 strings in the box JSON.**
+    `create` and `save` stamp with `DateTime.now().toUtc()`; `StoredGame.toJson()` writes
+    each field with `toIso8601String()` — which carries the trailing `Z` on a UTC value —
+    and `fromJson` reads it back with `DateTime.parse(...).toUtc()`.
+    **Why this is specified rather than left to the implementer:** a **local** `DateTime`
+    written with `toIso8601String()` carries **no offset at all**, so a record written in one
+    timezone and read in another compares against the rest as though it had been written at a
+    different instant — and requirement 29 sorts on exactly that comparison, so the player's
+    list would reorder itself after a flight or a DST change. Storing UTC removes the failure
+    and costs nothing.
+    *[The encoding is a consequence of the settlement above, not a separate decision. The
+    one alternative — epoch milliseconds as an `int` — is equivalent and reverses in one
+    place, `toJson`/`fromJson`. What must not ship is a local `DateTime`.]*
+
+    **No `copyWith` on `StoredGame` is added for this, and none is added silently.** With the
+    repository stamping `updatedAt` and preserving `createdAt`, a caller saving a new board
+    has no timestamp to carry forward correctly, so the timestamp reason for a `copyWith` is
+    gone. Whether one should exist for the *ordinary* ergonomic reason — a caller holding a
+    record and wanting the same record with a new `Board`, without restating five constructor
+    arguments — is a question **no requirement in any PRD currently answers**, and it is
+    flagged here rather than settled: no consumer PRD requires the member. (Note
+    `P3-02-move-input.md` req 22's scan bans `copyWith` on **`Board`** — a different type, a
+    different rule, and not a precedent either way for this one.)
+
+    *Testable:* `createdAt` is identical before and after any number of `save` calls on the
+    same record, including across a rematch (requirement 8); `updatedAt` is not earlier than
+    `createdAt` on any record; a `save` handed a record whose `updatedAt` was hand-set to the
+    epoch and whose `createdAt` was hand-set to a year in the future comes back with
+    `updatedAt` at the write instant — not the epoch — and `createdAt` equal to the value
+    `create` minted, not the future one; two saves separated by a real interval produce a
+    strictly later `updatedAt`, and no save ever moves it backwards; every timestamp read
+    back satisfies `isUtc`.
 
 22. **`GameId` is an opaque, store-minted, stable-for-life identifier**, and it is the only
     thing that identifies an open game. The repository mints it on `create`; no caller
@@ -534,12 +662,21 @@ outside `storage/` knows Hive exists.
     *Testable:* three games created with identical opponent names have three different ids;
     an id captured before a rematch equals the id after it; deleting a game and creating
     another never reissues the deleted id.
+    *Unchanged by the timestamps:* ordering is derived from requirement 21's `updatedAt`,
+    with `createdAt` as requirement 29's tiebreaker, and never from the id. The ban on
+    deriving order from `GameId` still stands, and requirement 29 records what it costs —
+    there is no third sort key available when both timestamps tie.
 
 23. **Open games live in one Hive box named `open_games`, keyed by the id string, valued as
     JSON.** The key is `GameId.value`; the value is the `Map<String, dynamic>` produced by
     `StoredGame.toJson()`. One box, one entry per open game, no adapters (requirement 12).
     *Testable:* after two creates, the `open_games` box has two entries whose keys are the
-    two `GameId` strings and whose values are JSON maps.
+    two `GameId` strings and whose values are JSON maps, **each carrying both timestamp
+    fields** — a record round-tripped through the box comes back with `createdAt` and
+    `updatedAt` equal to what was written, neither dropped nor collapsed into the other, and
+    each stored as the **ISO-8601 UTC string** requirement 21 specifies: a value ending in
+    `Z` that `DateTime.parse` returns to an equal instant. Changing the device timezone
+    between a write and a read changes neither the stored string nor requirement 29's order.
 
 24. **The five `shared_preferences` keys are exactly these strings:**
 
@@ -584,7 +721,10 @@ outside `storage/` knows Hive exists.
     whichever response Open Questions 3 settles on.
     *Testable:* at the ceiling, `create` returns `CapReached` with `cap` equal to the
     entitlement layer's value and `stored` equal to `readAll().length`, and no record is
-    added; below it, `create` returns `GameCreated` carrying a record whose `GameId` is new.
+    added; below it, `create` returns `GameCreated` carrying a record whose `GameId` is new
+    and **whose `createdAt` and `updatedAt` are both set rather than left null** — both UTC
+    per requirement 21, and, on a freshly created record, equal to each other, since nothing
+    has saved it yet.
 
 ### Resolved settings providers
 
@@ -722,12 +862,13 @@ outside `storage/` knows Hive exists.
     are read points over it. No `@riverpod`, no `StateNotifier` — `P1-01-app-scaffold.md`
     req 12.
     **`musicEnabledProvider` ships with no consumer, and that is expected.** `Theming.md`
-    now makes music a theme concern, but nothing plays it yet: `P2-02-audio.md` owns
-    one-shot effects and its `SoundMoment` enum has no music member, and no theme file
-    carries music audio. The setting is persisted and readable from the moment this PRD
-    lands, and whichever PRD eventually plays music reads this provider rather than
-    declaring its own — which is the whole point of resolving the default once. Until then
-    it is a stored, testable value with no reader.
+    makes music a theme concern and the user has since settled its key shape — a single
+    app-wide `sound.music` (`P1-03-theme-system.md` req 17) — but nothing plays it yet:
+    `P2-02-audio.md` owns one-shot effects and its `SoundMoment` enum has no music member,
+    and no theme file carries music audio. The setting is persisted and readable from the
+    moment this PRD lands, and whichever PRD eventually plays music reads this provider
+    rather than declaring its own — which is the whole point of resolving the default once.
+    Until then it is a stored, testable value with no reader.
     *Testable:* with an empty store, all four providers read `true`; with
     `ttt.pref.soundEffectsEnabled` stored `false` and the seed complete,
     `soundEffectsEnabledProvider` reads `false` while the other three read `true`; a scan
@@ -850,71 +991,128 @@ outside `storage/` knows Hive exists.
     `openGamesListProvider` rebuilds with one fewer row and no navigation round trip; after
     a `CapReached`, it does not rebuild.
 
-29. **`readAll()` carries no ordering guarantee, and consumers must not assume one.** The
-    order is whatever the box yields. It is **not** creation order, **not** recency order,
-    and requirement 22 forbids deriving one from `GameId`.
-    *Why this is stated rather than left silent:* `P4-02-open-games-list.md` req 2
-    previously fenced its row order against "creation order, i.e. the order `readAll()`
-    returns (`P1-04` req 21)" — a guarantee this PRD has never made. It has since corrected
-    itself. Saying so explicitly is what stops the next consumer fencing against the same
-    phantom.
-    *The concrete cost, named:* in practice this is Hive box-iteration order, which is
-    **not stable across compaction**. No test asserts order, so the failure mode is the
-    player's list silently reshuffling between launches rather than a failing suite. That is
-    a real defect and this PRD is not fixing it, because the fix is a field decision that is
-    not this PRD's to make alone — see below.
-    *One field settles three things.* A stored `updatedAt` (or `createdAt`) on `StoredGame`
-    would give: a stable sort key, a meaningful order for the list, and the relative
-    timestamp `1b` draws on each row. `P4-02` → Open Question 4 asks the product half —
-    what a row shows — and its Open Question 6 asks for recency ordering; both need the
-    same field, and adding it is a **wave-1 model change here**, not a wave-4 widget change.
-    *Testable as written:* two consecutive `readAll()` calls with no intervening mutation
-    return the same order; no test in any PRD asserts a *particular* order, and no consumer
-    file sorts on `GameId`.
-    *Open Questions 7 carries the decision.* If it lands on "add the field", this
-    requirement is replaced by an ordering guarantee and requirement 21's `StoredGame` gains
-    one line; nothing else in this PRD changes.
+29. **`readAll()` returns a stable order: sorted on `updatedAt`, most-recent-first, with
+    `createdAt` as the tiebreaker — not on the box's iteration order, never on `GameId`,
+    and not on `createdAt` as the primary key.** The order is
+    deterministic: the same stored set produces the same sequence on every read and across
+    relaunches, so the player's list does not reshuffle behind them.
+    *Source: the user's answers to Open Questions 7 and 8. OQ 7 settled that `StoredGame`
+    carries a timestamp — taken together with this requirement's own pre-committed
+    consequence, which said that if the answer landed on "add the field", *"this requirement
+    is replaced by an ordering guarantee and requirement 21's `StoredGame` gains one line;
+    nothing else in this PRD changes."* **OQ 8 then settled the comparator**: the field is
+    `updatedAt` and the direction is **most-recent-first**. Both halves are the user's, not
+    this PRD's proposal.*
+
+    **The comparator, stated completely, because a one-key version is not deterministic.**
+    Order by `updatedAt` **descending**; where two records carry the same `updatedAt`, order
+    by `createdAt` **descending**. The second key is not decoration:
+    - **Equal `updatedAt` values are reachable.** Requirement 25 makes `createdAt` and
+      `updatedAt` equal on a freshly created record, so two games created before either is
+      played can carry the same `updatedAt` — the more so where the platform clock is
+      coarse.
+    - **Dart's `List.sort` is documented as *not stable*.** With one key, tied records fall
+      back to whatever order the box iterated them in — which is exactly the Hive
+      box-iteration non-determinism this requirement exists to eliminate, reintroduced
+      through the back door.
+    - **`createdAt` is the only other key available.** It is already on the record
+      (requirement 21) and is the only other time-carrying field; requirement 22 forbids the
+      obvious third choice by making `GameId` opaque and explicitly non-ordering.
+    *[The tiebreaker is this PRD completing the comparator the user settled, not a second
+    decision about sort order: it is unobservable except where the settled key ties.]*
+    *Residual, recorded rather than papered over:* two records equal on **both** fields would
+    fall back to `List.sort`'s unspecified order. Reaching that means two stamps landing on
+    the same `DateTime.now().toUtc()` instant — microsecond resolution, each behind a
+    distinct player action — so it is not reachable in practice, and requirement 22 leaves no
+    third key that could break it.
+
+    *What this replaces, recorded because three PRDs fenced against it:* until an earlier
+    revision this requirement stated that `readAll()` carried **no** ordering guarantee, and
+    named the concrete cost — in practice Hive box-iteration order, which is **not stable
+    across compaction**, so the failure mode was the player's list silently reshuffling
+    between launches rather than a failing suite. `updatedAt` is the sort key that fixes it.
+    `P4-02-open-games-list.md` req 2 and its Open Question 6 fenced against the absence and
+    now cite this instead.
+    *Requirement 22 still forbids deriving order from `GameId`*, and nothing here changes
+    that: the id is opaque and carries no time information.
+    *Why `updatedAt` and not `createdAt`, recorded rather than re-derived:* `createdAt`
+    exists on the record (requirement 21) and would produce a different, equally stable
+    order. The user settled this one. The evidence that pointed the same way is the list
+    screen's own heading — *"Pick up where you left off"* (`P4-02-open-games-list.md`
+    req 24, transcribed from the handoff's `1b`) — which is about recency rather than
+    creation. Carrying both fields is what keeps that a **display** choice: a later decision
+    to show or sort by creation order needs no schema change and no Open Questions 1
+    migration.
+    *One player-visible consequence of requirement 21's stamping rule, named here because
+    this is where the order lives:* any `save` moves its record to index 0, **including a
+    save that is not a move** — taking a rematch (`P3-04-game-over-rematch.md` req 9) puts
+    that series at the top of the list before a mark is placed in the new game.
+    *Testable:* two consecutive `readAll()` calls with no intervening mutation return the
+    same order; a store rebuilt from disk returns the same order as before the rebuild;
+    given three records with distinct `updatedAt` values, `readAll()` returns them newest
+    first — index 0 is the largest `updatedAt` — and a `save` that advances one record's
+    `updatedAt` moves it to index 0 on the next read; **given two records created in the
+    same session and never played, so their `updatedAt` values collide, `readAll()` returns
+    the newest-created first and returns the same order on every repeat read and across a
+    store rebuilt from disk**; no consumer file sorts on `GameId`, and no consumer file
+    re-sorts the list at all.
 
 ## Out of Scope
 
 - **The domain models themselves** — `Board`, `Move`, their fields and their `freezed` /
   `json_serializable` definitions: `P1-02-engine-rules.md` (its reqs 29–31). This PRD
-  serializes them and defines none of them.
+  serializes them and defines none of them. The two timestamps requirement 21 adds are
+  **not** among them: they are storage's own fields, like the id and the opponent name, and
+  no design doc puts either in game state.
 - **Who calls save.** This PRD owns the repository and states the obligation (requirement
-  6). It does not own the call sites. **Timing is now settled; the call is still unclaimed
-  in code.** Modelled on `P2-02-audio.md`'s call-site table, which does the same for
-  playback:
+  6). It does not own the call sites. **Timing is settled and every write row now has an
+  owner** — the last two were claimed in wave 3, by `P3-02-move-input.md` req 36 and
+  `P3-04-game-over-rematch.md` req 9. Modelled on `P2-02-audio.md`'s call-site table, which
+  does the same for playback:
+
+  **Writes**
 
   | Write | When | Call-site owner |
   |---|---|---|
-  | After a confirmed move | Settled — `Menus and UI.md` → Decisions → When is a game written to storage? | **Unclaimed.** The commit path is `P3-02-move-input.md` req 4 ("the mark is placed and the turn passes"); no requirement in that PRD mentions persistence |
-  | At game end, carrying the increment | Same write — the game-ending move is a confirmed move | Same unclaimed path. `P3-04-game-over-rematch.md` req 9 can now be written against it |
-  | On taking a rematch | Not a move; needs its own write or the next confirmed move covers it | **Unclaimed** — `P3-04-game-over-rematch.md` req 9's territory |
+  | After a confirmed move | Settled — `Menus and UI.md` → Decisions → When is a game written to storage? | **`P3-02-move-input.md` req 36**, on the commit path its req 4 defines; fire-and-forget, not awaited |
+  | At game end, carrying the increment | Same write — the game-ending move is a confirmed move | **Same owner, `P3-02-move-input.md` req 36**; `P3-04-game-over-rematch.md` req 9(a) asserts the same write from the storage side |
+  | On taking a rematch | Not a move; needs its own write or the next confirmed move covers it | **`P3-04-game-over-rematch.md` req 9**, which claims it rather than letting the next move cover it. What that write does to `updatedAt` is not a caller's choice: requirement 21 has `save` stamp it |
   | On leaving a game to the main menu | No write needed — requirement 11 | n/a |
   | On creating a new game | On confirm in the name prompt | `P4-02-open-games-list.md` req 10, via requirement 28's notifier |
   | On deleting a game | On the delete action | `P4-02-open-games-list.md` req 7, via requirement 28's notifier |
   | On changing a settings toggle | On the switch | `P4-04-settings.md`, via requirement 27's setters |
 
-  The precise gap: **`P3-02-move-input.md` is where the confirmed-move write has to be
-  invoked, and that PRD has no requirement claiming it.** Naming it is this PRD's job;
-  adding the requirement is that PRD's, in wave 3. The rematch row is a second, smaller
-  gap — a rematch resets the board without being a move, so either it writes or the state
-  on disk lags by one move until the next confirm.
+  **Reads — because a write-only table is how the read owner went unnamed for so long.**
+  This layer publishes `readById` and `readAll` and calls neither; a reviewer noted that the
+  table's write-only shape hid the fact that nothing named who resumes a game.
+
+  | Read | When | Call-site owner |
+  |---|---|---|
+  | Resuming a stored game into the game screen — `readById`, then seeding `boardProvider` and `currentGameProvider` | In `GameScreen.initState`, once per `GameId`, before the board is rendered | **`P3-01-board-rendering.md` req 54.** The two providers are `P3-02-move-input.md`'s reqs 29 and 35; what the screen does when the read returns null or throws is that requirement's, not this PRD's |
+  | Listing open games | On the open-games screen | `P4-02-open-games-list.md` reqs 5, 21 and 25, via requirement 28's `openGamesListProvider` |
+
+  **What the two closures changed here.** Requirement 6's *"Testable, but not here"* now has
+  a home — `P3-02` req 36 carries the assertion that a confirmed move reaches storage — and
+  the rematch row's smaller gap (a rematch resets the board without being a move, so either
+  it writes or the state on disk lags by a game) is closed by `P3-04` req 9 choosing to
+  write. Naming the gaps was this PRD's job; filling them was theirs.
 - **The settings screen, its switches, and where they are reachable from** —
   `P4-04-settings.md`. Requirement 26 owns the *value* and requirement 27 the write path;
   that PRD owns the surface and calls the setters. It now draws four rows, not three.
-- **Music itself** — the theme's music slot, where the audio comes from, whether it loops,
-  and whether it differs by screen. `Theming.md` → Decisions → Do all four toggles ship,
-  and is music a theme concern? makes music a **theme** concern and leaves those three
-  questions open in its own Open Questions; the theme-side slot is
-  `P1-03-theme-system.md`'s and playback is `P2-02-audio.md`'s (whose `SoundMoment` enum
-  has no music member today). This PRD persists the on/off preference and nothing else.
+- **Music itself** — the theme's music slot, where the audio comes from, and whether it
+  loops. `Theming.md` → Decisions → Do all four toggles ship, and is music a theme concern?
+  makes music a **theme** concern; the user has since settled the key's **shape** as a single
+  app-wide `sound.music` (`P1-03-theme-system.md` req 17, which is where the slot lives), and
+  playback is nobody's — `P2-02-audio.md`'s `SoundMoment` enum has no music member and its
+  req 14 says it never will. This PRD persists the on/off preference and nothing else.
 - **What "off" means for each channel** — silence, no buzz, instant state changes:
   `P2-02-audio.md`, `P2-03-haptics.md`, `P2-04-animations.md`. This PRD supplies the
   boolean and asserts nothing about behavior.
-- **The open-games list UI** — the rows, the delete affordance, the empty state, and what a
-  player sees when `create` returns `CapReached`: `P4-02-open-games-list.md`. Requirement 28
-  supplies the data and the mutations; that PRD renders them and decides row content.
+- **The open-games list UI** — the rows, the delete affordance, the empty state, what a
+  player sees when `create` returns `CapReached`, and **whether a row displays either
+  timestamp** requirement 21 now stores: `P4-02-open-games-list.md`. Requirement 28 supplies
+  the data and the mutations; that PRD renders them and decides row content, and its Open
+  Question 4a still holds the display half.
 - **Incrementing the score.** The increment happens engine-side at game end
   (`P1-02-engine-rules.md` req 27); this layer writes whatever the engine produced.
 - **The entitlement model** — what the entitlements are, the free-tier defaults, **both cap
@@ -934,6 +1132,8 @@ outside `storage/` knows Hive exists.
 - **Creating the `lib/` tree** — `main.dart`, `app.dart` and the layer directories including
   `storage/` and `state/`: `P1-01-app-scaffold.md` req 2. Awaiting the settings seed before
   the first frame, if that is wanted, is that PRD's `main.dart` too — see requirement 27.
+  **Declaring the Hive packages** is also its req 14's: `hive_ce` + `hive_ce_flutter`,
+  settled by the user.
 - **Any backend, sync, or network storage.** Multiplayer is named as a direction that must
   not be foreclosed (`Tech Design.md` → Decisions → Online multiplayer is an intended
   future direction), not as work now.
@@ -948,17 +1148,19 @@ As worded in `Tech Design.md` → Open Questions → 1. Persisted data — versi
 > an open game gains a field — what happens to data already on the device? A game
 > written by v1.0 has to still load in v1.1.
 
-*Note that the doc's own example just happened:* a fifth preference **was** added (music,
-requirement 24), before any device holds data, so it cost nothing this time. That is the
-cheap case, and it will not stay cheap.
+*Note that the doc's own example just happened, twice:* a fifth preference **was** added
+(music, requirement 24), and an open game **has** gained fields (the two timestamps,
+requirement 21) — both before any device holds data, so both cost nothing this time. That is
+the cheap case, and it will not stay cheap.
 *Consequence of shipping without an answer — moved here from an Out of Scope bullet that was
 deciding it by omission:* this PRD designs no migration hook and no schema-version field, so
 **v1.0 data ships unversioned** — the `open_games` box holds bare `StoredGame` JSON and the
 five preference keys hold bare values. Any scheme adopted later therefore has to treat
 *absence of a version* as meaning v1 rather than meaning corrupt. That is a real constraint
 on the answer, not a decision this PRD is entitled to make. Adding a version field now,
-before any device holds data, is cheaper than inferring one later — and Open Questions 7 may
-add a field anyway, which is the natural moment to add both.
+before any device holds data, is cheaper than inferring one later — and the timestamps landed
+in this wave, which was the natural moment to add both, so that moment is the one now
+passing.
 
 ### 2. Does leaving a game still need a confirmation prompt?
 
@@ -997,6 +1199,13 @@ UI side. This changes the caller's response, not this layer's behavior.
   the handoff's *State* sketch, which `Tech Design.md` records as "a design sketch, not a
   decision taken here." Distinct from the *completed* last move, which requirement 7 does
   persist.
+- **What `save` does with a `GameId` that has no stored record.** Arrived with the stamping
+  settlement: requirement 21 has `save` **preserve the stored `createdAt`**, which presumes
+  there is one to preserve. `create` is the only minter of a `GameId` (requirement 22) and
+  every call site saves a record it read back, so nothing in the app reaches this today —
+  but the contract does not say whether such a `save` inserts the record (and with what
+  `createdAt`), silently does nothing, or throws. Not reachable, not blocking, and cheap to
+  settle now.
 
 <!-- Closed since earlier drafts:
      - "How is an open-game slot ever freed" → requirement 17.
@@ -1004,7 +1213,8 @@ UI side. This changes the caller's response, not this layer's behavior.
        lib/storage/.
      - "When is a save written" → ANSWERED. Menus and UI → Decisions → When is a game
        written to storage?: after every confirmed move. Now requirement 6's app-level claim.
-       What remains is not a question but an unclaimed call site — see Out of Scope.
+       What remained was not a question but an unclaimed call site; P3-02 req 36 claims it —
+       see Out of Scope.
      - "First-launch defaults for the toggles" → ANSWERED. Menus and UI → Decisions →
        What are the settings on a fresh install?: all default to on. Resolved in exactly one
        place, Settings.defaults, by requirement 26 — which also closes the undeclared-symbol
@@ -1053,28 +1263,76 @@ the id opaque and undisplayed, which is the narrow reading. If two games are bot
 way to tell the rows apart, and the fix could be a visible disambiguator (a number, a date, a
 "last played" line) that would make some part of a game's identity player-facing. Whether
 that is wanted, and what it shows, is `P4-02-open-games-list.md`'s to render and the user's
-to decide. This PRD adds no field for it.
+to decide. This PRD adds no field *for that purpose*; note that requirement 21 now stores
+**two** dates, so either a "last played" line (`updatedAt`) or a "started on" line
+(`createdAt`) is available if the answer is a date — which softens the question without
+answering it. Displaying either field is `P4-02` → Open Question 4a's.
 
-### 7. Does `StoredGame` gain a timestamp? (needs the user — one answer settles three things)
+### 7. CLOSED — `StoredGame` gains a timestamp
 
-**This is the same question as `P4-02-open-games-list.md` → Open Question 4**, reached from
-the storage side. That one asks what a row displays; this one asks whether the field exists.
-They cannot be answered separately, and the field is a **wave-1 model change** here whichever
-way it goes.
+**Answered by the user: yes.** This was the same question as `P4-02-open-games-list.md` →
+Open Question 4 (its 4c half), reached from the storage side, and the two could not be
+answered separately. It is a **wave-1 model change** and it is made here.
 
-What rides on it:
+What it settles, in the terms this question was written in:
 
-- **List ordering.** Requirement 29 states there is none today, and that Hive
-  box-iteration order is not stable across compaction — so the player's list can silently
-  reshuffle between launches. A timestamp is the sort key that fixes it. (`P4-02` → Open
-  Question 6 asks for recency ordering and needs this same field.)
-- **The row's relative timestamp.** `1b` draws one; `P4-02` req 4 fences it out of this wave
-  precisely because `StoredGame` has no field to render.
-- **Duplicate titles.** A date incidentally disambiguates two games both called
-  `ItSaMeMaRiO`, which softens OQ 6b above without making the id itself visible.
+- **The field exists.** Requirement 21's `StoredGame` carries it; requirement 23's box
+  values carry it; requirement 7 names it as part of the record. *(Open Questions 8 has
+  since settled that it is two fields, not one.)*
+- **List ordering.** Requirement 29 is now an ordering guarantee rather than an admission
+  that there is none, and the Hive-compaction reshuffle it warned about is fixed.
+  `P4-02` → Open Question 6 can cite requirement 29 instead of fencing against its absence.
+- **Duplicate titles.** A stored date incidentally serves OQ 6b above if the answer there is
+  a "last played" line — without making the id itself visible.
 
-Not chosen here, because "does the player see a timestamp" is a product question. But note
-the asymmetry: **adding the field is cheap now and expensive later** — it is one line on
-`StoredGame` today, and after v1.0 ships it is a migration against unversioned data
-(OQ 1). Storing it and not displaying it is a coherent middle: ordering and stability
-improve, and the row stays as `P4-02` req 4 fences it until the product half lands.
+**What it did not settle, and where that went:**
+
+- **Whether the player ever sees it.** `P4-02` req 4 fences the row's relative timestamp out
+  of this wave; its **Open Question 4a** holds the display half, and this answer does not
+  touch it. "Storing it and not displaying it" is exactly the coherent middle this question
+  described, and it is where the PRDs now sit.
+- **The field's name and semantics, and the sort direction** — Open Questions 8, which the
+  user has now closed.
+
+### 8. CLOSED — both `createdAt` and `updatedAt`, sorted most-recent-first on `updatedAt`
+
+**Answered by the user, both halves.** Answering 7 settled *that* `StoredGame` carries a
+timestamp; this question held what it is called, when it is written, and which end of the
+list the newest game sits at. Kept as a numbered stub because requirements 21, 22, 23, 25 and
+29, and `P4-02-open-games-list.md`'s requirements 2 and 4 and its Open Questions 4a/4c/6, all
+cite this number.
+
+- **The record carries both fields, not one or the other.** `createdAt` is written once, at
+  creation, and never changes; `updatedAt` is written on every `save`. Requirement 6 already
+  saves after every confirmed move, so keeping `updatedAt` current is free.
+  **The user's stated reason for carrying both:** it leaves the sort key a **display** choice
+  rather than a **schema** one. Either order can be offered later without touching stored
+  data — which matters because Open Questions 1 ships v1.0 unversioned, so a field added
+  after devices hold data is the expensive case.
+- **The list sorts most-recent-first, on `updatedAt`.** This PRD's proposal is confirmed.
+  Requirement 29's comparator is settled, not proposed, and the evidence that pointed at it —
+  the list screen's heading *"Pick up where you left off"* (`P4-02` req 24) — is now
+  corroboration rather than the basis.
+- **Whether either field is player-visible is still open**, and it is not this PRD's:
+  `P4-02` → Open Question 4a. Named here only so the display half is not read as closed by
+  this answer.
+
+**The consequence this question handed forward is now answered too: `save` stamps.** A
+rematch writes the same record (requirement 8), so it plainly keeps its `createdAt`; whether
+that write carried the **stale `updatedAt`** or **stamped now** was recorded as an open
+question on `P3-04-game-over-rematch.md` req 9, the first caller that would have had to
+choose. **The user has settled it one level down, which removes the choice rather than making
+it:** `OpenGamesRepository.save` **stamps `updatedAt` itself, ignoring whatever the caller
+passes**, and **preserves the stored `createdAt`**, discarding an incoming one — requirement
+21, with the reasoning recorded there.
+
+Two consequences, both recorded rather than re-derived:
+
+- **A rematch save stamps, so a rematched series jumps to the top of requirement 29's
+  most-recent-first list** before a move is played in the new game. That is player-visible,
+  and it is now a property of the storage layer rather than of the caller.
+  `P3-04-game-over-rematch.md` → Open Question 10 is **closed as answered** by this
+  settlement, and its req 9 states the effect.
+- **`createdAt` is immutable in fact, not only by convention.** A caller can construct a
+  `StoredGame` with any `createdAt` it likes — the constructor takes one — and `save`
+  discards it. Nothing else in this layer could have enforced that.

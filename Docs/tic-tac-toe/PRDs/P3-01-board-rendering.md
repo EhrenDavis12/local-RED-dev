@@ -1,4 +1,4 @@
-**Build-readiness: 92**
+**Build-readiness: 90**
 
 # PRD: Board Rendering and the Game Screen
 
@@ -29,36 +29,54 @@
 > requirement 53 takes ownership of the three scoreboard label strings, which `P3-03`
 > requirement 11 forbids in its own file and no PRD had claimed.
 >
-> **Why 92:** every value this PRD draws is a published theme key or a named code constant,
-> the widget surface is named, the screen four PRDs assert against exists, and both hit-test
-> behaviours on the screen are now explicit rather than defaulted. The same three user
-> decisions remain — two of them visual defects that fire on ordinary play — and two
-> interface amendments need routing to files this one cannot edit. Author's estimate,
-> pending re-grade.
+> **Revised again for the defect that made `GameScreen`'s only parameter dead code.**
+> **Requirement 54** is new: the screen loads the stored game its `GameId` names and seeds
+> `boardProvider` from it. Without it, `boardProvider`'s `build()` returns
+> `Board.newSeries()` and **resuming a saved game silently renders a new one** — a full,
+> legal, empty board that looks exactly like a correct new game. Requirement 46's stateless
+> fence is reversed by it, as that requirement said it might be, and requirement 48 gains a
+> precondition. The settlement also routed the missing artifact both sides needed — a
+> provider holding the on-screen game's identity — to `P3-02` requirement 35, which is where
+> its only *reader* lives.
+>
+> **Why 90:** every value this PRD draws is a published theme key or a named code constant,
+> the widget surface is named, the screen four PRDs assert against exists and now actually
+> shows the game it was asked for, and both hit-test behaviours on the screen are explicit
+> rather than defaulted. It is two points below the previous estimate rather than above it
+> because requirement 54 is new territory that opens two questions of its own — **what the
+> screen does when `readById` returns null, and what it does when the read throws** — where
+> before it opened none by doing nothing at all. That is an honest trade: a stated gap in a
+> requirement that exists beats no gap in a requirement that was missing. The same three
+> user decisions remain, two of them visual defects that fire on ordinary play.
+> Author's estimate, pending re-grade.
 
 > **Wave:** P3 · **Depends on:** `P1-01-app-scaffold.md` (creates `lib/ui/board/` and the
 > `ProviderScope`), `P1-02-engine-rules.md` (the state this renders — bound by symbol in
 > requirements 43 and 48), `P1-03-theme-system.md` (every themed value here is a Requirement
-> 15 key — bound by key path in requirement 28), `P2-01-navigation.md` (its req 2 route table
-> constructs `GameScreen`; its req 4 `appNavigatorProvider` is read by requirement 49),
-> `P2-04-animations.md` (owns all motion; requirement 31 here is the board-side half of its
-> requirement 21).
+> 15 key — bound by key path in requirement 28), `P1-04-persistence.md` (its req 21's
+> `OpenGamesRepository.readById`, `StoredGame` and its req 22's `GameId` — read by
+> requirement 54), `P2-01-navigation.md` (its req 2 route table constructs `GameScreen`; its
+> req 4 `appNavigatorProvider` is read by requirement 49), `P2-04-animations.md` (owns all
+> motion; requirement 31 here is the board-side half of its requirement 21).
 > **Depended on by:** `P3-02-move-input.md` (its req 19 taps the cell surface of requirement
 > 44; its req 26 clear surface is hosted by requirement 51; its OQ-7 is answered by
-> requirement 45), `P3-03-scoreboard-turn-indicator.md` (its `ScoreboardStrip` is composed by
+> requirement 45; its req 36 save depends on requirement 54 having seeded `currentGameProvider`),
+> `P3-03-scoreboard-turn-indicator.md` (its `ScoreboardStrip` is composed by
 > requirement 47 and fed by requirements 48, 49 and 53), `P3-04-game-over-rematch.md` (its
 > result card is hosted by requirement 52), `P3-05-how-to-play.md` (its strip is composed by
 > requirement 47 and its legend swatches read the same theme keys).
 > Within a wave, work is parallel-safe; a lower wave ships first.
 >
-> **⚠ Two amendments are needed in files this PRD cannot edit.**
-> 1. `P3-02-move-input.md` must publish the **previewed still-open quadrant set** on its
->    `PendingSelection` and pass it plus `destinationState` at its req 27 call site
->    (requirement 43). Its req 25 already computes the post-move board these come from, so
->    this is a publish, not a new computation. Until it lands, requirement 23's third row has
->    no data source.
-> 2. `P3-05-how-to-play.md` **names no widget class and no file** for the strip it specifies.
->    Requirement 47 has to compose it and cannot name it. Routing both is the coordinator's.
+> **⚠ One amendment is needed in a file this PRD cannot edit.**
+> 1. `P3-05-how-to-play.md` **names no widget class and no file** for the strip it specifies.
+>    Requirement 47 has to compose it and cannot name it. Routing it is the coordinator's.
+>
+> **Closed since the last revision:** `P3-02-move-input.md` **has published** the previewed
+> still-open quadrant set — `PendingSelection.freeChoiceQuadrants` (its req 23), derived in
+> its req 3 and passed at its req 27 call site — so requirement 23's third row has its data
+> source and requirement 43's `pendingFreeChoiceQuadrants` parameter is fed. That PRD has
+> also **widened `BoardNotifier`** with `replace(Board)` (its req 29), which is what makes
+> requirement 54 implementable.
 
 > **On accepting `GameScreen`.** It could have gone to a new screen PRD or to `P3-02`, and
 > neither is better. A separate PRD would hold a widget whose entire content is three
@@ -84,8 +102,9 @@
 
 > **Requirement numbers 1–45 are stable and must not be renumbered.** Inbound citations from
 > `P1-03`, `P3-02`, `P3-03` and `P3-05` bind to them by number; the screen was appended as
-> 46–53 for that reason. Five requirements are relabelled as constraints in *Design notes*
-> below and **keep their numbers**.
+> 46–53 for that reason, and requirement 54 was appended for the same reason. Five
+> requirements are relabelled as constraints in *Design notes* below and **keep their
+> numbers**.
 
 ---
 
@@ -109,6 +128,15 @@ tap because nothing will explain it afterwards.
 
 Around the board, four PRDs specify pieces of one screen and none of them assembles it.
 
+**And the screen that assembles it shows the wrong game.** `Menus and UI.md` → Leaving a
+game mid-play promises that *"going back to the main menu doesn't discard anything"*, and
+`P1-04-persistence.md` writes every confirmed move to disk so it can be resumed. But the
+route hands `GameScreen` a `GameId` and, until requirement 54, nothing read it: the screen
+rendered whatever `boardProvider` happened to hold, whose initial value is
+`Board.newSeries()`. **Tapping a saved game in the open-games list would have opened an
+empty board** — and because that board is complete and legal and correct-looking, nothing
+about it says a game was lost.
+
 ## Goal
 
 `lib/ui/board/` ships a `BoardView` that renders the 3x3-of-3x3 grid, its 81 cells, and
@@ -118,10 +146,11 @@ and its spacing from named code constants. Every one of the three simultaneous h
 is drawn so that it cannot be mistaken for either of the other two; locked, claimed and
 cat-game quadrants each read as unplayable and as distinct from one another; the whole 9x9
 stays visible in portrait with no zoom; and every state is legible with animations switched
-off. It also ships `GameScreen`, the host that composes the scoreboard strip, the board and
-the how-to-play strip into one vertical stack, reads the game once and passes it down, and
-holds the surfaces and strings its collaborators need it to hold. The board draws state — it
-computes no rules, handles no gesture, and holds no hardcoded *theme* value.
+off. It also ships `GameScreen`, the host that **loads the game its id names**, composes the
+scoreboard strip, the board and the how-to-play strip into one vertical stack, reads the game
+once and passes it down, and holds the surfaces and strings its collaborators need it to
+hold. Opening a saved game shows that game. The board draws state — it computes no rules,
+handles no gesture, and holds no hardcoded *theme* value.
 
 ## Requirements
 
@@ -346,6 +375,10 @@ requirements 11–12 are **status** treatments.
     −1, radius 5, with its outer and inset glow) on the cell named by `board.lastMove`. When
     `lastMove` is null — a new series, or the board returned by `startNextGame()` — no ring
     is drawn.
+    **It is a static ring and does not pulse.** `Animations.md` → Where Animations Fire
+    floats a pulsing treatment as a possibility; the user has since settled that animation
+    scope is the player's marker only, so this treatment is the whole of what the highlight
+    does. *(`P2-04-animations.md` requirement 2 and its requirement 25.)*
     *(`Game Board Design.md` → Last Move Highlight; `design_handoff_game_ui/README.md` →
     Cell states; `P1-02` requirement 40, which guarantees null rather than a sentinel)*
 
@@ -376,6 +409,9 @@ requirements 11–12 are **status** treatments.
     *(`Game Board Design.md` → Active Quadrant Highlight → The free-choice state, which
     floats the calmer treatment as a "may want"; resolved concretely by
     `design_handoff_game_ui/README.md` → Quadrant states and screen 1d)*
+    **Both modes are static.** The *"pulsing glow on the legal quadrant"* the docs float is
+    not built — animation scope is marker-only, settled by the user (`P2-04-animations.md`
+    requirement 2). The forced ring's glow is a drawn treatment, not motion.
     The **text** half of the free-choice cue is not this PRD's, and its home is settled: it
     lives in the how-to-play strip **below** the board, owned by `P3-05-how-to-play.md`
     requirements 10 and 13 — not in a banner above it.
@@ -415,10 +451,10 @@ requirements 11–12 are **status** treatments.
     dead *then*, and highlighting it would preview a quadrant the opponent cannot use —
     the exact failure `P3-02` requirement 3 was rewritten to prevent.
 
-    **Both values come from `P3-02-move-input.md`** (its requirements 3, 25 and 27). **The
-    board does not derive the destination from the cell** — that mapping is the sending
-    rule, which the engine overrides whenever the move kills its own send target, and it
-    belongs to the engine (requirement 35).
+    **Both values come from `P3-02-move-input.md`** (its requirements 3, 23, 25 and 27, all
+    landed). **The board does not derive the destination from the cell** — that mapping is
+    the sending rule, which the engine overrides whenever the move kills its own send
+    target, and it belongs to the engine (requirement 35).
     **The ghost is the player's mark at an opacity, not separate art.** `P1-03`
     requirement 15 publishes `board.pendingGhostOpacity` and no ghost-art slot.
 
@@ -496,6 +532,7 @@ requirements 11–12 are **status** treatments.
     | 23 | pending cell ring, ghost, destination ring and wash | `board.pendingCellRing`, `board.pendingGhostOpacity`, `board.pendingQuadrantRing`, `board.pendingQuadrantWash`, `color.highlightPending` | — |
     | 38, 50 | screen padding and gaps | `color.ground` (the screen's background) | `screenHorizontalPadding` 16, `safeAreaTop` 62, `stripToBoardGap` 14 |
     | 53 | the three chip label strings | — | `playerOneLabel`, `tiesLabel`, `playerTwoLabel` |
+    | 54 | the pre-seed surface, while the stored game loads | `color.ground` | — |
 
     **The boundary is narrower than "no numbers in code", and reading it wrong in either
     direction produces a defect.** What moved into code is the **gaps between things**:
@@ -535,6 +572,11 @@ requirements 11–12 are **status** treatments.
     switched off.** No state in this PRD may depend on motion to be understood; with
     animations off the game simply shows the new state, with no substitute effect. This is
     the board-side half of `P2-04-animations.md` requirement 21.
+    **Cheap to hold, now that animation scope is settled.** Not one treatment in this PRD
+    animates — the marker's pop is the only motion in the game (`P2-04` requirement 2), and
+    it is drawn *over* a mark this PRD renders statically. So there is no board state whose
+    only expression is motion, and this constraint is structural rather than a discipline to
+    maintain.
     *(`Animations.md` → Decisions → Animations off = instant state change;
     `design_handoff_game_ui/README.md` → Interactions & behavior)*
 
@@ -610,9 +652,10 @@ requirements 11–12 are **status** treatments.
     (requirements 40, 45), the no-per-cell-border rule (requirement 5), stack order
     (requirement 25), theme-key resolution and the guard scan (requirements 27–28), the
     engine-purity scan (requirement 35), the last-move lifetime (requirement 20), the four
-    preview branches (requirements 23, 43), the tap surfaces (requirements 44, 51), and the
-    screen's composition, wiring and strings (requirements 47–49, 53). Treatment correctness
-    is verified by eye against the handoff screens, and that review is the only check on it.
+    preview branches (requirements 23, 43), the tap surfaces (requirements 44, 51), the
+    screen's composition, wiring and strings (requirements 47–49, 53), **and the load path
+    (requirement 54)**. Treatment correctness is verified by eye against the handoff screens,
+    and that review is the only check on it.
 
 40. **Each rendered fact is independently addressable** via requirement 45's `BoardKeys`.
     The keys mirror requirement 14's two axes rather than flattening them into one
@@ -647,7 +690,7 @@ Named so `P3-02`, `P3-03` and `P3-05` bind to symbols rather than to prose, in t
 
     | File | Public symbol | Role |
     |---|---|---|
-    | `game_screen.dart` | `GameScreen` | the host; requirements 46–53 |
+    | `game_screen.dart` | `GameScreen` | the host; requirements 46–54 |
     | `board_view.dart` | `BoardView` | the 3x3 of quadrants; requirements 1–4, 26, 38 |
     | `quadrant_view.dart` | `QuadrantView` | one quadrant: the `Stack` of requirement 25; requirements 6–14, 23 |
     | `quadrant_grid_lines.dart` | `QuadrantGridLines` | requirement 34's four line boxes |
@@ -656,9 +699,10 @@ Named so `P3-02`, `P3-03` and `P3-05` bind to symbols rather than to prose, in t
     | `board_metrics.dart` | `BoardMetrics` | the board's spacing constants: `outerGap` 8, `quadrantPadding` 5, `innerGap` 3, `screenHorizontalPadding` 16 — `static const double`, one place, not scattered literals |
     | `board_keys.dart` | `BoardKeys` | requirement 45's key literals |
 
-    Requirement 50's two screen-level constants and requirement 53's three strings live in
-    `game_screen.dart` beside their only user, following `P3-03` requirement 21's precedent
-    of keeping a component's layout constants in its own file.
+    Requirement 50's two screen-level constants, requirement 53's three strings and
+    requirement 54's load state all live in `game_screen.dart` beside their only user,
+    following `P3-03` requirement 21's precedent of keeping a component's layout constants in
+    its own file.
     *(`Tech Design.md` → Decisions → Project structure — layer-first; `P1-01` requirement 2
     creates the directory)*
 
@@ -671,7 +715,7 @@ Named so `P3-02`, `P3-03` and `P3-05` bind to symbols rather than to prose, in t
     | `pendingSelection` | `Move?` | `P3-02` requirement 27 passes `pending?.move` |
     | `pendingDestinationQuadrant` | `int?` | `P3-02`'s `pending?.destinationQuadrant` — **passed, never derived** |
     | `pendingDestinationState` | `PlacementState?` | `P3-02`'s `pending?.destinationState` |
-    | `pendingFreeChoiceQuadrants` | `Set<int>?` | **`P3-02` amendment needed** — the still-open quadrants of its previewed post-move board |
+    | `pendingFreeChoiceQuadrants` | `Set<int>?` | `P3-02` requirement 23's `pending?.freeChoiceQuadrants` — the still-open quadrants of its previewed post-move board |
     | `onCellTap` | `void Function(int quadrant, int cell)` — **required, non-nullable** | requirement 48 |
 
     **The pending parameters are not paired. The invariant is one-way:**
@@ -760,6 +804,7 @@ Named so `P3-02`, `P3-03` and `P3-05` bind to symbols rather than to prose, in t
     | `cellGhostMark(q, c)` | `board.cell.$q.$c.ghostMark` | as `cellPending` |
     | **`cellPlayable(q, c)`** | `board.cell.$q.$c.playable` | **`board.legalMoves.contains(Move(quadrant: q, cell: c))`** |
     | `screen` · `clearSurface` | `board.screen`, `board.screen.clearSurface` | requirements 46, 51 |
+    | **`screenLoading`** | `board.screen.loading` | **requirement 54 — while the stored game is being read** |
 
     Spelling follows `P1-02` requirement 8's convention — no `p1`/`p2`, no `quad`.
     `quadrantPendingFreeChoice` is deliberately distinct from the `available` playability
@@ -777,20 +822,34 @@ Named so `P3-02`, `P3-03` and `P3-05` bind to symbols rather than to prose, in t
 ### `GameScreen` — the host
 
 Accepted by this PRD rather than left unowned; see the status block. Every obligation below
-is already specified from the other side, so these requirements assemble rather than invent.
+is already specified from the other side, so these requirements assemble rather than invent —
+**with one exception, requirement 54, which no PRD specified from any side.**
 
-46. **`GameScreen` is a `ConsumerWidget` in `lib/ui/board/game_screen.dart`**, constructed
-    by `P2-01` requirement 2's route table as `GameScreen(id: GameId(...))` and taking that
-    `GameId` as its only constructor parameter.
+46. **`GameScreen` is a `ConsumerStatefulWidget` in `lib/ui/board/game_screen.dart`**,
+    constructed by `P2-01` requirement 2's route table as `GameScreen(id: GameId(...))` and
+    taking that `GameId` as its only constructor parameter.
     *(`P2-01-navigation.md` requirement 2, whose route table already attributes it here;
     `P1-04-persistence.md` requirement 22 for `GameId`)*
-    **Stateless, fenced, reversible.** Both pieces of mutable state it renders live in
-    providers — `boardProvider` (`P3-02` requirement 29) and `pendingSelectionProvider`
-    (`P3-02` requirement 24) — and nothing on this screen is animation, focus or scroll
-    state, which are the usual reasons to reach for `ConsumerStatefulWidget`. If a later
-    requirement needs a controller, promoting the class changes no call site.
+
+    **Stateful, because requirement 54 made it so — and that requirement said it might.**
+    An earlier revision fenced this class as stateless, with the reasoning that both pieces
+    of mutable state it renders live in providers — `boardProvider` (`P3-02` requirement 29)
+    and `pendingSelectionProvider` (`P3-02` requirement 24) — and that *"if a later
+    requirement needs a controller, promoting the class changes no call site."* Requirement
+    54 is that later requirement: it performs **one async read, once, keyed to this screen's
+    `id`**, and it must not be re-issued on every rebuild. That is per-instance lifecycle,
+    which is what `initState` exists for. **The prediction held** — the route still builds
+    it with an id and no other argument, and no call site changed.
+
+    **The alternative considered and not taken:** a `FutureProvider.family` keyed by
+    `GameId`. It would keep the class stateless and give caching for free, but no PRD
+    declares such a provider, it puts a `lib/ui/board/` concern into `lib/state/` — `P3-02`'s
+    territory — and a `.family` provider that is never disposed accumulates one entry per
+    game ever opened. **Reversible**, and it changes only this class and requirement 54's
+    mechanism.
     **Verification:** the route builds it with an id and no other argument; a widget test
-    pumps it inside a `ProviderScope` with `boardProvider` overridden and nothing else.
+    pumps it inside a `ProviderScope` with the repository, `boardProvider` and
+    `currentGameProvider` overridden and nothing else.
 
 47. **The screen is one vertical stack of three children, in this order:** the scoreboard
     strip (`P3-03`'s `ScoreboardStrip`), `BoardView`, and the how-to-play strip
@@ -799,6 +858,9 @@ is already specified from the other side, so these requirements assemble rather 
     *(`Game Board Design.md` → Visual Layout — "Vertical stack: **scoreboard on top, board
     below**"; → Decisions → Where does the free-choice cue live? for the third child's
     position; `P3-03` requirement 2; `P3-05` requirement 13; requirement 38 here)*
+    **This stack is what requirement 54 withholds until the game has loaded**, so "the
+    screen is these three children" describes the loaded state, which is every state the
+    player spends time in.
     **The column is height-bounded, and no child is asked to size itself intrinsically.**
     The stack sits directly inside the screen's `Scaffold` body under requirement 50's
     padding, so every child receives a bounded vertical constraint. `GameScreen` wraps no
@@ -836,12 +898,17 @@ is already specified from the other side, so these requirements assemble rather 
       pendingSelection: pending?.move,
       pendingDestinationQuadrant: pending?.destinationQuadrant,
       pendingDestinationState: pending?.destinationState,
-      pendingFreeChoiceQuadrants: pending?.freeChoiceQuadrants,    // P3-02 amendment
+      pendingFreeChoiceQuadrants: pending?.freeChoiceQuadrants,
       onCellTap: (q, c) => ref.read(pendingSelectionProvider.notifier)
                               .tapCell(Move(quadrant: q, cell: c)),
     );
     ```
 
+    **This code runs only after requirement 54 has seeded `boardProvider`.** That is the
+    precondition, and it is not decorative: read one frame earlier, `board` is
+    `BoardNotifier.build()`'s `Board.newSeries()` and this snippet renders a correct-looking
+    empty game in place of the player's. Requirement 54 delivers the precondition by not
+    building this subtree at all until the seed lands.
     **Neither child reads a game-state provider.** `P3-03` requirement 19 is explicit that
     `ScoreboardStrip` reads neither `boardProvider` nor `pendingSelectionProvider`, and
     requirement 43 here says the same of `BoardView`. One watcher for the screen is what
@@ -883,7 +950,8 @@ is already specified from the other side, so these requirements assemble rather 
     is measured from the frame top, so a naive `SafeArea` *plus* 62pt double-counts the
     notch inset on every modern iPhone. The screen pads to `max(mediaQuery.padding.top,
     safeAreaTop)` — 62pt where the inset is smaller, the inset where it is larger, never the
-    sum.
+    sum. **The same padding applies to requirement 54's pre-seed surface**, so nothing
+    shifts vertically when the game lands.
     *(`design_handoff_game_ui/README.md` → Spacing — "Safe-area top padding 62 on board
     screens"; `Theming.md` → Decisions → Does a theme control spacing and padding?)*
     **The route does not supply this.** `P2-01` requirement 1 states that none of its
@@ -924,6 +992,9 @@ is already specified from the other side, so these requirements assemble rather 
     includes the settings button of requirement 49. `P2-01` requirement 20 closes that from
     the router side by clearing before every navigation operation. Both halves are needed;
     neither substitutes for the other.
+    **Not installed over the pre-seed surface.** Requirement 54's loading state hosts no
+    clear surface: there is no board, so there is nothing pending to clear, and
+    `pendingSelectionProvider` is null throughout by construction.
     **Verification:** with a pending selection active, a tap clears it when it lands in a
     cell gutter, on the board's 16pt margin, **on the scoreboard strip's background**, and
     on one of the three counters; a tap on an illegal cell does not clear it; exactly one
@@ -940,8 +1011,14 @@ is already specified from the other side, so these requirements assemble rather 
     draws underneath is partly settled (requirement 14: every quadrant locked) and partly
     open — see Open Questions. Requirement 26's stacking context is what lets the card sit
     above the claim overlays.
+    **A resumed game can open straight into this state.** `P1-04` stores finished games —
+    the game-ending move is a confirmed move and is written like any other — so requirement
+    54 can seed a board whose `placementState` is already `gameOver`. Nothing special is
+    needed: the overlay's condition is read from the board, not from a transition.
     **Verification:** with a finished board, `P3-04`'s card is in the tree above
-    `BoardView`, and `BoardView` is still mounted beneath it.
+    `BoardView`, and `BoardView` is still mounted beneath it; and a game loaded by
+    requirement 54 whose stored board is finished shows the card on first paint of the
+    loaded state, with no intervening frame of a live-looking board.
 
 53. **The screen owns the three scoreboard label strings** — `static const String` in
     `game_screen.dart`, passed to `ScoreboardStrip` by requirement 48:
@@ -972,10 +1049,123 @@ is already specified from the other side, so these requirements assemble rather 
     **This is a label, not a name.** The players are still "Player One" and "Player Two"
     (`Game Overview.md` → Decisions → Player names). Keeping the three strings at one call
     site is what makes `P3-03` requirement 10's future swap to real opponent names a change
-    here rather than a change inside the strip.
+    here rather than a change inside the strip. **Requirement 54 makes that swap cheaper
+    than it was**: `currentGameProvider` now holds the record's `opponentName`, so the data
+    the future swap needs is already on this screen.
     **Verification:** a source scan of `scoreboard_strip.dart` finds no user-facing display
     string; under Neon the three chips render `PLAYER 1`, `TIES`, `PLAYER 2`; no rendered
     chip ever reads `PLAYER ONE` or `PLAYER TWO`.
+
+54. **`GameScreen` loads the stored game its `GameId` names, and seeds the two state
+    providers from it before rendering the board.**
+
+    **The defect this closes.** `P2-01` requirement 2's route builds `GameScreen(id: …)`,
+    requirement 46 takes that id as the only constructor parameter — and **until this
+    requirement, nothing read it.** The screen rendered whatever `boardProvider` held, whose
+    `build()` is `Board.newSeries()` (`P3-02` requirement 29). So **tapping a saved game in
+    the open-games list opened a brand-new empty board**, silently, with a correct scoreboard
+    header above it and no error anywhere. Every layer worked: `P1-04` wrote the game after
+    every confirmed move, the list showed it, the route carried its id, and the id went
+    nowhere. This is the only requirement in this PRD whose absence is a data-loss bug rather
+    than a visual one.
+
+    **The mechanism.**
+    1. In `initState`, once and only once, the screen calls
+       `ref.read(openGamesRepositoryProvider).readById(widget.id)` (`P1-04` requirements 21
+       and 28). It is keyed to `widget.id` and is never re-issued on rebuild.
+    2. **On success**, and **outside `build`**, it seeds both providers:
+       ```dart
+       ref.read(boardProvider.notifier).replace(game.board);       // P3-02 req 29
+       ref.read(currentGameProvider.notifier).set(game);           // P3-02 req 35
+       ```
+       then marks itself loaded so the next build produces requirement 47's stack.
+    3. **Until step 2 completes**, the screen builds a minimal surface carrying
+       `BoardKeys.screenLoading` — the theme's `color.ground` under requirement 50's padding
+       — and **no `ScoreboardStrip`, no `BoardView` and no clear surface**.
+
+    **Seeding must not happen during `build`.** Riverpod forbids mutating a provider while a
+    widget is building, and the natural-looking shortcut — reading the future in `build` and
+    calling `replace` when it resolves inline — is exactly that mutation. Doing the write in
+    the `initState` future's completion callback keeps it out of the build phase. Recorded
+    because it is the mistake an implementer makes once.
+
+    **Why the board is withheld rather than seeded-over.** This is the invalidation answer,
+    and it needs stating because the obvious reading of "seed on entry" is unsafe:
+    `boardProvider` is a plain `NotifierProvider`, **not `autoDispose`** (`P3-02`
+    requirement 29), and `P2-01` requirement 2's child-route structure never unmounts the
+    game screen. So the provider **survives leaving game A and opening game B**, still
+    holding A's board. If `GameScreen` rendered `BoardView` immediately and seeded when the
+    read returned, the player would see **game A's position** on game B's screen for as many
+    frames as the disk took — a wrong board that looks exactly like a right one, which is
+    the same failure class as the defect above and harder to notice. **Withholding the
+    subtree until the seed lands makes the stale value unobservable**, which is what makes
+    a non-auto-dispose provider safe here without changing its lifecycle.
+    - **`replace` is a full overwrite**, so no residue of the previous game survives the
+      seed. No `ref.invalidate` is needed and none is issued: invalidating would return the
+      provider to `Board.newSeries()`, which is the wrong value to be holding, one frame
+      earlier than necessary.
+    - **The pending selection clears itself.** `replace` changes the board, which fires
+      `P3-02` requirement 30's `ref.listen(boardProvider)`, which nulls
+      `pendingSelectionProvider`. That is requirement 9's row 4 in that PRD. Nothing here
+      clears it explicitly, and adding a second clear would create a second owner of a
+      rule that has one.
+    - **`currentGameProvider` is overwritten on the same path**, so the identity and the
+      board can never describe two different games. Seeding one without the other is the
+      failure mode this ordering exists to prevent; `P3-02` requirement 36's save reads that
+      provider and would otherwise write game A's `GameId` with game B's board.
+
+    **Why this screen owns the load, rather than the router or the storage layer.** `P2-01`
+    requirement 1 states that none of its requirements specifies what a screen contains, so
+    the router hands over an id and stops. `P1-04` is a repository and has no idea which game
+    is on screen. `P3-02` owns the state but not the lifecycle, and says so — its
+    requirement 29 declares `boardProvider` and explicitly disclaims *"seeding it from
+    storage."* **The screen holding the id is the only thing that knows which game to load,
+    and it is the only thing that can withhold the board while it loads.** Settled with the
+    user.
+
+    **Fenced, reversible — two failure cases this PRD decides rather than guesses.** Both
+    are recorded as Open Questions because neither has a design-doc answer:
+    - **`readById` returns null** — the record is gone. Reachable: `P4-02` deletes games, and
+      a route can outlive one. **Default: navigate back to the main menu** via
+      `ref.read(appNavigatorProvider).exitGameToMainMenu()` (`P2-01` requirement 3), showing
+      nothing else. Reasoning: the alternative — an error screen — needs copy, a surface key
+      and a control that nobody has specified, and there is nothing for the player to do on
+      it. Returning to the list they came from is the only action available. **Reversible**;
+      changes one branch.
+    - **`readById` throws** — the store failed. **Default: the same path**, and the error is
+      **not caught**, so it reaches `P1-06-crash-reporting.md` requirement 2's handler as an
+      unhandled asynchronous error and becomes one `CrashReport`, exactly as `P3-02`
+      requirement 36 treats a failed save. Nothing reads that sink in wave 1 — the same
+      honest limit that requirement records.
+
+    *(`Menus and UI.md` → Leaving a game mid-play — *"going back to the main menu doesn't
+    discard anything"* — and → Decisions → When is a game written to storage?, which is what
+    makes a resumable record exist to load; `P1-04-persistence.md` requirements 6, 11, 21,
+    22, 28; `P3-02-move-input.md` requirements 29, 30, 35, 36; `P2-01-navigation.md`
+    requirements 1, 2, 3.)*
+    **Verification**, with an overridden `openGamesRepositoryProvider`:
+    - (a) **the defect test.** `readById` returns a `StoredGame` whose board has moves
+      played; after the future resolves, `boardProvider` is `identical()` to that board and
+      the rendered cells match it. **Run with `boardProvider` left at its default**, so a
+      build that never seeds fails here rather than passing on a lucky override — this is the
+      assertion the whole requirement exists for;
+    - (b) `currentGameProvider` holds the same record — same `GameId`, `opponentName`,
+      `createdAt` — so `P3-02` requirement 36's save has its five fields;
+    - (c) **the stale-board test.** Seed `boardProvider` with game A's board, then pump
+      `GameScreen(id: B)` against a repository whose `readById` completes on a controlled
+      future: **before** it completes, `BoardKeys.screenLoading` is present and no
+      `BoardKeys.quadrant(0)` and no `BoardKeys.clearSurface` are in the tree; after it
+      completes, the rendered board is B's and A's position was never painted;
+    - (d) `readById` is called exactly once across an arbitrary number of rebuilds, and with
+      `widget.id`;
+    - (e) a pending selection set before the seed is null after it, with no explicit clear
+      call in `game_screen.dart` (source scan) — `P3-02` requirement 30 does it;
+    - (f) `readById` returning null records exactly one `exitGameToMainMenu()` on `P2-01`
+      requirement 3's recording fake, and no board is rendered;
+    - (g) `readById` throwing records the same navigation, and a source scan of
+      `game_screen.dart` finds no `catch`, no `.catchError` and no `onError` around it;
+    - (h) a stored board whose `placementState` is `gameOver` renders requirement 52's
+      overlay on the first painted frame of the loaded state.
 
 ### Design notes — constraints on how the above is built, not separately assertable
 
@@ -997,7 +1187,8 @@ check.
   `P1-03` → Open Questions carries the question of what form this contract could take.
 - **Requirement 31 — the board is readable with animations off.** `P2-04-animations.md`
   owns the toggle; that the *static* board carries every state is a property of this PRD's
-  design — no requirement here specifies motion — and reviewing it is a by-eye check.
+  design — no requirement here specifies motion, and under that PRD's marker-only scope none
+  could — and reviewing it is a by-eye check.
 
 ## Out of Scope
 
@@ -1010,6 +1201,18 @@ here.
   clear surface (requirement 51) and draws the pending selection; it decides none of the
   semantics and never computes a destination or a previewed open set. Focus/hover styling
   (`surfaces.focusRing`) is input-state styling and belongs there too.
+- **The state providers themselves** — `boardProvider`, `pendingSelectionProvider` and
+  `currentGameProvider`, their types and their mutators: `P3-02-move-input.md` requirements
+  24, 29 and 35. Requirement 54 **calls** `replace` and `set`; it declares neither, and
+  nothing under `lib/ui/board/` may add a provider or a notifier member.
+- **The storage layer** — the repository, `StoredGame`'s shape, `GameId` minting, the Hive
+  box, ordering, the 3-game cap, and **writing after a confirmed move**:
+  `P1-04-persistence.md`, whose confirmed-move write is claimed by `P3-02` requirement 36.
+  **This PRD reads once, on entry, and never writes.** A source scan of `lib/ui/board/`
+  finds `readById` and no other repository call.
+- **Resetting the game** — the rematch's `startNextGame()` and its own storage write:
+  `P3-04-game-over-rematch.md` requirements 6 and 9. It calls the same `replace` requirement
+  54 does, from the other end of the game's life.
 - **The scoreboard strip's contents and rendering** — the three counters, the turn
   highlight, the casing transform, the settings button's own haptic and tap sound, and its
   internal layout constants: `P3-03-scoreboard-turn-indicator.md`. This PRD composes the
@@ -1025,13 +1228,19 @@ here.
 - **Routes, the router, and clearing on navigation** — `P2-01-navigation.md`. This PRD reads
   `appNavigatorProvider`; it never imports `go_router`, and `P2-01` requirement 1's scan
   enforces that.
+- **Crash reporting** — the sink, the handlers and whether a recovered error ever reports:
+  `P1-06-crash-reporting.md`. Requirement 54's throwing case relies on its requirement 2
+  handler existing and reports nothing itself.
 - **The theme mechanism** — the schema, YAML loading, merge-over-Neon and authoring
   `neon.yaml`: `P1-03-theme-system.md`.
 - **Legal-move computation and all rules** — `P1-02-engine-rules.md`.
-- **All motion** — `P2-04-animations.md`. **Nothing in this PRD asserts that any of these
-  treatments animate.** Whether the last-move and active-quadrant highlights animate at all
-  is unanswered and sits with the user; `P2-04` requirement 27 fences wave 2 to `placeMark`
-  only.
+- **All motion** — `P2-04-animations.md`. **Nothing in this PRD animates, and that is now
+  settled rather than deferred.** Animation scope is the player's marker only (its
+  requirement 2, settled by the user), so the last-move ring, the active-quadrant highlight,
+  the claim and cat overlays and the pending preview are all **static treatments in their
+  final form** — requirements 19, 21 and 23 are the whole of what those highlights do. The
+  earlier note that whether they animate *"is unanswered and sits with the user"* is
+  withdrawn; it is answered.
 - **Sound** — the pending selection deliberately has no sound of its own
   (`Game Board Design.md` → Move Input → Sound); playback is `P2-02-audio.md`.
 - **The app-root Dynamic Type clamp** — unowned across `P3-03`, `P3-05` and `P4-01`; this
@@ -1073,9 +1282,28 @@ here.
    Reachable on any board where a selected cell would complete a third quadrant in a line or
    fill the last open quadrant.
 
+### New with requirement 54 — needs the user, not blocking
+
+4. **What should the player see while a stored game loads?** Requirement 54 renders a bare
+   `color.ground` surface with the screen's padding and nothing else, on the reasoning that
+   a local Hive read of one small record is fast enough that a spinner would flash and read
+   as a stutter — and that no doc, screen or token specifies a loading treatment anywhere in
+   this app. `design_handoff_game_ui/` draws no loading state on any of its screens. If a
+   spinner, a skeleton board or the scoreboard-without-a-board is wanted, it needs a
+   treatment and probably a theme key. **Not blocking:** something legal renders today.
+
+5. **What should happen when the game a route names is gone, or cannot be read?**
+   Requirement 54 defaults both cases to `exitGameToMainMenu()` with no message. Reachable
+   for real: `P4-02` deletes games, and a route can name one that no longer exists. The
+   alternatives are an error surface with copy and a control, or a silent fallback to a new
+   game in that slot — the second being *exactly the defect requirement 54 exists to close*,
+   so it is not proposed. **Silently returning to the menu is honest but tells the player
+   nothing about why**, which for a deleted game is arguably fine and for a storage failure
+   is arguably not. `Menus and UI.md` describes no failure surface anywhere.
+
 ### Relieved, not closed — still with the user
 
-4. **What happens at frame widths other than 402pt?** Every number in requirement 4 is
+6. **What happens at frame widths other than 402pt?** Every number in requirement 4 is
    committed at a 402 × 874 reference frame. Whether the board scales proportionally, holds
    fixed point values and re-centers, or caps at a maximum width is unstated — and if it
    scales, whether the four mark sizes scale with it. Dynamic Type is off *(`Menus and
@@ -1095,6 +1323,9 @@ here.
    **`GameScreen` now holds the sum** (requirements 47, 50), so this PRD is where a scaling
    rule would land when one exists.
 
+   *(This item was numbered 4 before requirement 54 added two questions above it; it is
+   renumbered because nothing cites it by number. Items 1–3 keep their numbers.)*
+
 ### Fenced by this PRD — reversible, flagged so a ruling is cheap
 
 - **Veil and border composition** (requirement 14) — finished subsumes locked. Changes
@@ -1108,7 +1339,15 @@ here.
   `QuadrantGridLines`'s internals only.
 - **`BoardView` takes pending scalars rather than `PendingSelection` or a provider**
   (requirement 43) — changes one constructor and `P3-02` requirement 27's call site.
-- **`GameScreen` is stateless** (requirement 46) — promoting it changes no call site.
+- **`GameScreen` loads in `initState` rather than through a `FutureProvider.family`**
+  (requirements 46, 54) — changes this class only; the family alternative and why it was not
+  taken are recorded in requirement 46.
+- **The board subtree is withheld until the seed lands** (requirement 54) — the alternative
+  is rendering immediately and accepting stale frames from a non-auto-dispose provider,
+  which is a wrong-board defect rather than a slower one. Not really reversible; recorded
+  because it looks like a free optimisation to remove.
+- **Both load-failure cases exit to the main menu** (requirement 54) — Blocking 5. Changes
+  one branch.
 - **`stripToBoardGap` = 14pt** (requirement 50) — a number nothing states, chosen for
   symmetry with the 14pt below the board. Changes one constant, and `P3-03` requirement
   17's and `P3-05`'s OQ-7 arithmetic with it.
@@ -1144,10 +1383,31 @@ here.
   labels and the non-board haptic — not the treatments this PRD draws. The claimed-quadrant
   mark, the locked treatment and the free-choice highlight are still hedges, settled here
   only because the approved handoff drew a concrete answer.
+- **No design doc describes opening a saved game as a *screen* behaviour.** `Menus and
+  UI.md` covers leaving one (*"doesn't discard anything"*) and `P1-04` covers storing one,
+  but nothing on either side says what the screen does when it arrives. Requirement 54 is
+  derived from the two halves plus the user's settlement of its ownership, and it is the
+  only requirement in this PRD with no direct design-doc sentence behind its mechanism.
 
 ### Closed since the last revision — recorded so they are not reopened
 
-- **`GameScreen` has no owner.** Closed: it is this PRD's, requirements 46–53. `P3-03`'s
+- **`GameScreen` renders a new game when asked for a saved one.** Closed: requirement 54.
+  It was not previously listed as a question because no PRD had noticed the parameter was
+  unread.
+- **The provider holding the on-screen game's identity had no owner.** Closed: `P3-02`
+  requirement 35's `currentGameProvider`, declared there because `lib/state/` is that PRD's
+  layer and its requirement 36's save is the only thing that *reads* it. Requirement 54
+  writes it. Neither this PRD's load nor that PRD's save closes without it.
+- **`P3-02` had not published the previewed still-open quadrant set.** Closed: its
+  requirement 23's `freeChoiceQuadrants`, derived in its requirement 3 and passed at its
+  requirement 27. Requirement 23's third row has its data source.
+- **`P3-02`'s `BoardNotifier` published no way to seed a board.** Closed: its requirement
+  29's `replace(Board)`, which requirement 54 and `P3-04` requirement 6 both call.
+- **Whether the last-move and active-quadrant highlights animate.** Closed: they do not.
+  Animation scope is marker-only, settled by the user (`P2-04` requirement 2). Requirements
+  19 and 21 draw the final static treatments and this PRD's Out of Scope no longer defers
+  anything conditional to that PRD.
+- **`GameScreen` has no owner.** Closed: it is this PRD's, requirements 46–54. `P3-03`'s
   *Needs an assignment* section resolves with it.
 - **The three scoreboard label strings are unowned.** Closed: requirement 53. They were
   forbidden in `scoreboard_strip.dart` by `P3-03` requirement 11 and written nowhere.
@@ -1165,6 +1425,8 @@ here.
   last-move ring persists behind the result card and whether the veils change under it.
   `P3-04` owns the card; requirement 52 only hosts it. `P3-05` → OQ-9 asks the same of the
   strip.
+- **Who stamps `updatedAt` on a save?** `P3-02` → OQ-10, routed to `P1-04`. Not this PRD's —
+  requirement 54 reads a record and writes none — but it shares the record this screen holds.
 - **Which values, concretely, does Classic Red vs Blue override?** *(`Theming.md` → Open
   Questions; owned by `P5-01-classic-theme.md`.)* The first real test of requirement 30 —
   and `P1-03` notes Classic has a near-white ground while inheriting veils and glows tuned

@@ -17,9 +17,10 @@ coverage.
 > idiom, and its **req 14** exhaustive dependency list), `P1-02-engine-rules.md` (`Board`, and
 > **req 32's `Board.newSeries()`**), `P1-03-theme-system.md` (**req 15**'s slot schema at
 > **v8** — every key requirement 17 names now exists, including `icons.trash` and
-> `surfaces.destructive`), `P1-04-persistence.md` (**reqs 21** `OpenGamesRepository`, **22**
-> `GameId`, **25** `CreateGameResult`, **10** the create-time cap check, **17** `delete`,
-> **28** the providers this screen reads, **29** the absence of an ordering guarantee),
+> `surfaces.destructive`), `P1-04-persistence.md` (**reqs 21** `OpenGamesRepository` and
+> `StoredGame` — **which now carries `createdAt` and `updatedAt`**, **22** `GameId`, **25**
+> `CreateGameResult`, **10** the create-time cap check, **17** `delete`, **28** the providers
+> this screen reads, **29** the `updatedAt`-ordered, most-recent-first `readAll()`),
 > `P1-07-entitlements.md` (**req 3**, via `entitlementsProvider` →
 > `Entitlements.openGameCap`), `P2-01-navigation.md` (**reqs 1, 2, 3, 7, 11, 12**, plus the
 > two additions requirement 28 asks it for), `P2-02-audio.md` (**req 6**'s
@@ -37,22 +38,26 @@ coverage.
 
 Every requirement here is buildable today. Two kinds of statement appear, marked at each one:
 
-- **Settled** — traceable to a Decision in a design doc, or to a published interface in a
-  sibling PRD. Do not deviate.
+- **Settled** — traceable to a Decision in a design doc, to a settlement the user has made, or
+  to a published interface in a sibling PRD. Do not deviate.
 - **Fenced default** — a build-level choice this PRD made so the work is not blocked, each with
-  the open question it defers to and what it costs to reverse. Fences are in requirements 2, 3,
-  4, 11, 22, 26, 27, 28 and 29.
+  the open question it defers to and what it costs to reverse. Fences are in requirements 3, 4,
+  11, 22, 26, 27, 28 and 29.
 
-**Five of those nine reverse inside one widget file, and four do not.** An earlier draft claimed
-all nine did; that was wrong, and the error is worth naming because it hid the defect the 76
-corrected.
+**Requirement 2's fence is gone, and so is its residual.** It fenced row order against the
+absence of a sort key, and the user has since settled both halves: `StoredGame` carries a
+timestamp (`P1-04` → Open Question 7) and the list sorts **most-recent-first on `updatedAt`**
+(`P1-04` → Open Question 8). `P1-04` req 29 is now a fully settled ordering guarantee and this
+screen cites it rather than fencing on it or flagging a residual. That leaves eight fences, of
+which **six reverse inside one widget file and two do not.**
 
-| Reverses in one file | Reverses across files, or needs a model change |
+| Reverses in one file | Reverses across files, or needs another PRD's change |
 |---|---|
-| **3** pinned vs scrolling — a widget-tree move | **2** row order — the `..sort()` only exists after 4c adds a sort key to `StoredGame`: a **wave-1 model change** |
-| **11** name normalization — the field's configuration | **4** the interim row — the chips are one file, but the **timestamp needs `updatedAt` on `StoredGame`**, which `P1-04` req 21 does not carry |
-| **26** load and empty states — one widget or one call | **22** the `CapReached` branch — if Open Question 3 lands on the upsell, this PRD and `P4-05-purchase-flow.md` stop being parallel-safe inside wave 4 |
-| **27** the modal's sentence — one string | **28** the modal's host — **three files across two owners**, and it changed what requirement 29 could assert. See requirement 28 |
+| **3** pinned vs scrolling — a widget-tree move | **22** the `CapReached` branch — if Open Question 3 lands on the upsell, this PRD and `P4-05-purchase-flow.md` stop being parallel-safe inside wave 4 |
+| **4** the interim row — now genuinely one file: the score chips were always one widget, and **the timestamp fields now exist** (`P1-04` req 21), so rendering one is a widget change rather than a wave-1 model change. What is still not this PRD's to decide is *whether* either is shown — Open Question 4a | **28** the modal's host — **three files across two owners**, and it changed what requirement 29 could assert. See requirement 28 |
+| **11** name normalization — the field's configuration | |
+| **26** load and empty states — one widget or one call | |
+| **27** the modal's sentence — one string | |
 | **29** the revealed-row lifecycle — the row widget alone | |
 
 **The lesson the 76 taught, recorded so it is not repeated:** a reversal cost measured only in
@@ -60,6 +65,9 @@ corrected.
 storage, but it removed the ability of a *different* requirement to observe an outcome — and an
 assertion that cannot be written is worse than one that is missing, because a red test leaves
 nobody able to tell whether the code or the spec is wrong.
+**The timestamp is the counter-example worth keeping beside it:** requirement 4's cost was
+correctly reported as *not one file* precisely because it needed a wave-1 model change, and the
+answer to that question is what made it one file. The reporting was right both times.
 
 **Two strings still do not exist** (Open Question 14). Neither blocks the screen: the footer is
 simply not shipped, and the `CapReached` branch renders the numbers it is handed
@@ -77,6 +85,13 @@ simply not shipped, and the `CapReached` branch renders the numbers it is handed
   (`Theming.md` → Decisions → *Does a theme control spacing and padding?*).
 - **Non-board controls make a sound** — one tap sound everywhere (`Theming.md` → Decisions →
   *Do non-board controls make a sound?*). Requirement 30 carries both channels.
+- **`StoredGame` carries a timestamp** — the user answered `P1-04` → Open Question 7 **yes**,
+  which was the same question as this PRD's Open Question 4c. Requirements 2 and 4 change with
+  it; Open Question 6 is closed; Open Question 4a — whether the *row shows* it — is not.
+- **The record carries two dates, and the order is settled** — the user has since answered
+  `P1-04` → Open Question 8: `StoredGame` carries **both `createdAt` and `updatedAt`**, and
+  `readAll()` returns **most-recent-first on `updatedAt`**. Requirement 2 no longer carries a
+  residual, and requirement 4's fence now covers *two* candidate dates rather than one.
 
 ## Problem
 
@@ -122,18 +137,21 @@ on the same phone.
    rows.
    *Derived, not cited:* the list **scrolls**. No design doc says so; it follows from
    requirement 6's cap of 100 against the handoff's 402×874 frame.
-   *Fenced default — row order:* rows render **in whatever order the list provider yields, which
-   is unspecified**. `P1-04` **req 29** states this outright — *"`readAll()` carries no ordering
-   guarantee … It is **not** creation order, **not** recency order"* — and records that an
-   earlier draft of this requirement fenced against a guarantee that PRD never made. In practice
-   it is Hive box-iteration order, **not stable across compaction**. No test asserts order, so
-   the failure mode is a list that silently reshuffles, not a red suite.
-   **This screen adds no ordering of its own** — it performs no sort and does not reorder after
-   a write. Any change in the survivors' relative order after a delete comes from the re-read:
-   `P1-04` req 29's stability testable covers consecutive reads *with no intervening mutation*,
-   and a delete is a mutation. *Reversal cost:* **not one file.** The `..sort()` is one line, but
-   there is nothing to sort on until Open Question 4c adds a key to `StoredGame` — a wave-1
-   model change. See Open Question 6.
+   **Row order is guaranteed by the provider, and this screen adds none of its own.**
+   `P1-04` **req 29** returns a **stable order sorted most-recent-first on the `updatedAt`
+   field `StoredGame` carries** — the user settled the field's existence (`P1-04` → Open
+   Question 7) and then the comparator itself (`P1-04` → Open Question 8), which is what turned
+   that requirement from *"`readAll()` carries no ordering guarantee"* into a settled
+   guarantee. This screen renders rows in the order the list provider yields, performs no sort,
+   and does not reorder after a write. The silent-reshuffle failure this requirement used to
+   fence against — Hive box-iteration order being unstable across compaction — is gone at the
+   source rather than papered over here.
+   *No residual.* An earlier draft flagged the **sort direction** as `P1-04`'s proposal rather
+   than a settlement. The user has confirmed it — most-recent-first — so there is nothing left
+   held open, and nothing on this screen changes either way, because this screen does not sort.
+   *Testable, for the ordering this screen must not disturb:* seeded with three stored games
+   whose `updatedAt` values differ, the rendered row order is exactly the provider's order, and
+   the row whose `updatedAt` is newest is rendered first.
    *Scoped to the normal state:* this requirement and requirement 6 assume the stored count is
    at or below the effective cap. The over-cap state is **Open Question 8**.
 
@@ -152,19 +170,22 @@ on the same phone.
    further.*
    *Testable, with the row in its **resting** state (requirement 29 defines the other):* a
    `StoredGame` with `opponentName: 'Dad'` renders a row whose title is exactly `Dad`; the row
-   renders no timestamp and no score chips; a tap resolves to requirement 5's call and a
+   renders no date and no score chips; a tap resolves to requirement 5's call and a
    leftward swipe to requirement 29's reveal.
    *Fenced default — the interim row:* title (`surfaces.gameRow.titleStyle`) + chevron
    (`icons.chevronRight`), on `surfaces.gameRow.{fill,radius}` at `radius.row`.
    **`surfaces.gameRow.{timeStyle,chip,chipYouOutline}` are deliberately left unread this
-   wave.** *Reversal cost — two different sizes:* the chips are one widget file, since the score
-   is already on `Board`; the timestamp is **not** — it needs an `updatedAt` on `StoredGame`
-   that `P1-04` req 21 does not carry, making that half a wave-1 model change
-   (Open Question 4c).
+   wave.** *Reversal cost — one file for both halves:* the chips are one widget file, since
+   the score is already on `Board`; **rendering a date is now one widget file too**, because
+   `P1-04` req 21's `StoredGame` carries **both `createdAt` and `updatedAt`** (the user settled
+   Open Question 4c, then `P1-04` → Open Question 8). What still gates it is not a missing field
+   but a product call — **Open Question 4a**, whether the row displays a date at all, **which
+   of the two it is**, and the copy it would render, which nothing specifies.
    **This asks `P1-03` to move those three keys to `deferred`,** exactly as it holds
    `surfaces.scoreboard.turnBanner`: *"A required key with no reader would make Requirement 11's
    check assert a value nothing consumes — so it stays in the contract and out of the check
-   until that decision lands."*
+   until that decision lands."* **The ask is unchanged by the fields landing** — a stored field
+   with no reader is still no reader, and two stored fields with no reader are still no reader.
 
    > **Why this row is fenced and requirement 23's counter is not.** Both are `required` keys
    > with this screen as their only consumer, so the naive rule — "a required key must be read"
@@ -172,8 +193,10 @@ on the same phone.
    > *contest* it. The counter's content is drawn (`11/16`), uncontested, and needs no data the
    > model lacks, so it is built. The chips' content is contested — `1b` labels them
    > `YOU / TIES / THEM` while every design doc says Player One / Player Two (Open Question 4d)
-   > — and the timestamp needs a field that does not exist. **Drawn and uncontested → build it.
-   > Contested, or needs a model change → leave the key unread and ask `P1-03` to defer it.**
+   > — and the date, though it now has two fields behind it, has no settled answer to
+   > *whether* it is shown, *which* date it is, or *how* it is worded. **Drawn and uncontested →
+   > build it. Contested, or unsettled in product terms → leave the key unread and ask `P1-03`
+   > to defer it.**
 
 5. **Selecting an open game resumes that series, not just its last board** — the board picks up
    where it was left and the game's own running score (Player One / Ties / Player Two) comes
@@ -246,8 +269,9 @@ on the same phone.
    - **The revealed control is an icon button.** It renders no text; the widget under test
      exposes an icon and no `Text` child, and its fill and radius resolve from
      `surfaces.destructive.action` rather than from any wrapper of its own.
-   - **Order is untouched.** Deleting removes one row and this screen reorders nothing — see
-     requirement 2.
+   - **Order is untouched.** Deleting removes one row and this screen reorders nothing — the
+     survivors come back in the order `P1-04` req 29's most-recent-first `updatedAt` sort
+     yields, which is the same relative order they were in. See requirement 2.
 
    *Considered and rejected:* automatically **replacing the oldest** open game, as drawn in
    `1b`'s footer. That footer is stale and is not authoritative; its replacement copy is
@@ -266,13 +290,31 @@ on the same phone.
 
    | Element | Verbatim copy | Slot | Fidelity |
    |---|---|---|---|
-   | Title | `Who are you playing?` | `surfaces.sheet.header.titleStyle` → `type.scale.sheetTitle` | exact — 20/600 both sides |
-   | Sub | `Just a name for the list — on the board you're still Player One and Player Two.` | `surfaces.sheet.header.subStyle` → `type.scale.sheetSub` | **mismatch — `sheetSub` is 11.5, `2c` draws 12.5.** Requirement 20 |
+   | Title | `Who are you playing?` | `surfaces.sheet.header.titleStyle` | exact — 20/600 |
+   | Sub | `Just a name for the list — on the board you're still Player One and Player Two.` | `surfaces.sheet.header.subStyle` | `2c` draws 12.5. Requirement 20 |
    | Field label | `Opponent` | `surfaces.input.labelStyle` | exact |
    | Helper | `Leave it as is if you can't be bothered.` | `surfaces.input.labelStyle` | no distinct helper key exists; requirement 20 |
    | Secondary action | `Cancel` | `surfaces.button.secondary` | exact |
    | Primary action | `Start playing` | `surfaces.button.primary` | exact |
 
+   **The `→ type.scale.*` notation is corrected, not merely tidied.** The two header rows
+   previously read `surfaces.sheet.header.titleStyle` **→** `type.scale.sheetTitle`, which
+   asserted that a `*Style` key *dereferences* a style name. **It does not.** The user has
+   settled that a `*Style` key under `surfaces.*` is an **inline object carrying its own
+   colour** — normative in `P1-03` req 15 → `surfaces`, **schema v10**, where these two keys
+   are declared `textStyle`. So `titleStyle` holds `{size, weight, color, …}` directly; there
+   is no arrow and no lookup.
+   `type.scale.sheetTitle` and `.sheetSub` still exist as the published type ramp and are
+   where these numbers were **drawn from**, which is why they are still worth naming — but
+   that is provenance, not a runtime reference. Slot columns elsewhere in this PRD name a key
+   a widget reads, and these two now do the same.
+   **What this changes about the two fidelity notes.** The title's 20/600 is unaffected. The
+   sub's *"mismatch — `sheetSub` is 11.5, `2c` draws 12.5"* was a mismatch **only under the
+   dereference reading**: two independent objects cannot disagree, so `subStyle.size` can
+   simply be 12.5 while `type.scale.sheetSub` stays 11.5 for its own consumers. **Requirement
+   20 still carries that row and this PRD does not resolve it here** — whether the two
+   *should* agree is a fidelity question for `P1-03`'s transcription pass, and it is now a
+   choice rather than a conflict.
    *Source: `Menus and UI.md` → Play Game → Where It Takes You; → Screens (so far) → 3; the
    strings are `design_handoff_game_ui/` → *2c*, quoted verbatim because copy an implementer
    invents is invisible to every test that does not name it.*
@@ -301,6 +343,10 @@ on the same phone.
     cells empty, `score` 0/0/0, `firstPlayerThisGame == Player.one`,
     `currentPlayer == Player.one`), matching `Rules.md` → Turn Order Across Games. Requirement 14
     disclaims only who goes first in a **rematch** (`P1-02` req 34).
+    **Who supplies the dates:** the repository, on `create` — `P1-04` req 21 makes `createdAt`
+    and `updatedAt` both `StoredGame`'s fields, and its req 25's testable asserts a created
+    record has both set (and, on a fresh create, equal to each other). This screen passes a name
+    and a board and nothing else; the two-argument call is unchanged.
     *Testable:* confirming with `Jules` calls the notifier's `create` once with
     `opponentName: 'Jules'` and a board equal to `Board.newSeries()`; on `GameCreated` it records
     exactly one `openGame(result.game.id)`. The `CapReached` branch is requirement 22.
@@ -356,7 +402,7 @@ on the same phone.
     | What it draws | Key path | Read this wave? |
     |---|---|---|
     | Game row card and title | `surfaces.gameRow.{fill,radius,titleStyle}`, `radius.row` | yes |
-    | Row timestamp and score chips | `surfaces.gameRow.{timeStyle,chip,chipYouOutline}` | **no — requirement 4's fence; asked to be `deferred`** |
+    | Row date and score chips | `surfaces.gameRow.{timeStyle,chip,chipYouOutline}` | **no — requirement 4's fence; asked to be `deferred`** |
     | Row chevron | `surfaces.gameRow.chevron` / `icons.chevronRight` | yes |
     | Revealed panel behind the trash glyph | `surfaces.destructive.action.{fill,radius}` | yes |
     | Trash glyph | `icons.trash.{kind,set,name,path,tint,size}` — **no `button` sub-object; the row's height sizes the panel** | yes |
@@ -415,6 +461,9 @@ on the same phone.
     *Still open, and only this half:* whether any part of a game's identity is ever shown to the
     player — `P1-04` → Open Question **6b**, carried here as Open Question 9. **The modal does not
     depend on it:** the settled copy says *"this game"*, not the opponent name (requirement 27).
+    *Note, since the fields now exist:* `StoredGame` carries two dates — `createdAt` and
+    `updatedAt` — either of which would serve that question if the answer is a date. Showing one
+    is Open Question 4a's, not this requirement's, and the id stays opaque either way.
 
 20. **Values this screen draws that still have no key in `P1-03` req 15's schema.** Each is a
     request to that PRD.
@@ -508,6 +557,10 @@ on the same phone.
     chosen; `0 games` renders during the load state and permanently after the last delete; and
     `1b`'s footer states behavior requirement 7 rejects and has no replacement — ship no footer
     until Open Question 3 lands. All three are Open Question 14, and none blocks the screen.
+    *Noted, not acted on:* the heading was the evidence `P1-04` req 29 cited when it *proposed*
+    most-recent-first. The user has since settled that direction (`P1-04` → Open Question 8), so
+    the heading is corroboration rather than the basis. This copy is transcribed and does not
+    change either way.
 
 25. **The list's data source is `openGamesListProvider`, and refresh is structural.**
     `P1-04` **req 28** declares it as an
@@ -695,7 +748,10 @@ Referenced by filename rather than specified here:
   list, route opacity, and ratifying requirement 28's route and operation →
   `P2-01-navigation.md`.
 - **Storage** — the repository, Hive, `GameId` minting, the create-time cap check, the `delete`
-  implementation, `StoredGame`'s shape, and the providers → `P1-04-persistence.md`.
+  implementation, `StoredGame`'s shape **including both timestamp fields, their semantics and
+  the sort direction** (`P1-04` reqs 21 and 29, settled at its Open Question 8), the ordering
+  guarantee, and the providers → `P1-04-persistence.md`. This screen reads what it is given and
+  sorts nothing.
 - **Both feedback layers themselves** — the platform call, the mute and vibrate gates, asset
   resolution, the no-engine case → `P2-03-haptics.md` and `P2-02-audio.md`. This screen is a
   caller of each.
@@ -715,28 +771,36 @@ Referenced by filename rather than specified here:
 ### Needs the user — none of them blocking a build
 
 4. **What does a row show besides the opponent's name?** *(The build half is fenced in
-   requirement 4.)* Four decisions, not one. **Where each lands first is named, because this PRD
-   and `P1-04` → Open Question 7 have been pointing at each other.**
+   requirement 4.)* Four decisions, not one — **and one of the four is now answered.**
 
-   - **4a — Does a row show a relative timestamp?** Depends on 4c. Lands in `Menus and UI.md` →
-     Decisions, then requirement 4 here and `P1-03` req 15's status for
-     `surfaces.gameRow.timeStyle`.
-   - **4b — Does a row show the three score chips?** Independent of 4c — the score is already in
-     `Board`. Lands the same way.
-   - **4c — Is the field stored regardless of what is displayed?** **This lands in `P1-04` first,
-     and it is the one to answer first**, because it is a wave-1 model change and both 4a and Open
-     Question 6 depend on it. Its req 29: *"One field settles three things.* A stored `updatedAt`
-     (or `createdAt`) on `StoredGame` would give: a stable sort key, a meaningful order for the
-     list, and the relative timestamp `1b` draws." **Storing without displaying is a coherent
-     middle** — it fixes the ordering defect while leaving requirement 4's fence intact.
+   - **4a — Does a row show a date, and which one?** **Still open, and it no longer depends on
+     4c.** Two fields exist — `createdAt` and `updatedAt` (`P1-04` req 21) — so this question is
+     now *whether* the player sees a date and, if so, *which*: a "last played" line reads
+     `updatedAt`, a "started on" line reads `createdAt`. Neither follows from the fields
+     existing. Lands in `Menus and UI.md` → Decisions, then requirement 4 here and `P1-03`
+     req 15's status for `surfaces.gameRow.timeStyle`. If it lands on yes, the wording is
+     unwritten too — nothing specifies what a relative date reads as.
+   - **4b — Does a row show the three score chips?** Still open, and always was independent of
+     4c — the score is already in `Board`. Lands the same way.
+   - **4c — ANSWERED: the dates are stored regardless of what is displayed.** The user settled
+     `P1-04` → Open Question 7 **yes**, which is where this half lived: `StoredGame` carries a
+     timestamp, as a wave-1 model change; `P1-04` → Open Question 8 then settled that it carries
+     **two**. That PRD's req 29 said *"one field settles three things"* — a stable sort key, a
+     meaningful list order, and the relative timestamp `1b` draws — and the first two are now
+     delivered by its settled ordering guarantee. **Storing without displaying is exactly where
+     this landed**, which is the coherent middle this question described: the ordering defect is
+     fixed and requirement 4's fence is intact.
+     *No residual.* The field names, their semantics and the sort direction were the leftovers;
+     the user has closed all three at `P1-04` → Open Question 8.
    - **4d — If the chips ship, what are they labelled?** `1b` says `YOU / TIES / THEM`; every
      design doc says Player One / Player Two. **A separate question from the one already
      settled** — `Game Overview.md` → *Player-facing vocabulary* closed "board" vs "quadrant" and
      says nothing about player labels.
 
-   **Two files disagree until 4a/4b land:** `P1-03` req 15 marks
+   **Two files still disagree until 4a/4b land:** `P1-03` req 15 marks
    `surfaces.gameRow.{timeStyle,chip,chipYouOutline}` **required** and names this PRD's
-   requirements 4, 17 and 18 as their consumer; requirement 4 leaves them unread.
+   requirements 4, 17 and 18 as their consumer; requirement 4 leaves them unread. The date
+   answer does not resolve that — stored fields with no reader are still no reader.
 
 20. **Is single-row exclusivity wanted on the revealed row?** Requirement 29 says two rows may be
     revealed at once, because requiring otherwise needs a coordination point above the rows and
@@ -758,7 +822,8 @@ Referenced by filename rather than specified here:
 
 14. **Two pieces of copy do not exist**, and this PRD invents neither: the **`CapReached`
     message** (requirement 22, blocked behind Open Question 3) and **`1b`'s footer replacement
-    with its plural and zero cases** (requirement 24).
+    with its plural and zero cases** (requirement 24). *(A third would join them if 4a lands on
+    "yes" — the date's wording is unwritten as well.)*
 
 3. **What does New Game do when the player is already at the effective cap?** Settled: both
    ceilings, delete frees a slot, replace-the-oldest rejected, and the storage contract. Open:
@@ -779,7 +844,9 @@ Referenced by filename rather than specified here:
 9. **Is any part of a game's identity ever shown to the player?** `P1-04` → Open Question **6b**.
    Three rows reading `ItSaMeMaRiO` is the default case and requirement 4's interim row gives a
    player nothing to tell them apart. Requirement 27's copy says "this game", so the modal does
-   not depend on the answer.
+   not depend on the answer. **Note the overlap with 4a:** a displayed date would disambiguate
+   the rows without making the id itself visible, so answering 4a "yes" would soften this without
+   answering it.
 
 ### Routed to another PRD — asks, not questions for the user
 
@@ -788,8 +855,14 @@ Referenced by filename rather than specified here:
     **ask 2 is worth doing regardless**, because `showGeneralDialog` and `showAdaptiveDialog`
     pass a scan meant to catch exactly them.
 
-6. **Nothing specifies the order the list arrives in.** `P1-04` **req 29** states this outright
-   and names the cost. Requirement 2 fences on it honestly. The fix is Open Question 4c.
+6. **CLOSED — nothing specifies the order the list arrives in.** `P1-04` **req 29** now does:
+   `readAll()` returns a stable order sorted **most-recent-first on `updatedAt`**, because the
+   user settled that the fields exist (that PRD's Open Question 7, this PRD's 4c) and then
+   settled the comparator itself (that PRD's Open Question 8). Requirement 2 cites the guarantee
+   instead of fencing against its absence, and the silent-reshuffle failure mode is gone.
+   **Nothing is left over:** the sort direction was the residual and it is now settled, and this
+   screen was indifferent to it either way because it sorts nothing. Kept as a numbered stub so
+   requirement 2's citation stays stable.
 
 ### Fenced in this PRD — a build default is in place, with its reversal cost
 
@@ -809,7 +882,9 @@ Referenced by filename rather than specified here:
 
 7. **How does the player leave the list without picking anything?** `1b` draws a back button; no
    design doc says where back goes. `P2-01` **req 13** owns `leaveOpenGamesList()`; its Open
-   Question 8 holds the destination open.
+   Question 8 holds the destination open. *(Note `P2-01`'s Open Question 2 — the game exit — has
+   since been settled by the user as `router.go('/')`, and that PRD records explicitly that the
+   argument does not transfer to this control.)*
 
 ### Answered since an earlier draft — recorded so they are not re-raised
 
