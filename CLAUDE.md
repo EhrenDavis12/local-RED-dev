@@ -69,11 +69,21 @@ When you edit or add any doc under `Docs/`, match the existing house style:
 1. `# Title`
 2. `> **Status:** ...` blockquote
 3. Content sections (`##`)
-4. `## Decisions` — settled items, one `### sub-heading` each, answer stated in **bold**
-5. `## Open Questions` — **always the last section in the file**
+4. `## Open Questions` — **always the last section in the file**
 
 Other standing rules for these docs:
 
+- **Revise in place; never keep a decision log.** When something is settled, rewrite the prose
+  so it states the new answer, and delete what it replaced. Never add a "we used to do X, we
+  now do Y" entry, and never leave X standing elsewhere in the doc. A design doc says what is
+  being built, in the present tense, and says nothing about how it got that way.
+- **Git is the audit trail.** `git log -p <doc>` already records when X became Y. A
+  hand-maintained decisions section duplicates that, drifts from it, and turns every settled
+  question into a contradiction someone has to keep reconciling — the docs here reached 89%
+  decision-log before this rule existed. Where a rejected alternative is genuinely
+  load-bearing, because knowing it prevents a regression, state the reason inline in present
+  tense ("marks are drawn in code, not theme, because theme packs cannot ship layout") in the
+  section it governs. That is a reason, not a ledger entry.
 - **Never answer an open question yourself.** Unanswered questions stay in Open Questions,
   worded exactly as the user wrote them. Don't guess, infer, or soften a question into a
   statement.
@@ -96,6 +106,12 @@ Every new or changed agent goes through the `/agent-creator` skill
 (`.claude/skills/agent-creator/`). It gates on overlap with existing agents, a justified
 model/effort tier, and one job per agent, and it handles installation.
 
+Changes to how agents work *together* — a pipeline stage, a document type, the flow itself —
+start at the `/agent-builder` skill (`.claude/skills/agent-builder/`). It is the design record:
+the three layers, what each agent is for, and a log of what each hard-won rule cost to learn.
+Read it before proposing a flow change; `/agent-creator` then builds whatever survives. Both
+are repo-level and outlive any one system.
+
 An agent that is neither named in the active system's `SYSTEM.md` nor backed by a hook will not
 reliably run — so adding the agent file is not the same as installing it.
 
@@ -110,7 +126,8 @@ batch rather than guessing. When one comes back blocked:
 1. **Answer what you can yourself** — from the spec, the docs, or the code. Most returned
    "questions" are research, and doing that research is your job, not the user's.
 2. **Batch the rest into one ask.** Only questions needing the user's intent or preference
-   reach them.
+   reach them — and rewrite each one so it stands alone, per "Asking the user a question"
+   below. An agent's wording is addressed to you, never to the user.
 3. **Resume the same agent with `SendMessage`** — refer to it by name. This restores its
    transcript, so it keeps its partial work and its reasoning.
 
@@ -124,6 +141,40 @@ result.
 
 If an agent returns questions it could have answered by reading, say so when you resume it.
 Over-asking is the failure mode that makes this loop expensive.
+
+## Asking the user a question
+
+Every question put to the user must be answerable **without opening a single file.** This
+applies to questions you thought of yourself and to ones relayed from an agent — and relaying
+is where it usually breaks, because an agent's report is written for you, not for the user.
+
+**Translate before you ask. Never forward a reference the user has no way to resolve.**
+
+- No identifiers of any kind: no `R3`, `C1`, `requirement 54`, `P3-01`, `OQ-2`, no
+  `file.dart:88`, no section or heading names. The user does not hold these in their head and
+  should not have to go looking.
+- **State the situation in terms of the thing itself** — what happens on screen, what the
+  player does, what gets saved. Not what the document says about it.
+- **Give the concrete options**, and say what each one would actually mean in the app.
+- **Say how hard it is to change later.** Cheap and reversible, say so — that licenses a quick
+  gut call instead of a careful one. Expensive or irreversible, say that too, and say why.
+- One question is one question. If answering needs three decisions, ask three.
+
+The test: could someone who has never read these docs answer it correctly? If not, rewrite it.
+
+Worked example. An agent reports:
+
+> **Needs your call:** C1 — R3 and R19 conflict on highlight persistence.
+
+What reaches the user:
+
+> When a player takes a square, it gets highlighted so you can see the last move. When that
+> player moves again, should the older highlight disappear, or stay so both are visible?
+> (Easy to change later — a quick call is fine.)
+
+**Agents keep their references.** Requirement numbers and `file:line` are precise and cheap for
+you to act on, and stripping them from agent reports would cost you accuracy. The translation
+happens at the boundary where a human is on the other side — which is you, every time.
 
 ## The active system
 
