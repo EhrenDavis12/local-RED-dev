@@ -151,7 +151,7 @@ is where it usually breaks, because an agent's report is written for you, not fo
 **Translate before you ask. Never forward a reference the user has no way to resolve.**
 
 - No identifiers of any kind: no `R3`, `C1`, `requirement 54`, `P3-01`, `OQ-2`, no
-  `file.dart:88`, no section or heading names. The user does not hold these in their head and
+  `board.ext:88`, no section or heading names. The user does not hold these in their head and
   should not have to go looking.
 - **State the situation in terms of the thing itself** — what happens on screen, what the
   player does, what gets saved. Not what the document says about it.
