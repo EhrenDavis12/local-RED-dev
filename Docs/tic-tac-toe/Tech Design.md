@@ -45,7 +45,7 @@ into the app. A universal, theme-like object that can be loaded in.
 *"the themes should be saved by UUID in the YAML files."*
 
 The persisted "selected theme" preference stores the UUID, not the theme's name. See
-[Theming](./Theming.md) → Decisions → Does the theme persist between sessions.
+[Theming](./Theming.md) → Choosing a Theme.
 
 ### Fallback to Neon — merge, not resolve
 **Merge over Neon.** Each theme is materialized into a complete theme by merging it over
@@ -121,7 +121,7 @@ decides what gets written into it, and who is allowed to know it is Hive.
 to put one. See [Theming](./Theming.md) → Architectural Rule.
 
 Inter 400/500/600 is bundled as **Neon's** font choice, not an app-wide font constant. See
-[Theming](./Theming.md) → Decisions → Does a theme supply its own font.
+[Theming](./Theming.md) → What a Theme Controls.
 
 ### How is the board rendered?
 **Widgets.** *"ok widgets is the winner lets make that happen."*
@@ -136,14 +136,11 @@ overlay drawing only the grid lines. That is an escape hatch, not a decision tak
 ### Audio package
 **`audioplayers`.**
 
-### Marks — image or icon, supplied by the theme
-**"Due to themes im thinking the marks can be an image or an icon. For example neon just
-needs icons of X and O while the dinosaur theme might use a T-Rex as an Icon."**
-
-So marks are asset slots on the theme, not shapes drawn in board code.
-
-This also settles the marks question in [Theming](./Theming.md) — see Theming →
-Decisions → Marks beyond X and O.
+### Marks — supplied by the theme
+**Marks are asset slots on the theme, not shapes drawn in board code.** The theme supplies
+the mark art; board code places it and draws nothing itself. Which kinds of art a theme
+may supply — and why an image is the real answer for a theme — is
+[Theming](./Theming.md) → What a Theme Controls.
 
 ### Device support
 **"We will want to port our game over to every devices. iPhone will be the primary target
@@ -203,10 +200,9 @@ starts at zero**.
      layer-first. -->
 
 The scope comes from [Theming](./Theming.md) → Architectural Rule, which derives its slot
-list from what the screens actually consume rather than a closed category list — see
-Theming → Decisions → What the theme's slots are derived from. Indicative patterns to
-catch, to be sharpened at the keyboard rather than settled here — and not a complete
-enumeration of that slot inventory:
+list from what the screens actually consume rather than a closed category list. Indicative
+patterns to catch, to be sharpened at the keyboard rather than settled here — and not a
+complete enumeration of that slot inventory:
 
 | Category | Roughly what the scan looks for |
 |---|---|
@@ -429,11 +425,8 @@ on becomes harder, because the report will not say.
 ### In-app purchases
 **The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
 vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
-[Theming](./Theming.md) → Decisions → Which themes are free, and
+[Theming](./Theming.md) → Free and Paid Themes, and
 [Menus and UI](./Menus%20and%20UI.md) → Decisions → How many open games do we keep.
-
-This is a reversal of the previous no-monetization position on themes (see
-[Theming](./Theming.md) → Decisions → Are themes unlockable/rewards).
 
 **Consequence for offline status:** in-app purchases require StoreKit, which needs network
 access and a restore-purchases path tied to the Apple ID. This means **Fully offline. No

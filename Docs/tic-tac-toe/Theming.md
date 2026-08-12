@@ -1,7 +1,6 @@
 # Theming
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
-> what's under **Decisions**.
+> **Status:** Brain dump. Contradictions are expected and OK.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Neon now exists as a concrete,
@@ -19,12 +18,12 @@ Build the theme system **from the beginning**, not bolted on later.
 > **All of our code operates off of the theme. No code should be operating independently
 > from the selected theme.**
 
-Meaning — no hardcoded values anywhere in the code, across the full slot inventory the
-screens actually consume:
+Meaning — no hardcoded values anywhere in the code. The slot list is derived from what the
+screens actually consume, not from a category list written in the abstract:
 - Colors, backgrounds, fonts, piece styles, sounds, animations.
 - Board geometry — grid-line width, grid-line inset, mark sizes. Spacing and padding —
-  outer gap, quadrant padding, inner gap — are the one named exception; see Decisions →
-  Does a theme control spacing and padding?
+  outer gap, quadrant padding, inner gap — are the one named exception; see **What a Theme
+  Does NOT Control** below.
 - Corner radii — cell, quadrant, modal, chip, control, button.
 - The type scale — sizes and weights, distinct from "fonts" meaning a typeface.
 - Opacities — the locked, claimed and cat-game veils.
@@ -36,7 +35,9 @@ And:
 - Every visual, audio, and motion value is read from the currently selected theme.
 - If something on screen has a color, that color came from the theme. If something makes
   a noise, that sound came from the theme. **If something moves, that motion came from
-  the theme.** No exceptions.
+  the theme.** No exceptions once the app is running — the one screen drawn without a
+  theme is the **Failed to load Neon Theme** screen, which exists precisely because there
+  is no theme to read; see **Choosing a Theme** below.
 - Adding a new theme should require zero changes to game/board/menu code — only adding
   a new theme definition.
 
@@ -65,197 +66,52 @@ treating them the same schedules the wrong one.
 - **For now, themes are contained within the codebase.** Bundled/shipped with the app.
 - Not user-uploaded, not downloaded from a server, not user-authored. That's a possible
   later thing, not now.
-
----
-
-## Decisions
-
-### How many themes ship at launch
-**Two — Neon and Classic Red vs Blue.** See the Theme Catalog below.
-
-### Where theme selection lives
-**On the main menu.** Themes up front — a nice big button, the same size and treatment
-as the Play Game button. Not buried in a settings screen.
-
-### Does the theme persist between sessions
-**Yes.** Once a player selects a theme, it stays active. Close the app, open it again,
-that's still their theme. Requires persisting the selection to device storage.
-
-<!-- The persisted value is the theme's UUID, not its name, so renaming a theme does not
-     lose the selection. See Tech Design → Decisions → Theme identity — UUID. -->
-
-### Can you change the theme mid-game
-**No — leave it out for now.** Theme changes happen from the main menu only. Possible
-later feature if we decide we want it.
-
-### Do themes affect sound
-**Yes. Themes come with sound.** A theme is a full audio-visual package, not just a skin.
-Sound is theme-driven exactly like visuals are — no hardcoded audio anywhere.
-
-### Are themes unlockable/rewards
-**Yes — some themes are paid.** *"We will label what themes are free as of now we will
-have 2 free themes the neon and the red Vs Blue themes any other themes will be a paid for
-theme."*
-
-This reverses the earlier position on this doc, which said all themes were free and
-unlocked with no monetization goal. That is no longer the case — see **Which themes are
-free** below.
-
-### Which themes are free
-**Neon and Classic Red vs Blue are free. Every theme beyond those two is paid.** The theme
-selection list **labels** which themes are free and which are paid.
-
-### Does a theme supply its own font
-**Yes — a font stays a themeable value.** Inter 400/500/600 is bundled as **Neon's** font
-choice, not as an app-wide font constant. See [Tech Design](./Tech%20Design.md) →
-Decisions → Do themes pick their own font?, which stays true and is now clarified rather
-than contradicted.
-
-### Marks beyond X and O
-**Marks are not locked to X and O — a theme supplies its own mark art, as an image or an
-icon.** From [Tech Design](./Tech%20Design.md) → Decisions: *"Due to themes im thinking
-the marks can be an image or an icon. For example neon just needs icons of X and O while
-the dinosaur theme might use a T-Rex as an Icon."*
-
-The marks aren't locked to X and O — a theme might swap them for icons, emoji, animals,
-shapes, etc. The theme system must be built so that's possible. Neon still uses X and O
-icons; that's Neon's choice of art, not a constraint on the system.
-
-### What happens if a theme fails to load
-**A modal on the Theme screen saying the theme is unavailable, then fall back to Neon.**
-As stated: *"From the Theme screen if a theme fails to load put up a modal with sorry this
-theme is unavailable please try another theme. Then fallback to neon."*
-
-Neon is the one theme with nothing to fall back to, per **Neon Is the Base Theme** below.
-
-Theme selection is an overlay on the main menu rather than its own screen — see
-[Menus and UI](./Menus%20and%20UI.md) → Decisions → Is theme selection its own screen or
-an overlay?
-
-### Is anything distinguished by colour alone?
-**Handled per theme — a theme can add non-colour distinguishing features.** It is not a
-system-wide rule. As stated: *"Themes will be defined and other things can be added for
-this."*
-
-So this gets solved when a theme is defined, and the theme system has to allow a theme to
-distinguish things by more than colour — shape, icon, outline, pattern. It is not
-currently written as a requirement that every theme must do so; compare **What a Theme
-Controls** below, which does require every theme to keep the gameplay-critical highlights
-legible.
-
-### How a theme merges over Neon
-**Deep merge, null = clear.** *"If the new theme has no value at all then that is inherit.
-Like it's missing the option entirely."* Three distinct cases:
-
-- **Key absent** from the overriding theme → inherit Neon's value.
-- **Key present with a value** → that value wins.
-- **Key present and explicitly null** → the value is *cleared*, not inherited.
-
-And the merge is **deep**: a theme naming one key inside a section keeps Neon's other keys
-in that section rather than replacing the whole section. Nested maps merge recursively.
-
-See [Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
-
-**Consequence:** `neon.theme.json` ships `sound.music` as an explicit `null`. Under this
-rule a null means "cleared," so Neon's own null is a deliberate clear rather than a gap —
-worth noting so nobody later mistakes it for an unfilled slot.
-
-### What the theme's slots are derived from
-**The theme's slot list is derived from what the screens actually consume, not from a
-category list written in the abstract.** The earlier six-category list — colors,
-backgrounds, fonts, piece styles, sounds, animations — was written before the screens
-existed. It omits board geometry and sizing, corner radii, the type scale, and
-opacities, and it has no slot for any modal, sheet, settings card, open-game row, badge,
-or the main-menu logo — so four PRDs were left unbuildable under the "no hardcoded
-values" rule. See **Architectural Rule** above for the corrected enumeration.
-
-### How are themes discovered, and does a theme file carry its own name and description?
-**Each theme file carries its own display name and one-line description, and the app
-discovers themes by scanning the themes folder.** Adding a theme is dropping one file in —
-no second file to edit, no code change.
+- **The app discovers themes by scanning the themes folder**, and each theme file carries
+  its own display name and one-line description. Adding a theme is dropping one file in —
+  no second file to edit, no code change.
 
 This follows directly from the principle already stated for animations: *"i want to drop a
 file in the new theme folder that can tell the application what animations are and
 everything else the applicaiton needs to know."* The name and blurb are part of "everything
 else."
 
-This rules out a separate catalog file as the source of truth, and it rules out a hardcoded
-list in Dart. The handoff's `themes.catalog.json` becomes a reference asset rather than a
-shipping input.
+There is no separate catalog file as the source of truth, and no hardcoded list in Dart.
+The handoff's `themes.catalog.json` is a reference asset, not a shipping input.
 
-### Do themes control the app's chrome icons?
-**Yes.** The settings gear, close X, chevrons and plus are theme-controlled, and a theme may
-either name a glyph from a bundled icon set or ship its own image.
+## Choosing a Theme
+Theme selection lives **on the main menu**. Themes up front — a nice big button, the same
+size and treatment as the Play Game button. Not buried in a settings screen. It opens as
+an overlay on the main menu rather than its own screen — see
+[Menus and UI](./Menus%20and%20UI.md) → Decisions → Is theme selection its own screen or
+an overlay?
 
-### Closing Neon's value gaps
-**Transcribe the drawn values from the design handoff into Neon's YAML.**
-`assets/themes/neon.yaml` is our file and the handoff README is the design source, so
-writing those values into it is **authoring Neon**, not editing an approved asset.
+**The selected theme persists between sessions.** Once a player selects a theme, it stays
+active. Close the app, open it again, that's still their theme. Requires persisting the
+selection to device storage.
 
-Two consequences:
-- The read-only `neon.theme.json` stays as it is; it is a reference, and Neon's shipped
-  YAML is the complete definition. That means the two can drift, and the YAML is
-  authoritative where they differ.
-- Where the handoff draws no value at all — the settings purchases section is the known
-  case, since no approved screen shows it — transcription cannot help, and those values
-  still need authoring from scratch. That remains the gap this decision does not close.
+<!-- The persisted value is the theme's UUID, not its name, so renaming a theme does not
+     lose the selection. See Tech Design → Decisions → Theme identity — UUID. -->
 
-### Does a theme control spacing and padding?
-**No. Spacing and layout numbers are fixed in the code, not theme-controlled — for now.**
-*"No spacing will be fixed for now."*
+**You can't change the theme mid-game** — leave it out for now. Theme changes happen from
+the main menu only. Possible later feature if we decide we want it.
 
-This is the one place that cuts against the project's general direction of pushing as much
-as possible into the theme. The reason is enforcement: the hardcoded-theme-value test (see
-[Tech Design](./Tech%20Design.md) → Decisions → Do we add a test that fails on hardcoded
-theme values?) **cannot** catch a hardcoded gap. It can see a colour, a font size, a radius
-or an asset path, but `SizedBox(width: 8)` holding a themed gap and `SizedBox(width: 8)`
-holding an incidental one are indistinguishable to it. A padding section in the schema
-would therefore have been a rule that nothing verifies — a claimed guarantee the project
-could not keep.
+**If a theme fails to load, a modal on the Theme screen says the theme is unavailable, and
+the app falls back to Neon.** *"From the Theme screen if a theme fails to load put up a
+modal with sorry this theme is unavailable please try another theme. Then fallback to
+neon."* Neon is the one theme with nothing to fall back to — see **Neon Is the Base
+Theme** below.
 
-Themes still control colour, marks, sounds, icons, animation, radii and the type scale.
-Spacing and padding is the one slot pulled out of the inventory, and "for now" is the
-user's own hedge — this is reversible if the enforcement story changes.
+**If Neon itself fails to load, the app does not start.** The first screen is a
+**Failed to load Neon Theme** screen and the player cannot get past it: *"If Neon fails to
+load then the first screen should be Failed to load Neon Theme. dont let the user proceed
+its a loud fail."* A loud, deliberate hard stop — not a degraded mode, and not a silent
+one.
 
-### Do all four toggles ship, and is music a theme concern?
-**Yes — all four toggles ship (Music, Sound Effects, Vibrate on Touch, Animations), and
-music belongs to the theme.** In the user's own words: *"Do all four toggles, Music should
-be apart of the Theme documents."*
-
-This resolves the standing disagreement where the approved handoff draws four toggles and
-the docs had settled three: the handoff is right.
-
-The larger consequence is that **a theme supplies its own music**, the same way it
-supplies its sounds. This is new scope — no doc previously treated music as themed, and
-nothing currently produces any music. What is **not** settled: whether music loops, whether
-it differs by screen, and where the audio comes from — see Open Questions.
-
-This reverses **One-shot sound effects only, for now** below, which said no background
-music this version; that stance no longer holds.
-
-### Do non-board controls make a sound?
-**Yes — one tap sound, everywhere.** Every button, row and toggle plays the same short tap
-sound: menu buttons, theme rows, settings toggles, the game-over card's two controls, the
-trash button and the modal's Yes and No.
-
-This is the same symmetry the haptic question was already settled by — see
-[Game Board Design](./Game%20Board%20Design.md) → Decisions → Does the haptic fire on
-non-board controls? — so the two feedback channels now behave consistently rather than one
-buzzing where the other is silent. One sound file covers all of it.
-
-This does not change the existing board sound moments — placing a mark, claiming a
-quadrant, the cat game, winning — which are unaffected, and an invalid tap stays silent in
-both channels.
-
-### What are Classic Red vs Blue's colours?
-**The three colours in the design handoff are Classic's real palette, not placeholder
-swatches.** `#f3f5fe` for the ground, `#d92d3f` for player one, `#2453c4` for player two —
-and every other value in the theme derives from them.
-
-This unblocks authoring the theme file, and it means the derivation work is real work. A
-colour that is a tinted or alpha-adjusted version of one of these three must be recomputed
-from the new value rather than inherited from the first theme, because inheriting one
-silently produces a red player with pink chips.
+**That screen is drawn in plain, unstyled text, like a raw error message** — no theme
+values, no branding, no styling of any kind, because the thing that supplies styling is
+what failed: *"Just put it in play text like an error message this should never happen. so
+we want this failing loud. Only if Neon fails."* It is the one screen in the app drawn
+without a theme, and it should never appear.
 
 ---
 
@@ -312,6 +168,23 @@ This applies to **everything**, not just sound:
         └──────────────────────────┘
 ```
 
+### The merge rules
+**Deep merge, null = clear.** *"If the new theme has no value at all then that is inherit.
+Like it's missing the option entirely."* Three distinct cases:
+
+- **Key absent** from the overriding theme → inherit Neon's value.
+- **Key present with a value** → that value wins.
+- **Key present and explicitly null** → the value is *cleared*, not inherited.
+
+And the merge is **deep**: a theme naming one key inside a section keeps Neon's other keys
+in that section rather than replacing the whole section. Nested maps merge recursively.
+
+See [Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
+
+**Consequence:** `neon.theme.json` ships `sound.music` as an explicit `null`. Under this
+rule a null means "cleared," so Neon's own null is a deliberate clear rather than a gap —
+worth noting so nobody later mistakes it for an unfilled slot.
+
 ### Why this matters for the build
 - **Neon must be complete before anything else ships.** It's the floor everything stands
   on. A gap in Neon is a gap with no fallback — that's the one failure the system can't
@@ -324,6 +197,19 @@ This applies to **everything**, not just sound:
   and there is no fallback step. See [Tech Design](./Tech%20Design.md) → Decisions →
   Fallback to Neon — merge, not resolve.
 
+### Closing Neon's value gaps
+**The drawn values from the design handoff are transcribed into Neon's YAML.**
+`assets/themes/neon.yaml` is our file and the handoff README is the design source, so
+writing those values into it is **authoring Neon**, not editing an approved asset.
+
+Two consequences:
+- The read-only `neon.theme.json` stays as it is; it is a reference, and Neon's shipped
+  YAML is the complete definition. That means the two can drift, and the YAML is
+  authoritative where they differ.
+- Where the handoff draws no value at all — the settings purchases section is the known
+  case, since no approved screen shows it — transcription cannot help, and those values
+  still need authoring from scratch. That gap stays open.
+
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
 with Neon's electric buzz sounds and glow animations may feel mismatched — clean visuals
@@ -334,6 +220,8 @@ real; not a problem to solve now.
 ---
 
 ## Theme Catalog
+
+**Two themes ship at launch — Neon and Classic Red vs Blue.**
 
 ### Theme 1 — Neon (base)
 The first theme. The look:
@@ -366,11 +254,35 @@ background — the plain, familiar look.
 Good pairing with Neon: one is loud and electric, the other is clean and classic. Two
 genuinely different looks, which is a real test that nothing is hardcoded.
 
+**Classic is the inheritance proof, not a second designed theme.** *"still build out the
+Red vs Blue theme with some minor changes to the schema to represent the Red Vs Blue
+theme. But it will mostly be an example and Proof of how it inherits from Neon."* Neon is
+the base and cannot inherit from anything, so Classic is the only place the inheritance
+model is ever exercised before launch. It has to override enough to demonstrably differ,
+and inherit the rest visibly and on purpose — it is not held to being a fully-designed,
+shipping-quality theme.
+
 **What it overrides:**
 - **Graphics.** That's the override — the art and colors. Red player, blue player, no
   black background.
 - **Sound:** a **splat** — like a water balloon popping. Wet and playful, deliberately
   nothing like Neon's electric buzz.
+
+**The palette:** `#f3f5fe` for the ground, `#d92d3f` for player one, `#2453c4` for player
+two. These are Classic's real palette, not placeholder swatches, and every other value in
+the theme derives from them.
+
+A colour that is a tinted or alpha-adjusted version of one of these three must be
+recomputed from the new value rather than inherited from the first theme, because
+inheriting one silently produces a red player with pink chips.
+
+**Classic is a light theme, and that is more than a palette swap.** Its ground is
+near-white where Neon's is near-black, so any value whose correctness depends on its
+*relationship* to the ground — contrast, not hue — has to be overridden rather than
+inherited. Neon's text ramp is the certain case: inherited whole it puts near-white text
+on a near-white ground, which is unusable rather than merely off-palette. A hue-defined
+value is different — red is red because red is the design, not because of what sits behind
+it — which is why the three anchors are anchors.
 
 **What it inherits from Neon:** everything else — animations included.
 
@@ -379,13 +291,36 @@ Classic **splats** like a water balloon.
 
 ---
 
+## Free and Paid Themes
+**Neon and Classic Red vs Blue are free. Every theme beyond those two is paid.** The theme
+selection list **labels** which themes are free and which are paid.
+
+*"We will label what themes are free as of now we will have 2 free themes the neon and
+the red Vs Blue themes any other themes will be a paid for theme."*
+
+**Ownership is not part of a theme definition.** A theme file carries no ownership or
+price key — whether a theme is free, owned or locked is answered outside the theme, so the
+same file ships unchanged whether it is free or paid.
+
 ## What a Theme Controls
 Everything visual and audible. Rough list, not exhaustive:
 
 **Visual**
 - Board background / page background — "really cool backgrounds"
 - Big board and small board grid lines (colors, thickness, style)
-- The player marks themselves — see **Marks beyond X and O** under Decisions
+- **The player marks themselves** — marks are not locked to X and O. A theme supplies its
+  own mark art as a **glyph, an image or an icon** — those three kinds, and nothing else.
+  **The image is the real answer for a theme;** the glyph and the icon are the short
+  route, so nobody has to author image files for something as simple as an X and an O:
+  *"truly it can just be images and the image would just show an X and another an O if it
+  really comes done to issues between icons or images. But for themes it would have ot be
+  an Image, Icons were just the short route so we dont need to create images for such a
+  thing. If nessasary create a .svg of an X and an O and convert that into an image."*
+  Where neither a glyph nor an icon will do, the mark is drawn as an `.svg` and converted
+  to an image. A theme might swap the marks for icons, emoji, animals or shapes — a
+  dinosaur theme might use a T-Rex — and the theme system must be built so that's
+  possible. Neon still uses X and O; that's Neon's choice of art, not a constraint on the
+  system.
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
@@ -397,8 +332,11 @@ Everything visual and audible. Rough list, not exhaustive:
 - Main menu styling (background, button look, title)
 - **Board geometry** — grid-line width, grid-line inset, mark sizes. Spacing and padding
   (outer gap, quadrant padding, inner gap) are fixed in code, not theme-controlled — see
-  Decisions → Does a theme control spacing and padding?
+  **What a Theme Does NOT Control** below.
 - **Corner radii** — cell, quadrant, modal, chip, control, button
+- **The font** — a theme supplies its own typeface. Inter 400/500/600 is bundled as
+  **Neon's** font choice, not as an app-wide font constant. See
+  [Tech Design](./Tech%20Design.md) → Decisions → Do themes pick their own font?
 - **The type scale** — sizes and weights, distinct from a theme's choice of font
 - **Opacities** — the locked, claimed and cat-game veils
 - **Modals** — winner, draw
@@ -408,10 +346,30 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Badges**
 - **The main-menu logo**
 - **Page background** — gradient-capable
+- **Chrome icons** — the settings gear, close X, chevrons, plus, and the trash button on
+  an open-game row. A theme may either name a glyph from a bundled icon set or ship its
+  own image.
 
 > **Every theme must keep these legible.** The last-move highlight and active-quadrant
 > highlight are *gameplay-critical*, not decoration — a theme that makes them hard to spot
 > breaks the game. A pretty theme that hides the last move is a broken theme.
+
+Distinguishing things by more than colour is **handled per theme** — a theme can add
+non-colour distinguishing features, and the theme system has to allow it: shape, icon,
+outline, pattern. It is not a system-wide rule: *"Themes will be defined and other things
+can be added for this."*
+
+**No theme is required to do it.** Classic Red vs Blue happens to separate its players by
+shape as well as by colour, but that is that theme's own choice, not an obligation the
+system enforces — a theme whose two players differ by hue alone is still a valid theme:
+*"colour-blind players We wont have themes require this type. Red VS blue can sill have
+different shapes like like X and O but even it it was splats that are similar and red vs
+blue the Theme is not necessary thinking about color blindness. If a theme does that
+poorly then another theme would be better from them."* A theme that handles it badly is
+simply not the theme for that player: *"Im not interested in Color blind handling that
+theme just wont be for that person."*
+
+This is separate from the legibility requirement above, which every theme must still meet.
 
 **Audio**
 - Placing a mark
@@ -431,10 +389,30 @@ Everything visual and audible. Rough list, not exhaustive:
 A specific case of the general inheritance rule above — themes don't need a full sound
 set; anything undefined comes from Neon.
 
-### One-shot sound effects only, for now
-**Superseded — see Decisions → Do all four toggles ship, and is music a theme concern?**
-This said no background music in this version; that no longer holds, since a theme now
-supplies its own music. Left here as history rather than deleted.
+### Music
+**A theme supplies its own music**, the same way it supplies its sounds. *"Do all four
+toggles, Music should be apart of the Theme documents."*
+
+**One track for the whole app, taken from the selected theme.** *"ONe sound.music app wide
+baised on selected theme."* Music does not differ by screen.
+
+All four settings toggles ship — Music, Sound Effects, Vibrate on Touch, Animations. See
+[Menus and UI](./Menus%20and%20UI.md) → Settings Menu.
+
+Nothing currently produces any music. Whether music loops and where the audio comes from
+are not settled — see Open Questions.
+
+### The tap sound
+**One tap sound, everywhere.** Every button, row and toggle plays the same short tap
+sound: menu buttons, theme rows, settings toggles, the game-over card's two controls, the
+trash button and the modal's Yes and No. One sound file covers all of it.
+
+This matches the haptic — see [Game Board Design](./Game%20Board%20Design.md) → Decisions
+→ Does the haptic fire on non-board controls? — so the two feedback channels behave
+consistently rather than one buzzing where the other is silent.
+
+The board sound moments are separate — placing a mark, claiming a quadrant, the cat game,
+winning — and an invalid tap stays silent in both channels.
 
 ### Global mute
 There's a **global mute / sound toggle, separate from the theme.** Muting is a player
@@ -463,34 +441,74 @@ This draws the boundary of the theme system. Compare:
 | Music | ✅ Yes |
 | Animations | ✅ Yes |
 | **Haptics / vibration** | ❌ No — app setting |
+| **Spacing and padding** | ❌ No — fixed in code |
+| **Ownership and price** | ❌ No — answered outside the theme |
 
 Note the asymmetry with the settings toggles: music, sound and animations are
 *theme-defined but player-switchable*, while haptics are *never theme-defined at all*. The
 four toggles in [Menus and UI](./Menus%20and%20UI.md) look alike, but three of them switch
 off a theme channel and one switches off an app behavior.
 
+Spacing and padding are also **not** theme-controlled: spacing and layout numbers are
+fixed in the code — for now. *"No spacing will be fixed for now."*
+
+This is the one place that cuts against the project's general direction of pushing as much
+as possible into the theme. The reason is enforcement: the hardcoded-theme-value test (see
+[Tech Design](./Tech%20Design.md) → Decisions → Do we add a test that fails on hardcoded
+theme values?) **cannot** catch a hardcoded gap. It can see a colour, a font size, a radius
+or an asset path, but `SizedBox(width: 8)` holding a themed gap and `SizedBox(width: 8)`
+holding an incidental one are indistinguishable to it. A padding section in the schema
+would therefore have been a rule that nothing verifies — a claimed guarantee the project
+could not keep.
+
+Themes still control colour, marks, sounds, icons, animation, radii and the type scale.
+Spacing and padding is the one slot pulled out of the inventory, and "for now" is the
+user's own hedge — this is reversible if the enforcement story changes.
+
+**Stated in its own terms:** a theme controls **everything visual about the game except the
+placement of objects** — the art, the icons, the images, the music and the sound effects
+are all the theme's. The grid lines are the clearest case: *"I want ribbons as the tick tac
+to lines. This should be controled by the theme but the pacment of the lines is still
+controled by the game its self. jsut what those lines look like is contoled by the theme."*
+
+Concretely: a theme controls **the drawn geometry of a thing itself** — stroke width, glyph
+size, corner radius, glow spread. Code controls **where things sit relative to one
+another** — gaps, padding, margins. Element *sizing* is where a theme's visual range lives;
+element *spacing* is layout. Classify a new value with that sentence, not by looking for
+the word "padding."
+
 ## Open Questions
 - Which values, concretely, does Classic Red vs Blue override? (Settled in principle —
   graphics and its splat sound, inheriting the rest. An exact list will fall out when it's
   actually built.)
+- **Which values beyond the text ramp are ground-relative**, and therefore have to be
+  overridden rather than inherited when Classic inverts Neon's ground? The text ramp is
+  the certain case. The veils and scrims, the hairlines and the glows are candidates on
+  the evidence, not a settled set — and the smaller Classic's override set, the more each
+  remaining inheritance carries.
+- **Which of the theme's playable sounds does Classic's splat fill?** The playable moments
+  are placing a mark, claiming a quadrant, the cat game, winning, and the tap sound. The
+  tap sound is the live one now that one tap sound plays on every button, row and toggle —
+  a splat there is heard constantly, and a buzz there is Neon's personality on every
+  Classic screen.
+- **Does Classic override the marks at all?** A theme may supply its own mark art, but
+  nothing says Classic uses it — the handoff gives Classic the same ✕ / ○ marks as Neon.
 - What is the exact slot schema — the key structure — for what a theme defines? The
   approved `neon.theme.json` does not currently cover the pending-move highlight, any
   modal or sheet surface, a gradient background, or a logo.
 - Neon is required to be complete (see **Neon Is the Base Theme**). The gap between the
   approved `neon.theme.json` and the drawn handoff — the pending-move highlight, badges,
   modal and sheet surfaces, several radii and glows — closes by transcription into Neon's
-  YAML (see **Closing Neon's value gaps** under Decisions). The settings purchases section
-  is the one value with **no drawn counterpart at all**, since no approved screen shows
-  it — transcription can't supply a value nothing draws, so that piece still needs
-  authoring from scratch. Is the purchases section the only such case, or are there others
-  the handoff never drew?
+  YAML (see **Neon Is the Base Theme** → Closing Neon's value gaps). The settings
+  purchases section is the one value with **no drawn counterpart at all**, since no
+  approved screen shows it — transcription can't supply a value nothing draws, so that
+  piece still needs authoring from scratch. Is the purchases section the only such case,
+  or are there others the handoff never drew?
 - What form does the legibility contract take — a contrast floor, a review step,
   something else? **What a Theme Controls** requires every theme to keep the last-move
   and active-quadrant highlights legible, but this is unfalsifiable as written: Classic
   Red vs Blue has a near-white ground while inheriting Neon's near-white text and its
   veils and glows tuned for a near-black ground, so a theme could be complete, pass every
   stated check, and still be unreadable.
-- **Does a theme's music loop?** Not settled by Decisions → Do all four toggles ship, and
-  is music a theme concern?
-- **Does music differ by screen**, or is it one track for the whole app? Not settled.
+- **Does a theme's music loop?** Not settled by **Sound Decisions** → Music.
 - **Where does the music come from** — composed, licensed, generated? Not settled.

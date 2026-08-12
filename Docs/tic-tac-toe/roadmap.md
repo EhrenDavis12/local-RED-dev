@@ -41,13 +41,6 @@ and how a session of many games hangs together.
 - Decisions
 - Open Questions
 
-**Decisions:**
-- Recursion depth
-- Scoreboard lifetime
-- Player names
-- Single-player / AI opponent
-- Player-facing vocabulary: "board" vs. "quadrant"
-
 ## [Menus and UI](./Menus%20and%20UI.md)
 Menu structure, screen flow, theme selection, settings, persistence, and the game-over
 rematch flow.
@@ -67,35 +60,6 @@ rematch flow.
   - Leaving a game mid-play
 - Decisions
 - Open Questions
-
-**Decisions:**
-- Should there be a mute button, and where does it live?
-- How do you get back to the main menu from a game?
-- What happens when a game ends?
-- What does the player see when a game ends?
-- What controls does the game-over result card carry?
-- Does the main menu need a title/logo?
-- Is theme selection its own screen or an overlay?
-- Is the main menu button "New Game" or "Play Game"?
-- Does a game in progress have to be saved to device storage?
-- What does each row in the open-games list show?
-- Does the opponent name replace "Player Two" in game?
-- When does the scoreboard increment
-- Which theme is active by default?
-- How does theme selection show which theme is in use?
-- What does an open game hold?
-- How many open games do we keep?
-- Deleting an open game
-- How does a player delete an open game?
-- Do we support Dynamic Type?
-- Navigation and the back stack
-- How to play — the on-board legend and hint
-- When is a game written to storage?
-- Where the open-game slot unlock is sold
-- Is the turn banner built, and where does the free-choice cue live?
-- Does the About Us screen ship?
-- What are the settings on a fresh install?
-- What are the settings toggle sub-labels?
 
 ## [Rules](./Rules.md)
 The rules of play — setup, turn structure, placement rules, winning conditions, and edge
@@ -117,12 +81,6 @@ cases.
 - Conflicting Ideas (unresolved)
 - Decisions
 - Open Questions
-
-**Decisions:**
-- Does the opening move send the opponent?
-- Who goes first after a tie?
-- Does a move that claims its own send target still send there?
-- What happens if an illegal move reaches the engine?
 
 ## [Game Board Design](./Game%20Board%20Design.md)
 The visual and interaction design of the board itself — layout, highlights, move input, and
@@ -156,13 +114,6 @@ haptics.
 - Decisions
 - Open Questions
 
-**Decisions:**
-- Where does the free-choice cue live?
-- Does a tap outside the board clear a pending move?
-- What does the board preview when the selected move would claim its own send target?
-- What do the scoreboard chips read?
-- Does the haptic fire on non-board controls?
-
 ## [Theming](./Theming.md)
 The theme system — what a theme is, how it inherits from Neon, and what it controls.
 
@@ -170,45 +121,27 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
 - The Idea
 - Architectural Rule (the important part)
 - Where Themes Live
-- Decisions
+- Choosing a Theme
 - What Is a Theme?
 - Neon Is the Base Theme (inheritance model)
   - How it works
+  - The merge rules
   - Why this matters for the build
+  - Closing Neon's value gaps
   - Watch out for
 - Theme Catalog
   - Theme 1 — Neon (base)
   - Theme 2 — Classic Red vs Blue
+- Free and Paid Themes
 - What a Theme Controls
 - Sound Decisions
   - Sound falls back to Neon
-  - One-shot sound effects only, for now
+  - Music
+  - The tap sound
   - Global mute
 - Inheritance Depth
 - What a Theme Does NOT Control
 - Open Questions
-
-**Decisions:**
-- How many themes ship at launch
-- Where theme selection lives
-- Does the theme persist between sessions
-- Can you change the theme mid-game
-- Do themes affect sound
-- Are themes unlockable/rewards
-- Which themes are free
-- Does a theme supply its own font
-- Marks beyond X and O
-- What happens if a theme fails to load
-- Is anything distinguished by colour alone?
-- How a theme merges over Neon
-- What the theme's slots are derived from
-- How are themes discovered, and does a theme file carry its own name and description?
-- Do themes control the app's chrome icons?
-- Closing Neon's value gaps
-- Does a theme control spacing and padding?
-- Do all four toggles ship, and is music a theme concern?
-- Do non-board controls make a sound?
-- What are Classic Red vs Blue's colours?
 
 ## [Animations](./Animations.md)
 The animation vocabulary and how animations tie into the theme system.
@@ -228,25 +161,12 @@ The animation vocabulary and how animations tie into the theme system.
 - Decisions
 - Open Questions
 
-**Decisions:**
-- Themes describe their animations; the runtime interprets them
-- Themes author their own animations — no shared library
-- Do themes inherit Neon's animations?
-- One animation at a time
-- Duration lives in the animation
-- Animations don't block input
-- Turn animations off — a global setting
-- Does iOS Reduce Motion drive the animations toggle?
-- Animations off = instant state change
-
 ## [Alternative Game Styles](./Alternative%20Game%20Styles.md)
 Parking lot for variants and roads-not-taken — not the current game. See
 [Rules](./Rules.md) for the actual rules.
 
 **Headings:**
 - Lock-In Style
-
-**Decisions:** none — this is a parking-lot doc, not a Decisions/Open Questions doc.
 
 ## [Tech Design](./Tech%20Design.md)
 How we build it — framework, language, storage, state management, project structure, and
@@ -261,49 +181,6 @@ release/distribution.
   - 2. Theme loading
   - 3. Build and distribution
   - 4. Kids category — age rating questionnaire
-
-**Decisions:**
-- Framework — Flutter
-- App name
-- Primary target — Apple
-- Language — Dart
-- Theme representation — data, not code
-- What format are theme files — JSON or YAML?
-- Theme identity — UUID
-- Fallback to Neon — merge, not resolve
-- Flutter's ThemeData vs our own theme object
-- Orientation — portrait only
-- Minimum iOS version
-- Is the game logic separate from Flutter?
-- Persistence package
-- Game state storage — Hive
-- Serialization and the storage layer
-- Unit tests for the rules engine
-- Do themes pick their own font?
-- How is the board rendered?
-- Audio package
-- Marks — image or icon, supplied by the theme
-- Device support
-- Where do sound and art assets come from?
-- Do we add a test that fails on hardcoded theme values?
-- State management — Riverpod
-- Navigation
-- Navigation approach — go_router
-- The app icon
-- Online multiplayer is an intended future direction
-- Game state is immutable
-- Project structure — layer-first
-- Widget tests for the board — no golden tests
-- Fresh build, not a refactor
-- Distribution — public App Store release
-- Bundle identifier
-- CI — local builds only
-- Release tooling — fastlane
-- Crash reporting — catch and build the report, don't send it
-- What does a crash report capture?
-- In-app purchases
-- Entitlements — Apple stores them, no backend needed
-- Kids category
 
 ---
 
