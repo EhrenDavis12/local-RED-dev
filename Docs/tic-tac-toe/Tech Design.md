@@ -220,7 +220,8 @@ turns this from a discipline into a check.
 
 **`shared_preferences` for the five player preferences, Hive for game state.** Open games
 — the board, whose turn it is, and the scoreboard — are stored in Hive, not in
-`shared_preferences`.
+`shared_preferences`. The Hive packages are **`hive_ce` + `hive_ce_flutter`**, the
+actively maintained community fork, not `hive` + `hive_flutter`.
 
 This is what makes [Menus and UI](./Menus%20and%20UI.md) → Persistence and
 [Game Overview](./Game%20Overview.md) → Session Structure — Games and Continuing
@@ -228,16 +229,136 @@ implementable.
 
 ### Serialization and the storage layer
 **`freezed` + `json_serializable` for the domain models in `engine/`, and a `storage/`
-layer holding a repository interface with a Hive implementation that stores JSON. No Hive
-`TypeAdapter`s.**
+layer holding the repository interfaces with Hive and `shared_preferences`
+implementations that store JSON. No Hive `TypeAdapter`s.**
 
 Two consequences worth naming, because they cut across other sections:
 
-- **`hive_flutter` is not pure Dart, so it must never be imported from `engine/`.**
-  `storage/` owns it.
+- **`hive_ce_flutter` is not pure Dart, so it must never be imported from `engine/`.**
+  `storage/` owns it — and more strongly, **only `storage/` knows the store is Hive.** No
+  file outside it imports either Hive package, and every caller depends on the repository
+  interfaces rather than their implementations. That is also what lets tests run against
+  in-memory fakes with no Hive initialized.
 - **Serialization lives with the model.** `toJson`/`fromJson` are generated into `engine/`
   by json_serializable — pure Dart, Flutter-free — while the Hive box, adapters-free,
-  lives in `storage/`.
+  lives in `storage/`. The storage layer writes no hand-rolled encoding of its own.
+
+### Every persisted record carries a version stamp
+**Every record written to either store carries a stamp identifying the app version that
+wrote it, and it is there from the first release.** Preferences and open games both.
+
+The stamp costs almost nothing while no device holds a save, and it cannot be recovered
+afterward: without it, a record written by an older version is indistinguishable from one
+written by the current version, and the app is left inferring a version from the shape of
+the data. What the app *does* when it reads a record written by an older version is a
+separate question, and an open one — see **Open Questions** below.
+
+### What a stored open game holds
+**A stored open game is the engine's whole game-plus-series state, plus three things that
+are storage's own: the record id, the opponent name the game is titled with, and two
+timestamps.** No design doc puts any of those three in game state, so they sit alongside
+the board rather than inside it.
+
+**The most recent completed move is persisted as the move itself, not as a derived
+value.** It has two consumers and only the move serves both: the forced quadrant is
+derived from it and is *not* recoverable from the cells, and the opponent's last-move
+highlight is drawn from it. Round-tripping only a forced-quadrant value loses the second.
+
+**The persisted series carries enough state to resume turn order across games** — see
+[Rules](./Rules.md) → Turn Order Across Games — with the app having been closed in
+between.
+
+**The id is opaque, store-minted and stable for life.** It is the only thing that
+identifies an open game: a rematch, a rename, or any number of saves leave it identical,
+and it is never reused after a delete. Nothing parses it, derives ordering from it, or
+displays it. The opponent name cannot serve as the key, because it is a title and
+duplicate titles are the ordinary case.
+
+**The record carries both a created and an updated timestamp, not one or the other.** That
+leaves the sort key a *display* choice rather than a *schema* one — a list that wanted
+creation order, or a row that wanted "started on", can be served later without migrating
+data already on the device.
+
+**The repository owns both timestamps; the caller supplies neither.** A save stamps the
+updated timestamp from the clock and preserves the stored created one, discarding whatever
+the caller passed in either field. Both halves are deliberate: keeping the updated stamp
+current stops being a rule every call site has to remember — the symptom of forgetting is
+a silently mis-ordered list rather than a failing test — and the created stamp's
+immutability becomes enforceable at the one choke point instead of merely conventional.
+
+**Both timestamps are UTC.** A local `DateTime` serialized to ISO-8601 carries no offset at
+all, so a record written in one timezone and read in another compares as though it had
+been written at a different instant — and the open-games list is ordered on exactly that
+comparison, so the list would reorder itself after a flight or a DST change.
+
+### The open-games list has a defined order
+**Reading the open-games list returns most-recent-first on the updated timestamp,
+tiebroken by the created one** — never the box's iteration order, and never the id. The
+order is deterministic: the same stored set produces the same sequence on every read and
+across relaunches, so the player's list does not reshuffle behind them. Hive's
+box-iteration order is **not** stable across compaction, which is the concrete failure
+this prevents — a list silently reshuffling between launches rather than a failing test.
+
+The tiebreaker is not decoration: a freshly created record has both stamps equal, so two
+games created before either is played can tie on the primary key, and Dart's `List.sort`
+is not stable.
+
+**Any save moves its record to the top, including a save that is not a move** — taking a
+rematch puts that series first before a mark is placed in the new game.
+
+### The cap is enforced on create, and the store never evicts
+**Creating an open game is refused when it would exceed the current ceiling**, and that is
+a create-time check rather than a standing invariant: it constrains what may be added and
+nothing else. The ceiling is not a constant — see [Menus and UI](./Menus%20and%20UI.md) →
+How many open games we keep — and the storage layer reads it from entitlement state rather
+than defining either number itself.
+
+**The store never evicts.** A create at the ceiling does not silently remove an existing
+game; a slot is freed only by an explicit, player-initiated delete. If the ceiling ever
+drops below the number already stored — an entitlement lapsing — nothing here licenses
+deleting any of them.
+
+**Reaching the cap is an ordinary, player-reachable condition, not an error**, so a refused
+create reports it as a value carrying the effective ceiling and how many are held, rather
+than throwing. That lets the caller say "3 of 3" without a second round trip.
+
+**Deleting removes one open game and its whole series** — board, scoreboard and all —
+permanently, leaves every other stored game untouched, and touches no preference. Nothing
+else in this layer discards a record: a game left mid-play is still there, with its
+scoreboard, on the next read.
+
+### Reads return "nothing stored", and defaults resolve above this layer
+**Every persistence operation is asynchronous**, because both stores are async on first
+open and a synchronous facade would either block startup or lie about readiness.
+
+**Every read returns "nothing stored" — never a default, and never a throw.** An empty
+store is a valid state rather than an error. What "nothing stored" *means* is resolved
+once, above this layer, by whoever can name the value without inventing it: the theme
+layer resolves the default theme because only it knows Neon's UUID, and the state layer
+resolves the four toggle defaults because they are plain booleans with a doc-settled
+value. Putting a theme constant in `storage/` would trip the hardcoded-theme-value test —
+see **Testing** below.
+
+**The selected theme is stored as the theme's UUID, not its name**, so renaming a theme
+neither changes the stored value nor loses the player's selection.
+
+**The preference store holds those five keys and nothing else.** They are namespaced so
+that check is mechanical rather than a judgement call.
+
+### Entitlement state is written down, never minted
+**What is stored is the set of product identifiers the store reported, verbatim.** This
+layer translates none of them and never mints an entitlement — it writes what it is
+handed. What the stored values *mean* is **In-App Purchases and Entitlements** below.
+
+**Only an affirmative store answer overwrites what is held.** A failed, timed-out or
+otherwise unanswered query is **not** an answer of "owns nothing", and must not clear or
+downgrade stored entitlement state. Read the other way — "whatever Apple reports, whenever
+the two disagree" — a dropped network call is a disagreement, and a player's purchases
+would be cleared on an offline launch. A failed network call must not revoke something a
+player bought.
+
+**Nothing in `storage/` talks to a network, StoreKit included.** The app's one sanctioned
+network path is the purchase flow.
 
 <!-- A candidate shape for the persisted Game object — cells, quadrants, activeQuadrant,
      currentPlayer, lastMove, score, firstPlayerThisGame — is sketched in Design Handoff →
@@ -486,7 +607,7 @@ Apple Developer Program membership is required before any of it works.
 These are the things I think we need to hammer out. Grouped roughly by how much they
 block other work.
 
-### 1. Persisted data — versioning
+### 1. Persisted data — migration
 - When the shape of stored data changes — a fifth preference is added, a key is renamed,
   an open game gains a field — what happens to data already on the device? A game
   written by v1.0 has to still load in v1.1.
@@ -527,3 +648,14 @@ block other work.
 - The Kids-category listing choice and the resulting parental-gate, analytics, and
   privacy-policy requirements are settled — see Kids Category, and the age rating (4+).
   What remains open is the exact age-rating questionnaire answers.
+
+### 5. Which store holds entitlement state?
+- The local copy of the player's entitlements is an offline convenience rather than the
+  record (see In-App Purchases and Entitlements), but nothing says where it is written.
+  **`shared_preferences`**, alongside the five preferences — small, flat, already the home
+  of app-level player state; but it costs the mechanical check that the preference store
+  holds exactly the five preference keys and nothing else, turning that scan into a
+  judgement call. Or **Hive** — already structured, and a set of product identifiers is a
+  growing collection rather than a single flag, though it means a second box beside the
+  open-games one. "Nothing persisted, re-queried at launch" is ruled out: the
+  last-known-plus-refresh provider needs a local copy to fall back to.

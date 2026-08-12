@@ -200,6 +200,12 @@ release/distribution.
   - The theme system is the main architectural risk
 - Persistence and Serialization
   - Serialization and the storage layer
+  - Every persisted record carries a version stamp
+  - What a stored open game holds
+  - The open-games list has a defined order
+  - The cap is enforced on create, and the store never evicts
+  - Reads return "nothing stored", and defaults resolve above this layer
+  - Entitlement state is written down, never minted
 - Audio and Assets
   - Where sound and art assets come from
 - In-App Purchases and Entitlements
@@ -219,10 +225,11 @@ release/distribution.
   - CI — local builds only
   - Release tooling — fastlane
 - Open Questions
-  - 1. Persisted data — versioning
+  - 1. Persisted data — migration
   - 2. Theme loading
   - 3. Build and distribution
   - 4. Kids category — age rating questionnaire
+  - 5. Which store holds entitlement state?
 
 ---
 
