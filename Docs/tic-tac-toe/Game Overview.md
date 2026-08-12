@@ -1,7 +1,7 @@
 # Game Overview
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
-> what's under **Decisions**.
+> **Status:** Brain dump. Contradictions are expected and OK. What's settled is stated in
+> present tense; anything unsettled is in **Open Questions**.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Approved high-fidelity mockups
@@ -26,6 +26,9 @@ is to win on the bigger board.
   quadrant. Every move both contests a small board and dictates where the opponent goes
   next. That's where the strategy lives. See [Rules](./Rules.md) → Placement Rules.
 
+**Two levels is the whole game** — big board → small board, and that's it. No deeper
+nesting. ("For now," but this is the game we're building.)
+
 Variants we've considered but aren't building live in
 [Alternative Game Styles](./Alternative%20Game%20Styles.md).
 
@@ -36,12 +39,27 @@ a row on the same phone**:
 - A **scoreboard** at the top of the game screen tracks **Player One / Ties / Player Two**.
 - When a game is won or tied, the player is offered an option to **continue playing**.
 - Continuing **resets the board**. The score increments at game end, not when continuing
-  is taken — see [Menus and UI](./Menus%20and%20UI.md) → Decisions → When does the
-  scoreboard increment.
+  is taken — see [Menus and UI](./Menus%20and%20UI.md) → Game Over → Rematch.
 - The scoreboard carries across games so a session becomes a running series.
 - **The winner of the last game goes first in the next one.**
 
 This makes the natural unit of play a *session of many games*, not one game.
+
+**Each open game carries its own scoreboard.** The score belongs to that game, not to a
+session at the board — leave to the main menu, pick the same game back up from the
+open-games list, and its running series is still there.
+
+The scoreboard is saved along with the game. See
+[Menus and UI](./Menus%20and%20UI.md) → Persistence.
+
+**Always "Player One" and "Player Two"** — no custom names for the players themselves.
+
+The opponent name entered at New Game does **not** replace "Player Two" on the in-game
+scoreboard. It titles the game in the open-games list, and nothing else. See
+[Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes You.
+
+With the option to change that later. Don't hardcode the strings in a way that fights
+adding real names down the road.
 
 ## How a Move Is Made
 Moves are **two taps — select, then confirm:**
@@ -75,6 +93,8 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
   Player One → Player Two. Started from the **Play Game** button on the main menu.
 
+**No single-player mode and no AI opponent** — two players on one phone is the only mode.
+
 See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 
 ## Terminology (working vocabulary)
@@ -85,45 +105,13 @@ See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 - **Cat game** — a small board filled with no winner. Quadrant stays unclaimed forever.
 
 **Internal vs. player-facing:** the terms above are the docs' own working vocabulary — for
-the docs, the PRDs and the code. What the player reads on screen is different — see
-Decisions → Player-facing vocabulary below.
+the docs, the PRDs and the code. **Player-facing text says "board". The internal term
+stays "quadrant".** "Board" is what the player reads on screen; "quadrant" is what the
+docs, the PRDs and the code use.
 
-## Decisions
-
-### Recursion depth
-**Two levels is the whole game** — big board → small board, and that's it. No deeper
-nesting. ("For now," but this is the game we're building.)
-
-### Scoreboard lifetime
-**Each open game carries its own scoreboard.** The score belongs to that game, not to a
-session at the board — leave to the main menu, pick the same game back up from the
-open-games list, and its running series is still there.
-
-The scoreboard is saved along with the game. See
-[Menus and UI](./Menus%20and%20UI.md) → Persistence and Decisions.
-
-### Player names
-**Always "Player One" and "Player Two"** — no custom names for the players themselves.
-
-The opponent name entered at New Game does **not** replace "Player Two" on the in-game
-scoreboard. It titles the game in the open-games list, and nothing else. See
-[Menus and UI](./Menus%20and%20UI.md) → Decisions.
-
-With the option to change that later. Don't hardcode the strings in a way that fights
-adding real names down the road.
-
-### Single-player / AI opponent
-**No.** Two players on one phone is the only mode.
-
-### Player-facing vocabulary: "board" vs. "quadrant"
-**Player-facing text says "board". The internal term stays "quadrant".** "Board" is what
-the player reads on screen; "quadrant" is what the docs, the PRDs and the code use. See
-Terminology (working vocabulary) above.
-
-This settles a disagreement the docs have carried for a while: every drawn screen says
-"board", while the docs' working vocabulary says "quadrant". "Board" is the more natural
-word for a child, and children are a stated target audience — see Target Audience &
-Platform above.
+Every drawn screen says "board", while the docs' working vocabulary says "quadrant".
+"Board" is the more natural word for a child, and children are a stated target audience —
+see Target Audience & Platform above.
 
 The ambiguity that made this a real question does not disappear: "board" now refers both
 to the big 3x3 grid and to each of the nine small ones, and player-facing copy has to

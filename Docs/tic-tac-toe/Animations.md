@@ -1,7 +1,7 @@
 # Animations
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
-> what's under **Decisions**.
+> **Status:** Brain dump. Contradictions are expected and OK. What's settled is stated in
+> present tense; anything unsettled is in **Open Questions**.
 >
 > Animations are **part of the theme**. See [Theming](./Theming.md).
 >
@@ -60,33 +60,6 @@ A theme is not just colors. A theme is the complete package:
 So a different theme can bring a different animation personality — one theme might pop and
 bounce, another might glow and pulse. The animation set travels with the theme.
 
-## Where Animations Fire
-Not yet decided in detail, but the obvious moments:
-- **Placing a marker** — the primary one. The mark appears with a pop.
-- Winning a small board / claiming a quadrant.
-- Cat game.
-- Winning the whole game.
-- The last-move highlight and active-quadrant highlight (see
-  [Game Board Design](./Game%20Board%20Design.md)) — these could be animated rather than
-  static, e.g. a pulsing glow on the legal quadrant.
-
-The handoff puts a starting value on each of these:
-`Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` → `animation` has `placeMark`,
-`claimQuadrant`, `catGame`, `winGame`, `activeQuadrant` and `lastMove`, each with a type
-and a duration; the last two are drawn as looping glow-pulses. Starting values, in the
-handoff's own words — not decisions.
-
-## Animations Inherit From Neon
-Animations follow the same inheritance rule as everything else: **Neon is the base
-theme**, and any theme that doesn't define its own animations gets Neon's. See
-[Theming](./Theming.md) → Neon Is the Base Theme.
-
-So the Neon animation set must be **complete** — every animated moment in the game needs a
-Neon definition, because it's the fallback for every other theme.
-
-## Decisions
-
-### Themes describe their animations; the runtime interprets them
 **A theme describes its animations as data, and the runtime interprets that data.** The
 user's intent: *"Say we want to create a new theme with new animations. I don't want to
 code the new animations into the game. I want to drop a file in the new theme folder that
@@ -108,53 +81,61 @@ Consequence: this is a larger piece of work than a fixed set of named animations
 schema for describing motion has to be designed. The schema itself belongs to the theme
 system's PRD and is not settled here.
 
-This is consistent with — and strengthens rather than replaces — **Themes author their
-own animations — no shared library** below.
-
-### Themes author their own animations — no shared library
 There is **no shared animation library or menu to pick from**. The vocabulary above
 (grow/shrink, glow, shadowbox, jiggle, dance) is the *direction* — not a fixed set of
 options a theme selects between.
 
 This is about *authoring*, not inheritance: a theme writes its own animations rather than
-picking from a menu, and whatever it doesn't write it inherits from Neon. See **Do themes
-inherit Neon's animations?** below.
+picking from a menu, and whatever it doesn't write it inherits from Neon. See
+**Animations Inherit From Neon** below.
 
-### Do themes inherit Neon's animations?
-**Inherit from Neon, but it can define its own animations that will then merge over the
-Neon theme.**
+## Where Animations Fire
+Not yet decided in detail, but the obvious moments:
+- **Placing a marker** — the primary one. The mark appears with a pop.
+- Winning a small board / claiming a quadrant.
+- Cat game.
+- Winning the whole game.
+- The last-move highlight and active-quadrant highlight (see
+  [Game Board Design](./Game%20Board%20Design.md)) — these could be animated rather than
+  static, e.g. a pulsing glow on the legal quadrant.
 
-Same model as every other theme value: a theme starts from Neon's complete animation set
-and its own definitions merge over the top, overriding only what it names. See
+The handoff puts a starting value on each of these:
+`Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` → `animation` has `placeMark`,
+`claimQuadrant`, `catGame`, `winGame`, `activeQuadrant` and `lastMove`, each with a type
+and a duration; the last two are drawn as looping glow-pulses. Starting values, in the
+handoff's own words — not decisions.
+
+## Animations Inherit From Neon
+Animations follow the same inheritance rule as everything else: **Neon is the base
+theme**, and any theme that doesn't define its own animations gets Neon's. See
+[Theming](./Theming.md) → Neon Is the Base Theme.
+
+A theme starts from Neon's complete animation set and its own definitions merge over the
+top, overriding only what it names — the same model as every other theme value. See
 [Tech Design](./Tech%20Design.md) → The Theme System.
 
-### One animation at a time
+So the Neon animation set must be **complete** — every animated moment in the game needs a
+Neon definition, because it's the fallback for every other theme.
+
+## How Animations Play
 Animations **never overlap**. Strictly one at a time.
 
-### Duration lives in the animation
 **Speed is specified in the animation itself**, not globally. Each animation carries its
 own timing, so a theme controls its own pacing.
 
-### Animations don't block input
 Animations **never block input**. You can tap through them, and the animation keeps
 playing as normal — it isn't interrupted or skipped, and the game doesn't wait on it.
 
-### Turn animations off — a global setting
+## Turning Animations Off
 There is an **animations on/off toggle**, and it is **not theme-defined**. It's a global
 player setting sitting **right alongside the vibration and mute toggles** in the Settings
-menu (see [Menus and UI](./Menus%20and%20UI.md)).
+menu (see [Menus and UI](./Menus%20and%20UI.md)). Same shape as the other two: global,
+player-controlled, independent of theme.
 
-Same shape as the other two: global, player-controlled, independent of theme.
+iOS Reduce Motion does not drive it — the toggle stays a player setting: *"no lets leave
+this as a game setting for user to command."* So there is exactly one control, and the
+player owns it. Reduce Motion being on does not change what the game does.
 
-### Does iOS Reduce Motion drive the animations toggle?
-**No — the animations toggle stays a player setting.** The OS accessibility setting does
-not turn animations off on its own: *"no lets leave this as a game setting for user to
-command."*
-
-So there is exactly one control, and the player owns it. Reduce Motion being on does not
-change what the game does.
-
-### Animations off = instant state change
 With animations turned off, the game does the thing **instantly**. The mark simply
 appears, the quadrant is simply claimed — no animation, no substitute effect, no fade or
 transition standing in for one.

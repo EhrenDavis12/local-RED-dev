@@ -82,8 +82,7 @@ The handoff's `themes.catalog.json` is a reference asset, not a shipping input.
 Theme selection lives **on the main menu**. Themes up front — a nice big button, the same
 size and treatment as the Play Game button. Not buried in a settings screen. It opens as
 an overlay on the main menu rather than its own screen — see
-[Menus and UI](./Menus%20and%20UI.md) → Decisions → Is theme selection its own screen or
-an overlay?
+[Menus and UI](./Menus%20and%20UI.md) → Theme Selection.
 
 **The selected theme persists between sessions.** Once a player selects a theme, it stays
 active. Close the app, open it again, that's still their theme. Requires persisting the
@@ -407,9 +406,9 @@ are not settled — see Open Questions.
 sound: menu buttons, theme rows, settings toggles, the game-over card's two controls, the
 trash button and the modal's Yes and No. One sound file covers all of it.
 
-This matches the haptic — see [Game Board Design](./Game%20Board%20Design.md) → Decisions
-→ Does the haptic fire on non-board controls? — so the two feedback channels behave
-consistently rather than one buzzing where the other is silent.
+This matches the haptic — see [Game Board Design](./Game%20Board%20Design.md) → Haptic
+Rule — so the two feedback channels behave consistently rather than one buzzing where the
+other is silent.
 
 The board sound moments are separate — placing a mark, claiming a quadrant, the cat game,
 winning — and an invalid tap stays silent in both channels.

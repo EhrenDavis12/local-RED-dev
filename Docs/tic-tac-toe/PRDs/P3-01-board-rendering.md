@@ -15,8 +15,8 @@
 > judgments in place of guesses.
 >
 > **Revised again** against `P3-02`'s landed interface (requirement 43's one-way invariant,
-> requirement 44's non-nullable `onCellTap`), then for the free-choice-cue Decision (the
-> turn banner is not built), then for two more Decisions — the self-claiming preview
+> requirement 44's non-nullable `onCellTap`), then for the free-choice-cue Decision (the cue
+> lives in the strip below the board), then for two more Decisions — the self-claiming preview
 > (requirement 23's third row) and spacing-is-code (requirement 28's constants column).
 >
 > **Revised again to take ownership of `GameScreen`** — requirements 46–53. Four PRDs
@@ -38,6 +38,17 @@
 > precondition. The settlement also routed the missing artifact both sides needed — a
 > provider holding the on-screen game's identity — to `P3-02` requirement 35, which is where
 > its only *reader* lives.
+>
+> **Revised again for a reversed decision — the turn banner *is* built**, and it carries the
+> pending-move prompt *"Play here?"* / *"Tap again to lock it in."* (`Menus and UI.md` → How
+> to Play — the On-Board Legend and Hint). This PRD does not build it and no PRD owns it, so
+> what changed here is narrow: requirements 38 and 47 no longer assert that *nothing* sits
+> between the scoreboard and the board — only that this PRD composes nothing there — and Open
+> Questions item 6's vertical arithmetic, which had counted the banner's block as height
+> **returned**, is reopened as item 7. The docs state no height and no position for the
+> banner, so no corrected total is computed. The free-choice cue's home is unaffected: it
+> still lives in the strip below the board. The build-readiness figure below has not been
+> re-estimated against this reversal.
 >
 > **Why 90:** every value this PRD draws is a published theme key or a named code constant,
 > the widget surface is named, the screen four PRDs assert against exists and now actually
@@ -415,7 +426,7 @@ requirements 11–12 are **status** treatments.
     The **text** half of the free-choice cue is not this PRD's, and its home is settled: it
     lives in the how-to-play strip **below** the board, owned by `P3-05-how-to-play.md`
     requirements 10 and 13 — not in a banner above it.
-    *(`Game Board Design.md` → Decisions → Where does the free-choice cue live?)*
+    *(`Game Board Design.md` → The free-choice state)*
 
 22. In free choice, **claimed and cat-game quadrants still read as locked**. It is "pick
     any of these open ones," not "the board is unlocked." This is requirement 14's
@@ -627,14 +638,18 @@ requirements 11–12 are **status** treatments.
     subtree to the whole game screen.
 
 38. The board sits in a **vertical stack below the scoreboard**, with **16pt horizontal
-    padding, as a code constant** (`BoardMetrics.screenHorizontalPadding`). **Nothing sits
-    between the scoreboard and the board** except requirement 50's gap — the turn banner the
-    handoff drew there is not built, and the how-to-play strip sits *below* the board. The
-    stack itself is requirement 47.
-    *(`Game Board Design.md` → Visual Layout; → Decisions → Where does the free-choice cue
-    live?; `Theming.md` → Decisions → Does a theme control spacing and padding?;
-    `design_handoff_game_ui/README.md` → Spacing, screens 1d/1e; `P3-03` requirement 2;
-    `P3-05` requirement 13)*
+    padding, as a code constant** (`BoardMetrics.screenHorizontalPadding`). **This PRD
+    composes nothing between the scoreboard and the board** except requirement 50's gap, and
+    the how-to-play strip sits *below* the board. The stack itself is requirement 47.
+    **The turn banner is built** and carries the pending-move prompt, and the handoff draws
+    it in exactly that position. **It is not built here, and no PRD owns it** — the docs give
+    it neither a height nor a place in the column — so this requirement neither reserves
+    space for it nor rules it out, and its earlier claim that the banner is not built is
+    withdrawn. See Open Questions item 7.
+    *(`Game Board Design.md` → Visual Layout; → The free-choice state; `Menus and UI.md` →
+    How to Play — the On-Board Legend and Hint; `Theming.md` → Decisions → Does a theme
+    control spacing and padding?; `design_handoff_game_ui/README.md` → Spacing, screens
+    1d/1e; `P3-03` requirement 2; `P3-05` requirement 13)*
 
 ### Tests
 
@@ -853,11 +868,15 @@ is already specified from the other side, so these requirements assemble rather 
 
 47. **The screen is one vertical stack of three children, in this order:** the scoreboard
     strip (`P3-03`'s `ScoreboardStrip`), `BoardView`, and the how-to-play strip
-    (`P3-05-how-to-play.md`). Nothing else sits between the scoreboard and the board except
-    requirement 50's gap.
+    (`P3-05-how-to-play.md`). This PRD composes nothing else between the scoreboard and the
+    board except requirement 50's gap. **That is a statement about what this PRD builds, not
+    about what the screen ends up holding:** the turn banner is built and unowned
+    (requirement 38), and if it lands in this column the stack gains a child and requirement
+    50's arithmetic gains a term. Open Questions item 7, not a settled omission.
     *(`Game Board Design.md` → Visual Layout — "Vertical stack: **scoreboard on top, board
-    below**"; → Decisions → Where does the free-choice cue live? for the third child's
-    position; `P3-03` requirement 2; `P3-05` requirement 13; requirement 38 here)*
+    below**"; → The free-choice state for the third child's position; `Menus and UI.md` → How
+    to Play — the On-Board Legend and Hint; `P3-03` requirement 2; `P3-05` requirement 13;
+    requirement 38 here)*
     **This stack is what requirement 54 withholds until the game has loaded**, so "the
     screen is these three children" describes the loaded state, which is every state the
     player spends time in.
@@ -1218,8 +1237,10 @@ here.
   internal layout constants: `P3-03-scoreboard-turn-indicator.md`. This PRD composes the
   strip (requirement 47), feeds it (requirements 48, 49) and holds the three label strings
   it may not hold itself (requirement 53). The scoreboard's name highlight is the
-  **permanent** whose-turn affordance, since the banner that would have duplicated it is not
-  built.
+  **permanent** whose-turn affordance. The turn banner is built (requirement 38), but the
+  docs settle only that it carries the pending-move prompt; whether it also carries the
+  whose-turn line the handoff draws on 1d/1e — and so whether the two say the same thing
+  twice — is Open Questions item 7.
 - **The how-to-play strip's contents** — the free-choice text cue, the two-tap hint, the
   legend and the ring explanations: `P3-05-how-to-play.md`. This PRD composes it and holds
   the gap above it.
@@ -1309,22 +1330,49 @@ here.
    scales, whether the four mark sizes scale with it. Dynamic Type is off *(`Menus and
    UI.md` → Decisions)*, so nothing else moves these numbers.
 
-   **The arithmetic improved and is now known.** The turn banner is not built, and `P3-05`
-   requirements 11 and 14 compute the effect: the banner's block returns **≈70pt** while the
-   cue costs **27pt exactly**, for **net 43pt returned** to every board screen — both sides
-   code constants now, so a fixed number rather than an estimate. With requirement 50's two
-   constants supplied, the whole column closes at the reference frame: 874 − 62 − ~48 − 370
-   − 56 − 14 ≈ **324pt** of remainder.
+   **The arithmetic is reopened, and its sign has flipped.** An earlier revision computed a
+   **net 43pt returned** to every board screen from the turn banner not being built. **The
+   banner is built** (`Menus and UI.md` → How to Play — the On-Board Legend and Hint), so its
+   block is height this column **spends**, not height it returns. The ≈70pt it was credited
+   with was an estimate of what the banner *would have* cost; **no design doc states the
+   banner's height, and none states where in the column it sits**, so no corrected total is
+   given here — any number would be invented. What survives is the one side that is a code
+   constant: `P3-05` requirement 14's free-choice cue costs **27pt exactly**, and requirement
+   50 supplies `safeAreaTop` (62pt) and `stripToBoardGap` (14pt). The column cannot be summed
+   at the reference frame until the banner's height and position are stated — see item 7.
 
-   **That relieves the contention; it does not close the question.** iPhone SE is 375 × 667
-   — **207pt shorter** than the reference frame — so 43pt covers roughly a fifth of the
-   deficit. iPad remains a declared second target. What gives up height first is still the
+   **The contention is worse, not better, and the question stays open.** iPhone SE is
+   375 × 667 — **207pt shorter** than the reference frame — and the column now carries a
+   block this PRD had assumed it had shed, against a deficit that was already the binding
+   one. iPad remains a declared second target. What gives up height first is still the
    user's call, and this is **one shared question** with `P3-05` → OQ-7, not two.
    **`GameScreen` now holds the sum** (requirements 47, 50), so this PRD is where a scaling
    rule would land when one exists.
 
    *(This item was numbered 4 before requirement 54 added two questions above it; it is
    renumbered because nothing cites it by number. Items 1–3 keep their numbers.)*
+
+### Reopened by the turn banner — needs the user
+
+7. **How tall is the turn banner, where does it sit, and what else does it say?** What is
+   settled is that the banner **is** built and that it carries the pending-move prompt
+   *"Play here?"* / *"Tap again to lock it in."* *(`Menus and UI.md` → How to Play — the
+   On-Board Legend and Hint.)* Three things are not:
+   - **Its height.** Nothing states one. The handoff gives it radius 11 and padding `11/13`
+     *(`design_handoff_game_ui/README.md` → 1d, 2d)*, which is a drawing, not a committed
+     point value — and until there is one, item 6's column has an unknown term in it.
+   - **Its position in the column.** The handoff draws it directly below the scoreboard, but
+     no doc commits to that placement, so requirements 38 and 47 say only what this PRD
+     composes.
+   - **Whether it also carries the whose-turn line.** The handoff's 1d/1e draw the player's
+     mark and *"Player One, you're up!"*; the docs settle only the pending-move prompt. If it
+     carries both, it duplicates `P3-03`'s scoreboard highlight, which is the permanent
+     whose-turn affordance.
+
+   **And it has no owner.** No PRD builds the banner — this one does not, and requirement 38
+   says so explicitly rather than leaving the omission to be read as a decision. That part is
+   routing rather than a user decision, but it cannot be routed until the height and position
+   exist to specify.
 
 ### Fenced by this PRD — reversible, flagged so a ruling is cheap
 
@@ -1362,6 +1410,10 @@ here.
   strip as `GameScreen`'s third child and cannot name the symbol it is composing. Every
   other collaborator publishes one — `ScoreboardStrip`, `BoardView`, `AppNavigator`. Needs
   routing, not a user decision.
+- **The turn banner is built and no PRD builds it.** `Menus and UI.md` → How to Play — the
+  On-Board Legend and Hint states it exists and carries the pending-move prompt; several
+  PRDs, including earlier revisions of this one, were written against the opposite and
+  deflected it. It needs an owner and, before that, a height and a position — item 7.
 - **The previewed free choice is provisional but drawn solid**, the one place requirement
   24's *dashed = provisional* rule breaks. It follows from the Decision, whose stated reason
   is that preview and result should look consistent. Recorded because a reader who knows
@@ -1415,8 +1467,10 @@ here.
   still-open quadrant is highlighted. Requirement 23's third row builds it; `P3-02` OQ-2
   closes with it. The `gameOver` sub-case is Blocking 3.
 - **Where requirement 38's 16pt padding comes from.** Settled: code, not theme.
-- **Where the free-choice text cue lives, and whether a turn banner is built.** Settled: the
-  strip below the board, and the banner is not built.
+- **Where the free-choice text cue lives.** Settled: the strip below the board.
+  *(`Game Board Design.md` → The free-choice state.)* This entry previously also recorded
+  *"and the banner is not built"* — that half is **reversed**, not closed: the banner is
+  built. Item 7 carries what is now open about it.
 
 ### Carried from elsewhere — recorded so they are not answered by accident
 

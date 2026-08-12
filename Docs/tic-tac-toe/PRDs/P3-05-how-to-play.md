@@ -1,17 +1,19 @@
-**Build-readiness: 90** — actionability 19/20 · verifiability 18/20 · decision completeness
-16/20 · interface precision 19/20 · self-containment 18/20. *(Author's estimate. An independent
+**Build-readiness: 88** — actionability 19/20 · verifiability 18/20 · decision completeness
+14/20 · interface precision 19/20 · self-containment 18/20. *(Author's estimate. An independent
 re-grade follows and governs.)*
-**Why 90:** every requirement is buildable except two sentences. Req 8's sending-rule copy and
+**Why 88:** every requirement is buildable except two sentences. Req 8's sending-rule copy and
 req 10's cue phrasing are **copy-blocked, not under-specified** — host, condition, precedence,
 placement, theme key and vocabulary are settled for both, and both are explicitly marked *leave
 unbuilt*. They are one ask, **OQ-1**, and the only thing standing between this PRD and a build.
 What holds the remaining points: six reversible defaults a ruling would confirm cheaply
-(**OQ-3, 4, 6, 9, 10, 14**), and **OQ-7**'s sub-402pt budget, now quantified exactly but still
-with the user.
-*Changed since the 89: the strip publishes `HowToPlayStrip` and `HowToPlayKeys` (requirements
-25–26), closing the hole `P3-01` req 47 flagged; requirement 13 hands the board-to-strip gap to
-`GameScreen` rather than applying it here, which would have double-counted it; and OQ-7's
-arithmetic is corrected for `max`-not-sum safe-area insets.*
+(**OQ-3, 4, 6, 9, 10, 14**), and the vertical budget, which is now open on both sides —
+**OQ-15** for what the turn banner takes, **OQ-7** for what happens below 402pt.
+*Changed since the 90: `Menus and UI.md` now states that **the turn banner is built** and
+carries the pending-move prompt. Requirement 11 is rewritten to record that and to fence the
+banner out of this PRD; requirements 14 and OQ-7 give back the 43pt they had banked on the
+banner not existing; OQ-4 flips from "the banner's copy is homeless" to "does the strip say
+anything at all while a move is pending"; and **OQ-15** asks who builds the banner and what it
+costs above the board.*
 
 # PRD: How To Play — The On-Board Legend and Hint
 
@@ -247,9 +249,11 @@ free choice is a first-class board state here, so a block keyed to it drops stra
    is needed to reach any branch.
    **Reversible, two ways:** S3-over-S2 is read off the drawing, not stated in any doc
    (*reverses to:* both pairs stacked). S3-suppresses-C is inferred from the banner's behavior
-   in an element that is no longer built (*reverses to:* the cue persisting through S3, which
-   is arguable — free choice is still true while the selection is held, and the player may
-   still reselect any open quadrant). See **OQ-3**.
+   on the drawn `2d`, an element requirement 11 records as **built** — but no doc states that
+   the banner still drops its mode cue there, so the inference rests on the drawing alone
+   (*reverses to:* the cue persisting through S3, which is arguable — free choice is still true
+   while the selection is held, and the player may still reselect any open quadrant). See
+   **OQ-3**.
 
 2. **In S1 the strip renders a legend of quadrant states carrying exactly three entries —
    `Open`, `Locked`, `Cat game` — each a swatch followed by its label**, in that order.
@@ -380,13 +384,14 @@ free choice is a first-class board state here, so a block keyed to it drops stra
    → Lifetime; corroborated by `P3-01-board-rendering.md` requirement 20.*
    **Testable:** after a first tap both sentences render in that order; the first swatch is
    dashed and the second solid.
-   > **Divergence, recorded not resolved.** The Decision describes `2d`'s explanation as
+   > **Divergence, recorded not resolved.** `Menus and UI.md` describes `2d`'s explanation as
    > sitting *"on the turn banner rather than a bottom strip"* and quotes **different copy** —
-   > *"Play here?"* / *"Tap again to lock it in."* Both exist in the drawing: those two strings
-   > are on `2d`'s **banner**, which requirement 11 confirms is **not built**; the two above
-   > are on `2d`'s **bottom strip**, which is this PRD's territory. This requirement builds the
-   > strip pair. If the banner's provisional voice is wanted, it has no host and would have to
-   > be re-homed here as a fourth block. See **OQ-4**.
+   > *"Play here?"* / *"Tap again to lock it in."* Both texts exist in the drawing: those two
+   > strings are on `2d`'s **banner**, which requirement 11 records as **built and carrying
+   > exactly them**; the two above are on `2d`'s **bottom strip**, which is this PRD's
+   > territory. This requirement builds the strip pair. What that leaves open is the reverse of
+   > the old question: not where the banner's copy goes, but whether the strip should say
+   > anything at all in S3 now that the banner carries the prompt. See **OQ-4**.
 
 10. **When the player has a free choice of quadrant, the strip says so in words — and the
     strip is where that cue lives.** Free choice covers the opening move and being sent to a
@@ -395,15 +400,14 @@ free choice is a first-class board state here, so a block keyed to it drops stra
     on the record, `Game Board Design.md`'s *"Free choice — pick any open quadrant"* is ruled
     out by the ratified rule; the handoff's *"Free choice — pick any board"* is the form that
     survives it.
-    *Source: `Game Board Design.md` → Decisions → **Where does the free-choice cue live?** —
-    **"The free-choice cue lives in the how-to-play strip below the board — not in a banner
-    above it."** The reasoning recorded with it: the strip already exists, already swaps
-    content by board state, and already has an owner and a theme slot.
-    `Game Overview.md` → Terminology, for the word. Supporting: `Game Board Design.md` →
-    Active Quadrant Highlight → The free-choice state (which offered the cue as an option —
-    "**or a text cue**" — and is now answered); `Rules.md` → Edge Cases → Sent to a dead
-    quadrant → free choice; `P3-01-board-rendering.md` → Out of Scope, which declines the cue,
-    does **not** push it to `P3-03`, and names this requirement as its owner.*
+    *Source: `Game Board Design.md` → Active Quadrant Highlight → **The free-choice state** —
+    **"The free-choice cue lives in the how-to-play strip below the board — not in a turn
+    banner above it."** The reasoning recorded with it: the strip already exists, already swaps
+    content by board state, and already has an owner and a theme slot. The same section offers
+    the cue as an option — "**or a text cue**" — and then answers it.
+    `Game Overview.md` → Terminology, for the word. Supporting: `Rules.md` → Edge Cases → Sent
+    to a dead quadrant → free choice; `P3-01-board-rendering.md` → Out of Scope, which declines
+    the cue, does **not** push it to `P3-03`, and names this requirement as its owner.*
     **Testable:** constructing the strip with `placementState: freeChoice` and
     `hasPendingSelection: false` renders a cue naming it; `forced` renders none; `freeChoice`
     with `hasPendingSelection: true` renders none (requirement 1).
@@ -413,25 +417,26 @@ free choice is a first-class board state here, so a block keyed to it drops stra
     > than as the whole grid, which is the disambiguation cost the vocabulary decision
     > accepted. Raised with requirement 8's sentence as **OQ-1**.
 
-11. **The turn banner is not built.** Nothing is added above the board. The free-choice cue was
-    the only content the banner carried that no other element covered, requirement 10 rehomes
-    it, and requirement 7's second line covers the forced-mode case — so the banner has no
-    remaining reason to exist.
-    *Source: `Game Board Design.md` → Decisions → Where does the free-choice cue live?
-    ("**not in a banner above it**"); `P1-03-theme-system.md`, which holds
-    `surfaces.scoreboard.turnBanner` as **deferred** with "**No confirmed reader**" — a status
-    that is now permanent rather than provisional.*
-    **Consequences, stated so they are not rediscovered:**
-    - `P3-03-scoreboard-turn-indicator.md` → Open Question 1, which held the banner question
-      open, closes. Its assertion that `P1-03` carries `turnBanner` as `required` was wrong
-      when written — it is `deferred` — and is now moot.
-    - The banner's *"Player One, you're up!"* line is not built either. The whose-turn
-      affordance remains the scoreboard's name highlight, which `Game Board Design.md` →
-      Turn Indicator names as **the** mechanism for it.
-    - `P3-01` requirement 47 composes exactly three children, with nothing between the
-      scoreboard and the board except its `stripToBoardGap` — which is the same fact stated
-      from the screen's side.
-    **Testable:** no widget above the board renders any of the banner's four drawn strings.
+11. **The turn banner is built and carries the pending-move prompt — and this PRD does not
+    build it.** The banner is a separate surface **above** the board; this PRD owns only the
+    strip **below** it. Nothing in this layer renders above the board, and the free-choice cue
+    stays in the strip either way (requirement 10).
+    *Source: `Menus and UI.md` → How to Play — the On-Board Legend and Hint: "**The turn banner
+    is built, and it carries the pending-move prompt** — the two lines *'Play here?'* and *'Tap
+    again to lock it in.'* … That is what the approved handoff draws on screen `2d`", and the
+    same section's `2d` bullet; `Game Board Design.md` → Active Quadrant Highlight → The
+    free-choice state, which keeps the free-choice cue off the banner.*
+    **What this settles, and what it deliberately leaves open:**
+    - **Settled:** the banner exists, and the pending-move prompt is what it carries.
+    - **Not settled, and not settled here:** which PRD builds it, how tall it is, where exactly
+      it sits, how it is styled or themed, and whether it also names the active player. Those
+      are **OQ-15**. An implementer of *this* PRD builds nothing above the board and assumes
+      nothing about the banner's size.
+    - The whose-turn affordance this strip relies on remains the scoreboard's name highlight,
+      which `Game Board Design.md` → Turn Indicator names as **the** mechanism for it. Whether
+      the banner duplicates it is part of **OQ-15**, not something this PRD rules on.
+    **Testable:** `HowToPlayStrip` renders no widget above the board; no test in this PRD
+    asserts the banner's presence, absence or size.
 
 12. **A line whose referent does not exist is omitted, and its swatch with it.** In S2 the
     first line of requirement 7, and in S3 the second line of requirement 9, are suppressed
@@ -488,11 +493,15 @@ free choice is a first-class board state here, so a block keyed to it drops stra
     and legend together), S2 and S3, the scoreboard, the settings button, all 81 cells and the
     strip lay out with no `RenderBox` reporting overflow and no `Scrollable` in `GameScreen`'s
     tree.
-    **The budget improved, and the arithmetic is now stable.** Requirement 11 returns the
-    banner's block — margins 16 + 12, padding 11 + 11, and a ~20pt content line, so **≈70pt** —
-    while requirement 10's cue costs a 19pt line plus the `gap: 8` above the hint, **27pt**.
-    **Net 43pt returned** to every board screen, a fixed number now that spacing is code rather
-    than theme. Frames other than 402pt remain **OQ-7**, which is `GameScreen`'s to answer.
+    **The budget is tighter than an earlier revision of this PRD assumed, and one side of it is
+    now unknown.** That revision banked ≈70pt on the turn banner not being built; requirement 11
+    records that it **is** built, so nothing is returned. What this strip costs is known and
+    small: requirement 10's cue adds a 19pt line plus the `gap: 8` above the hint, **27pt**, on
+    free-choice turns only, a fixed number now that spacing is code rather than theme. What the
+    banner costs above the board is **not settled** — its height and styling are open
+    (**OQ-15**) — so this requirement makes no arithmetic claim about the screen total. It is
+    verified *as laid out*, against whatever height `GameScreen` leaves the strip. Frames other
+    than 402pt remain **OQ-7**, which is `GameScreen`'s to answer.
 
 15. **Portrait only.** No landscape layout is built.
     *Source: `Tech Design.md` → Decisions → Orientation — portrait only, enforced at the app
@@ -758,9 +767,10 @@ Named so the boundary is explicit. Each is specified elsewhere; do not specify i
   pending selection's lifecycle, hosted by `P3-01` requirement 51. Requirement 16 only
   guarantees this widget stays transparent to it.
 - **The scoreboard, the turn indicator and the settings button** —
-  `P3-03-scoreboard-turn-indicator.md`. The whose-turn affordance stays entirely there;
-  requirement 11 removes the banner that would have duplicated it.
-- **The turn banner** — *not built at all*, per requirement 11.
+  `P3-03-scoreboard-turn-indicator.md`. The whose-turn affordance stays there.
+- **The turn banner** — it is built and carries the pending-move prompt (requirement 11), but
+  nothing here builds, places, sizes, styles or themes it, and no PRD has claimed it yet.
+  **OQ-15**.
 - **The rules being explained** — the sending rule's mechanics, claims, cat game, free
   choice, win and draw detection: `P1-02-engine-rules.md`. Requirement 8 states the rule in
   words; it computes nothing.
@@ -784,7 +794,8 @@ Named so the boundary is explicit. Each is specified elsewhere; do not specify i
 ## Open Questions
 
 Numbers are stable across revisions so siblings can cite them; an answered question is marked
-rather than removed. **OQ-1 is the only thing blocking a requirement from being built.**
+rather than removed. **OQ-1 is the only thing blocking a requirement *in this PRD* from being
+built. OQ-15 blocks the screen that hosts it.**
 
 ### Answered — kept so the citation trail survives
 
@@ -813,13 +824,15 @@ internal/player-facing split is the general rule its test is written against). T
 file and is now a copy constraint on OQ-1.
 
 **OQ-2 — Where does the free-choice text cue live? — ANSWERED.**
-> **The free-choice cue lives in the how-to-play strip below the board — not in a banner above
-> it.**
+> **The free-choice cue lives in the how-to-play strip below the board — not in a turn banner
+> above it.**
 
-*(`Game Board Design.md` → Decisions.)* Requirement 10 builds it, requirement 1 gives it a
-condition and precedence, requirement 13 places it, requirement 18 gives it a key, requirement
-26 gives it a test key, and requirement 11 records the consequence: **the turn banner is not
-built**. `P3-03-scoreboard-turn-indicator.md` → Open Question 1 closes as a side effect.
+*(`Game Board Design.md` → Active Quadrant Highlight → The free-choice state.)* Requirement 10
+builds it, requirement 1 gives it a condition and precedence, requirement 13 places it,
+requirement 18 gives it a key, and requirement 26 gives it a test key. **This answer survived
+the banner's return**: the banner is built (requirement 11) and carries the pending-move
+prompt, but the free-choice cue stays in the strip. What the banner's return reopens is
+**OQ-15**, not this.
 
 **OQ-8 — What does a tap landing on this strip do? — ANSWERED.**
 > **Any tap outside the nine quadrants clears a pending, unconfirmed selection** — including
@@ -854,6 +867,24 @@ theme key, test key and vocabulary are settled. Requirement 26 reserves `howToPl
 so that (a) landing is a copy change, not a rename. An implementer leaves (a) and (b) unbuilt
 rather than authoring them.*
 
+**OQ-15 — The turn banner is built. Who builds it, and what does it take from the board?**
+The docs now say the banner exists and carries the pending-move prompt — *"Play here?"* / *"Tap
+again to lock it in."* — as drawn on screen `2d`. That settles **that** it exists and **what**
+it says. Four things it does not settle, none of them readable out of any doc:
+
+| # | The call | Why it can't be guessed |
+|---|---|---|
+| a | **Which PRD builds it?** It sits above the board, between the scoreboard and the board — so the natural candidates are the scoreboard/turn-indicator feature, the game-screen feature that composes them, or a feature of its own. It is **not** this one. | It has been passed between features before and accepted by none; with no owner named it ships in none of them |
+| b | **How tall is it, and is that height reserved on every turn or only while a move is pending?** | The game screen is the tightest vertical budget in the app, and this strip is sized against whatever the board leaves. A banner that appears only during a pending move costs nothing on a normal turn; one that is always there costs on every turn |
+| c | **Does it also name the active player** — the drawn *"Player One, you're up!"* — or carry only the pending-move prompt? | The scoreboard's name highlight is already the whose-turn affordance; if the banner says it too, one of them is redundant |
+| d | **Does it get a theme slot of its own, or is it tinted from the active player's colour like the drawn one?** | A slot for it was dropped on the grounds it would never be built, which is no longer true |
+
+*This PRD needs only (b), and only as a number it is given rather than one it chooses:
+requirement 11 fences the banner out and builds nothing above the board, and requirement 14 no
+longer makes any arithmetic claim about the space above it. (a), (c) and (d) are recorded here
+because this PRD is where the banner's absence was previously written down, and anyone
+following that trail lands here.*
+
 ### Recorded defaults — decided in this PRD, reversible, worth confirming
 
 **OQ-3 — Two precedence calls, both inferred from the drawings.**
@@ -861,20 +892,23 @@ rather than authoring them.*
 a pending selection in a forced quadrant satisfies both. Requirement 1 gives S3 precedence,
 because that is what the drawing shows.
 (ii) *Does the free-choice cue survive a first tap?* Requirement 1 suppresses it in S3,
-following `2d`'s banner, which drops its mode cue and switches wholly to the provisional voice.
-The counter-argument is real: free choice is still true while a selection is held, and the
-player may still reselect any open quadrant — so the cue arguably should persist. The evidence
-for suppression comes from an element that is no longer built (requirement 11), which weakens
-it. Cost of reversing: one extra line in S3, 27pt, which requirement 14's recovered 43pt now
-comfortably affords.
+following the drawn `2d`'s banner, which drops its mode cue and switches wholly to the
+provisional voice. The counter-argument is real: free choice is still true while a selection is
+held, and the player may still reselect any open quadrant — so the cue arguably should persist.
+The banner **is** built (requirement 11), so the evidence is no longer borrowed from a dropped
+element — but the docs settle only that the banner carries the pending-move prompt, not that it
+drops a mode cue, so the inference still rests on the drawing alone. Cost of reversing: one
+extra line in S3, 27pt, on a screen whose remaining budget is now **OQ-15**'s to establish.
 
-**OQ-4 — `2d`'s explanation is specified twice, with two different texts.** The Decision says
-it sits *"on the turn banner rather than a bottom strip"* and quotes *"Play here?"* / *"Tap
-again to lock it in."* The drawn `2d` has **both**: those strings on the banner, and
+**OQ-4 — `2d`'s explanation is specified twice, with two different texts.** `Menus and UI.md`
+says it sits *"on the turn banner rather than a bottom strip"* and quotes *"Play here?"* /
+*"Tap again to lock it in."* The drawn `2d` has **both**: those strings on the banner, and
 requirement 9's two different strings on the bottom strip. Requirement 9 builds the strip pair.
-**Requirement 11 sharpens this:** the banner is not built, so if the Decision's reading is the
-intended one, that copy is now homeless and would have to be re-homed into this strip as a
-fourth block — not merely relabelled.
+**The banner's return flips this question round.** The banner's copy now has a home, so nothing
+is homeless. What is unresolved is the *"rather than a bottom strip"* half: with the banner
+carrying the prompt, does the strip still show requirement 9's two lines during a pending move
+(as drawn), or should it show **nothing** while a move is pending (as that phrase can be read)?
+This PRD keeps the drawn behaviour and does not decide it.
 
 **OQ-6 — Do swatches reproduce their board treatments or simplify them?** Requirement 3 takes
 the drawings as normative. The alternative is defensible from `Game Board Design.md` →
@@ -892,8 +926,9 @@ it, so something is drawn down there; nothing says whether it is this.
 no. They are training wheels on the screen with the tightest vertical budget in the app, and a
 player on their fortieth game pays for them every turn. If they can fade, the trigger is
 unstated — a move count, a games-played count, a setting, a dismiss control — and a dismiss
-control needs a way to bring them back, plus a fourth constructor argument. Requirement 14's
-recovered 43pt lowers the pressure behind this question without answering it.
+control needs a way to bring them back, plus a fourth constructor argument. The pressure behind
+this question went **up**, not down, when the turn banner came back (requirement 14): the 43pt
+that was going to relieve it is not returned.
 
 **OQ-14 — Where within the strip does the free-choice cue sit?** Requirement 13 puts it at the
 strip's top, above the hint: it is a status line about this turn, so it reads before the
@@ -903,11 +938,13 @@ chosen rather than transcribed. *Reverses to:* the bottom block, above the legen
 
 ### Relieved, and now owned elsewhere
 
-**OQ-7 — What is the vertical budget below 402pt?** **Requirement 11 changed the arithmetic in
-this PRD's favour, and both sides are now constants:** not building the banner returns its
-margins (16 + 12), padding (11 + 11) and ~20pt content line — **≈70pt** — while requirement
-10's cue costs a 19pt line plus the `gap: 8` above the hint, **27pt**. **Net 43pt returned to
-every board screen.**
+**OQ-7 — What is the vertical budget below 402pt?** **The banner's return takes back the 43pt
+an earlier revision of this PRD banked.** That revision assumed the banner was not built and
+counted its block — margins 16 + 12, padding 11 + 11, ~20pt content line, **≈70pt** — as
+returned to the board. Requirement 11 records that it **is** built, so it is not. This strip's
+own cost is unchanged and known: requirement 10's cue is a 19pt line plus the `gap: 8` above
+the hint, **27pt**, on free-choice turns only. The banner's cost is unknown, because its height
+and styling are unsettled — **OQ-15**.
 
 Two further inputs have since closed. `stripToBoardGap` is fenced at **14pt**
 (`P3-01` requirement 50), so the board's lower gutter is a known number rather than an unknown.
@@ -922,8 +959,10 @@ reading suggested.
 requirements 46–52 now hold the vertical sum, so a sub-402pt scaling rule — proportional
 scaling, fixed points with re-centering, or a cap — lands there and this strip consumes
 whatever it decides. Its Open Questions 3 states the answer is **"unresolved and with the
-user."** iPhone SE is 375 × 667, **207pt shorter** than the reference frame, so the recovered
-43pt covers about a fifth of the deficit; iPad remains a declared second target; and
+user."** iPhone SE is 375 × 667, **207pt shorter** than the reference frame, and the 43pt that
+was going to cover about a fifth of that deficit is no longer available (see above), so the
+rule has more to absorb than the previous revision implied; iPad remains a declared second
+target; and
 requirement 21 rules out Dynamic Type as the mechanism. Recorded here because S1+C is the
 tallest strip state and therefore the case any rule has to clear.
 

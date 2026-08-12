@@ -13,7 +13,7 @@
 - Inner: each quadrant holds a full 3x3 tic-tac-toe board.
 - Total playable cells: 81.
 - Depth is **fixed at 2 levels** (big board → small board). No deeper nesting.
-  See [Game Overview](./Game%20Overview.md) → Decisions.
+  See [Game Overview](./Game%20Overview.md) → Core Concept.
 
 ```
 ╔═══════════╦═══════════╦═══════════╗
@@ -47,8 +47,6 @@ colors.
 ## Scoreboard
 A **scoreboard sits at the top of the game screen**, above the board. Three counters:
 
-See Decisions → What do the scoreboard chips read? for the settled chip labels.
-
 | Player One | Ties | Player Two |
 |:----------:|:----:|:----------:|
 
@@ -64,6 +62,13 @@ See Decisions → What do the scoreboard chips read? for the settled chip labels
 ```
 PLAYER 1 highlighted above — their turn to play.
 
+**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `TIES` between them), not
+`PLAYER ONE` / `PLAYER TWO`.
+
+This does **not** change the settled term for the player — the players are still called
+"Player One" and "Player Two." The chip uses the numeral because that is what every drawn
+screen shows and because the spelled-out form is materially wider in a fixed-width column.
+
 - Tracks results across multiple games played back to back.
 - A **settings button sits at the top right**, alongside the scoreboard — the mid-game
   entry point to quick actions and exiting the game. See
@@ -76,9 +81,12 @@ PLAYER 1 highlighted above — their turn to play.
 ### Turn Indicator
 The active player's name in the scoreboard is **highlighted** to show whose turn it is.
 
-This is the mechanism for the "whose turn it is" affordance in
-[Player Feedback / Affordances](#player-feedback--affordances) below — it matters because
-both players share one phone, so the screen is the only thing telling them who's up.
+This is one of two mechanisms for the "whose turn it is" affordance in
+[Player Feedback / Affordances](#player-feedback--affordances) below — the other is the
+turn banner, which names the active player whenever no move is pending (see
+[Menus and UI](./Menus%20and%20UI.md) → How to Play — the On-Board Legend and Hint). Both
+are built. It matters because both players share one phone, so the screen is the only
+thing telling them who's up.
 
 Like everything else, what the highlight looks like is theme-driven — see
 [Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
@@ -149,9 +157,11 @@ The free-choice state should still make the *locked* quadrants (claimed, cat-gam
 locked. It's "pick any of these open ones," not "the board is unlocked." Nine glowing
 quadrants at once also risks looking like noise, so free choice may want a calmer
 treatment than the single-quadrant forced highlight — or a text cue ("Free choice — pick
-any open board"). Whether this cue is text, a calmer highlight, or both is answered by
-Decisions → Where does the free-choice cue live? below: the cue lives in the how-to-play
-strip below the board, not a turn banner above it — the banner is not built.
+any open board").
+
+**The free-choice cue lives in the how-to-play strip below the board — not in a turn banner
+above it.** That strip already exists, already swaps its content by board state, and
+already has an owner and a theme slot.
 
 ### Taps outside the legal quadrant
 Illegal cells shouldn't accept input. They also shouldn't *look* like they would — the
@@ -208,8 +218,9 @@ Things the board needs to communicate (driven by the rules so far):
 - **Cat-game quadrants** — must look visually distinct from claimed *and* from
   in-play. It's permanently dead and neither player can ever have it.
 - **Whose turn it is** — extra important here: both players share one phone, so the
-  screen is the only thing telling them who's up. Needs to be unmissable. See dedicated
-  section above (Turn Indicator).
+  screen is the only thing telling them who's up. Needs to be unmissable. Carried by the
+  scoreboard highlight and the turn banner both — see dedicated section above (Turn
+  Indicator).
 
 > These treatments all need to coexist on one screen without turning into visual noise —
 > and every one of them is theme-driven, so **each theme has to solve this, not just the
@@ -221,10 +232,22 @@ Placing a mark takes **two taps**, not one.
 1. **First tap — select.** The player taps a cell in the small board. This *doesn't* place
    the mark. Instead, the big board **highlights the quadrant that choice points to** —
    showing where this move would send the opponent. (Unless that move would claim or
-   cat-game the very quadrant it points at — see Decisions → What does the board preview
-   when the selected move would claim its own send target?)
+   cat-game the very quadrant it points at — see *When the selected move claims its own
+   send target* below.)
 2. **Second tap — confirm.** Tapping the same cell again commits the move. The mark is
    placed and the turn passes.
+
+### When the selected move claims its own send target
+**Every still-open quadrant is highlighted.** Normally, selecting a cell previews the
+quadrant the opponent will be sent to. But if that move would claim or cat-game the very
+quadrant it points at, the quadrant is dead by the time the send resolves and the opponent
+gets a free choice — so there is no single quadrant to ring. The preview shows the truth —
+the opponent may play anywhere still open — rather than showing nothing.
+
+This reuses the free-choice highlight that already exists for the state after such a move
+lands (see **The free-choice state** above), so the preview and the resulting board state
+look consistent. It also teaches the rule at the moment it fires, which matters because
+sending an opponent to a dead quadrant is a real strategic cost that players have to learn.
 
 ### Why this is more than a safety net
 The preview between the two taps is a teaching tool. It makes the sending rule visible
@@ -242,10 +265,18 @@ a mis-tap harmless — you just tap the cell you actually meant.
 
 ### Changing your mind
 - **Tap a different cell** → that cell becomes the new selection. No need to cancel first.
-- **Tap outside the full grid** → deselects entirely, clearing the pending move.
+- **Tap outside the nine quadrants** → deselects entirely, clearing the pending move.
 
 So there are two ways out of a pending selection, and neither needs a dedicated cancel
 button: pick something else, or tap away.
+
+**Any tap outside the nine quadrants clears a pending, unconfirmed selection.** That
+includes the legend/how-to-play strip, the scoreboard, the settings button, and opening any
+menu or sheet. One rule, uniformly applied.
+
+The gutters between cells (3pt) and the quadrant padding (5pt) are outside the cells, so a
+near-miss between two cells clears the selection rather than doing nothing. That is the
+accepted cost of the single uniform rule.
 
 ### Confirming
 The confirm tap is **on the same cell** — effectively a **double tap** to place a mark.
@@ -311,8 +342,11 @@ the two-tap confirm makes a mis-tap free. See
 <!-- ASCII diagrams, rough layouts -->
 
 ## Haptic Rule
-**The haptic fires on every valid click.** Any valid selection or valid action buzzes —
-including the first tap of a two-tap move, since selecting a legal cell is a valid action.
+**The haptic fires on every valid click, anywhere in the app.** Any valid selection or
+valid action buzzes — including the first tap of a two-tap move, since selecting a legal
+cell is a valid action, and including controls that aren't board cells: menu buttons,
+theme rows, settings toggles, the game-over card's controls, the settings gear. It matches
+the setting's own name, *Vibrate on Touch*.
 
 Paired with the illegal-tap rule below, this produces a clean, consistent system:
 
@@ -324,54 +358,6 @@ don't happen.
 
 (Subject to the vibrate-on-touch setting being on — see
 [Menus and UI](./Menus%20and%20UI.md).)
-
-## Decisions
-
-### Where does the free-choice cue live?
-**The free-choice cue lives in the how-to-play strip below the board — not in a turn banner
-above it.** That strip already exists, already swaps its content by board state, and
-already has an owner and a theme slot.
-
-**The turn banner is not built.** It was the only thing that banner was needed for, so
-nothing above the board is added, and the vertical space it would have taken on small
-screens is not spent.
-
-### Does a tap outside the board clear a pending move?
-**Yes — any tap outside the nine quadrants clears a pending, unconfirmed selection.** That
-includes the legend/how-to-play strip, the scoreboard, the settings button, and opening any
-menu or sheet. One rule, uniformly applied.
-
-The gutters between cells (3pt) and the quadrant padding (5pt) are outside the cells, so a
-near-miss between two cells clears the selection rather than doing nothing. That is the
-accepted cost of the single uniform rule.
-
-### What does the board preview when the selected move would claim its own send target?
-**Every still-open quadrant is highlighted.** Normally, selecting a cell previews the
-quadrant the opponent will be sent to. But if that move would claim or cat-game the very
-quadrant it points at, the quadrant is dead by the time the send resolves and the opponent
-gets a free choice — so there is no single quadrant to ring. The preview shows the truth —
-the opponent may play anywhere still open — rather than showing nothing.
-
-This reuses the free-choice highlight that already exists for the state after such a move
-lands (see **The free-choice state** above), so the preview and the resulting board state
-look consistent. It also teaches the rule at the moment it fires, which matters because
-sending an opponent to a dead quadrant is a real strategic cost that players have to learn.
-
-### What do the scoreboard chips read?
-**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `TIES` between them), not
-`PLAYER ONE` / `PLAYER TWO`.
-
-This does **not** change the settled term for the player — the players are still called
-"Player One" and "Player Two." The chip uses the numeral because that is what every drawn
-screen shows and because the spelled-out form is materially wider in a fixed-width column.
-
-### Does the haptic fire on non-board controls?
-**Yes — every valid tap buzzes, anywhere in the app.** Menu buttons, theme rows, settings
-toggles, the game-over card's controls, the settings gear — not only board cells.
-
-It matches the setting's own name, *Vibrate on Touch*, and it is what three PRDs had
-already assumed while the question was open. The buzz still fires only on a **valid**
-action — an illegal board tap remains silent, which is the existing rule and is unchanged.
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->

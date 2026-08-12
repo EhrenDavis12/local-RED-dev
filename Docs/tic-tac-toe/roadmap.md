@@ -38,27 +38,36 @@ and how a session of many games hangs together.
 - Inspirations / References
 - Modes
 - Terminology (working vocabulary)
-- Decisions
 - Open Questions
 
 ## [Menus and UI](./Menus%20and%20UI.md)
-Menu structure, screen flow, theme selection, settings, persistence, and the game-over
-rematch flow.
+Menu structure, screen flow, navigation, theme selection, settings, persistence, and the
+game-over rematch flow.
 
 **Headings:**
 - Main Menu
+  - About Us
 - Play Game → Where It Takes You
+  - What an open game holds
+  - How many open games we keep
+  - Deleting an open game
 - A New Game → What It Starts
 - Pass-and-Play Turn Handoff
+- How to Play — the On-Board Legend and Hint
 - Screens (so far)
+- Navigation and the Back Stack
 - Theme Selection
 - Settings Menu
+  - Defaults on a fresh install
   - Vibrate on Touch
+  - Purchases
   - How you reach settings from gameplay
+- Dynamic Type
 - Game Over → Rematch
+  - The result card
 - Persistence
+  - When a game is written to storage
   - Leaving a game mid-play
-- Decisions
 - Open Questions
 
 ## [Rules](./Rules.md)
@@ -77,9 +86,9 @@ cases.
   - Sent to a dead quadrant → free choice
   - Big board full with no three-in-a-row → straight draw
 - Turn Order Across Games
+- Engine Contract
 - Variants / Optional Rules
 - Conflicting Ideas (unresolved)
-- Decisions
 - Open Questions
 
 ## [Game Board Design](./Game%20Board%20Design.md)
@@ -100,6 +109,7 @@ haptics.
 - The Two Highlights Together
 - Player Feedback / Affordances
 - Move Input — Tap to Select, Tap Again to Confirm
+  - When the selected move claims its own send target
   - Why this is more than a safety net
   - Changing your mind
   - Confirming
@@ -111,7 +121,6 @@ haptics.
 - Responsive / Screen Size
 - Sketches & Notes
 - Haptic Rule
-- Decisions
 - Open Questions
 
 ## [Theming](./Theming.md)
@@ -158,7 +167,8 @@ The animation vocabulary and how animations tie into the theme system.
 - Animation Sets Are Part of the Theme
 - Where Animations Fire
 - Animations Inherit From Neon
-- Decisions
+- How Animations Play
+- Turning Animations Off
 - Open Questions
 
 ## [Alternative Game Styles](./Alternative%20Game%20Styles.md)

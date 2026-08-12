@@ -9,10 +9,13 @@
 > `design_handoff_game_ui/` is a read-only reference asset — screens `1d`/`1e` draw this
 > strip.
 >
-> **This round:** the cross-axis stretch is named as `IntrinsicHeight` — as specified it
-> would not have compiled; the three label strings get an owner and a file, filling the
-> ellipsis in `P3-01` req 48; and `GameScreen` is cited as **landed text** (`P3-01` reqs
-> 46–52) rather than as an assignment in flight.
+> **This round:** the turn banner is **built** again — `Menus and UI.md` → How to Play — the
+> On-Board Legend and Hint gives it the pending-move prompt, reversing the "not built" this
+> PRD had reasoned from in requirement 6 and listed as closed. No requirement changes: the
+> whose-turn affordance is still the chip highlight, sourced directly to `Game Board Design.md`
+> → Turn Indicator rather than to the banner's absence, and the free-choice cue still lives
+> below the board. Everything about the banner other than *that it exists* and *what it says*
+> is unsettled and now sits in **Open Question 3**.
 >
 > **A fence is a claim that a question is open.** Once the docs answer it, a surviving fence
 > tells the next agent that settled behaviour is optional. Every fence here is re-checked
@@ -143,8 +146,12 @@ its visibility.
 
 6. **The active player's counter is highlighted, and that highlight is the game screen's
    "whose turn it is" affordance.** The active player is `board.currentPlayer` (`P1-02`
-   req 38) — engine state, never derived from move parity. Since the turn banner is not built
-   (Closed 1), this is the only whose-turn mechanism on the screen.
+   req 38) — engine state, never derived from move parity. `Game Board Design.md` → Turn
+   Indicator names this highlight as **the** mechanism for that affordance, so it is the
+   screen's whose-turn signal on its own terms — not by default, for want of anywhere else to
+   put it. **The turn banner is built** (`Menus and UI.md` → How to Play — the On-Board Legend
+   and Hint), but the docs give it the pending-move prompt only and no turn indicator, so it
+   does not change this requirement. See Open Question 3.
    *Source: `Game Board Design.md` → Turn Indicator; → Player Feedback / Affordances ("Needs
    to be unmissable"); `P1-02-engine-rules.md` req 38.*
    *Testable:* with `currentPlayer == Player.one` and `isGameOver == false`, the Player One
@@ -609,6 +616,9 @@ its visibility.
   `P3-01-board-rendering.md` reqs 46–52.
 - **`BoardView` and its highlights** — `P3-01-board-rendering.md`; **the on-board legend,
   hint text and the free-choice cue** — `P3-05-how-to-play.md`.
+- **The turn banner and the pending-move prompt it carries** — built per `Menus and UI.md` →
+  How to Play — the On-Board Legend and Hint, but no part of this strip and given no owner
+  here. Its size, position, styling and theme slot are all unsettled — Open Question 3.
 - **The open-games list and its per-row score chips** — `P4-02-open-games-list.md`.
 - **Real player names.** Requirement 11 keeps the swap cheap; it does not add the feature.
 - **Animating the scoreboard or the turn highlight.** `Animations.md` → Scope For Now scopes
@@ -631,8 +641,10 @@ its visibility.
   (req 51), the game-over overlay (req 52) and the screen's vertical sum.
 - **Who applies `chipLabel.uppercase`?** Each component, at render. `P4-01` req 2 does it for
   the menu; requirement 11 does it here. Duplication to consolidate one day, not an absence.
-- **The turn banner is not built, and the free-choice cue lives below the board.**
-  `surfaces.scoreboard.turnBanner` was **removed in v5**.
+- **The free-choice cue lives below the board, not on the turn banner.** `Game Board
+  Design.md` → The free-choice state, which states it in those words. Unchanged, and not this
+  strip's — `P3-05-how-to-play.md`. *(The turn banner itself is a different matter and is no
+  longer closed — see Open Question 3.)*
 - **`surfaces.scoreboard.turnIndicator`** — **removed in v6**, on this PRD's report.
 - **`surfaces.scoreboard.{padding,gap}`** — **removed in v7** with every spacing key; spacing
   is code. Requirement 21 holds the constants.
@@ -661,3 +673,34 @@ its visibility.
 - **How do the counters read past 99?** Requirement 17 fences ≤99 inside an equal-width
   column. What gives at three digits — a smaller value style, an unequal column, or a cap — is
   unsettled.
+
+### 3. The turn banner — needs the user's call, with no fenced default
+
+`Menus and UI.md` → How to Play — the On-Board Legend and Hint now states that **the turn
+banner is built and carries the pending-move prompt** — *"Play here?"* / *"Tap again to lock
+it in."* — reversing the earlier "not built." Nothing in this PRD's requirements changes as a
+result: the banner is given the prompt, not the turn indicator, and the free-choice cue still
+sits below the board. What the reversal leaves unanswered is everything about the banner
+itself, and none of it is guessable from a doc, so nothing here carries a default:
+
+- **Is the banner part of this strip, or a separate element between it and the board?** This
+  PRD reads it as **not this strip**: no doc attaches the banner to the scoreboard,
+  requirement 21's row is three chips and a button, and requirement 17's height derivation has
+  no banner term. If the banner is meant to live inside `ScoreboardStrip`, requirements 17, 19
+  and 21 all reopen.
+- **Which PRD owns it?** No PRD is named here as its owner, and this one is not claiming it.
+- **How tall is it, and where does that height come from?** Requirement 17 budgets the screen
+  as 874pt less the safe areas, less the 370pt board, less this strip's ≈56pt, less the 14pt
+  gap — ≈320–328pt left over — and accounts for no banner. Whatever the banner's height is, it
+  comes out of that number.
+- **What theme slot does it read?** `P1-03-theme-system.md` removed
+  `surfaces.scoreboard.turnBanner` in v5 on the grounds that the banner was not built. That
+  reasoning is now false, but **the removal stands: there is no banner slot in the schema
+  today.** This PRD neither re-adds one nor assumes one exists. Whether the slot comes back,
+  under that name or another, and which PRD asks for it, is your call.
+- **Does the banner also say whose turn it is?** The approved handoff draws *"Player One,
+  you're up!"* on it, while `Game Board Design.md` → Turn Indicator says the scoreboard
+  highlight is the mechanism for that affordance. This PRD follows the design doc and leaves
+  the whose-turn affordance on the chips (requirement 6). If the banner is meant to carry it
+  too, requirements 6, 7 and 16 reopen — requirement 16's value-inequality check exists
+  precisely because the chip highlight is the *only* whose-turn signal.

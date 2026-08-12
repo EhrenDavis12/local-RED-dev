@@ -20,7 +20,7 @@ here so they don't get re-litigated:
 |---|---|
 | **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. | Two players, one phone; qualified by In-App Purchases and Entitlements |
 | **Local persistence** for 5 values: theme, music, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
-| **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence, Decisions |
+| **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
 | **Haptics** on every valid click | [Game Board Design](./Game%20Board%20Design.md) → Haptic Rule |
 | **A theme system with fallback** — every visual/audio/motion value resolves through the active theme, falling back to Neon | [Theming](./Theming.md) |
@@ -222,9 +222,9 @@ turns this from a discipline into a check.
 — the board, whose turn it is, and the scoreboard — are stored in Hive, not in
 `shared_preferences`.
 
-This is what makes [Menus and UI](./Menus%20and%20UI.md) → Decisions → Does a game in
-progress have to be saved to device storage? and [Game Overview](./Game%20Overview.md) →
-Decisions → Scoreboard lifetime implementable.
+This is what makes [Menus and UI](./Menus%20and%20UI.md) → Persistence and
+[Game Overview](./Game%20Overview.md) → Session Structure — Games and Continuing
+implementable.
 
 ### Serialization and the storage layer
 **`freezed` + `json_serializable` for the domain models in `engine/`, and a `storage/`
@@ -288,8 +288,8 @@ this doc.
 
 **The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
 vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
-[Theming](./Theming.md) → Free and Paid Themes, and
-[Menus and UI](./Menus%20and%20UI.md) → Decisions → How many open games do we keep.
+[Theming](./Theming.md) → Free and Paid Themes, and [Menus and UI](./Menus%20and%20UI.md)
+→ Play Game → Where It Takes You → How many open games we keep.
 
 **Consequence for offline status:** in-app purchases require StoreKit, which needs network
 access and a restore-purchases path tied to the Apple ID. StoreKit is the one exception to
@@ -410,9 +410,9 @@ complete enumeration of that slot inventory:
 | **Piece styles** | Hardcoded `'X'`/`'O'` strings and `Icons.*` anywhere outside the theme layer |
 | **Sounds and backgrounds** | Literal `assets/…` paths outside the theme layer |
 
-Durations are in scope because [Animations](./Animations.md) → Decisions → Duration lives
-in the animation puts timing inside the theme's animation definitions, so a hardcoded
-`Duration` is a theme value that escaped.
+Durations are in scope because [Animations](./Animations.md) → How Animations Play puts
+timing inside the theme's animation definitions, so a hardcoded `Duration` is a theme
+value that escaped.
 
 PRD review found several of these indicative patterns miss the idiomatic forms this
 project actually decided on, and this is a finding to sharpen rather than a redesign: the

@@ -1,7 +1,7 @@
 # Rules
 
-> **Status:** Brain dump. Contradictions are expected and OK. Nothing here is settled except
-> what's under **Decisions**.
+> **Status:** Brain dump. Contradictions are expected and OK. What's settled is stated in
+> present tense; anything unsettled is in **Open Questions**.
 >
 > **Approved UI design:** `Docs/tic-tac-toe/design_handoff_game_ui/README.md` —
 > [Design Handoff](./design_handoff_game_ui/README.md). Game logic stays in this doc;
@@ -85,6 +85,11 @@ small board can't be played. Instead:
 - Any still-open quadrant is fair game.
 - This is the same kind of freedom the first player has on the opening move.
 
+**The send resolves against the board as it stands *after* the move that triggers it.** A
+quadrant the move just claimed or cat-gamed is dead exactly the same as one that was
+already dead beforehand — so play the centre cell of quadrant 5, and if that same move
+completes three in a row *in* quadrant 5 and claims it, the opponent gets a free choice.
+
 Design consequence: sending your opponent to a dead quadrant **hands them a free choice**,
 which is a real strategic cost. Players will learn to avoid it — and sometimes to use it
 deliberately.
@@ -103,50 +108,24 @@ If the whole big board fills and nobody has three claimed quadrants in a row, it
 
 Note that going first is an advantage — you pick the opening quadrant — so this hands the
 advantage to whoever is already ahead.
+A tie doesn't pass the first-move advantage — it stays where it was.
 
-## Variants / Optional Rules
-<!-- House rules, difficulty toggles, alt win conditions -->
-
-## Conflicting Ideas (unresolved)
-<!-- Two rules that can't both be true yet. Keep both here until we pick. -->
-
-## Decisions
-
-### Does the opening move send the opponent?
-**Yes — the cell the first player plays sends the second player, exactly as on every later
-move. There is no exception for move 1.** This resolves a contradiction: this doc's old
-*Second player* bullet said the second player must play in the big quadrant the first
-player selected (no sending), while [Game Overview](./Game%20Overview.md) → Core Concept
-stated the sending rule with no exception. The sending rule now applies uniformly.
-
-### Who goes first after a tie?
-**The player that went first last time for the tie game goes first again.** A tie doesn't
-pass the first-move advantage — it stays where it was.
-
-That completes the turn order rule across games: first game → Player One; after a win →
-the winner; after a tie → whoever went first in the tied game.
-
-### Does a move that claims its own send target still send there?
-**The send is evaluated against the board *after* the claim.** Example: play the centre
-cell of quadrant 5, and that same move completes three in a row *in* quadrant 5, claiming
-it. The quadrant is dead by the time the send resolves, so the opponent gets a **free
-choice** of any still-open quadrant.
-
-This is not an exception to *Sent to a dead quadrant → free choice* above — it's the same
-rule applying. The send always resolves against the board as it stands after the move that
-triggers it, and a quadrant that move just claimed (or cat-gamed) is dead exactly the same
-as one that was already dead beforehand.
-
-### What happens if an illegal move reaches the engine?
-**The engine throws.** An illegal move, or any move applied to an already-finished game,
-raises rather than returning silently. *"I think failing loud and throwing an error is
-correct when in theory the UI should never allow it to begin with."*
+## Engine Contract
+**The engine throws on an illegal move.** An illegal move, or any move applied to an
+already-finished game, raises rather than returning silently. *"I think failing loud and
+throwing an error is correct when in theory the UI should never allow it to begin with."*
 
 The UI already prevents illegal moves reaching the engine — locked cells absorb taps — so
 this is a defensive contract rather than a routine path. A throw surfaces a real defect
 loudly instead of silently returning stale state. The already-finished-game case is
 worth naming explicitly, since it is the one where a silent return risks counting a game
 twice.
+
+## Variants / Optional Rules
+<!-- House rules, difficulty toggles, alt win conditions -->
+
+## Conflicting Ideas (unresolved)
+<!-- Two rules that can't both be true yet. Keep both here until we pick. -->
 
 ## Open Questions
 <!-- Nothing outstanding on this doc right now. -->

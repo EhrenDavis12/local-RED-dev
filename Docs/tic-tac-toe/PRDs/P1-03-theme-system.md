@@ -42,6 +42,16 @@
 > **Schema version 10.** The last open contradiction with `Tech Design.md` closed when its
 > guard table dropped the "inside board widgets" scoping; Requirement 25 and that doc now
 > agree.
+>
+> **Revised again for a user reversal — the turn banner is built after all.** `Menus and
+> UI.md` → *How to Play — the On-Board Legend and Hint* now states that the banner **is**
+> built and carries the pending-move prompt. That destroys the premise v5 removed
+> `surfaces.scoreboard.turnBanner` on. **The key is not restored**, because no design doc
+> says what the banner needs themed, and a half-shaped row in a normative schema is the
+> `*Style` deadlock again (Appendix A.2). Requirement 15's *Not in the schema* table now
+> records a **gap** rather than a ruling, Requirement 37 records why **no version bump is
+> owed**, and the shape is **Blocking item 8**. **Still schema version 10 — nothing about
+> the schema changed.**
 
 **Wave:** P1 · **File:** `P1-03-theme-system.md`
 
@@ -575,7 +585,11 @@ value the approved design defines, plus the short list the design settled withou
     **What changed and why.** The action key previously carried `labelStyle` and `icon`. Both
     are gone: the Decision specifies *"a trash button — an icon, not a worded 'Delete'
     label,"* so **there is no label to style**, and the glyph now has its own slot. A component
-    key with no reader comes out — the same test `turnBanner` and `turnIndicator` failed.
+    key with no reader comes out — the same test `turnIndicator` failed in v6.
+    **`turnBanner` is no longer an example of that test.** It was removed in v5 for the same
+    reason, but the premise has since been reversed: `Menus and UI.md` → *How to Play — the
+    On-Board Legend and Hint* states the banner **is** built, so it will have a reader. Its
+    key is still absent only because nothing settles its shape — Open Question 8.
     **The modal's other button is not a new key.** Its choices are **Yes and No**: **Yes** is
     `surfaces.destructive.confirmAccept`, **No** is the existing `surfaces.button.secondary`,
     and the dialog's chrome is `surfaces.modal` over `surfaces.scrim.modal`.
@@ -635,7 +649,7 @@ value the approved design defines, plus the short list the design settled withou
     | **spacing and padding** | **Decided against** — the guard cannot verify it. Hedged *"for now"* |
     | fill patterns / textures | **not supported** — Requirement 21 |
     | `surfaces.destructive.action.labelStyle` | **removed in v8** — the control is an icon, not a word |
-    | `surfaces.scoreboard.turnBanner` | **removed in v5** — the banner is not built |
+    | `surfaces.scoreboard.turnBanner` | **absent, but not ruled out — this row is a gap, not a ruling.** Removed in v5 because *"the banner is not built"*; `Menus and UI.md` → *How to Play — the On-Board Legend and Hint* now states it **is** built and carries the pending-move prompt, so that reason is dead. The key is not restored here because **no design doc says what the banner needs themed** — Open Question 8 |
     | `surfaces.scoreboard.turnIndicator` | **removed in v6** — no reader |
     | `surfaces.deleteDialog.*` | never existed — the confirmation reuses `surfaces.modal` |
     | a `music.<context>` map | **not taken** — the user settled music as **one `sound.music` key, app-wide**, so a per-screen map is ruled out rather than deferred. Requirement 17 |
@@ -878,6 +892,7 @@ value the approved design defines, plus the short list the design settled withou
     | startup materialization | no | *"changed no key, no shape and no status"* |
     | `glyph` as a third mark `kind` | no | the set was already written that way — no structural change |
     | **v10 — `*Style` as inline object** | **yes** | **shape**, squarely |
+    | **the turn-banner reversal** | **no** | **no key, shape or status changed.** The design docs reversed *whether the banner is built*, not what the schema holds; `surfaces.scoreboard.turnBanner` was absent before and is absent after |
 
     **It is a shape change, not a meaning change, and the distinction is mechanical.** Under
     `ref`, `surfaces.legend.hintStyle` is a **string** — one YAML scalar, one leaf. Under
@@ -906,6 +921,16 @@ value the approved design defines, plus the short list the design settled withou
     shape and no status, and Requirement 8 already said "at startup."
     **There is no migration:** the only theme file in existence is Neon's, and Requirement 13
     writes it fresh this wave.
+
+    **No bump for the turn-banner reversal, and version row 5 stays exactly as written.**
+    The design docs reversed *whether the banner is built*; they changed no key path, no
+    shape and no status here, so the rule above gives no bump. Row 5 records what v5 did, and
+    v5 genuinely did remove `turnBanner` — this table is a record of versions, not of what is
+    currently believed, and editing row 5 would be a decision log run backwards. The reversal
+    is recorded where it belongs instead: as a **gap** in the *Not in the schema* table and as
+    **Blocking item 8**. **A version row becomes owed the moment item 8 is answered**, when a
+    key path with a declared shape and status enters the schema and Requirement 11's manifest
+    gains leaf paths — the v9 test, met. Noted here so the next author bumps then, not now.
 
 ## Out of Scope
 
@@ -1005,9 +1030,14 @@ path resolving is not evidence that anything should read it.
 
 ## Open Questions
 
-**None of the below blocks a landed consumer from compiling against this PRD.** Item 7 is the
-closest: `P4-04` can build its purchases section but has no styling source for it. It is
-*ugly*, not *impossible*, by A.2's rule.
+**None of the below blocks a landed consumer from compiling against this PRD** — every
+requirement here stands as written whatever the answers are. Item 7 is the closest of the
+*ugly* ones: `P4-04` can build its purchases section but has no styling source for it.
+
+**Item 8 is the exception and is a different class.** It does not block this PRD, whose schema
+is unchanged, but it is *impossible* rather than *ugly* by A.2's rule for whoever builds the
+turn banner: there is no slot to read and no literal permitted, so that work has no legal
+implementation until the item is answered.
 
 ### Blocking — needs the user
 
@@ -1091,6 +1121,47 @@ closest: `P4-04` can build its purchases section but has no styling source for i
 7. **Should `surfaces.settingsCard.purchases.*` become `required` (authored)?** It sits where
    `surfaces.destructive` sat — a required reader and a settled placement, but nothing drawn,
    and no Decision describes what the section *is*.
+8. **The turn banner is built again — what does it need from the theme?**
+
+   `Menus and UI.md` → *How to Play — the On-Board Legend and Hint* now states: *"The turn
+   banner is built, and it carries the pending-move prompt"* — the two lines *"Play here?"*
+   and *"Tap again to lock it in."* shown when a player taps a square to preview a move
+   before confirming it. **That settles that the banner exists and what prompt it carries.
+   It does not settle what a theme has to define for it**, and no other design doc does
+   either — `Theming.md` never names the banner, and `Game Board Design.md` mentions it only
+   to say the free-choice cue does *not* live there.
+
+   So `surfaces.scoreboard.turnBanner` is **not** restored. Two things have to be known
+   before a key path can be written, and neither is answerable by reading:
+
+   1. **Is the banner on screen for the whole game, or only while a move is pending?** This
+      decides the key count, not just its values. *Pending-only* needs one neutral treatment
+      and the two prompt lines. *Always-on* needs a per-player set as well — the scoreboard
+      chips already pay that cost, one `active` and one `inactive` treatment per player,
+      because a shared one could not express the turn highlight.
+   2. **What does the banner draw besides the two prompt lines?** The two lines are settled;
+      nothing else about the banner's contents is. Whether it also carries a whose-turn line,
+      a swatch or a mode cue each adds its own slot, and the design docs name none of them.
+
+   **Why this PRD will not answer it from the drawings.** `design_handoff_game_ui/README.md`
+   draws a banner on `1d`, `1e` and `2d`, with a per-player tint, a *"Player One, you're
+   up!"* line and a mode cue on the first two, and a neutral dashed treatment with the two
+   prompt lines on `2d`. Transcribing that would answer both questions above by accident and
+   in the *always-on, four-element* direction. **This PRD has been bitten by exactly that
+   before** — Appendix A.1b records five animation keys that were `required`, authored and
+   green while the app animated five things the docs say it does not animate, and the rule
+   that came out of it is that the handoff is a **drawing, not a decision**. Requirement
+   13(a) scopes transcription for the same reason.
+
+   **What it costs to leave open.** Nothing in this PRD, and nothing in wave 1 — the schema
+   is unchanged and no requirement moves. It is *impossible*, not *ugly*, for whoever builds
+   the banner: with no slot to read and no literal permitted (`Theming.md` → *Architectural
+   Rule*), there is no legal implementation, so that work cannot ship rather than shipping
+   unstyled. Answering it costs a version bump and Neon authoring one block (Requirement 37).
+
+   **What the answer changes here:** a new `surfaces.scoreboard.turnBanner` block in
+   Requirement 15, its row leaving the *Not in the schema* table, a `required`/`deferred`
+   call, Requirement 13's Neon contents, Requirement 11's manifest, and a schema version row.
 
 ### From the design docs — carried, not resolved
 
@@ -1118,10 +1189,12 @@ closest: `P4-04` can build its purchases section but has no styling source for i
   Requirement 15 keeps all five `deferred` for exactly that reason.
 - **Unknown or misspelled keys inside a valid theme file** — Requirement 32 catches malformed
   files and bad versions, not bad keys inside a good one.
-- **Resolved earlier:** spacing and padding (v7), the three lookup paths (Requirement 24), the
-  turn banner (v5), theme discovery and per-file name/blurb (Requirement 32), chrome icons,
-  and the `Tech Design.md` guard-table scoping — its table now reads *"`Icons.*` anywhere
+- **Resolved earlier:** spacing and padding (v7), the three lookup paths (Requirement 24),
+  theme discovery and per-file name/blurb (Requirement 32), chrome icons, and the
+  `Tech Design.md` guard-table scoping — its table now reads *"`Icons.*` anywhere
   outside the theme layer"*, so nothing is outstanding against Requirement 25.
+  **The turn banner has left this list.** It was resolved in v5 on a premise the design docs
+  have since reversed, and is now Blocking item 8.
 - **The exact slot schema.** Requirement 15 is this PRD's answer, structure ratified. Writing
   it, the chrome-icon Decision, the spacing boundary and now the settled music shape into
   `Theming.md` is `forge-doc-writer`'s to route.
