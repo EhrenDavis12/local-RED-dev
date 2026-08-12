@@ -126,7 +126,7 @@ Neon theme.**
 
 Same model as every other theme value: a theme starts from Neon's complete animation set
 and its own definitions merge over the top, overriding only what it names. See
-[Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
+[Tech Design](./Tech%20Design.md) → The Theme System.
 
 ### One animation at a time
 Animations **never overlap**. Strictly one at a time.

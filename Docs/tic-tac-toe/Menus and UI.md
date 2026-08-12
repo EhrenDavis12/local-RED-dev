@@ -283,8 +283,8 @@ on it.
 
 So there are five persisted preferences — theme, music, sound, vibration, and animations —
 plus game state: every open game is saved, each with its own scoreboard. How that gets
-stored is settled in [Tech Design](./Tech%20Design.md) → Decisions — preferences in
-`shared_preferences`, game state in Hive.
+stored is settled in [Tech Design](./Tech%20Design.md) → Persistence and Serialization
+— preferences in `shared_preferences`, game state in Hive.
 
 ### Leaving a game mid-play
 Since a game in progress is saved, going back to the main menu doesn't discard anything —
@@ -347,7 +347,7 @@ the top of that open-games list.
 
 ### Does a game in progress have to be saved to device storage?
 **Yes — a game in progress is saved to device storage.** How it is stored is answered in
-[Tech Design](./Tech%20Design.md) → Decisions → Game state storage — Hive.
+[Tech Design](./Tech%20Design.md) → Persistence and Serialization.
 
 ### What does each row in the open-games list show?
 **The list shows New Game plus any open games, and each open game is titled with the

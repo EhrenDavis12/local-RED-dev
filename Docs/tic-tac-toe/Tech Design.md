@@ -1,7 +1,6 @@
 # Tech Design
 
 > **Status:** Brain dump / early tech decisions. Contradictions are expected and OK.
-> Nothing here is settled except what's under **Decisions**.
 >
 > This doc covers *how we build it*. What we're building lives in
 > [Game Overview](./Game%20Overview.md), [Rules](./Rules.md),
@@ -13,79 +12,215 @@
 > per-game data shape and its *Assets* section names concrete font and icon dependencies.
 > Reference asset — read-only.
 
-## Decisions
+## What the Design Docs Already Imply
+Some technical requirements are already locked by decisions made elsewhere. Listing them
+here so they don't get re-litigated:
 
-### Framework — Flutter
-**Flutter.** Already in use for the game.
+| Requirement | Comes from |
+|---|---|
+| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. | Two players, one phone; qualified by In-App Purchases and Entitlements |
+| **Local persistence** for 5 values: theme, music, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
+| **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence, Decisions |
+| **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
+| **Haptics** on every valid click | [Game Board Design](./Game%20Board%20Design.md) → Haptic Rule |
+| **A theme system with fallback** — every visual/audio/motion value resolves through the active theme, falling back to Neon | [Theming](./Theming.md) |
+| **Animations toggleable off entirely**, with instant state changes instead | [Animations](./Animations.md) |
+| **Portrait phone layout**, whole 9x9 board visible, no zoom | [Game Board Design](./Game%20Board%20Design.md) |
 
-### App name
-**"Tic Tac Toe Extreme."** 20 characters, inside Apple's 30-character App Store limit. The
-approved handoff draws it as a kicker/wordmark split (`TIC TAC TOE` over `EXTREME`) on
-screen `1a`.
+## Platform and Targets
 
-### Primary target — Apple
+**Flutter and Dart.** Already in use for the game, and Dart comes with Flutter.
+
 **iOS is the primary target as of right now.** Android is supported by virtue of Flutter,
 but Apple is what we're building and testing against first.
 
 Practical meaning: when a platform question comes up, iOS wins. Android is a
 build-target, not a design constraint.
 
-### Language — Dart
-**Dart.** Comes with Flutter.
+The ordering, as stated: **"We will want to port our game over to every devices. iPhone
+will be the primary target iPads next then will want to branch out to all media devices.
+such as Android in the far future."**
 
-### Theme representation — data, not code
-**Themes are data — a JSON or YAML object loaded at runtime**, not a Dart class compiled
-into the app. A universal, theme-like object that can be loaded in.
+Concretely: **iPhone first, iPad second, Android far future.** "All media devices" is
+recorded as stated and is not yet scoped to particular platforms.
 
-### What format are theme files — JSON or YAML?
-**YAML.**
+### Minimum iOS version
+**iOS 15.** The in-app purchase layer is built on StoreKit 2 —
+`Transaction.currentEntitlements`, `Transaction.updates` and `AppStore.sync()` — and those
+APIs require iOS 15.
 
-### Theme identity — UUID
+**Watch out for:** the floor cannot be lowered. Below iOS 15 the plugin falls back to
+StoreKit 1, which has no `currentEntitlements` and whose restore returns queue transactions
+that do not cleanly exclude revoked purchases — so a refunded player would keep permanent
+access, and it fails silently rather than as a build error.
+
+### Orientation — portrait only
+**Portrait only.** No landscape.
+
+### Fresh build, not a refactor
+**A fresh build.** Nothing from the earlier Flutter work carries into this design —
+everything in this doc describes something being built new, not refactored toward.
+
+## Project Structure
+
+**Layer-first.** Group by kind, not by feature:
+
+```
+lib/
+  main.dart
+  app.dart
+  engine/          ← pure Dart, zero Flutter imports
+    board.dart
+    rules.dart
+  storage/         ← repository interface + Hive implementation
+  theme/
+    theme.dart     ← merged theme object
+    loader.dart    ← YAML → theme
+  state/           ← Riverpod providers
+  navigation/      ← the app's routing layer
+  audio/           ← sound playback, owned by P2-02-audio
+  haptics/         ← haptic feedback, owned by P2-03-haptics
+  entitlements/    ← StoreKit entitlement state, owned by P1-07-entitlements
+  diagnostics/     ← crash catching/reporting, owned by P1-06-crash-reporting
+  purchase/        ← store integration, owned by P4-05-purchase-flow
+  ui/
+    board/
+    menus/
+assets/
+  themes/*.yaml
+  images/
+  audio/
+```
+
+`storage/` is local persistence only — the repository interface and its Hive
+implementation (see **Persistence and Serialization** below). There is **no backend data
+layer**: nothing in the app talks to a server. Online multiplayer is an intended future
+direction, so tech choices must not foreclose syncing board state over a network — a
+backend layer gets added if multiplayer arrives.
+
+`navigation/` holds the app's routing layer — see **Navigation** below. It is
+Flutter-side, same as `ui/` and `state/` — nothing here changes the `engine/` purity rule.
+What goes inside the layer beyond that is a PRD's job, not this doc's.
+
+`assets/themes/`, `assets/images/` and `assets/audio/` are the **designated folders for
+assets** required by **Audio and Assets** below.
+
+`audio/`, `haptics/`, `entitlements/`, `diagnostics/` and `purchase/` follow the same
+one-folder-per-layer convention, each owned by the PRD named in the tree above. File names
+inside each are that PRD's to decide, not this doc's.
+
+## The Rules Engine
+
+**The rules engine is separate from Flutter.** Board state, legal moves, sending rule,
+win/cat-game detection and free-choice state are **pure Dart with zero Flutter imports**,
+and the UI layer reads from it.
+
+**Game state is immutable.** The engine never mutates a board in place — every move
+produces a new state object, and that new object is what the UI renders.
+
+The API is `Board applyMove(Board, Move)` returning new state, not `board.play(move)`
+mutating in place — so the pure-Dart engine and the Riverpod layer agree on how state
+changes.
+
+## State Management
+
+**Riverpod, without Riverpod's own codegen to start.** Plain `NotifierProvider`
+declarations, no `@riverpod` annotations. Riverpod codegen can be adopted later without
+rewriting the logic.
+
+It also covers the requirement that settings and the theme be readable from
+**everywhere**, including deep in the board widget tree.
+
+**Watch out for:** fey-tactics uses `StateNotifier`, which is the legacy API. Use
+`Notifier`/`NotifierProvider` — fey-tactics is a reference for the sync shape, not for
+the API surface.
+
+## Navigation
+
+**The app has an explicit navigation layer, and the routing package is `go_router`.** The
+user asked for the choice that serves the end objective of building larger games, made
+once and correctly rather than as a stopgap: *"I want to pick the navigation layer that
+solves for the full problems this application can have. Something that is not just
+temporary but the right choice for the end objective of building larger games… Lets get
+this right the first time."*
+
+Why: it is the Flutter team's recommended routing package; it is declarative, so routes
+are described rather than imperatively pushed; it handles deep links and the browser URL
+bar without rework; it supports nested and shell navigation, which is what larger games
+need for persistent chrome; and it scales past this game's six screens without a second
+migration.
+
+Consequences, recorded honestly rather than as caveats:
+- It adds a dependency, which `P1-01`'s exhaustive dependency list has to carry.
+- Dismissing a route becomes `context.pop()` rather than `Navigator.pop`, so the
+  navigation layer's internals are shaped by this choice even though its public
+  operations are not.
+
+The route table and route paths are not designed here — that is a PRD's job.
+
+## Rendering the Board
+
+**The board is rendered with widgets.** *"ok widgets is the winner lets make that
+happen."* 81 `GestureDetector`s in nested `GridView`/`Column`s, not a `CustomPainter`.
+
+**Watch out for:** nested `Border.all` doubles interior grid lines — two adjacent 1px
+borders read as 2px — and hairlines can look uneven at fractional device pixel ratios.
+The known fix is a hybrid: widgets for cells and marks, plus one thin `CustomPaint`
+overlay drawing only the grid lines. That is an escape hatch, not a decision taken.
+
+### Marks — supplied by the theme
+**Marks are asset slots on the theme, not shapes drawn in board code.** The theme supplies
+the mark art; board code places it and draws nothing itself. Which kinds of art a theme
+may supply — and why an image is the real answer for a theme — is
+[Theming](./Theming.md) → What a Theme Controls.
+
+## The Theme System
+
+**Themes are data — a YAML object loaded at runtime**, not a Dart class compiled into the
+app. A universal, theme-like object that can be loaded in.
+
 **Each theme carries a UUID in its YAML file, and that UUID is the theme's identity.**
 *"the themes should be saved by UUID in the YAML files."*
 
 The persisted "selected theme" preference stores the UUID, not the theme's name. See
 [Theming](./Theming.md) → Choosing a Theme.
 
-### Fallback to Neon — merge, not resolve
 **Merge over Neon.** Each theme is materialized into a complete theme by merging it over
 Neon.
 
 ### Flutter's ThemeData vs our own theme object
 **Use Flutter's `ThemeData`/`ThemeExtension` as far as possible**, filled out from our
-theme JSON/YAML file. The remaining parts, not supported by the Flutter theme, we
-implement ourselves.
+theme YAML file. The remaining parts, not supported by the Flutter theme, we implement
+ourselves.
 
 Sounds and animations live in the **same theme object** — not a parallel structure. We
 give Flutter's `ThemeData` what we can and handle the rest ourselves, all from the same
 file.
 
-### Orientation — portrait only
-**Portrait only.** No landscape.
+### Themes pick their own font
+**A font is a themeable value like any other**, and the theme object needs somewhere to
+put one. See [Theming](./Theming.md) → Architectural Rule.
 
-### Minimum iOS version
-**iOS 15.** The in-app purchase layer is built on StoreKit 2 —
-`Transaction.currentEntitlements`, `Transaction.updates` and `AppStore.sync()` — and those
-APIs require iOS 15. At an iOS 13 floor the purchase layer was unbuildable as specified,
-and the silent failure was worse than a build error: below iOS 15 the plugin falls back to
-StoreKit 1, which has no `currentEntitlements` and whose restore returns queue transactions
-that do not cleanly exclude revoked purchases — so a refunded player would keep permanent
-access.
+Inter 400/500/600 is bundled as **Neon's** font choice, not an app-wide font constant. See
+[Theming](./Theming.md) → What a Theme Controls.
 
-### Is the game logic separate from Flutter?
-**Yes.** The rules engine — board state, legal moves, sending rule, win/cat-game detection,
-free-choice state — is **pure Dart with zero Flutter imports**, and the UI layer reads from
-it.
+### The theme system is the main architectural risk
+> *"All of our code operates off of the theme. No code should be operating independently
+> from the selected theme."*
 
-### Persistence package
-**`shared_preferences` — for the five player preferences.**
+This is the one constraint that touches every file, and it's the one that's expensive to
+retrofit. Whatever we choose for state management and widget structure has to make
+"every value comes from the theme" the *easy* path, not a discipline we have to maintain
+by hand.
 
-Game state does not go here. It is saved too, in Hive — see **Game state storage — Hive**
-below.
+The countermeasure is the hardcoded-theme-value test — see **Testing** below. That is what
+turns this from a discipline into a check.
 
-### Game state storage — Hive
-**Hive.** Open games — the board, whose turn it is, and the scoreboard — are stored in
-Hive, not in `shared_preferences`.
+## Persistence and Serialization
+
+**`shared_preferences` for the five player preferences, Hive for game state.** Open games
+— the board, whose turn it is, and the scoreboard — are stored in Hive, not in
+`shared_preferences`.
 
 This is what makes [Menus and UI](./Menus%20and%20UI.md) → Decisions → Does a game in
 progress have to be saved to device storage? and [Game Overview](./Game%20Overview.md) →
@@ -96,65 +231,25 @@ Decisions → Scoreboard lifetime implementable.
 layer holding a repository interface with a Hive implementation that stores JSON. No Hive
 `TypeAdapter`s.**
 
-Three consequences worth naming, because they cut across other Decisions:
+Two consequences worth naming, because they cut across other sections:
 
-- **`storage/` is a new layer** in **Project structure — layer-first** below.
 - **`hive_flutter` is not pure Dart, so it must never be imported from `engine/`.**
   `storage/` owns it.
 - **Serialization lives with the model.** `toJson`/`fromJson` are generated into `engine/`
   by json_serializable — pure Dart, Flutter-free — while the Hive box, adapters-free,
   lives in `storage/`.
 
-This does not change **Game state storage — Hive** above; Hive is still the store. It
-decides what gets written into it, and who is allowed to know it is Hive.
-
 <!-- A candidate shape for the persisted Game object — cells, quadrants, activeQuadrant,
      currentPlayer, lastMove, score, firstPlayerThisGame — is sketched in Design Handoff →
      State (Docs/tic-tac-toe/design_handoff_game_ui/README.md). It is a design sketch, not
      a decision taken here. -->
 
-### Unit tests for the rules engine
-**Yes — this is where the real complexity is.**
+## Audio and Assets
 
-### Do themes pick their own font?
-**Yes.** A font is a themeable value like any other, and the theme object needs somewhere
-to put one. See [Theming](./Theming.md) → Architectural Rule.
+**`audioplayers`** for sound playback.
 
-Inter 400/500/600 is bundled as **Neon's** font choice, not an app-wide font constant. See
-[Theming](./Theming.md) → What a Theme Controls.
-
-### How is the board rendered?
-**Widgets.** *"ok widgets is the winner lets make that happen."*
-
-81 `GestureDetector`s in nested `GridView`/`Column`s, not a `CustomPainter`.
-
-**Watch out for:** nested `Border.all` doubles interior grid lines — two adjacent 1px
-borders read as 2px — and hairlines can look uneven at fractional device pixel ratios.
-The known fix is a hybrid: widgets for cells and marks, plus one thin `CustomPaint`
-overlay drawing only the grid lines. That is an escape hatch, not a decision taken.
-
-### Audio package
-**`audioplayers`.**
-
-### Marks — supplied by the theme
-**Marks are asset slots on the theme, not shapes drawn in board code.** The theme supplies
-the mark art; board code places it and draws nothing itself. Which kinds of art a theme
-may supply — and why an image is the real answer for a theme — is
-[Theming](./Theming.md) → What a Theme Controls.
-
-### Device support
-**"We will want to port our game over to every devices. iPhone will be the primary target
-iPads next then will want to branch out to all media devices. such as Android in the far
-future."**
-
-Ordering, concretely: **iPhone first, iPad second, Android far future.** This refines
-**Primary target — Apple** above rather than replacing it — iOS still wins any
-platform question today.
-
-"All media devices" is recorded as stated and is not yet scoped to particular platforms.
-
-### Where do sound and art assets come from?
-**Generated with Replicate when we actually need them — not now.** This answers both the
+### Where sound and art assets come from
+**Generated with Replicate when we actually need them — not now.** This covers both the
 sound assets (the Neon buzz, the Classic splat) and the art (the logo): *"I have used
 Replicate in the past so will need to build out a clean Replicate API calling mechanism
 for this."*
@@ -189,15 +284,118 @@ this doc.
      Neither is Replicate-generated. See
      Docs/tic-tac-toe/design_handoff_game_ui/README.md. -->
 
-### Do we add a test that fails on hardcoded theme values?
-**Yes — add it, covering the slot inventory the Architectural Rule names.** An ordinary
-test in the suite, not a custom analyzer plugin. It scans the source under `lib/` for
-banned patterns outside the theme layer itself, and it holds a per-file baseline that
-fails when a new violation appears. There is no application code yet, so **the baseline
-starts at zero**.
+## In-App Purchases and Entitlements
 
-<!-- "The theme layer" is concretely `lib/theme/`. See Decisions → Project structure —
-     layer-first. -->
+**The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
+vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
+[Theming](./Theming.md) → Free and Paid Themes, and
+[Menus and UI](./Menus%20and%20UI.md) → Decisions → How many open games do we keep.
+
+**Consequence for offline status:** in-app purchases require StoreKit, which needs network
+access and a restore-purchases path tied to the Apple ID. StoreKit is the one exception to
+**Fully offline** under **What the Design Docs Already Imply** above.
+
+### Entitlements — Apple stores them, no backend needed
+**No receipt-validation server, and no backend of ours.** StoreKit provides
+`Transaction.currentEntitlements` — the set of currently-valid transactions for this app
+under the signed-in Apple ID, cryptographically signed by Apple and verified on device.
+That is the authoritative answer to "does this player own this." `Transaction.all` gives
+full purchase history if it is ever needed.
+
+Restore for non-consumables is largely automatic: signing in on a new device repopulates
+entitlements without the player doing anything. The visible **Restore purchases** control
+is still required by Apple's review guidelines, and `AppStore.sync()` is the explicit call
+behind it — so the control is a compliance requirement more than a functional one.
+
+On-device verification is sufficient for an app this size.
+
+**Consequence for the architecture: Apple is the record of truth and it is queryable at
+runtime.** Any locally stored entitlement state is an offline convenience, not the record.
+A refunded or lapsed purchase simply stops appearing in `currentEntitlements` — that is what
+answers "what happens when an entitlement goes away."
+
+**The entitlement provider's shape — last-known plus refresh.** Entitlement state is exposed
+as a plain value, seeded from the locally cached copy and refreshed when the store answers —
+not as an async wrapper every consumer must branch on. This is the same class of decision as
+**State Management** above.
+
+Consequences:
+- Consumers never handle a "pending" case; they always get a usable answer.
+- A paying player never sees their purchased content as locked while a query is in flight —
+  which is the failure the alternative produces.
+- The value carries an indication of whether it is still provisional, so a consumer that
+  cares can tell.
+
+## Kids Category
+
+**The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
+changes what gets built in features that ship long before release work:
+
+- A **parental gate** is required before any purchase flow and before any link that leaves
+  the app.
+- Third-party analytics and behavioural advertising are restricted.
+- A privacy policy is mandatory.
+
+These reach the purchase flow and theme-selection features directly, and the gate has to
+exist before those are built rather than being added at submission.
+
+A separate, consequent fact: the age rating is **4+.**
+
+**The parental gate's scope is purchases only.** The game has no outbound links today — no
+in-app support URL, no social links, no advertising — so purchases are the only trigger that
+currently exists. If an outbound link is ever added, it needs the gate too — that is a thing
+to remember rather than a thing already handled. What the gate looks like and how it
+challenges is a PRD's job, not this doc's.
+
+## Crash Reporting
+
+**Catch errors and construct the crash-report object from the start. Do not transmit it.**
+As stated:
+
+> *"I have nowhere to send the data. I think it would be good to set the game up to handle
+> this putting in the catches now from the start to build out the crash report. We just
+> won't send it out just yet. We will come up with where it will be sent to later. But for
+> now just catch and build out the object. Just don't send it. yet"*
+
+So the error handling and the report object are day-one work; the transport is not. The
+destination is deliberately left for later rather than being an open question — today's
+answer is "nowhere."
+
+This keeps **Fully offline, except for in-app purchases.** under **What the Design Docs
+Already Imply** above true for now. StoreKit being permitted does not make a report
+destination permitted — those are two separate exceptions, and this one stops being true
+the day a destination is chosen.
+
+### What a crash report captures
+**The error, the stack trace, and a timestamp. Nothing else.** No game state, no screen,
+and specifically no opponent name — no text a player has typed.
+
+This is about more than debugging convenience: the app is in the **Kids category**, and in
+a 4+ app *transmitting* personal data is itself the regulated act, not merely something a
+privacy label declares. Capturing nothing personal means that if a destination is ever
+added later, no consent flow is required — the decision keeps a future option open rather
+than only satisfying today's rules.
+
+Named cost: reproducing a bug that depends on board position or which screen the player was
+on becomes harder, because the report will not say.
+
+## Testing
+
+### Unit tests for the rules engine
+The rules engine gets unit tests — **this is where the real complexity is.**
+
+### Widget tests for the board — no golden tests
+**Widget tests, no goldens.** Test that taps do the right thing and that the highlight
+states appear. Skip golden image tests.
+
+### A test that fails on hardcoded theme values
+**The suite carries a test that fails on hardcoded theme values, covering the slot
+inventory the Architectural Rule names.** An ordinary test in the suite, not a custom
+analyzer plugin. It scans the source under `lib/` for banned patterns outside the theme
+layer itself, and it holds a per-file baseline that fails when a new violation appears.
+There is no application code yet, so **the baseline starts at zero**.
+
+<!-- "The theme layer" is concretely `lib/theme/`. See Project Structure. -->
 
 The scope comes from [Theming](./Theming.md) → Architectural Rule, which derives its slot
 list from what the screens actually consume rather than a closed category list. Indicative
@@ -224,129 +422,21 @@ sound rule looks for literal `assets/…` paths, but `audioplayers` uses
 rule looks for `'X'`/`'O'`, while Neon's approved marks are `✕ ○ Ø`.
 
 This is the structural enforcement that **The theme system is the main architectural
-risk** below asks for, and it is what makes [Theming](./Theming.md) → Architectural Rule a
+risk** above asks for, and it is what makes [Theming](./Theming.md) → Architectural Rule a
 checkable rule rather than a matter of discipline.
 
-### State management — Riverpod
-**Riverpod, without Riverpod's own codegen to start.** Plain `NotifierProvider`
-declarations, no `@riverpod` annotations. Riverpod codegen can be adopted later without
-rewriting the logic.
+## Distribution and Release
 
-It also covers the requirement that settings and the theme be readable from
-**everywhere**, including deep in the board widget tree.
+### App name
+**"Tic Tac Toe Extreme."** 20 characters, inside Apple's 30-character App Store limit. The
+approved handoff draws it as a kicker/wordmark split (`TIC TAC TOE` over `EXTREME`) on
+screen `1a`.
 
-**Watch out for:** fey-tactics uses `StateNotifier`, which is the legacy API. Use
-`Notifier`/`NotifierProvider` — fey-tactics is a reference for the sync shape, not for
-the API surface.
+### Bundle identifier
+**`com.ehrendavis.tictactoeextreme`.** Lowercase reverse-DNS, the conventional Apple form.
 
-### Navigation
-**The app has an explicit navigation layer, and it is now in scope.** The routing approach
-is settled — see Decisions → Navigation approach — go_router below.
-
-### Navigation approach — go_router
-**`go_router`.** The user asked for the choice that serves the end objective of building
-larger games, made once and correctly rather than as a stopgap: *"I want to pick the
-navigation layer that solves for the full problems this application can have. Something
-that is not just temporary but the right choice for the end objective of building larger
-games… Lets get this right the first time."*
-
-Why: it is the Flutter team's recommended routing package; it is declarative, so routes
-are described rather than imperatively pushed; it handles deep links and the browser URL
-bar without rework; it supports nested and shell navigation, which is what larger games
-need for persistent chrome; and it scales past this game's six screens without a second
-migration.
-
-Consequences, recorded honestly rather than as caveats:
-- It adds a dependency, and this doc's existing structure means `P1-01`'s exhaustive
-  dependency list must be amended to carry it.
-- Dismissing a route becomes `context.pop()` rather than `Navigator.pop`, so the
-  navigation layer's internals are shaped by this choice even though its public
-  operations are not.
-
-The route table and route paths are not designed here — that is a PRD's job.
-
-### The app icon
-**The app ships an icon, and it is not the main-menu logo.** App Store submission cannot
-happen without a 1024×1024 icon. It lives in the iOS asset catalog rather than the
-Flutter `assets/` tree, and it is a separate asset from the logo. Who produces it, and
-whether it is generated, is open — see Open Questions.
-
-### Online multiplayer is an intended future direction
-**Tech choices must not foreclose syncing board state over a network.** Not built now —
-see **Fully offline, except for in-app purchases.** under What the Design Docs Already
-Imply below, which holds today.
-
-### Game state is immutable
-**Immutable.** The engine never mutates a board in place — every move produces a new state
-object, and that new object is what the UI renders.
-
-It also pins down the shape of the API that **Is the game logic separate from Flutter?**
-leaves open. The engine exposes `Board applyMove(Board, Move)` returning new state, not
-`board.play(move)` mutating in place — so the pure-Dart engine and the Riverpod layer
-agree on how state changes.
-
-### Project structure — layer-first
-**Layer-first.** Group by kind, not by feature:
-
-```
-lib/
-  main.dart
-  app.dart
-  engine/          ← pure Dart, zero Flutter imports
-    board.dart
-    rules.dart
-  storage/         ← repository interface + Hive implementation
-  theme/
-    theme.dart     ← merged theme object
-    loader.dart    ← YAML → theme
-  state/           ← Riverpod providers
-  navigation/      ← the app's routing layer
-  audio/           ← sound playback, owned by P2-02-audio
-  haptics/         ← haptic feedback, owned by P2-03-haptics
-  entitlements/    ← StoreKit entitlement state, owned by P1-07-entitlements
-  diagnostics/     ← crash catching/reporting, owned by P1-06-crash-reporting
-  purchase/        ← store integration, owned by P4-05-purchase-flow
-  ui/
-    board/
-    menus/
-assets/
-  themes/*.yaml
-  images/
-  audio/
-```
-
-`storage/` is local persistence only — the repository interface and its Hive
-implementation (see **Serialization and the storage layer** above). There is still **no
-backend data layer**: nothing in the app talks to a server. One gets added if multiplayer
-arrives.
-
-`navigation/` is a new layer, for the same reason `storage/` was added above: **Navigation**
-above names an explicit navigation layer that this tree had no home for. It is Flutter-side,
-same as `ui/` and `state/` — nothing here changes the `engine/` purity rule. The routing
-approach is settled — see Decisions → Navigation approach — go_router. What goes inside the
-layer beyond that is a PRD's job, not this doc's. A navigation PRD already depends on this
-layer existing.
-
-`assets/themes/`, `assets/images/` and `assets/audio/` are the **designated folders for
-assets** required by **Where do sound and art assets come from?** above.
-
-`audio/`, `haptics/`, `entitlements/`, `diagnostics/`, and `purchase/` are five more new
-layers, each proposed by the PRD that needs it and following the same one-folder-per-layer
-convention as `storage/` and `navigation/` above. This closes the same gap in five PRDs at
-once — several had been carrying it as an open question they could not resolve alone, and
-two shipped wrong import paths in the meantime. File names inside each are that PRD's to
-decide, not this doc's.
-
-### Widget tests for the board — no golden tests
-**Widget tests, no goldens.** Test that taps do the right thing and that the highlight
-states appear. Skip golden image tests.
-
-This sits alongside **Unit tests for the rules engine** above, which covers the engine
-layer, and **Do we add a test that fails on hardcoded theme values?** below.
-
-### Fresh build, not a refactor
-**A fresh build.** Nothing from the earlier Flutter work carries into this design — every
-Decision in this doc describes something being built new, not refactored toward.
+**Watch out for:** a bundle identifier is effectively permanent once the app has been
+submitted to App Store Connect, so this is not a name to revisit casually.
 
 ### Distribution — public App Store release
 **The App Store.** A public release, not a personal or TestFlight-only build.
@@ -354,11 +444,11 @@ Decision in this doc describes something being built new, not refactored toward.
 That makes the App Store Connect listing a real deliverable — description, keywords,
 screenshots, categories — which is what **Release tooling — fastlane** below manages.
 
-### Bundle identifier
-**`com.ehrendavis.tictactoeextreme`.** Lowercase reverse-DNS, the conventional Apple form.
-
-**Watch out for:** a bundle identifier is effectively permanent once the app has been
-submitted to App Store Connect, so this is not a name to revisit casually.
+### The app icon
+**The app ships an icon, and it is not the main-menu logo.** App Store submission cannot
+happen without a 1024×1024 icon. It lives in the iOS asset catalog rather than the
+Flutter `assets/` tree, and it is a separate asset from the logo. Who produces it, and
+whether it is generated, is open — see Open Questions.
 
 ### CI — local builds only
 **No CI. Local builds only.** `flutter test` and `flutter analyze` run locally.
@@ -391,135 +481,6 @@ It runs on Apple's official App Store Connect API underneath.
 **Watch out for:** fastlane does not automate App Review, which stays manual — and an
 Apple Developer Program membership is required before any of it works.
 
-### Crash reporting — catch and build the report, don't send it
-**Catch errors and construct the crash-report object from the start. Do not transmit it.**
-As stated:
-
-> *"I have nowhere to send the data. I think it would be good to set the game up to handle
-> this putting in the catches now from the start to build out the crash report. We just
-> won't send it out just yet. We will come up with where it will be sent to later. But for
-> now just catch and build out the object. Just don't send it. yet"*
-
-So the error handling and the report object are day-one work; the transport is not. The
-destination is deliberately left for later rather than being an open question — today's
-answer is "nowhere."
-
-This keeps **Fully offline, except for in-app purchases.** under **What the Design Docs
-Already Imply** below true for now. StoreKit being permitted does not make a report
-destination permitted — those are two separate exceptions, and this one stops being true
-the day a destination is chosen.
-
-### What does a crash report capture?
-**The error, the stack trace, and a timestamp. Nothing else.** No game state, no screen,
-and specifically no opponent name — no text a player has typed.
-
-This is about more than debugging convenience: the app is in the **Kids category**, and in
-a 4+ app *transmitting* personal data is itself the regulated act, not merely something a
-privacy label declares. Capturing nothing personal means that if a destination is ever
-added later, no consent flow is required — the decision keeps a future option open rather
-than only satisfying today's rules.
-
-Named cost: reproducing a bug that depends on board position or which screen the player was
-on becomes harder, because the report will not say.
-
-### In-app purchases
-**The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
-vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
-[Theming](./Theming.md) → Free and Paid Themes, and
-[Menus and UI](./Menus%20and%20UI.md) → Decisions → How many open games do we keep.
-
-**Consequence for offline status:** in-app purchases require StoreKit, which needs network
-access and a restore-purchases path tied to the Apple ID. This means **Fully offline. No
-backend, no network, no accounts.** under **What the Design Docs Already Imply** below is
-no longer unconditionally true — see the amended row there.
-
-### Entitlements — Apple stores them, no backend needed
-**No receipt-validation server, and no backend of ours.** StoreKit provides
-`Transaction.currentEntitlements` — the set of currently-valid transactions for this app
-under the signed-in Apple ID, cryptographically signed by Apple and verified on device.
-That is the authoritative answer to "does this player own this." `Transaction.all` gives
-full purchase history if it is ever needed.
-
-Restore for non-consumables is largely automatic: signing in on a new device repopulates
-entitlements without the player doing anything. The visible **Restore purchases** control
-is still required by Apple's review guidelines, and `AppStore.sync()` is the explicit call
-behind it — so the control is a compliance requirement more than a functional one.
-
-On-device verification is sufficient for an app this size.
-
-**Consequence for the architecture: Apple is the record of truth and it is queryable at
-runtime.** Any locally stored entitlement state is an offline convenience, not the record.
-A refunded or lapsed purchase simply stops appearing in `currentEntitlements` — that is what
-answers "what happens when an entitlement goes away."
-
-**The entitlement provider's shape — last-known plus refresh.** Entitlement state is exposed
-as a plain value, seeded from the locally cached copy and refreshed when the store answers —
-not as an async wrapper every consumer must branch on. This is the same class of decision as
-**State management — Riverpod** above.
-
-Consequences:
-- Consumers never handle a "pending" case; they always get a usable answer.
-- A paying player never sees their purchased content as locked while a query is in flight —
-  which is the failure the alternative produces.
-- The value carries an indication of whether it is still provisional, so a consumer that
-  cares can tell.
-
-### Kids category
-**The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
-changes what gets built in features that ship long before release work:
-
-- A **parental gate** is required before any purchase flow and before any link that leaves
-  the app.
-- Third-party analytics and behavioural advertising are restricted.
-- A privacy policy is mandatory.
-
-These reach the purchase flow and theme-selection features directly, and the gate has to
-exist before those are built rather than being added at submission.
-
-A separate, consequent fact: the age rating is **4+.**
-
-**The parental gate's scope is purchases only.** The game has no outbound links today — no
-in-app support URL, no social links, no advertising — so purchases are the only trigger that
-currently exists. If an outbound link is ever added, it needs the gate too — that is a thing
-to remember rather than a thing already handled. What the gate looks like and how it
-challenges is a PRD's job, not this doc's.
-
----
-
-## What the Design Docs Already Imply
-Some technical requirements are already locked by decisions made elsewhere. Listing them
-here so they don't get re-litigated:
-
-| Requirement | Comes from |
-|---|---|
-| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see Decisions → Entitlements — Apple stores them, no backend needed. | Two players, one phone; qualified by Decisions → In-app purchases |
-| **Local persistence** for 4 values: theme, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
-| **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence, Decisions |
-| **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
-| **Haptics** on every valid click | [Game Board Design](./Game%20Board%20Design.md) → Haptic Rule |
-| **A theme system with fallback** — every visual/audio/motion value resolves through the active theme, falling back to Neon | [Theming](./Theming.md) |
-| **Animations toggleable off entirely**, with instant state changes instead | [Animations](./Animations.md) |
-| **Portrait phone layout**, whole 9x9 board visible, no zoom | [Game Board Design](./Game%20Board%20Design.md) |
-
-### The theme system is the main architectural risk
-> *"All of our code operates off of the theme. No code should be operating independently
-> from the selected theme."*
-
-This is the one constraint that touches every file, and it's the one that's expensive to
-retrofit. Whatever we choose for state management and widget structure has to make
-"every value comes from the theme" the *easy* path, not a discipline we have to maintain
-by hand.
-
-<!-- Both halves are now chosen: state management is Riverpod (Decisions → State
-     management — Riverpod) and the renderer is widgets (Decisions → How is the board
-     rendered?). The requirement stands; the choice is no longer open. -->
-
-The countermeasure is now decided: a test that fails on hardcoded theme values — see
-**Do we add a test that fails on hardcoded theme values?** under Decisions. That is what
-turns this from a discipline into a check.
-
----
-
 ## Open Questions
 
 These are the things I think we need to hammer out. Grouped roughly by how much they
@@ -541,8 +502,8 @@ block other work.
   does not guard a theme file that misspells a key.
 
 ### 3. Build and distribution
-- Who produces the app icon, and is it generated or hand-made? See Decisions → The app
-  icon.
+- Who produces the app icon, and is it generated or hand-made? See Distribution and
+  Release → The app icon.
 - A set of hard App Store submission blockers, none of which any doc currently mentions,
   and all of which must be decided before shipping:
   - **Paid Applications Agreement**, plus banking and tax details — required before
@@ -562,12 +523,7 @@ block other work.
   - **App Review contact information**, and **sandbox testing of the purchase flow**
     before submission.
 
-<!-- Resolved: public App Store release; bundle identifier
-     com.ehrendavis.tictactoeextreme; local builds only, no CI; fastlane as the release
-     tooling; the app name. See Decisions → Distribution — public App Store release,
-     Bundle identifier, CI — local builds only, Release tooling — fastlane, and App name. -->
-
 ### 4. Kids category — age rating questionnaire
 - The Kids-category listing choice and the resulting parental-gate, analytics, and
-  privacy-policy requirements are settled — see Decisions → Kids category, and the age
-  rating (4+). What remains open is the exact age-rating questionnaire answers.
+  privacy-policy requirements are settled — see Kids Category, and the age rating (4+).
+  What remains open is the exact age-rating questionnaire answers.

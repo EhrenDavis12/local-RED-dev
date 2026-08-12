@@ -59,8 +59,8 @@ impossible case — the button can't be drawn at all. One is debt, the other a d
 treating them the same schedules the wrong one.
 
 <!-- Enforced by: the hardcoded-theme-value test, which covers the slot inventory listed
-     above. See Tech Design → Decisions → Do we add a test that fails on hardcoded theme
-     values? -->
+     above. See Tech Design → Testing → A test that fails on hardcoded theme
+     values. -->
 
 ## Where Themes Live
 - **For now, themes are contained within the codebase.** Bundled/shipped with the app.
@@ -90,7 +90,7 @@ active. Close the app, open it again, that's still their theme. Requires persist
 selection to device storage.
 
 <!-- The persisted value is the theme's UUID, not its name, so renaming a theme does not
-     lose the selection. See Tech Design → Decisions → Theme identity — UUID. -->
+     lose the selection. See Tech Design → The Theme System. -->
 
 **You can't change the theme mid-game** — leave it out for now. Theme changes happen from
 the main menu only. Possible later feature if we decide we want it.
@@ -179,7 +179,7 @@ Like it's missing the option entirely."* Three distinct cases:
 And the merge is **deep**: a theme naming one key inside a section keeps Neon's other keys
 in that section rather than replacing the whole section. Nested maps merge recursively.
 
-See [Tech Design](./Tech%20Design.md) → Decisions → Fallback to Neon — merge, not resolve.
+See [Tech Design](./Tech%20Design.md) → The Theme System.
 
 **Consequence:** `neon.theme.json` ships `sound.music` as an explicit `null`. Under this
 rule a null means "cleared," so Neon's own null is a deliberate clear rather than a gap —
@@ -194,8 +194,8 @@ worth noting so nobody later mistakes it for an unfilled slot.
   later.
 - **Fallback happens once, not per lookup.** Each theme is materialized into a complete
   theme at startup by merging over Neon, so at runtime every lookup hits a complete theme
-  and there is no fallback step. See [Tech Design](./Tech%20Design.md) → Decisions →
-  Fallback to Neon — merge, not resolve.
+  and there is no fallback step. See [Tech Design](./Tech%20Design.md) →
+  The Theme System.
 
 ### Closing Neon's value gaps
 **The drawn values from the design handoff are transcribed into Neon's YAML.**
@@ -336,7 +336,7 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Corner radii** — cell, quadrant, modal, chip, control, button
 - **The font** — a theme supplies its own typeface. Inter 400/500/600 is bundled as
   **Neon's** font choice, not as an app-wide font constant. See
-  [Tech Design](./Tech%20Design.md) → Decisions → Do themes pick their own font?
+  [Tech Design](./Tech%20Design.md) → The Theme System → Themes pick their own font.
 - **The type scale** — sizes and weights, distinct from a theme's choice of font
 - **Opacities** — the locked, claimed and cat-game veils
 - **Modals** — winner, draw
@@ -454,8 +454,8 @@ fixed in the code — for now. *"No spacing will be fixed for now."*
 
 This is the one place that cuts against the project's general direction of pushing as much
 as possible into the theme. The reason is enforcement: the hardcoded-theme-value test (see
-[Tech Design](./Tech%20Design.md) → Decisions → Do we add a test that fails on hardcoded
-theme values?) **cannot** catch a hardcoded gap. It can see a colour, a font size, a radius
+[Tech Design](./Tech%20Design.md) → Testing → A test that fails on hardcoded
+theme values) **cannot** catch a hardcoded gap. It can see a colour, a font size, a radius
 or an asset path, but `SizedBox(width: 8)` holding a themed gap and `SizedBox(width: 8)`
 holding an incidental one are indistinguishable to it. A padding section in the schema
 would therefore have been a rule that nothing verifies — a claimed guarantee the project

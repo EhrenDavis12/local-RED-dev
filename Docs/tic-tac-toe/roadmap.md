@@ -173,9 +173,41 @@ How we build it — framework, language, storage, state management, project stru
 release/distribution.
 
 **Headings:**
-- Decisions
 - What the Design Docs Already Imply
+- Platform and Targets
+  - Minimum iOS version
+  - Orientation — portrait only
+  - Fresh build, not a refactor
+- Project Structure
+- The Rules Engine
+- State Management
+- Navigation
+- Rendering the Board
+  - Marks — supplied by the theme
+- The Theme System
+  - Flutter's ThemeData vs our own theme object
+  - Themes pick their own font
   - The theme system is the main architectural risk
+- Persistence and Serialization
+  - Serialization and the storage layer
+- Audio and Assets
+  - Where sound and art assets come from
+- In-App Purchases and Entitlements
+  - Entitlements — Apple stores them, no backend needed
+- Kids Category
+- Crash Reporting
+  - What a crash report captures
+- Testing
+  - Unit tests for the rules engine
+  - Widget tests for the board — no golden tests
+  - A test that fails on hardcoded theme values
+- Distribution and Release
+  - App name
+  - Bundle identifier
+  - Distribution — public App Store release
+  - The app icon
+  - CI — local builds only
+  - Release tooling — fastlane
 - Open Questions
   - 1. Persisted data — versioning
   - 2. Theme loading
