@@ -16,20 +16,39 @@ The game needs a main menu.
   listing all open games. Large.
 - **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
-- **Settings** — opens the settings menu.
-- **About Us** — last in the list.
+- **Settings** — opens the settings menu. Smaller than the two above it.
+- **About Us** — last in the list, same smaller treatment as Settings.
+
+**Settings and About Us sit side by side in one row**, sharing its width — not two more
+full-width buttons stacked under Play Game and Theme. So the menu has two button tiers:
+the big pair, and the small pair beneath them.
+
+**Play Game and Theme are the same tier, not merely similar.** Both draw from one
+treatment, so a change to one is a change to both and no theme can drift them apart.
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
 same visual weight as Play Game.
 
-**The main menu has a title and a logo.** Both, not just buttons.
+Button labels are written the way they read — **Play Game**, not **PLAY GAME**. Whether a
+label renders in caps is a theme value like anything else, so the caps in the sketch below
+are Neon's choice, not part of the label.
+
+**The main menu has a title and a logo.** Both, not just buttons. The title is two parts —
+**TIC TAC TOE** above, **EXTREME** beneath it as the wordmark. Under the title sits the
+tagline, *"Nine boards. One winner. Good luck."* The logo is a placeholder for now, a
+dashed-bordered mark standing in for real art.
+
+**A footer line runs along the foot of the menu**, carrying the active theme's name and
+the app version — `Theme: Neon · v0.1.0` under Neon.
 
 ```
 ┌─────────────────────────┐
 │                         │
 │         [ LOGO ]        │
-│   TIC TAC TOE EXTREME   │
-│                         │
+│       TIC TAC TOE       │
+│         EXTREME         │
+│ Nine boards. One winner.│
+│        Good luck.       │
 │                         │
 │   ┌─────────────────┐   │
 │   │                 │   │
@@ -41,19 +60,20 @@ same visual weight as Play Game.
 │   │      THEME      │   │
 │   └─────────────────┘   │
 │                         │
-│   ┌─────────────────┐   │
-│   │    SETTINGS     │   │
-│   └─────────────────┘   │
+│  ┌────────┐ ┌────────┐  │
+│  │SETTINGS│ │ABOUT US│  │
+│  └────────┘ └────────┘  │
 │                         │
-│   ┌─────────────────┐   │
-│   │    ABOUT US     │   │
-│   └─────────────────┘   │
-│                         │
+│   Theme: Neon · v0.1.0  │
 └─────────────────────────┘
 ```
 
 The entire main menu is itself theme-driven — background, button styling, title. No
 hardcoded styling here either.
+
+**While theme selection is open, the main menu dims behind it.** The menu stays where it
+is underneath the overlay — it drops its own opacity, which is the menu's own job, and the
+overlay lays its scrim on top of that. Two layers, not one.
 
 ### About Us
 **About Us ships, and its button goes last in the main menu button list.** In the user's
@@ -65,6 +85,9 @@ words:
 So the main menu carries four buttons, in order: Play Game, Theme, Settings, About Us. The
 position is explicitly provisional — the user said "for now we might move it in the
 future" — so a later reordering is expected rather than a reversal.
+
+Because Settings and About Us share a row, that pairing is the part a later reorder has to
+revisit — nothing else in the menu depends on About Us being last.
 
 Two things this doesn't settle:
 - The screen's **content** is not specified by any doc. The handoff draws team photos;
