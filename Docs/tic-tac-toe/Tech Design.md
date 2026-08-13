@@ -574,35 +574,108 @@ states appear. Skip golden image tests.
 ### A test that fails on hardcoded theme values
 **The suite carries a test that fails on hardcoded theme values, covering the slot
 inventory the Architectural Rule names.** An ordinary test in the suite, not a custom
-analyzer plugin. It scans the source under `lib/` for banned patterns outside the theme
-layer itself, and it holds a per-file baseline that fails when a new violation appears.
-There is no application code yet, so **the baseline starts at zero**.
+analyzer plugin — and not an `analyzer`/AST-based scanner either. It scans the source
+under `lib/` for banned patterns outside the theme layer itself, and it holds a per-file
+baseline that fails when a new violation appears. There is no application code yet, so
+**the baseline starts at zero**. It runs in the default `flutter test` run, with no extra
+flag, tag or separate command.
 
 <!-- "The theme layer" is concretely `lib/theme/`. See Project Structure. -->
 
+**Two exclusions, both by path.** `lib/theme/` is exempt — it holds the merged theme
+object and the loader, so it is the one place a literal theme value legitimately appears.
+Generated files are exempt too, `*.g.dart` and `*.freezed.dart` anywhere under `lib/`:
+`freezed` and json_serializable generate into `engine/`, inside the scan root, and a
+developer cannot fix a violation in a file `build_runner` rewrites. Everything else under
+`lib/` is scanned.
+
 The scope comes from [Theming](./Theming.md) → Architectural Rule, which derives its slot
-list from what the screens actually consume rather than a closed category list. Indicative
-patterns to catch, to be sharpened at the keyboard rather than settled here — and not a
-complete enumeration of that slot inventory:
+list from what the screens actually consume rather than a closed category list. The
+categories below are what the guard claims; the patterns inside them are a floor to widen,
+never a ceiling, and still not a complete enumeration of that slot inventory:
 
 | Category | Roughly what the scan looks for |
 |---|---|
 | **Colors** | Raw `Color(0x…)` literals and references to Flutter's `Colors.*` palette |
-| **Animations** | Hardcoded `Duration(…)` timing values |
-| **Fonts** | `GoogleFonts.*` and literal `fontFamily:` values |
-| **Piece styles** | Hardcoded `'X'`/`'O'` strings and `Icons.*` anywhere outside the theme layer |
-| **Sounds and backgrounds** | Literal `assets/…` paths outside the theme layer |
+| **Animations** | `Duration(…)` timing built from a numeric literal |
+| **Fonts** | Literal `fontFamily:` values |
+| **Type scale** | Literal `fontSize:` values, `FontWeight.*` outside the theme layer |
+| **Radii** | `BorderRadius`/`Radius` corner radii built from a numeric literal |
+| **Opacities** | `withOpacity(…)`/`withValues(alpha: …)` given a numeric literal |
+| **Piece styles** | Hardcoded `'X'`/`'O'`/`✕`/`○`/`Ø` mark glyphs, in board code |
+| **Chrome icons** | `Icons.*` and any icon package's constants, outside the theme layer |
+| **Sounds and backgrounds** | `AssetSource('audio/…')`, and literal `assets/…` image paths |
 
 Durations are in scope because [Animations](./Animations.md) → How Animations Play puts
 timing inside the theme's animation definitions, so a hardcoded `Duration` is a theme
 value that escaped.
 
-PRD review found several of these indicative patterns miss the idiomatic forms this
-project actually decided on, and this is a finding to sharpen rather than a redesign: the
-sound rule looks for literal `assets/…` paths, but `audioplayers` uses
-`AssetSource('audio/…')` and supplies the prefix itself; the font rule looks for
-`GoogleFonts.*`, which will never appear because Inter is bundled; and the piece-style
-rule looks for `'X'`/`'O'`, while Neon's approved marks are `✕ ○ Ø`.
+`GoogleFonts.*` is not scanned for, because Inter is bundled rather than fetched and it
+will never appear. Sounds need their own pattern because `audioplayers` supplies the
+`assets/` prefix itself, so a literal `assets/` path never appears for a sound; literal
+`assets/…` paths still catch images and backgrounds, which have no prefix-supplying API
+hiding them. Marks are scoped to board code, because a bare `'X'` in a menu is far more
+likely to be ordinary text than an escaped theme value, while a chrome icon is a
+violation anywhere outside the theme layer.
+
+**A pattern matches a value typed in and lets an expression through.**
+`Duration(milliseconds: 220)` is a theme value that escaped;
+`Duration(milliseconds: theme.animation.placeMark.durationMs)` is the behaviour the guard
+exists to encourage and passes. That is the general form of the escape a caller is meant
+to use — read the value from the theme and pass it — and any rule added later follows it.
+The two that cannot, because an icon constant and a `FontWeight` are not labelled numbers,
+are permitted inside `lib/theme/` instead: resolving a theme's icon slot to a concrete
+`IconData`, and a stored integer weight to a `FontWeight`, both happen there, which is
+what makes those two rules satisfiable at all. Each pattern ships with a case asserting
+the compliant, theme-derived form produces no violation, so tightening one back fails here
+rather than in the feature that trips over it.
+
+**A green guard is not a covered inventory.** It catches a value typed into code as a
+literal. It cannot see a value that arrives through a variable or arithmetic, a path
+assembled rather than written, a theme-supplied glyph name hardcoded as a string, or a
+widget that reads the right slot and then ignores half of it. Completing the guard does
+not satisfy [Theming](./Theming.md) → Architectural Rule in full, and the suite being
+green must not be read as the inventory being covered.
+
+**The remaining bare-numeric slots are deferred until there is UI code to calibrate
+against.** A theme value that reaches code as an unlabelled number — grid-line width,
+grid-line inset, and the size fields on marks and icons — has no distinctive constructor
+to match on the way `Color(0x…)` has. Grid-line width is a known, accepted false negative,
+and the rest get calibrated when the first painter writes a bare numeric into real UI
+code, not guessed at before it exists.
+
+**No rule may target `padding:`, `width:`, `height:` or `SizedBox`.** Spacing and layout
+numbers are code constants ([Theming](./Theming.md) → What a Theme Does NOT Control), so a
+rule there would fail sanctioned code with no legal fix. That is a boundary, not a gap.
+
+**The baseline records what was found, not where.** An entry is keyed on the file, the
+rule and the matched text, with an occurrence count; line numbers are reported in the
+failure but never stored. Keying on a per-file count would let one violation be swapped
+for another with the total unchanged, and keying on line numbers would fail on any edit
+that shifts lines — a guard that cries wolf gets deleted.
+
+**Fixing a violation never breaks the build.** A file with fewer violations than its
+baseline passes, and stale entries — a fixed violation, a deleted file, a rule that no
+longer exists — are printed as a note to prune rather than failed. Failing on improvement
+would make deleting a hardcoded value the thing that breaks the build.
+
+**A hardcoded theme value is fixed, never recorded.** The baseline exists to catch a
+regression, not to house an exception: it starts at zero and stays there while the code is
+clean, and a violation found on the day this lands gets fixed rather than written into it.
+There is no `// ignore:` convention, no allow-list annotation, no per-line suppression,
+and no baseline entry standing in for one — a suppression convention has to be honored
+forever, and there is no sanctioned home for a deliberately hardcoded theme value. A diff
+that adds baseline entries is a diff that adds hardcoded theme values, and reads that way
+in review.
+
+**The failure is loud and it explains itself.** It names every new violation — file, line,
+rule and the matched text — and says why that value may not be hardcoded, so someone
+hitting it for the first time can fix it without going to find the rule. A guard that
+fails with "1 new violation" and no location is a guard someone deletes rather than
+debugs. Two things fail loudly rather than degrading quietly: a missing or malformed
+baseline file, which is never silently treated as empty, and a file under `lib/` that
+cannot be read or decoded, which is never skipped. A skipped file is an unscanned file,
+which is the false assurance this whole test exists to prevent.
 
 This is the structural enforcement that **The theme system is the main architectural
 risk** above asks for, and it is what makes [Theming](./Theming.md) → Architectural Rule a
@@ -736,3 +809,10 @@ block other work.
   inherit **1. Persisted data — migration** above? Whatever answers this has to say which
   rendering of the error reaches the store, because the board position is still on the
   error object even though nothing prints it.
+
+### 7. Timing and opacity that aren't theme values
+- A `Duration` or an opacity built from a numeric literal is a violation wherever it
+  appears under `lib/`, including timing and opacity that are not theme values at all — a
+  debounce interval, a storage timeout, a debug overlay. The escape is the same either
+  way: name the value and pass it as an expression. Is that an acceptable tax on non-theme
+  code, or should timing and opacity that aren't theme values be exempt?

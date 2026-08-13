@@ -235,6 +235,7 @@ release/distribution.
   - 4. Kids category — age rating questionnaire
   - 5. Which store holds entitlement state?
   - 6. Crash reporting
+  - 7. Timing and opacity that aren't theme values
 
 ---
 
