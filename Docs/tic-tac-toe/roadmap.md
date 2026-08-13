@@ -224,6 +224,12 @@ release/distribution.
   - Regenerating, and leaving nothing behind
 - In-App Purchases and Entitlements
   - Entitlements — Apple stores them, no backend needed
+  - Ownership is keyed by product, and only the store may change it
+  - Committing an answer — all of it, in order, to memory and disk
+  - What a player is owed, with or without a network
+  - Buying ends one of four ways, and one of them ends later
+  - Prices come from the store at runtime
+  - The parental gate — a word problem, every time
 - Kids Category
 - Crash Reporting
   - What gets caught
@@ -261,6 +267,7 @@ release/distribution.
   - 8. Generated assets
   - 9. The rules engine
   - 10. The bundled icon set
+  - 11. In-app purchases and entitlements
 
 ---
 

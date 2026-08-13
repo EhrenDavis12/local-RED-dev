@@ -767,9 +767,133 @@ not as an async wrapper every consumer must branch on. This is the same class of
 Consequences:
 - Consumers never handle a "pending" case; they always get a usable answer.
 - A paying player never sees their purchased content as locked while a query is in flight —
-  which is the failure the alternative produces.
+  which is the failure the alternative produces. The last known answer is what gating uses
+  until a newer one arrives, and the free tier is what a device that has never stored
+  anything reports — never what the app falls back to because an answer has not landed yet.
 - The value carries an indication of whether it is still provisional, so a consumer that
   cares can tell.
+
+### Ownership is keyed by product, and only the store may change it
+**What the app holds is a set of store product identifiers** — the products the player
+owns, not the things those products unlock. Asking whether a theme is owned resolves
+forward: which product unlocks this theme, and is that product in the set? Nothing maps
+backwards from a product to a theme, and nothing needs to. A product identifier has no
+relationship to a display name, so renaming a theme cannot orphan an entitlement the player
+paid for. What gets written down, and under what rule, is **Persistence and Serialization**
+→ *Entitlement state is written down, never minted*.
+
+**Paid-ness is derived, not recorded.** A theme is paid because it is not one of the free
+ones — see [Theming](./Theming.md) → Free and Paid Themes. No theme file, catalog entry or
+ownership marker records it, so there is no second list of paid themes to keep in step with
+the first.
+
+**The purchasable theme is a third theme, and it does not exist yet.** Neither of the two
+free themes becomes the paid one — the product is a theme beyond them, and building it is
+deliberately deferred rather than pending. What that means for the store record is
+**Distribution and Release** → *The store-side products*; when the theme lands is
+**Open Questions**.
+
+**Every theme is in exactly one of three states — free, owned, or locked**, and that is what
+the theme selection list labels its rows from.
+
+**The open-game cap is a value this model supplies, not a constant written anywhere else.**
+The storage layer reads it rather than defining it — see **Persistence and Serialization** →
+*The cap is enforced on create, and the store never evicts* — and no screen defines it
+either.
+
+**Nothing anywhere in the app mints an entitlement.** Every entitlement held originates in
+an answer from the store. There is no local grant and no debug-only setter in shipped code:
+the ability to hand out an entitlement is not a thing that exists. **Persistence and
+Serialization** forbids it of the storage layer; this forbids it of everything.
+
+**An affirmative store answer replaces what is held; it never adds to it.** Replacing is
+what makes a refund or a revocation take effect at all — an answer that could only add would
+never be able to take anything away, and the loss case above would be unreachable.
+
+### Committing an answer — all of it, in order, to memory and disk
+**The store is asked once at every cold launch, and again whenever the player uses Restore.**
+An answer from a previous session is last-known, never confirmation, so every session asks
+for itself. A design that only asked when the purchases screen opened would run the whole
+session on a stale answer.
+
+**A store answer is always a complete snapshot of what the player currently owns**, never a
+set assembled from a single transaction that happened to arrive. Partial answers and replace
+semantics cannot coexist: a fragment applied as a replacement silently drops everything it
+does not mention.
+
+**An older answer never overwrites a newer one, and "older" means asked earlier, not arrived
+earlier.** Two questions can be in flight at once — the one every launch asks, and the one a
+transaction resolving out of band provokes — and the slow one can land last while carrying
+the older picture. Applied, it silently revokes something the player just obtained. In the
+wild that reads as *"it forgot what I bought"*: timing-dependent, and it will not reproduce
+on demand.
+
+**Memory and disk are updated together, in one place.** Every answer the app accepts — from
+launch, from restore, from a purchase, from a transaction that resolved out of band — goes
+through the same commit, so no path can update one and forget the other. Forgetting the disk
+half gives a player who buys the unlock, sees 100 slots, quits and reopens to 3, with no
+error and nothing in any log.
+
+### What a player is owed, with or without a network
+- **The game launches and plays with no network and no store.** A purchase check that cannot
+  complete does not block launch, does not block starting or resuming a game, and does not
+  put an error on screen that has to be dismissed to keep playing.
+- **Free content is never gated.** A player with no purchases, and a player whose store query
+  never completed, reaches every free theme.
+- **A purchase takes effect immediately.** A completed purchase or restore reaches everything
+  that gates on it within the same session, with no restart.
+- **What is bought stays bought.** Both products are permanent once purchased — not consumed,
+  not expiring, and never charged again on a device that already has them. The store-side
+  half of that is **Distribution and Release** → *The store-side products*.
+- **An app that shows the free tier until Restore is pressed is defective, not cautious.**
+  Entitlements arrive on a new device from the launch query above; the visible control is a
+  review requirement, not the mechanism.
+- **A locked theme still previews.** Ownership withholds selection, not the theme's values —
+  a locked row reads as buyable, not broken.
+
+### Buying ends one of four ways, and one of them ends later
+**A purchase ends as success, cancelled, failed, or pending, and only success produces an
+entitlement.** Nothing else in the app can produce one.
+
+**Pending is the normal case here, not the rare one.** The app is in the Kids Category, so
+parental approval is the expected purchase path: a parent approves minutes or days later,
+out of band, very likely while this app is not the one asking. **A purchase approved that way
+still reaches the player.** The failure this forbids is the natural implementation — await
+the purchase, treat anything that is not success as not-success, return — where the parent
+approves, nobody is listening, and the child never receives what was bought, while every
+other part of the flow looks correct.
+
+What the player is *shown* for each of the four is not settled — see **Open Questions**.
+
+### Prices come from the store at runtime
+**Every price shown is read from the store at runtime and localized. No price is hardcoded
+anywhere in the app.** The **$4.99** in these docs is the number to configure on the store
+record, not a string to render: a player in another currency sees their own, and a price
+changed on the record reaches the app without a build.
+
+### The parental gate — a word problem, every time
+**The gate challenges with an arithmetic problem stated in words, answered with a number** —
+*"Enter the answer: seven times eight."* **The operands are spelled out as words rather than
+digits**, and that is the load-bearing part: digits are solvable by a child who can count,
+while the word form defeats pre-readers and early readers alike. The problem is randomised
+each time the gate is raised, and **three wrong attempts dismiss it** without ever reaching
+the store.
+
+**A pass is good for one purchase and nothing else.** There is no remembered pass — the next
+purchase raises the gate again, immediately after a passed one included. This also avoids
+having to define "session" at all: cold launch, foreground return and dismissing a surface
+are three different answers and none of them is obviously right.
+
+**Restore is not gated.** Restore spends no money.
+
+**The gate is enforced at the purchase itself, not by whatever raises it.** No purchase can
+be initiated without passing it, and the surfaces hosting the purchase controls implement no
+gate of their own — which is what [Menus and UI](./Menus%20and%20UI.md) → Settings Menu →
+Purchases means by keeping one parental gate in one place. Moving the challenge out to the
+caller and passing an assurance inward would weaken the guarantee from enforced to
+conventionally observed, which is the whole thing the gate exists for.
+
+Why the gate exists at all is **Kids Category** below.
 
 ## Kids Category
 
@@ -789,8 +913,8 @@ A separate, consequent fact: the age rating is **4+.**
 **The parental gate's scope is purchases only.** The game has no outbound links today — no
 in-app support URL, no social links, no advertising — so purchases are the only trigger that
 currently exists. If an outbound link is ever added, it needs the gate too — that is a thing
-to remember rather than a thing already handled. What the gate looks like and how it
-challenges is a PRD's job, not this doc's.
+to remember rather than a thing already handled. What the gate asks, and how long a pass
+lasts, is **In-App Purchases and Entitlements** above.
 
 ## Crash Reporting
 
@@ -1323,3 +1447,28 @@ block other work.
   stay? Nothing reads it, and the hardcoded-theme-value guard bans its constants outside
   the theme layer — but it is one small first-party package, and it is already there if
   the icon set ever lands on Cupertino glyphs.
+
+### 11. In-app purchases and entitlements
+- Does the first frame wait on the entitlements read? Waiting costs every launch one small
+  disk read before anything is drawn, and a paying player never sees a flash of
+  locked-everything. Not waiting paints immediately and lets a paying player see their own
+  content locked, briefly, on every launch until the read lands.
+- What is the player shown for each of the four purchase endings? Pending is the one that
+  needs real copy — the player is being told to wait for someone else, and under the Kids
+  Category that is the common case rather than the rare one.
+- Which store plugin sits behind the purchase layer. Nothing is chosen, and it is the
+  largest single thing standing between this section and a build. Whichever it is has to
+  expose the StoreKit 2 semantics this section depends on — the current-entitlements query,
+  the ability to re-issue it on demand, the explicit restore call, and the stream of
+  transactions that resolve out of band. Not every Flutter plugin surfaces all four. See
+  Platform and Targets → Minimum iOS version.
+- Can a paid theme ever be a product whose theme file is not on the device? If every paid
+  theme ships in the build and a purchase merely unlocks it, the model only ever gates
+  content the device already has. If a paid theme can arrive any other way, it has to handle
+  an entitlement held for something not installed. [Theming](./Theming.md) → Where Themes
+  Live says themes live in the codebase "for now", which is prose with a "for now" in it
+  rather than a decision.
+- Does the third theme land in time for the first public release, or after it? Distribution
+  and Release states that the first release carries a theme product, and a theme product
+  cannot be configured before the theme it sells exists. The theme itself is deferred as not
+  needed right now. Whether those are the same point in time is not stated.
