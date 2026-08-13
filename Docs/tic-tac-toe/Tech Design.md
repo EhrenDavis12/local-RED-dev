@@ -487,6 +487,23 @@ Already Imply** above true for now. StoreKit being permitted does not make a rep
 destination permitted — those are two separate exceptions, and this one stops being true
 the day a destination is chosen.
 
+**No off-the-shelf crash SDK is used.** Crashlytics, Sentry and the rest all assume a
+destination and a network, and there is neither — so none is added, and no HTTP or socket
+client comes in with one. The Kids category restricts third-party analytics on top of
+that.
+
+### What gets caught
+**Unhandled errors only, and exactly one report per error.** An error that application
+code catches and recovers from — a theme file that fails to parse being the decided case,
+see [Theming](./Theming.md) → Choosing a Theme — produces no report, and there is no
+application-facing "report this" entry point.
+
+Catching is in place before the first frame, so an error thrown during startup — while
+preferences load, while themes materialize — is caught rather than lost.
+
+**Errors inside a spawned isolate reach no handler and are not reported.** Nothing in the
+app spawns one today; whoever adds the first one owns the gap.
+
 ### What a crash report captures
 **The error, the stack trace, and a timestamp. Nothing else.** No game state, no screen,
 and specifically no opponent name — no text a player has typed.
@@ -499,6 +516,51 @@ than only satisfying today's rules.
 
 Named cost: reproducing a bug that depends on board position or which screen the player was
 on becomes harder, because the report will not say.
+
+### The one error that carries game state renders none of it
+**`IllegalMoveError.toString()` renders the reason and the offending move, and never the
+board.** A report holds the thrown error object itself, so every way a report is ever
+rendered as text goes through that object's `toString()`. The engine's `IllegalMoveError`
+carries the `Move` and the `Board` it was applied to, and it is the one object reachable
+from a report that holds a whole board position. The error **keeps** its `Board` — that
+is the debugging value the payload was written for, and it stays readable from a debugger
+attached in process — and nothing renders it into text.
+
+The residual is a contract on a *string*, not an invariant on the object: the `Board` is
+still on the error, so any route that renders or copies a report other than `toString()`
+re-leaks the position — a `toJson` on either type, a persisted report, a reflective or
+generated serializer walking the error, or a debugger dump written to a file. Whoever adds
+persistence or a destination owns closing that.
+
+### A caught error is silent to the player and logged for the developer
+As stated:
+
+> *"What i want for now is a signlent fail to the user but the error gets logged in the
+> concel in the background. This should allow the dev to see it. Note i want this
+> sentralized so that  the location of the log can be redirected in the future. so all
+> logs such as this can be sent or reported on. that not yet. for now just concel log them
+> using a centralized method we can update and controle the where in teh future."*
+
+**The player sees nothing.** No dialog, banner, snackbar, toast, sound, haptic, navigation
+or theme change results from a caught error, and the framework's default presentation is
+preserved exactly — a build-phase failure renders whatever Flutter renders by default.
+
+**The report is logged to the console, and every log goes through one centralized
+method.** That is what lets a developer see the failure while working. No call site writes
+to the console itself, because the point of the choke point is that the destination can be
+redirected later — to wherever reports are eventually sent — without touching a single
+caller.
+
+The console is a developer-facing log, not a transmission. It does not make a report
+destination chosen, and **Fully offline, except for in-app purchases.** stays true. What
+reaches the console is the report rendered as text, so the contract above governs what it
+can say.
+
+### Reports are held in memory
+**A report is kept in memory and goes no further.** It is written to no file and to
+neither store, so reports are gone when the app closes — including the crash that produced
+them. Retention is bounded rather than unlimited, because an error thrown from a build
+method re-fires every frame and would otherwise grow the list without end.
 
 ## Testing
 
@@ -659,3 +721,18 @@ block other work.
   growing collection rather than a single flag, though it means a second box beside the
   open-games one. "Nothing persisted, re-queried at launch" is ruled out: the
   last-known-plus-refresh provider needs a local copy to fall back to.
+
+### 6. Crash reporting
+- After an unhandled asynchronous error, should the app carry on, or hand the error to the
+  platform's default handler instead?
+- Should a build-phase failure that re-fires every frame ever escalate, rather than render
+  the default error widget forever?
+- Are errors the app catches and recovers from reported too? Today only unhandled ones
+  are. The standing case on the other side is a theme file that fails to parse
+  ([Theming](./Theming.md) → Choosing a Theme).
+- Are reports held only in memory, or persisted? They are in memory today, which means
+  they are gone when the app dies — including the crash that produced them. If they
+  should survive: which store, `shared_preferences` or Hive, and does the stored shape
+  inherit **1. Persisted data — migration** above? Whatever answers this has to say which
+  rendering of the error reaches the store, because the board position is still on the
+  error object even though nothing prints it.

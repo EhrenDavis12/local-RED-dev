@@ -212,7 +212,11 @@ release/distribution.
   - Entitlements — Apple stores them, no backend needed
 - Kids Category
 - Crash Reporting
+  - What gets caught
   - What a crash report captures
+  - The one error that carries game state renders none of it
+  - A caught error is silent to the player and logged for the developer
+  - Reports are held in memory
 - Testing
   - Unit tests for the rules engine
   - Widget tests for the board — no golden tests
@@ -230,6 +234,7 @@ release/distribution.
   - 3. Build and distribution
   - 4. Kids category — age rating questionnaire
   - 5. Which store holds entitlement state?
+  - 6. Crash reporting
 
 ---
 
