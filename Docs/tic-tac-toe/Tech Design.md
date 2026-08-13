@@ -405,6 +405,138 @@ this doc.
      Neither is Replicate-generated. See
      Docs/tic-tac-toe/design_handoff_game_ui/README.md. -->
 
+### One script, and the per-asset inputs are data
+**Adding an asset adds an entry to a list, never a second script.** The one script reads a
+hand-written prompt manifest — one entry per asset, naming the model, the prompt, the
+format and any model parameters — and generates whichever entry it is asked for. That is
+what keeps *"not a script of every asset generation"* true as the asset set grows: what
+varies per asset is data the user writes, not code.
+
+The manifest is YAML, for the same reason theme files are — it is hand-authored project
+data. The script reads it and never writes it, and it invents nothing that belongs in it:
+prompts, formats and model ids are the user's to write. A prompt an agent made up would be
+recorded as provenance and read back later as a decision.
+
+**The script is Dart**, so generation needs no second toolchain — the SDK already ships
+with Flutter.
+
+**fey-tactics is consulted for the API call and for nothing else.** It is not part of this
+project and is not reachable from it, and Replicate's HTTP API is publicly documented, so
+the reference is a convenience rather than a dependency. The weight of the decision is the
+prohibition on adopting their system.
+
+### The generator is an authoring tool, not a build step
+**Nothing in the app or its build ever runs it.** It is not invoked by `flutter build`,
+`flutter run`, `flutter test` or any CI job; no code under `lib/` imports it or shells out
+to it; and the app builds, tests and archives on a machine that has never held a Replicate
+credential. The credential is read from the environment, never from a committed file, a
+flag or a prompt, and never lands in anything the tool writes.
+
+This is what keeps **Fully offline, except for in-app purchases.** under **What the Design
+Docs Already Imply** above true — the app makes no Replicate call, because generation
+happened on a developer's machine long before the build. It also has to be true because
+**CI — local builds only** below leaves nowhere to hold a build-time secret.
+
+### What gets generated, and where it lands
+**`assets/images/` and `assets/audio/` are where art and audio ship from, and the
+generator writes to neither.** Everything it produces lands in a drafts area first — see
+the next subsection — and reaches those folders only by being approved and moved.
+`assets/themes/` holds theme YAML and is a destination at neither stage. The app icon sits
+outside all of this: it lives in the iOS asset catalog rather than the Flutter `assets/`
+tree (see **Distribution and Release** → **The app icon**), so if it is ever generated
+here, this rule has to widen to reach it.
+
+**The generator computes filenames; nobody types one.** A file is named from the theme and
+the slot it fills, so there is one source of truth for the path a theme's YAML points at,
+and the name an asset is drafted under is the name it ships under. Every generated file is
+theme-prefixed, the logo included, which is what lets one theme override a slot without
+colliding with another theme's file in a flat folder.
+
+**What it owes is per theme, not per game** — each theme's playable sound slots and its
+main-menu logo (see [Theming](./Theming.md) → What a Theme Controls). Mark art is produced
+here too when a theme names it: that section calls an image *"the real answer for a
+theme."* Both themes that exist today draw their marks as glyphs, so no mark image is
+needed yet.
+
+**Logos ship as PNG with alpha at 1x, 2x and 3x, all three downscaled from one render.**
+Flutter treats the three as the same artwork at different densities, so generating each
+independently would make the logo change appearance from device to device. A render that
+is not square, or too small to downscale from, is rejected rather than cropped:
+crop-center, crop-top, letterbox and squash all satisfy "make it square" and most of them
+mangle a logo, so the fix belongs in what was asked for, not in the tool.
+
+**A sound's format is declared per entry and checked against the bytes that arrive**, so a
+file never contradicts its own extension. `.mp3` is what the audio layer is written
+against, but most Replicate audio models emit wav or flac — which format ships is open
+below.
+
+**Music is not part of this.** A theme supplies its own music (see
+[Theming](./Theming.md) → Music), and where that audio comes from — composed, licensed or
+generated — is open there, not here.
+
+### Nothing generated is applied directly — drafts, then approval
+As stated:
+
+> *"WE can generate the content fenced in however i never what the content to be directly
+> applyed. we want each asset to be created into a assests_Draft folder of some type then
+> approved and moved to the real folder to be implamented and tracked by themes. So fence
+> it into a Draft folder first. Approval is my just saying yes use this assest X then move
+> it along."*
+
+So generation is two stages. **The generator writes into a drafts area kept separate from
+the shipped asset folders, and that is the only place it writes.** What that area is
+called is code's to settle — the decision here is the fence, not the path.
+
+**Approval is a person saying yes, and it is the user's to give.** There is no score, no
+threshold and nothing automatic: the user says use this one, and only then does the asset
+move into its shipped folder to be implemented and tracked by themes.
+
+**The fence is structural rather than a rule the tool has to remember.** Approved art does
+not live anywhere the generator can write, so a rerun cannot clobber it — the guarantee
+holds even if the tool is wrong about everything else.
+
+**A drafts area is not a shipped location.** It is not declared in `pubspec.yaml` and
+nothing in it reaches the bundle, which is what makes drafting cheap: generate, look,
+discard, generate again, with nothing at stake until the move.
+
+### Declared in `pubspec.yaml`, or it does not ship
+**The declaration for `assets/images/` and `assets/audio/` lands in the same change as the
+first approved file in each.** It is a hand edit and not something the generator writes:
+`pubspec.yaml` is pinned and hand-maintained, and a tool that loaded and re-dumped it
+would reformat the file and could clobber the theme declaration already there. The drafts
+area is never declared.
+
+**Watch out for:** approving an asset is two moves, and the second is the one that gets
+forgotten. Move the file into its shipped folder without the declaration and the bundle
+contains nothing — the sound never plays, the logo renders nothing, and every test still
+passes. A working-looking, non-functioning feature.
+
+### Regenerating, and leaving nothing behind
+**A run leaves the drafted assets and one record, and nothing else** — no temp files, no
+scratch scripts, no response dumps, no half-written asset. That is *"operates clean and
+generates no junk"* in operational form: a run that dies partway leaves the tree as it was
+rather than leaving a truncated file behind.
+
+**One record per asset, holding the last generation only.** Not a history and not an
+append-only log — regenerating an asset replaces that asset's entry rather than adding to
+it: *"Im more happy about just the one record per asset vs Every record."* An entry holds
+the pinned model version, the prompt, the seed and the parameters that produced the asset.
+**The model version is always pinned**, never a bare model name, which is the whole reason
+the record is worth keeping.
+
+**What the record is for is knowing what was last asked for, so the next request is a
+change from it** rather than a fresh invention: *"So we know what we last asked for and
+chagne from there."*
+
+**It is contained and trashable.** One file the generator owns, written nowhere else and
+never into any other document — *"i dont want asset generation to spam out of controle or
+palute other documents."* Deleting it is survivable: it costs the ability to tweak from
+the last request, and nothing else.
+
+**Regenerating is deliberate and one named asset at a time.** There is no bulk regenerate,
+because a single command that redoes everything is exactly how generation gets out of
+control; and an existing draft is replaced only when the rerun says so explicitly.
+
 ## In-App Purchases and Entitlements
 
 **The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
@@ -816,3 +948,17 @@ block other work.
   debounce interval, a storage timeout, a debug overlay. The escape is the same either
   way: name the value and pass it as an expression. Is that an acceptable tax on non-theme
   code, or should timing and opacity that aren't theme values be exempt?
+
+### 8. Generated assets
+- **Which image model and which audio model?** Nothing can be generated until both are
+  chosen, and the image model has to be one that emits transparent PNG and can be asked
+  for a square render.
+- If no audio model emits mp3, do we ship wav instead, or transcode with **ffmpeg**? The
+  second adds an external binary nothing else in the project needs.
+- **What is the logo, actually?** Nothing states its subject. The approved handoff draws a
+  placeholder of 81 dots — the game itself — and says *"Replace with real art"*, which
+  reads either as the brief for the real logo or as a description of the thing being
+  replaced.
+- **Are generated asset files committed to the repo?** [Theming](./Theming.md) → Where
+  Themes Live says themes are bundled and shipped with the app, which implies the assets
+  they name ship too, but nothing says whether the binaries live in git.

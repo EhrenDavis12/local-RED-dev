@@ -208,6 +208,12 @@ release/distribution.
   - Entitlement state is written down, never minted
 - Audio and Assets
   - Where sound and art assets come from
+  - One script, and the per-asset inputs are data
+  - The generator is an authoring tool, not a build step
+  - What gets generated, and where it lands
+  - Nothing generated is applied directly — drafts, then approval
+  - Declared in `pubspec.yaml`, or it does not ship
+  - Regenerating, and leaving nothing behind
 - In-App Purchases and Entitlements
   - Entitlements — Apple stores them, no backend needed
 - Kids Category
@@ -236,6 +242,7 @@ release/distribution.
   - 5. Which store holds entitlement state?
   - 6. Crash reporting
   - 7. Timing and opacity that aren't theme values
+  - 8. Generated assets
 
 ---
 
