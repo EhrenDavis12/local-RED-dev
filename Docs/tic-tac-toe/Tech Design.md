@@ -44,6 +44,11 @@ such as Android in the far future."**
 Concretely: **iPhone first, iPad second, Android far future.** "All media devices" is
 recorded as stated and is not yet scoped to particular platforms.
 
+**The project is built for iOS and Android only.** No web, macOS, Windows or Linux build
+exists, and those platform folders are not created. Adding one later is cheap and does not
+disturb `lib/`, so this scopes what is built and tested today rather than ruling a platform
+out.
+
 ### Minimum iOS version
 **iOS 15.** The in-app purchase layer is built on StoreKit 2 —
 `Transaction.currentEntitlements`, `Transaction.updates` and `AppStore.sync()` — and those
@@ -55,7 +60,18 @@ that do not cleanly exclude revoked purchases — so a refunded player would kee
 access, and it fails silently rather than as a build error.
 
 ### Orientation — portrait only
-**Portrait only.** No landscape.
+**Upright portrait only.** No landscape, and no 180° rotation — the app does not run
+upside-down.
+
+The lock is set at both the Flutter level and the iOS project level, and both name the
+upright orientation alone. Setting only the Flutter one is not a partial lock: iOS never
+delivers a rotation the project has not declared, so a Flutter-level preference for
+upside-down is dead code that reads like a decision that the app rotates.
+
+**Watch out for:** iOS declares supported orientations separately for iPhone and for iPad,
+and the generated iPad declaration allows both landscape orientations. Narrowing only the
+iPhone one leaves the app rotating on an iPad, and the Flutter-level lock hides that in
+most manual testing.
 
 ### Fresh build, not a refactor
 **A fresh build.** Nothing from the earlier Flutter work carries into this design —
@@ -72,7 +88,7 @@ lib/
   engine/          ← pure Dart, zero Flutter imports
     board.dart
     rules.dart
-  storage/         ← repository interface + Hive implementation
+  storage/         ← repository interfaces + their store implementations
   theme/
     theme.dart     ← merged theme object
     loader.dart    ← YAML → theme
@@ -92,18 +108,60 @@ assets/
   audio/
 ```
 
-`storage/` is local persistence only — the repository interface and its Hive
-implementation (see **Persistence and Serialization** below). There is **no backend data
-layer**: nothing in the app talks to a server. Online multiplayer is an intended future
-direction, so tech choices must not foreclose syncing board state over a network — a
-backend layer gets added if multiplayer arrives.
+**The Dart package name is `tic_tac_toe_extreme`**, the lower_snake_case form of the app
+name and the final segment of the bundle identifier. Every `package:` URI in the codebase
+is rooted at it. The repository's own directory name cannot serve — hyphens and capitals
+are not legal in a Dart package identifier — and changing it later is a whole-codebase
+rewrite.
 
-`navigation/` holds the app's routing layer — see **Navigation** below. It is
-Flutter-side, same as `ui/` and `state/` — nothing here changes the `engine/` purity rule.
-What goes inside the layer beyond that is a PRD's job, not this doc's.
+`storage/` is local persistence only — the repository interfaces and the implementations
+that back them. Which repositories exist, which store each is backed by, and what each
+holds is **Persistence and Serialization** below. There is **no backend data layer**:
+nothing in the app talks to a server. Online multiplayer is an intended future direction,
+so tech choices must not foreclose syncing board state over a network — a backend layer
+gets added if multiplayer arrives.
+
+That rule is checked rather than trusted: a scan over `lib/` finds no HTTP client and no
+network target other than the store SDK. It covers `lib/` only, so build-time tooling
+outside that tree is out of its reach by construction. What is fixed is that property, not
+a list of banned symbols — widening it when a new transport appears is ordinary
+maintenance, narrowing it to let a real network call through is not. It must **not** be
+written as "no networking API is reachable from `lib/`": in-app purchases are the one
+sanctioned network path, so the stricter form fails the day the store layer lands.
+
+`engine/`'s purity is held by a test that scans the layer's imports rather than by
+discipline — see **The Rules Engine** below for what that check matches.
+
+`theme/` holds more than the merged theme object and its loader. Resolving a theme's icon
+slot to a concrete `IconData`, and a stored integer weight to a `FontWeight`, both live in
+this layer, because neither can be written as a theme value read and passed through — an
+icon constant and a `FontWeight` are not labelled numbers. The hardcoded-theme-value guard
+permits both only here (see **Testing** below), so either one written anywhere else under
+`lib/` fails that guard with no legal fix.
+
+`main.dart` is the entry point and nothing else: it initializes the Flutter binding,
+applies the orientation lock, and calls `runApp` exactly once, from one place. `app.dart`
+holds the root widget. That single `runApp` call site is what crash handling wraps, which
+puts its handlers and any guarded zone **outside** `ProviderScope`, so a failure during
+scope construction is still caught.
+
+**`ProviderScope` is the outermost app-level widget**, above the root widget. That
+placement is what makes settings and the theme readable from anywhere in the tree,
+including deep in the board — see **State Management** below.
+
+**The app is routed from the first build**, on the routed `MaterialApp.router` form rather
+than a `home:` widget, so installing the real route table replaces a value instead of
+restructuring the root widget.
+
+`navigation/` holds the app's routing layer — see **Navigation** below. Route construction
+happens there and nowhere else. It is Flutter-side, same as `ui/` and `state/` — nothing
+here changes the `engine/` purity rule. What goes inside the layer beyond that is a PRD's
+job, not this doc's.
 
 `assets/themes/`, `assets/images/` and `assets/audio/` are the **designated folders for
-assets** required by **Audio and Assets** below.
+assets** required by **Audio and Assets** below. A folder's `pubspec.yaml` declaration
+lands with the first real file put into it, never before — Flutter fails the build when a
+declared asset directory holds no files.
 
 `audio/`, `haptics/`, `entitlements/`, `diagnostics/` and `purchase/` follow the same
 one-folder-per-layer convention, each owned by the PRD named in the tree above. File names
@@ -1253,3 +1311,15 @@ block other work.
   shortcut is building fixtures from stored JSON, and that binds the whole suite to a
   serialized shape **1. Persisted data — migration** above leaves open — where the
   breakage then looks like a rules failure rather than a fixture one.
+
+### 10. The bundled icon set
+- Which bundled icon set the app ships, and whether it arrives as a package dependency or
+  as icon art bundled per theme. [Theming](./Theming.md) → What a Theme Controls sanctions
+  either — "a theme may either name a glyph from a bundled icon set or ship its own image"
+  — and the approved handoff names Phosphor without that being a decision, but no decision
+  names a set. If it is a package it joins the declared dependencies; if it is per-theme
+  image assets it lands under the asset-folder rule in **Project Structure** above.
+- Downstream of that: does the `cupertino_icons` dependency the Flutter scaffold generates
+  stay? Nothing reads it, and the hardcoded-theme-value guard bans its constants outside
+  the theme layer — but it is one small first-party package, and it is already there if
+  the icon set ever lands on Cupertino glyphs.

@@ -260,6 +260,7 @@ release/distribution.
   - 7. Timing and opacity that aren't theme values
   - 8. Generated assets
   - 9. The rules engine
+  - 10. The bundled icon set
 
 ---
 
