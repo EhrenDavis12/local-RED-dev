@@ -269,8 +269,12 @@ gesture leads. See Open Questions below.
 Menu is screen 1 in **Screens (so far)**) and stated nowhere else.
 
 ## Theme Selection
-Opened by the **Theme** button on the main menu. This is an **overlay** on the main menu,
-not its own screen — see [Theming](./Theming.md).
+Opened by the **Theme** button on the main menu, and by nothing else. This is an
+**overlay** on the main menu, not its own screen — see [Theming](./Theming.md). The main
+menu stays mounted and painted underneath it, dimmed — see **Main Menu** above.
+
+**The sheet's header is "Pick your look"**, with **"Both free. Switch any time."** on a
+second line under it.
 
 **Two options at launch:**
 - **Neon** — black background, electric neon colors. The base theme.
@@ -278,14 +282,49 @@ not its own screen — see [Theming](./Theming.md).
 
 See [Theming](./Theming.md) → Theme Catalog for the full look of each.
 
+**The list is one row per theme file in the themes folder**, so adding a theme is dropping
+one file in and nothing on this screen changes — see [Theming](./Theming.md) → Where
+Themes Live. **The list always renders.** One theme file the app can't read never blanks
+the overlay or stops the other rows from appearing.
+
+**Each row shows a preview tile, the theme's name and a one-line description, all read
+from that theme's own file.** The preview tile is a miniature quadrant rendered in that
+theme's own colors and marks — that theme's grid lines, and one mark from each player — so
+two themes side by side are told apart by the tile alone. An empty grid, or a grid drawn
+in the *active* theme's colors, isn't this.
+
 **The currently active theme is highlighted** in the list, so it's obvious which one is in
-use before you change anything.
+use before you change anything. The active row carries both treatments — a ring around
+the row **and** an **ACTIVE** badge — and it keeps its ownership badge as well, so an
+active free theme reads **ACTIVE** and **FREE** together. A ring on its own, or a badge on
+its own, isn't the highlight.
+
+**Every row also carries exactly one ownership badge** — **FREE**, **OWNED**, or, on a
+locked row, a price action in place of the badge with the preview tile dimmed. **ACTIVE**
+is not an ownership badge and never replaces one. What the three states mean, and why a
+locked row still shows its preview, is [Tech Design](./Tech%20Design.md) → In-App
+Purchases and Entitlements. The row draws all three without reshaping, so a paid theme
+drops into the list later without redrawing the screen.
+
+**Nothing on this overlay is buyable, and no purchase or restore control lives here.**
+Both themes that ship are free, so no row is locked at launch. The purchases section and
+the global **Restore purchases** control are on the Settings screen — see **Settings
+Menu** → **Purchases**. The approved handoff draws a *Restore purchases* link in this
+overlay's footer; that link isn't built here, because one global control on Settings keeps
+the purchase flow off the other menu screens.
 
 **Neon is the default** — what's active before a player has ever opened theme selection,
 and it's the base theme every other theme falls back to. See [Theming](./Theming.md).
 
-Selecting a theme applies it, and it persists between sessions — see
-[Theming](./Theming.md) → Choosing a Theme.
+**Selecting a theme applies it immediately** — the menu behind the overlay is already in
+the new theme, no restart — and the overlay closes. The choice persists between sessions;
+see [Theming](./Theming.md) → Choosing a Theme. **The overlay can also be closed without
+changing anything**, with the close control in its header.
+
+**If the theme fails to load, the overlay does not close.** The "sorry this theme is
+unavailable" modal sits on top of the overlay, which stays underneath it, and the app
+falls back to Neon — so Neon is the highlighted row behind the modal. The modal and the
+fallback are [Theming](./Theming.md) → Choosing a Theme.
 
 ```
 ┌─────────────────────────┐
@@ -472,3 +511,14 @@ reason for one ("Leave game? Your score will be lost") no longer applies.
   three the handoff draws (`1d`, `1e`, `2d`)?** The board has more states than that — game
   over, and free choice after being sent to a dead quadrant — and it's not decided what,
   if anything, this strip shows for those.
+- **After the "this theme is unavailable" modal is dismissed, does the overlay stay open
+  on the Neon list, or close along with the modal?**
+- **Where does the "theme is unavailable" message go when the load fails at launch**,
+  before the overlay is even open — fall back to Neon quietly and show it the next time
+  theme selection is opened, or say something at launch?
+- **Is the Neon fallback remembered?** When a theme fails to load and the app drops back
+  to Neon, does Neon become the saved choice, or is the player's original pick kept and
+  tried again next launch?
+- **What does a player see when a theme file is broken?** The list still renders either
+  way, but nothing says whether that theme is quietly missing from it or shown as
+  unavailable.
