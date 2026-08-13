@@ -242,6 +242,14 @@ release/distribution.
   - The app icon
   - CI — local builds only
   - Release tooling — fastlane
+  - The release run
+  - Credentials never live in the repository
+  - The listing ships in one locale
+  - The store-side products
+  - The Paid Applications Agreement does not wait
+  - Export compliance is pre-answered
+  - What the record declares about data collection
+  - The manual steps, and the checklist that holds them
 - Open Questions
   - 1. Persisted data — migration
   - 2. Theme loading

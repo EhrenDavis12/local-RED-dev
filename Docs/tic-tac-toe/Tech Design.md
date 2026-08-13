@@ -994,14 +994,134 @@ The three pieces:
   App Store Connect.
 - **`match`** stores signing certificates and provisioning profiles in a git repo and
   syncs them.
-- **`produce`** creates the app record and registers the bundle identifier from the CLI.
+- **`produce`** creates the app record and registers the bundle identifier and the app
+  name from the CLI — the record is never hand-created in the App Store Connect web UI.
+  It runs once, when the record is created, not on every release.
 
-It runs on Apple's official App Store Connect API underneath.
+It runs on Apple's official App Store Connect API underneath, authenticated by an App
+Store Connect API key rather than an Apple ID session.
 
 **Set up when actually approaching shipping — not now.**
 
 **Watch out for:** fastlane does not automate App Review, which stays manual — and an
-Apple Developer Program membership is required before any of it works.
+Apple Developer Program membership is required before any of it works. That membership
+is not the same thing as the Paid Applications Agreement below: it lets you ship an app,
+not sell anything.
+
+### The release run
+**One command runs the release, and it starts by running the local checks.** `flutter
+analyze` and `flutter test` run first, and the release aborts if either fails — nothing
+is built and nothing is uploaded from a tree that does not pass. With **CI — local
+builds only** above, that is the only automated gate that exists: whatever the release
+procedure checks is the only thing anything checks.
+
+From there the run syncs the signing material, increments the build number, builds the
+app, and uploads the build and the listing to App Store Connect. **The first release is
+version `1.0.0`.** The build number is incremented by the run rather than by hand and
+never repeats; an upload is refused without a unique one, so the alternative is not
+"undecided" but "decided at the keyboard on upload night." The marketing version
+thereafter is a hand edit to `pubspec.yaml`.
+
+**A listing change can be pushed on its own, without producing a build.** That is what
+makes keeping the listing as text worth doing — a wording fix is a commit and a push,
+not a release.
+
+Submitting to App Review is still a human step, and so is waiting on the review itself.
+
+### Credentials never live in the repository
+**"Kept in the repo" covers the listing text and the screenshots, and nothing else.**
+The App Store Connect API key, the signing passphrase, and the address of the
+certificate repository are all read from the environment. The key file lives outside the
+repository and is never committed in any form, and **the certificate repository is
+private.**
+
+This is a rule rather than a preference because a private key committed to a repository
+is an unrecoverable leak: it cannot be un-published, only revoked.
+
+### The listing ships in one locale
+**`en-US`, and it is the only one.** Nothing is localized for the first release, and
+adding a locale later is additive — a new set of field files beside the existing ones.
+The listing also carries a copyright line naming the year of first release and a holder;
+who the holder is has not been decided — see Open Questions.
+
+**Screenshots are release work.** Building the screens does not produce them; turning a
+finished screen into a store image at Apple's required sizes is its own job, and the
+images are committed alongside the listing text. **The submitted build is universal —
+iPhone and iPad** — because the scaffold leaves the iOS device family at its default, so
+the sizes required are Apple's current iPhone and iPad reference sizes. Narrowing to
+iPhone-only is cheaper before first submission than after; see Open Questions.
+
+### The store-side products
+**The record declares in-app purchases, and the products configured on it are exactly
+the products the app queries — no others.** A store entry the app never queries is a
+product nobody can buy and a review surface nobody maintains.
+
+**The first public release carries two purchasable products:** the **$4.99 unlock that
+raises the open-game cap from 3 to 100**, sold from the Settings screen's purchases
+section, and **one purchasable theme**. The theme product belongs to first release, not
+to the MVP that comes before it.
+
+**A purchasable theme needs a theme to sell.** One beyond the two free ones has to exist
+and ship in the submitted build, and no third theme is specified today — so that product
+cannot be configured until one is. Which theme is the paid one is open, and so is
+whether paid themes are ultimately one product, one per theme, or a bundle: one
+purchasable theme at first release settles the launch shape, not the model. See Open
+Questions.
+
+**Products are created as non-consumables**, which is what the entitlement model already
+assumes: restore is largely automatic, and a refunded purchase simply stops appearing in
+the player's entitlements. Neither is true of a consumable. **App Store Connect fixes
+the product type at creation and it cannot be changed afterwards** — a consumable
+created by mistake has to be abandoned and replaced under a new identifier, which is
+permanent too.
+
+**Products are configured separately from the app record and are their own review
+surface.** Each carries its own metadata and review state and can be rejected
+independently of the app, and no part of the release run touches them.
+
+### The Paid Applications Agreement does not wait
+**Everything else here waits for shipping to actually approach. This does not.** The
+Paid Applications Agreement, and the banking and tax details that go with it, is a
+human, multi-day process with no automation path, and it gates the products existing at
+all — nothing can be sold, including any in-app purchase, until it is executed. Starting
+it late delays a ship date by weeks.
+
+**Nothing in the tooling detects that it is missing.** App Store Connect simply will not
+let the products exist.
+
+### Export compliance is pre-answered
+**`ITSAppUsesNonExemptEncryption` is set to `false`, in the iOS project's
+`Info.plist`.** The app implements and calls no cryptography of its own, and the HTTPS
+StoreKit performs on its behalf is exempt. Without the key, the compliance question is
+answered by hand on every upload — a step to forget rather than a decision to make. If
+the app ever ships its own cryptography, the answer changes and so does the filing.
+
+### What the record declares about data collection
+**Nothing is transmitted, so the privacy nutrition label's answer for the build being
+submitted is "no data collected."** The app operates no server of its own: entitlements
+live with Apple and are verified on device, crash reports are built and never sent, and
+there is no analytics or advertising SDK to declare — see **Crash Reporting** and
+**In-App Purchases and Entitlements** above.
+
+**It is not settled beyond that build.** Whatever a crash report ends up carrying is
+what a future destination would send, and that is what the label would then have to
+declare — so this is re-checked the day a destination is chosen. The label and the
+age-rating questionnaire are filled in by a human either way.
+
+### The manual steps, and the checklist that holds them
+**Every step of submission that leaves no artifact is written down rather than
+remembered** — on a checklist kept in the repo beside the release tooling, with a place
+to record who did each one and when. The first evidence of a missed step is otherwise a
+rejected submission. The steps are the Paid Applications Agreement, the Developer
+Program membership, submitting the app and each product to review, the App Review
+contact details, the content-rights answer, the price and territory entries, the privacy
+policy URL, and the sandbox pass below.
+
+**The purchase flow is exercised against a real App Store sandbox account before
+submission.** Every automated test of buying and restoring runs against a double, and
+nothing automated ever touches the real store — so this manual pass is the only time the
+real thing is exercised at all. The path is the one a player takes: Settings → purchases
+section → parental gate → buy.
 
 ## Open Questions
 
@@ -1034,16 +1154,34 @@ block other work.
   - **A privacy policy URL and a support URL** — both required listing fields. The
     project has no website of any kind.
   - **The privacy nutrition label and the age rating questionnaire.**
-  - **App Store category, price tier, and territory availability.**
-  - **Export compliance** — asked on every upload; can be pre-answered with an
-    `Info.plist` key, which is the scaffold's file.
+  - **The secondary App Store category, the price tier, and territory availability.**
+    The primary category is settled by the Kids-category listing.
   - **Content rights** — the submission asks whether the app contains third-party
     content, and the answer depends on the licensing of Replicate-generated assets and
     of the bundled Inter and Phosphor dependencies, none of which is established.
-  - **Screenshots** at Apple's required device sizes — who captures them, and by what
-    means, is unowned.
+  - **Screenshots** at Apple's required device sizes — by what means they are captured
+    is open: by hand on a simulator, or with fastlane's `snapshot`, which would be a
+    fourth fastlane component beyond the three under Distribution and Release →
+    Release tooling — fastlane.
   - **App Review contact information**, and **sandbox testing of the purchase flow**
     before submission.
+  - **The product identifiers.** No doc names one for either of the two products and
+    none has been minted. An identifier is permanent and cannot be reused, and the
+    product type is fixed at creation as well, so a mistake has to be abandoned rather
+    than corrected.
+  - **Which theme is the purchasable one**, and whether paid themes are ultimately one
+    product, one per theme, or a bundle. One purchasable theme at first release settles
+    the launch shape, not the model.
+  - **Which git repository holds the signing certificates.** It has to be private;
+    where it lives is open.
+  - **Whether the submitted build stays universal.** Narrowing to iPhone-only is
+    cheaper before first submission than after.
+  - **Who the copyright line names.** The listing requires one — the year of first
+    release and a holder — and nothing states the holder.
+- **Nobody owns debug symbols (dSYMs) or symbolication.** Without symbols, a stack trace
+  from a release build is raw addresses rather than function names. Uploading symbols
+  would be release tooling's job if a crash-report destination were ever chosen, but no
+  destination is chosen and choosing one is a separate decision — see Crash Reporting.
 
 ### 4. Kids category — age rating questionnaire
 - The Kids-category listing choice and the resulting parental-gate, analytics, and
