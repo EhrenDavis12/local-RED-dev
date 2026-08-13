@@ -190,6 +190,14 @@ release/distribution.
   - Fresh build, not a refactor
 - Project Structure
 - The Rules Engine
+  - One value holds the game and the series
+  - The engine speaks the project's vocabulary
+  - Quadrants and cells are indexed the same way
+  - Three placement states, and the UI reads them
+  - The series lives in the same state
+  - The engine publishes which three quadrants won
+  - What the engine refuses
+  - What the engine is not
 - State Management
 - Navigation
 - Rendering the Board
@@ -243,6 +251,7 @@ release/distribution.
   - 6. Crash reporting
   - 7. Timing and opacity that aren't theme values
   - 8. Generated assets
+  - 9. The rules engine
 
 ---
 

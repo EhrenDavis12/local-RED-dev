@@ -115,12 +115,146 @@ inside each are that PRD's to decide, not this doc's.
 win/cat-game detection and free-choice state are **pure Dart with zero Flutter imports**,
 and the UI layer reads from it.
 
+**It imports no Hive package either, whatever the spelling.** `storage/` owns the store —
+see **Persistence and Serialization** below — and the purity check matches any package
+whose name begins `hive`, so it keeps holding if that choice is ever revisited.
+
 **Game state is immutable.** The engine never mutates a board in place — every move
 produces a new state object, and that new object is what the UI renders.
 
 The API is `Board applyMove(Board, Move)` returning new state, not `board.play(move)`
 mutating in place — so the pure-Dart engine and the Riverpod layer agree on how state
 changes.
+
+### One value holds the game and the series
+
+**`Board` is the whole game plus the series it belongs to** — the 81 cells, the 9 quadrant
+states, the placement state and the forced quadrant, whose turn it is, the last completed
+move, the outcome and the line that won it, the running score, and who went first in this
+game. There is no outer type wrapping it: the state a game-ending move returns already
+carries the incremented score, so a caller has one value to render, save and resume.
+
+The name is narrower than what it holds, and it is kept rather than quietly improved —
+the API above and every consuming layer are written against it.
+
+### The engine speaks the project's vocabulary
+
+**The public surface uses the working vocabulary** — big board, quadrant, small board,
+claim, cat game, Player One, Player Two — from
+[Game Overview](./Game%20Overview.md) → Terminology. No abbreviation of *quadrant*, and
+nothing shortened to `p1`/`p2`.
+
+**The engine holds no mark glyph and no display string.** X and O are theme-supplied asset
+slots — see **Marks — supplied by the theme** below — so nothing in the engine names a
+glyph, an icon, an asset path, or any text a player reads. The players are Player One and
+Player Two, named so that real names can be added later without fighting the engine.
+
+### Quadrants and cells are indexed the same way
+
+**Both are 0 to 8, row-major from the top left** — 0 top-left, 4 centre, 8 bottom-right —
+for a cell inside its small board and for a quadrant inside the big board alike. That
+shared numbering is what makes the sending rule an identity: the index of the cell played
+is the index of the quadrant the opponent is sent to. The 1–9 labels in
+[Rules](./Rules.md) → Cell → Quadrant Mapping are that same order, written for humans to
+read.
+
+### Three placement states, and the UI reads them
+
+**Forced, free choice and game over are engine state, not something the UI infers.** The
+engine names which one is active, and in the forced state which quadrant. The opening move
+is the free-choice state over all nine quadrants, not a state of its own.
+
+A consumer branches on the placement state and never on "there is no forced quadrant" —
+free choice and game over both have none, so that test reads a finished game as free
+choice. A forced state always names a quadrant with at least one legal move in it, because
+a send onto a quadrant that just died resolves to free choice instead.
+
+**One still-open quadrant is still free choice, not forced.** When the send lands on a
+dead quadrant and exactly one quadrant is left open, the state is free choice. The legal
+moves are identical either way; the difference is what the board draws — that quadrant
+reads as available rather than as the forced one, see
+[Game Board Design](./Game%20Board%20Design.md) → The free-choice state.
+
+**A claim or cat game is resolved before the send is.** That ordering inside a move is
+what makes a move that kills its own destination hand the opponent a free choice, which
+[Rules](./Rules.md) → Sent to a dead quadrant states as the rule.
+
+**The legal-move set is empty exactly when the game is over**, so an in-progress board
+always offers at least one move.
+
+### The series lives in the same state
+
+**The score is series state, and the engine moves it** — the winner's column, or Ties, is
+already incremented on the state the game-ending move returns. See
+[Menus and UI](./Menus%20and%20UI.md) → When does the scoreboard increment. Starting the
+next game resets the board and moves no counter, because the finished game was counted
+when it ended.
+
+**Whose turn it is, is engine state, never derived from move parity.** Turn order across
+games ([Rules](./Rules.md) → Turn Order Across Games) makes Player Two the first player of
+some games, so the engine also retains who went first in the current game. A move names a
+quadrant and a cell and never a player — the mark is the current player's, which makes
+alternation the engine's to enforce rather than the caller's to get right.
+
+**Watch out for:** a turn derived from move parity passes a single-game test suite and
+then silently inverts the turn indicator for every later game in a series.
+
+**The move that ends the game does not alternate.** Every other move flips whose turn it
+is; the winning move leaves the winner as the current player, so a finished game reads as
+the winner's wherever it is read rather than naming the player who lost. The cost is that
+the last move is the one exception to alternation, and anything asserting that invariant
+has to carve it out. On a straight draw there is no winner to stop on, so the value stays
+with whoever made the final move — nobody is to move on a finished game, and anything that
+presents a turn gates on the game-over state.
+
+**The last completed move is part of the state, and it is absent rather than a stand-in
+value on a board nobody has played** — a fresh series and the board that starts the next
+game both have none. A stand-in would draw the last-move ring on a cell nobody played, on
+the first board of every rematch.
+
+### The engine publishes which three quadrants won
+
+**On a won game the engine names the three quadrants of the completed big-board line**, so
+whatever announces or highlights the win reads it rather than re-deriving it. It is absent
+on an in-progress board and on a draw, and there is no stand-in value to test for.
+
+Absence carries two meanings and is not a draw signal: a consumer reads the outcome first
+and asks for the line only in the two winning cases. The three come back in ascending
+order — a list needs some order, no doc gives one, and anything wanting the order a line
+is drawn in sorts them itself. When one claim completes two lines at once, exactly one
+comes back: the first in a fixed order — rows top to bottom, then columns left to right,
+then the two diagonals — so the value is deterministic. Which line a *player* should be
+shown in that case is an open question below.
+
+The line is derivable from the quadrant states, so nothing turns on whether it is stored
+with a saved game or recomputed on load.
+
+**This makes a winning-quadrant highlight expressible; it designs none.** What is drawn
+with the value belongs to [Game Board Design](./Game%20Board%20Design.md) and
+[Animations](./Animations.md).
+
+### What the engine refuses
+
+[Rules](./Rules.md) → Engine Contract settles that the engine throws rather than returning
+silently. The engine's own share of that contract:
+
+- **Two reasons, and the already-finished game is checked first**, so a move applied to a
+  finished game reports that rather than "not a legal move" — both are true of it and only
+  one of them is useful.
+- **It raises an `Error`, not an `Exception`.** This is a contract violation rather than a
+  recoverable condition, and no caller is meant to catch it.
+- **The error carries the offending move and the board it was applied to.** That is the
+  debugging value, and it is read from a debugger attached in process. What may be
+  *rendered* from it is **Crash Reporting** → *The one error that carries game state
+  renders none of it* below; the engine's own tests assert that rendering this error as
+  text prints no board content.
+
+### What the engine is not
+
+The engine draws nothing, holds no theme value, and knows nothing about screens. A pending
+selection — the first tap of the two-tap move — is input state and never engine state. The
+record id, the opponent name and the timestamps a saved game carries belong to storage,
+not to game state; see **What a stored open game holds** below.
 
 ## State Management
 
@@ -962,3 +1096,22 @@ block other work.
 - **Are generated asset files committed to the repo?** [Theming](./Theming.md) → Where
   Themes Live says themes are bundled and shipped with the app, which implies the assets
   they name ship too, but nothing says whether the binaries live in git.
+
+### 9. The rules engine
+- If a win completes two lines at once, does the game name one of them, or both? The
+  engine returns one so the value is deterministic, but that fixes what the engine
+  publishes, not what a player should be shown — and "both" is not expressible in what it
+  returns today. Widening that later is a change at every consumer; widening which one it
+  picks is not.
+- What happens if the next game is started while a game is still in progress? Starting the
+  next game is settled for a *finished* game — reset the board, carry the score, apply the
+  turn-order rule — and there is no first player to derive from a board with no result.
+  The candidates are throw, reset and discard the game in progress, or leave it undefined.
+- What comes back from reading a cell or a quadrant with an index outside 0–8? An
+  out-of-range index on the write path is an illegal move; the read path has no stated
+  answer, so today it is whatever the underlying collection happens to do.
+- How may a test build a mid-game board? The only way in through the public surface is a
+  fresh series plus a replay of legal moves, which is faithful but long. The tempting
+  shortcut is building fixtures from stored JSON, and that binds the whole suite to a
+  serialized shape **1. Persisted data — migration** above leaves open — where the
+  breakage then looks like a rules failure rather than a fixture one.
