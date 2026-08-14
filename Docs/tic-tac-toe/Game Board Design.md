@@ -78,6 +78,12 @@ screen shows and because the spelled-out form is materially wider in a fixed-wid
 - Takes vertical space away from the board — worth noting given the board already has
   81 cells to fit on a phone.
 
+**How much vertical space it takes isn't a fixed number — the height is derived from its
+content.** A theme picks the type scale, so a theme with larger chip text makes the
+scoreboard taller: it grows rather than clipping the labels or the numbers. Whatever
+height it lands on, the whole 9x9 board still has to fit below it with no zoom and no
+scrolling — see [Responsive / Screen Size](#responsive--screen-size).
+
 ### Turn Indicator
 The active player's name in the scoreboard is **highlighted** to show whose turn it is.
 
