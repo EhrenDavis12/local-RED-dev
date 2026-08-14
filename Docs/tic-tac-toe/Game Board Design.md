@@ -147,6 +147,13 @@ leaves the other eight looking normal and tappable. The non-legal quadrants shou
 **locked** — dimmed, desaturated, greyed, receded, something. The contrast between "here"
 and "not here" is what carries the rule.
 
+**Dimmed, not blacked out.** Whatever's already been played in a locked quadrant has to
+stay readable through the dimming. You can't plan a move without reading the whole board,
+and in the forced state eight of the nine quadrants are locked.
+
+**Once the game is over, nothing reads as playable.** Every quadrant goes locked — a
+finished board doesn't sit there glowing with places to tap behind the result card.
+
 ### The free-choice state
 There's a second legal state the board has to handle: when a player is sent to a dead
 (claimed or cat-game) quadrant, they get a **free choice of any still-open quadrant**
@@ -161,9 +168,10 @@ So the active-quadrant highlight needs **two modes**:
 
 The free-choice state should still make the *locked* quadrants (claimed, cat-game) read as
 locked. It's "pick any of these open ones," not "the board is unlocked." Nine glowing
-quadrants at once also risks looking like noise, so free choice may want a calmer
-treatment than the single-quadrant forced highlight — or a text cue ("Free choice — pick
-any open board").
+quadrants at once would look like noise, so free choice takes a calmer treatment than the
+single-quadrant forced highlight — the still-open quadrants read as available rather than
+each getting a copy of the forced highlight — and a text cue ("Free choice — pick any open
+board") as well.
 
 **The free-choice cue lives in the how-to-play strip below the board — not in a turn banner
 above it.** That strip already exists, already swaps its content by board state, and
@@ -205,6 +213,13 @@ sentence, and they're the core of the board's readability:
 create exactly the confusion they exist to prevent. They differ in scope, which helps:
 one marks a **single cell** (what just happened), the other marks a **whole quadrant**
 (what you can do now).
+
+**The last-move highlight reads through the dimming.** The opponent's last move is usually
+sitting in a quadrant that's now locked — that's the normal case, not the odd one — so the
+locked treatment dims that quadrant without hiding what's highlighted inside it. The claim
+mark is different: on a won quadrant it covers the whole quadrant, and the cell that won
+it isn't picked out separately underneath. What changed there is that the quadrant was
+won, and that's what the player sees.
 
 Between them they answer the only two questions a player has when handed the phone:
 *what changed, and what can I do?*
