@@ -243,6 +243,10 @@ Placing a mark takes **two taps**, not one.
 2. **Second tap — confirm.** Tapping the same cell again commits the move. The mark is
    placed and the turn passes.
 
+That's the whole gesture, everywhere. There's no separate step where you pick a quadrant
+first — on the opening move and in free choice you still just tap the cell you want,
+there are simply more of them to choose from.
+
 ### When the selected move claims its own send target
 **Every still-open quadrant is highlighted.** Normally, selecting a cell previews the
 quadrant the opponent will be sent to. But if that move would claim or cat-game the very
@@ -254,6 +258,14 @@ This reuses the free-choice highlight that already exists for the state after su
 lands (see **The free-choice state** above), so the preview and the resulting board state
 look consistent. It also teaches the rule at the moment it fires, which matters because
 sending an opponent to a dead quadrant is a real strategic cost that players have to learn.
+
+**The quadrant this move kills is not one of the highlighted ones.** It's open now and
+dead the moment the move lands, so the preview shows the board as it will be, not as it
+is — otherwise it would be pointing the opponent at the one quadrant they can't use.
+
+**A move that ends the game previews no destination at all.** If confirming would win or
+draw the whole game, nobody is being sent anywhere, so the big board gets no preview
+treatment and only the pending cell reads as provisional.
 
 ### Why this is more than a safety net
 The preview between the two taps is a teaching tool. It makes the sending rule visible
@@ -291,6 +303,10 @@ No separate Confirm button.
 Note this makes a fast double-tap the natural "I know what I'm doing" gesture, while a
 slower tap-look-tap gives you the preview. Same interaction serves both the player who
 wants speed and the one who wants to check.
+
+**There's no time limit between the two taps.** A pending selection sits there until
+it's confirmed, replaced or tapped away — look at the board for a minute, come back, tap
+the same cell again, and it still commits.
 
 ### Sound
 The pending selection **does not** get its own sound. Sound belongs to the confirmed
