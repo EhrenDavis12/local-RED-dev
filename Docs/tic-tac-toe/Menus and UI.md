@@ -196,14 +196,34 @@ board is doing:
 - `1e` (forced quadrant + last move) — neither of those. Its bottom strip instead carries
   two lines explaining the two rings: *"They played here last — that's what sent you."* /
   *"The only board you can play in right now."*
-- `2d` (pending move) — a third, different pair of lines, on the turn banner rather than a
-  bottom strip: *"Play here?"* / *"Tap again to lock it in."*
+- `2d` (pending move) — a third, different pair of lines, and the explanation is split
+  across two surfaces. The turn banner carries *"Play here?"* / *"Tap again to lock it
+  in."*, and the bottom strip carries its own pair: *"Your pick, not played yet — and
+  where it sends them."* / *"Still showing what they did last — it stays until you
+  commit."*
+
+**The strip only explains what is actually on screen.** A line about a ring that isn't
+there is dropped, and its swatch with it — on the opening move nobody has played yet, so
+the last-move line doesn't render.
+
+**The hint is the only place in the whole product that says the two-tap mechanic exists**,
+so neither half of it can be dropped if the copy is ever rewritten. The preview half is
+what teaches the sending rule, and the "tap it again" half is what stops a first tap
+reading as a failure.
 
 The sending rule is the hardest thing in the game to explain, kids are a stated target
 audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform), and
 today nothing in these docs explains it anywhere. Whether there is also a fuller
 Rules/How-to-Play screen is left open — see Open Questions below, which already carries
 that as a future menu item.
+
+**The strip has to state the sending rule itself — that the square you play inside a small
+board is what decides which board your opponent plays in next.** None of the drawn copy
+closes that: the hint says a tap shows you "where it sends them" without saying that
+*where* is decided by *which square*, and the forced-state line states the causality after
+the fact — *"that's what sent you"* — without the mapping, and only to a player who can
+already read the rings. The sentence itself isn't written and no approved screen draws
+it — see Open Questions below.
 
 **The turn banner is built, it is always visible, and it carries two things.** Normally
 it says whose turn it is — the approved handoff draws this as *"Player One, you're up!"*.
@@ -216,7 +236,11 @@ Because the banner is always visible, it takes vertical space on every board scr
 only while a move is pending.
 
 The free-choice cue is a separate matter and lives in the how-to-play strip below the
-board — see [Game Board Design](./Game%20Board%20Design.md) → The free-choice state.
+board — see [Game Board Design](./Game%20Board%20Design.md) → The free-choice state. On a
+free-choice turn it shows alongside the legend and the hint, not instead of them. It drops
+out while a move is pending and comes back when the player commits or picks somewhere
+else. A forced quadrant needs no cue of its own, since *"The only board you can play in
+right now."* already says it.
 
 ## Screens (so far)
 1. **Main Menu** — Play Game + Theme + Settings + About Us buttons.
@@ -566,6 +590,22 @@ reason for one ("Leave game? Your score will be lost") no longer applies.
   three the handoff draws (`1d`, `1e`, `2d`)?** The board has more states than that — game
   over, and free choice after being sent to a dead quadrant — and it's not decided what,
   if anything, this strip shows for those.
+- **What does the strip say to explain the sending rule?** Nothing written or drawn says,
+  in words, that the square you play inside a small board is what decides which board your
+  opponent plays in next. Whatever it says has to work in the words a player reads —
+  "square" for a cell and "board" for one of the nine — where "board" is also the name for
+  the whole grid.
+- **What exactly does the free-choice cue say?** The handoff's *"Free choice — pick any
+  board"* is the surviving candidate, and whether it ships as drawn is the call. It has to
+  read unmistakably as one of the nine and not as the whole grid.
+- **Does the strip still say anything of its own while a move is pending?** The turn
+  banner carries the pending-move prompt, and the handoff draws the strip talking as
+  well — or the strip could go quiet and leave the banner to do it.
+- **Do the hint and the legend ever fade once a player knows the game?** They're training
+  wheels on the screen with the tightest vertical budget in the app, and a player on their
+  fortieth game pays for them every turn. If they can fade, nothing says what triggers
+  it — a move count, a games-played count, a setting, a dismiss control — and a dismiss
+  control needs a way to bring them back.
 - **After the "this theme is unavailable" modal is dismissed, does the overlay stay open
   on the Neon list, or close along with the modal?**
 - **Where does the "theme is unavailable" message go when the load fails at launch**,
