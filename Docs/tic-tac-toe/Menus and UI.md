@@ -125,6 +125,17 @@ Play Game branches on whether there are existing open games.
 ```
 Each open game is titled with its opponent's name. ItSaMeMaRiO is the default.
 
+**The list is ordered most-recently-played first**, so the game you were last in sits at
+the top. It shows every open game — none is hidden, truncated or paginated away — so with
+the cap raised to 100 the list scrolls.
+
+**A row shows the opponent's name, and nothing else is settled.** The handoff draws a
+relative time and three score chips on every row; neither is decided — see Open Questions.
+
+**The footer drawn on `1b` — "Three saved games. Starting a fourth replaces the oldest." —
+does not ship.** Nothing ever removes a game the player did not choose to delete, so the
+drawing is stale on that point, and what the footer says instead is unwritten.
+
 Undecided: whether the empty-state path (no open games → straight into a new game) also
 shows the opponent-name prompt, or skips it. "No intermediate screen" and the prompt
 can't both be true on that path.
@@ -134,6 +145,14 @@ open-games list and nothing else. In game, the players are still **Player One** 
 **Player Two**. That might change in the future, so don't build it in a way that makes the
 swap hard to make later. See [Game Overview](./Game%20Overview.md) →
 Session Structure — Games and Continuing.
+
+**The name field comes up pre-filled with ItSaMeMaRiO and the text selected**, so typing
+replaces it. Leaving it empty falls back to ItSaMeMaRiO rather than blocking, and the
+field takes at most 16 characters. Cancelling the prompt creates nothing.
+
+**Opening a game from the list shows that game.** The board is not drawn until the saved
+position has loaded, so a player never sees an empty board, or the game they were in
+before, standing in for it.
 
 ### What an open game holds
 **An open game holds a whole series — the board plus the running score.** A rematch
@@ -150,6 +169,12 @@ slots.**
 What each of those 3 (or 100) holds is a whole series — see **What an open game holds**
 above.
 
+**Reaching the cap never makes the app delete or replace a game on its own.** A slot is
+freed only by the player deleting one — see **Deleting an open game** below, and
+[Tech Design](./Tech%20Design.md) → The cap is enforced on create, and the store never
+evicts. What the New Game action offers a player who is already at the cap is not settled
+— see Open Questions.
+
 ### Deleting an open game
 **The open-games list carries a delete action, so a slot can be freed.** With a cap of 3
 and a rematch staying in the same open game, nothing else frees a slot.
@@ -165,17 +190,29 @@ the user's own words:
 The revealed control is a **trash button** — an icon, not a worded "Delete" label. The
 modal's buttons are **Yes and No**, not Cancel/Delete.
 
+**The revealed trash button stays put when the finger lifts** — it has to, since the player
+has to tap it — and the reveal closes again on swiping the row back, on tapping the trash
+button, or on tapping the row body. **Tapping the row body closes the reveal and does not
+open the game**: it is the standard iOS behaviour and the safer one to sit next to a
+destructive control, at the cost of a tap that would have resumed a game doing nothing.
+
 The confirmation is there because deleting a game is the only irreversible action in the
 app — it destroys the game and its whole running scoreboard — and kids are a stated target
 audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform).
 
-Consequence for theming: this is the first affordance that needs a **destructive**
-treatment, which the theme schema currently holds as deferred, precisely because nothing
-has been drawn for it. The approved handoff draws no delete affordance at all on screen
-`1b` — this section is the source of the affordance, not the drawing.
+**Deleting the last open game leaves the player on the list**, with New Game alone on it,
+rather than dropping them into a new game. Going straight into a game is what Play Game
+does when there are none to begin with, not what deleting your way down to zero does.
+
+Consequence for theming: the trash button and the modal's **Yes** are the only
+**destructive** treatment in the app, and nothing else gets one. The approved handoff draws
+no delete affordance at all on screen `1b` — this section is the source of the affordance,
+not the drawing.
 
 ## A New Game → What It Starts
 - A **two player game on the same exact phone**. One device, passed back and forth.
+- It starts **empty** — no marks anywhere on the nine boards, a score of **0–0–0**, and
+  **Player One** to move (see [Rules](./Rules.md) → Turn Order Across Games).
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
 - No AI opponent, no online play in this version.
@@ -649,3 +686,27 @@ an open game** above.
   in-game settings sheet does.
 - **Does the `+1` under the column that just moved show again when a finished game is
   reopened later**, or only on the result that has just happened?
+- **What does New Game do when the player is already at the cap** — refuse and say the list
+  is full, route the player into the delete flow, offer the $4.99 unlock at the moment the
+  limit bites, or some combination of those? The cap itself and the rule that only a
+  player-initiated delete frees a slot are settled; this is only what the player is offered
+  instead.
+- **What happens to games already stored above the cap if the unlock goes away?** A player
+  with 60 open games whose ceiling drops back to 3 has 57 games nothing is willing to
+  touch.
+- **Does an open-game row show anything besides the opponent's name?** The handoff draws a
+  relative time and three score chips on every row. If a date ships, it isn't settled
+  whether it's when the game was started or when it was last played, or how it reads.
+- **If the score chips ship, what are they labelled?** The handoff draws
+  `YOU / TIES / THEM`; every design doc says Player One and Player Two.
+- **How does a player tell apart two open games that are both called ItSaMeMaRiO?** That's
+  the default name, so it's the ordinary case, and a row carrying only the name gives them
+  nothing to go on.
+- **Should swiping one row open close another row that is already revealed**, or can two
+  sit open at once?
+- **What should happen when a player opens a game that is no longer there**, or that can't
+  be read back? Going quietly back to the main menu tells them nothing about why, and an
+  error surface would need copy and a control that nothing specifies.
+- **What does the open-games list say for one game, or none?** "1 games on the go" is
+  wrong, and the footer the handoff draws states behaviour this doc rejects, so its
+  replacement is unwritten too.
