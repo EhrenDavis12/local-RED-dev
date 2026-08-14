@@ -571,11 +571,26 @@ Each write is a single small record, the game is turn-based so writes are infreq
 a game is saved specifically so it can be resumed — losing moves to a force-quit would
 undercut that.
 
+The write lands as the move is confirmed, on the move itself — not on leaving the game.
+
+**Taking the next game is written straight away too, even though it isn't a move.** The
+board a rematch starts is saved as it comes up, rather than waiting for the first move of
+that game to carry it. Otherwise a player who takes the next game and quits before playing
+reopens the *finished* board with the result card still over it, having already asked for
+a new one.
+
 ### Leaving a game mid-play
 Since a game in progress is saved, going back to the main menu doesn't discard anything —
 the game stays in the open-games list with its own scoreboard, and you can pick it up
 again. Whether leaving still needs a confirmation prompt is undecided; the original
 reason for one ("Leave game? Your score will be lost") no longer applies.
+
+Leaving performs no write of its own — the last confirmed move was already saved when it
+was confirmed, so there is nothing left to lose at the exit. A force-quit, a crash and a
+deliberate walk back to the main menu all leave the same thing on disk.
+
+Nothing but deleting a game from the open-games list ever removes one — see **Deleting
+an open game** above.
 
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
