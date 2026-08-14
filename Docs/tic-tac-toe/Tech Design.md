@@ -339,7 +339,7 @@ this right the first time."*
 Why: it is the Flutter team's recommended routing package; it is declarative, so routes
 are described rather than imperatively pushed; it handles deep links and the browser URL
 bar without rework; it supports nested and shell navigation, which is what larger games
-need for persistent chrome; and it scales past this game's six screens without a second
+need for persistent chrome; and it scales past this game's seven screens without a second
 migration.
 
 Consequences, recorded honestly rather than as caveats:
@@ -347,6 +347,102 @@ Consequences, recorded honestly rather than as caveats:
 - Dismissing a route becomes `context.pop()` rather than `Navigator.pop`, so the
   navigation layer's internals are shaped by this choice even though its public
   operations are not.
+
+### Screens call operations, not routes
+
+**The layer publishes one interface of named operations, and a screen calls an operation
+rather than a route.** A screen calls something like "exit game to main menu"; it does not
+`go`, `push`, `pop`, or name a path. That is the contract every screen codes against, and
+publishing it before the mechanism was chosen is why `go_router` arrived as an additive
+change rather than a rewrite — the back-stack choices still open land as edits inside this
+layer, and no call site moves when one of them is settled.
+
+**The layer reads the stored open-game count itself and writes nothing.** Play Game's
+branch — into a new game, or into the list of open ones — is evaluated inside the layer,
+so no screen reads the count for itself. Nothing here creates, saves or deletes a game:
+the layer presents the delete confirmation but never performs the deletion, which is why
+leaving a game discards nothing (see
+[Menus and UI](./Menus%20and%20UI.md) → Navigation and the Back Stack).
+
+### No operation reports an outcome back
+
+**No navigation operation returns a result to its caller.** An operation completes when
+the navigation is done, not when the surface it opened is finished with, so a modal's
+outcome — which button the player pressed, whether they confirmed or cancelled — never
+comes back through the interface. It cannot be recovered another way either, because
+observing the router from outside this layer is not allowed.
+
+**So any flow that seems to need a modal's answer has to be restructured so that nothing
+has to hear it**: the surface acts on the state itself, or the caller does its work before
+opening the surface rather than after it closes. This has already bitten once — a list
+row's delete reveal, specified to close when its confirmation was dismissed, became
+unimplementable the moment that confirmation became a route, and was fixed by closing the
+reveal before the modal opens. A host choice that touches no model, no storage and no
+engine can still make a sibling requirement unassertable, so check what a flow needs to
+*hear* before assuming a route can host it.
+
+### Nothing outside the layer puts a surface on screen
+
+**The only way a widget outside the navigation layer causes a surface to appear or
+disappear is by calling one of the layer's operations.** Like the engine's purity and the
+no-networking rule, this is checked rather than trusted: the routing package is imported
+only inside the layer, which catches every routing call because none of them compiles
+without that import; and outside it, nothing references Flutter's navigator, overlay or
+route types, holds a navigator key, or calls anything in the `show…` family.
+
+**That second scan matches a shape, not a list of names.** An earlier form banned
+`showDialog` and `showModalBottomSheet` by name — but `showGeneralDialog` and
+`showAdaptiveDialog` contain neither substring and sail through a guard written to stop
+exactly what they do, and `showCupertinoDialog`, `showCupertinoModalPopup`, `showMenu` and
+`showBottomSheet` are the same family. A deny-list is always one API name behind; matching
+`show` followed by a capital is not, because what it relies on is the naming convention
+rather than any particular name. It is deliberately over-broad, and the escape hatch is
+the point: a legitimate `show…` call lives in the navigation layer like every other
+presentation mechanism.
+
+**Neither scan sees a gesture.** Both are about calls, and the platform back-swipe makes
+none — it pops the route itself. That is why turning the gesture off on the game screen
+had to be done explicitly rather than falling out of these scans: the hole it closes is
+the absence of a call, which no scan for forbidden calls can find.
+
+### The layer is reached through a provider
+
+**Screens acquire the navigation layer through a Riverpod provider, and by no other
+means** — no static singleton, no global instance, no `BuildContext` extension reaching a
+navigator key. One implementation holds the router; screens read the navigator and never
+the router itself.
+
+This is not a stylistic preference. The provider is the injection point: under a singleton
+or an internally-held navigator key there is nowhere to substitute a recording fake, and
+"this screen invoked that navigation exactly once" could not be asserted at all.
+
+### Surfaces that stay on top of something are nested
+
+**A surface that has to leave something mounted beneath it is declared as a child of what
+it sits on**, rather than each screen being trusted to preserve what is behind it. That is
+what makes "the menu is still there behind the overlay" a property of the route table
+rather than of a screen's discipline, and it is what keeps a game mounted underneath an
+in-game surface.
+
+It also enforces one rule structurally rather than by convention: theme selection sits
+under the main menu and not under the game, so it cannot be reached from inside a game
+without leaving it — you can't change the theme mid-game (see
+[Theming](./Theming.md) → Choosing a Theme).
+
+**Nothing unmounts when a surface opens over the board, so nothing clears a pending move
+by accident** — which is why clearing it belongs to this layer. Every operation clears the
+pending, unconfirmed selection before it navigates; clearing when there is none is a
+no-op, and making it unconditional means no operation added later can forget to. It cannot
+live in the board layer instead, because that layer would have to observe the router to
+know a navigation happened, which is the one boundary this layer exists to hold. The rule
+itself is [Game Board Design](./Game%20Board%20Design.md) → Changing your mind.
+
+### Deep links are possible, not wired
+
+The route structure is link-shaped, because that is part of what `go_router` was chosen
+for. But nothing asks for an external entry point and the app is otherwise fully offline,
+so no URL scheme, universal link or associated-domain configuration is specified. The
+capability is retained; nothing is wired to it.
 
 The route table and route paths are not designed here — that is a PRD's job.
 

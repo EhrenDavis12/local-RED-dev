@@ -200,6 +200,12 @@ release/distribution.
   - What the engine is not
 - State Management
 - Navigation
+  - Screens call operations, not routes
+  - No operation reports an outcome back
+  - Nothing outside the layer puts a surface on screen
+  - The layer is reached through a provider
+  - Surfaces that stay on top of something are nested
+  - Deep links are possible, not wired
 - Rendering the Board
   - Marks — supplied by the theme
 - The Theme System
