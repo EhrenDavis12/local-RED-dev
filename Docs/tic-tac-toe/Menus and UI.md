@@ -474,6 +474,13 @@ column, or Ties, as soon as the game is won or tied, not when a rematch is taken
 **rematch button is available as an option**. Taking it only resets the board for the next
 game. See [Game Overview](./Game%20Overview.md) → Session Structure.
 
+**The rematch and the next-game button are the same thing under two names** — one
+behaviour, reached by one button. There is no third way on from a finished game.
+
+**A finished game is counted once, ever.** The increment belongs to the move that ended
+the game and to nothing else: reopening that game later counts nothing further, and going
+back to the main menu without taking the rematch doesn't un-count it.
+
 The rematch continues in the **same open game** — same series, scoreboard intact. It does
 not start a second open game. See **Play Game → Where It Takes You** → **What an open game
 holds**.
@@ -481,20 +488,41 @@ holds**.
 The winner of that game goes first in the rematch — or on a tie, whoever went first last
 time (see [Rules](./Rules.md) → Turn Order Across Games).
 
+**Nothing resets the board on its own.** A game the players finished and never rematched
+stays finished — reopen it from the open-games list and you get that finished board with
+the result card over it, both buttons live, exactly as it was left.
+
 ### The result card
 **A result card drawn over the board, with the board dimmed behind it** — not a separate
 screen and not a banner. The finished position stays visible behind the card.
 
-This matches what the approved handoff draws. The scrim, the board-behind opacity, and the
-card's own fill/border/radius are all real values that need a home, because the overlay
-reading is the one that requires them.
+This matches what the approved handoff draws. The board keeps being drawn behind the card
+rather than replaced by it — dimmed, but still legible enough to read the finished
+position. The scrim, the dim behind it, and the card's own fill, border and radius are
+theme values like everything else; its spacing and padding are not, since those are fixed
+in code app-wide (see [Theming](./Theming.md) → What a Theme Does NOT Control).
+
+**The card says what happened, in words, and a win and a tie read differently.** A win
+names the winning player. A tie names nobody — most quadrants claimed does not win it (see
+[Rules](./Rules.md) → Edge Cases).
+
+**It shows the running score, already counting the game that just ended**, with the column
+that moved identifiable, and **it says who goes first in the next game**.
 
 **The result card carries two buttons — one to start the next game, and one to go back to
 the main menu.** *"On game over result card we should have a button for next game as well
 as back to main menu."*
 
 The card is self-sufficient, so the player is never dependent on the settings button to
-leave a finished game.
+leave a finished game. The result stays up until one of the two is pressed, and leaving
+destroys nothing — the game and its score are already saved, and the series is picked back
+up from the open-games list exactly as it stands.
+
+**Next game is the affirmative action and takes the heavier button treatment; back to the
+main menu is the lighter alternative.** Continuing the session is what the game is built
+around (see [Game Overview](./Game%20Overview.md) → Session Structure), and that weighting
+is a permanent-looking difference to a player, so it is stated rather than left to whoever
+builds the card.
 
 ## Persistence
 | Thing | Persists? |
@@ -555,3 +583,14 @@ reason for one ("Leave game? Your score will be lost") no longer applies.
   no way to tell that a different switch is responsible.
 - **Does the Settings screen show which theme is active?** The approved handoff draws a
   read-only theme card there, and nothing here specifies one.
+- **What are the two buttons on the result card called?** The docs call the mechanic a
+  rematch and the control the next-game button; the approved handoff draws **REMATCH** and
+  a ghost **Exit to Main Menu**. Nothing settles the actual strings.
+- **What does the result card call a drawn big board?** The drawn draw modal words it as a
+  "cat game," which [Game Overview](./Game%20Overview.md) → Terminology defines as a small
+  board filled with no winner and [Rules](./Rules.md) → Edge Cases calls a straight draw.
+- **Can the result card be put aside to look at the finished board?** The board is visible
+  behind it either way, but neither drawn result modal carries a close control the way the
+  in-game settings sheet does.
+- **Does the `+1` under the column that just moved show again when a finished game is
+  reopened later**, or only on the result that has just happened?
