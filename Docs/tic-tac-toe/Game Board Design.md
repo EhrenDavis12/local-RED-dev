@@ -36,13 +36,14 @@
 ║ . │ . │ . ║ . │ . │ . ║ . │ . │ . ║
 ╚═══════════╩═══════════╩═══════════╝
 ```
-Thick lines = big board. Thin lines = small boards.
+In the sketch above: thick lines = big board, thin lines = small boards.
 
 Exact geometry — gaps, padding, radii, grid-line insets, line weights — is in
 [Design Handoff](./design_handoff_game_ui/README.md) → *The board (the important part)*.
-The small-board crosses are drawn lines inset inside the quadrant border, not gaps, and
-the big/small hierarchy this section asks for is carried by weight and glow, not by two
-colors.
+The small-board crosses are drawn lines inset inside the quadrant border, not gaps. The
+big/small hierarchy this section asks for is carried by glow, presence and that inset —
+both grids are the same color at the same line weight, so neither a second color nor a
+heavier line is what separates them.
 
 ## Scoreboard
 A **scoreboard sits at the top of the game screen**, above the board. Three counters:
@@ -98,8 +99,9 @@ Like everything else, what the highlight looks like is theme-driven — see
 [Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
 
 ## Visual Layout
-- Nesting needs to stay readable at a glance: heavy borders for the big board,
-  light borders for the small boards.
+- Nesting needs to stay readable at a glance: the big board has to read heavier than the
+  small boards inside it. How that hierarchy is carried is in
+  [Board Structure](#board-structure).
 - Vertical stack: **scoreboard on top, board below.**
 
 ## Last Move Highlight
@@ -348,6 +350,8 @@ for provisional, solid lavender for the last move, solid purple for the active q
 ## Pieces & Marks
 - Baseline is X and O, but marks are **theme-driven** — a theme may swap them for icons,
   emoji, animals, shapes. See [Theming](./Theming.md).
+- There are **three marks, not two** — Player One's, Player Two's, and one for a cat-game
+  quadrant. All three are theme art.
 
 ## Everything Here Is Theme-Driven
 Nothing in this document should be read as a hardcoded visual decision. Grid line colors,
@@ -409,3 +413,10 @@ takes its place. The player has the visuals, and that's the whole of the feedbac
 - **Do things the player didn't tap buzz?** A quadrant getting claimed, a game being won,
   the turn handing over — the rule is written around taps, and nothing says whether events
   like these get a buzz of their own or stay silent.
+- **What happens on a screen that isn't the one the board was drawn for?** The numbers in
+  [Responsive / Screen Size](#responsive--screen-size) are committed at one phone size. A
+  shorter phone has to fit the same scoreboard, turn banner, board and how-to-play strip
+  with no zoom and no scrolling, and an iPad — the declared second target — has room to
+  spare. Nothing says whether the board scales with the screen, holds its drawn sizes and
+  re-centers, or caps at a maximum width — nor, if it scales, whether the marks scale with
+  it, nor which of the four gives up height first when they don't all fit.
