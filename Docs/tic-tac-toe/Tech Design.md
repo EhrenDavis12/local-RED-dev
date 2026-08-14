@@ -1316,9 +1316,6 @@ block other work.
   written by v1.0 has to still load in v1.1.
 
 ### 2. Theme loading
-- Are all themes loaded and materialized at startup, or only the selected one, on demand?
-  [Theming](./Theming.md) → Why this matters for the build says materialization happens
-  "at startup" but does not say for how many themes.
 - Are the theme YAML files declared as assets in `pubspec.yaml`?
 - What happens to an unknown or misspelled *key* inside an otherwise-valid theme file?
   Merge-over-Neon will quietly fill the gap with Neon's value, so a typo in a theme file

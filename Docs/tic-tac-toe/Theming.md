@@ -27,9 +27,11 @@ screens actually consume, not from a category list written in the abstract:
 - Corner radii — cell, quadrant, modal, chip, control, button.
 - The type scale — sizes and weights, distinct from "fonts" meaning a typeface.
 - Opacities — the locked, claimed and cat-game veils.
+- Chrome icons — the settings gear, close X, chevrons, plus, and the trash button on an
+  open-game row.
 - Every surface: modals (winner, draw), sheets (theme select, in-game quick actions), the
-  settings card, open-game rows and their chips, badges, the main-menu logo, and a
-  gradient-capable page background.
+  scrim behind them, the settings card, open-game rows and their chips, badges, the
+  main-menu logo, and a gradient-capable page background.
 
 And:
 - Every visual, audio, and motion value is read from the currently selected theme.
@@ -57,6 +59,13 @@ A missing colour is the ugly case — a delete button renders unstyled, which is
 shippable. A missing icon, where there's no slot to read and no permitted literal, is the
 impossible case — the button can't be drawn at all. One is debt, the other a deadlock, and
 treating them the same schedules the wrong one.
+
+**Ask that about a slot's *shape*, not only about whether it exists.** A slot that exists
+but can't express what its consumer has to draw is impossible too, and it hides better,
+because a completeness check finds the slot present and moves on. When a component draws
+several distinct treatments and the theme offers it one, the only thing left to write is a
+choice made in code — a hardcoded value with no literal in it for a guard to catch. So a
+component that draws N treatments gets N themed values, not one plus a switch.
 
 <!-- Enforced by: the hardcoded-theme-value test, which covers the slot inventory listed
      above. See Tech Design → Testing → A test that fails on hardcoded theme
@@ -178,6 +187,11 @@ Like it's missing the option entirely."* Three distinct cases:
 And the merge is **deep**: a theme naming one key inside a section keeps Neon's other keys
 in that section rather than replacing the whole section. Nested maps merge recursively.
 
+Two things sit outside the merge. **A list is a leaf** — a theme naming a list replaces it
+whole, because there is no stable identity for "the second item" to merge against. And **a
+theme's identity, its display name and its one-line description are never inherited**: a
+theme that omits its name fails to load rather than quietly showing Neon's.
+
 See [Tech Design](./Tech%20Design.md) → The Theme System.
 
 **Consequence:** `neon.theme.json` ships `sound.music` as an explicit `null`. Under this
@@ -191,23 +205,30 @@ worth noting so nobody later mistakes it for an unfilled slot.
 - **New themes become cheap.** A theme can be as small as "black → white, neon green →
   red" and still be a complete, working theme. That directly supports adding more themes
   later.
-- **Fallback happens once, not per lookup.** Each theme is materialized into a complete
-  theme at startup by merging over Neon, so at runtime every lookup hits a complete theme
-  and there is no fallback step. See [Tech Design](./Tech%20Design.md) →
-  The Theme System.
+- **Fallback happens once, not per lookup.** Every installed theme — not just the selected
+  one — is materialized into a complete theme at startup by merging over Neon, so at
+  runtime every lookup hits a complete theme and there is no fallback step. See
+  [Tech Design](./Tech%20Design.md) → The Theme System.
 
 ### Closing Neon's value gaps
 **The drawn values from the design handoff are transcribed into Neon's YAML.**
 `assets/themes/neon.yaml` is our file and the handoff README is the design source, so
 writing those values into it is **authoring Neon**, not editing an approved asset.
 
+The gap between the approved `neon.theme.json` and the drawn handoff — the pending-move
+highlight, badges, modal and sheet surfaces, several radii and glows — closes by
+transcription into Neon's YAML.
+
 Two consequences:
 - The read-only `neon.theme.json` stays as it is; it is a reference, and Neon's shipped
   YAML is the complete definition. That means the two can drift, and the YAML is
   authoritative where they differ.
-- Where the handoff draws no value at all — the settings purchases section is the known
-  case, since no approved screen shows it — transcription cannot help, and those values
-  still need authoring from scratch. That gap stays open.
+- Where the handoff draws no value at all, transcription cannot help and those values need
+  authoring from scratch. The trash button and the delete confirmation's treatments were
+  decided after the handoff was drawn, so nothing draws them. The settings purchases
+  section has no approved screen showing it. And how far the mark grows in its pop is
+  nowhere: the handoff gives the pop a duration and an easing but never a magnitude.
+  Those gaps stay open.
 
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
@@ -509,14 +530,6 @@ the word "padding."
 - What is the exact slot schema — the key structure — for what a theme defines? The
   approved `neon.theme.json` does not currently cover the pending-move highlight, any
   modal or sheet surface, a gradient background, or a logo.
-- Neon is required to be complete (see **Neon Is the Base Theme**). The gap between the
-  approved `neon.theme.json` and the drawn handoff — the pending-move highlight, badges,
-  modal and sheet surfaces, several radii and glows — closes by transcription into Neon's
-  YAML (see **Neon Is the Base Theme** → Closing Neon's value gaps). The settings
-  purchases section is the one value with **no drawn counterpart at all**, since no
-  approved screen shows it — transcription can't supply a value nothing draws, so that
-  piece still needs authoring from scratch. Is the purchases section the only such case,
-  or are there others the handoff never drew?
 - What form does the legibility contract take — a contrast floor, a review step,
   something else? **What a Theme Controls** requires every theme to keep the last-move
   and active-quadrant highlights legible, but this is unfalsifiable as written: Classic
