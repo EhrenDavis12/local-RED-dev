@@ -657,6 +657,81 @@ network path is the purchase flow.
 
 **`audioplayers`** for sound playback.
 
+### One way to play a sound
+**Playing a sound is one call that names a moment**, and nothing else in the app plays
+audio. A caller says which moment just happened and never constructs a player, names an
+asset, or waits for anything. Which file a moment resolves to is the active theme's
+business — see [Theming](./Theming.md) → Architectural Rule — so the layer that plays it
+holds no asset path of its own.
+
+**The mute gate lives inside that call.** The sound effects setting is read there, on
+every call, and never captured at app start or when the layer is built. Call sites fire
+the call unconditionally and never consult the setting themselves: a call site that
+checked first would put the rule in as many places as there are sounds, and forgetting it
+in one of them is a bug nothing would catch.
+
+**Turning the setting off does two things at once** — it gates every sound that has not
+started, and it silences whatever is sounding at that instant, which stops where it is
+rather than playing out (see [Theming](./Theming.md) → Global mute). So flipping the
+toggle mid-game reaches the sound already in the air, not just the next one.
+
+**Stopping is the layer's own, never a verb offered to callers.** Silencing what is
+playing is how the layer answers the setting changing underneath it, so a caller still
+has one call and no way to stop a sound, ask whether one is playing, or branch on either.
+A stop handed outward would put the mute rule back among the call sites the gate exists
+to keep it out of.
+
+**Nothing outside that layer may reach the machinery underneath it.** That is what makes
+the gate unbypassable rather than conventional — anything able to reach a player directly
+could play a sound around the mute entirely.
+
+**The call is fire-and-forget.** It returns immediately and never reports whether anything
+was audible. Gated off by the toggle, silent because the theme cleared that slot, and
+failed to load are all indistinguishable to the caller, deliberately: a caller that could
+branch on playback state would put audio logic back at the call site.
+
+### Silence is a normal outcome
+**A theme slot with no sound in it means that moment is silent**, and that is ordinary
+operation rather than an error — nothing is logged, nothing is reported. Fallback happens
+when a theme is merged over Neon, not when a sound is played, so this layer performs no
+substitution at play time and holds no notion of Neon. See [Theming](./Theming.md) →
+Sound Decisions → Sound falls back to Neon.
+
+**A sound that names a file it cannot load is silent to the player too.** The failure is
+caught where it happens: no dialog, no banner, and no crash report — this layer adds
+nothing to what **Crash Reporting** below collects. What is deliberately not swallowed is
+a wiring failure, because hiding one behind a silent no-op turns a broken app into a
+merely quiet one.
+
+**Today that means all of it is silent.** Neon's sound slots hold placeholders until the
+first generated file lands, and the layer is complete and testable before any of them
+exist. Making a moment audible afterwards is a change to the theme definitions and the
+asset bundle, never to playback code.
+
+### Music is a separate layer, not another moment
+**A one-shot call cannot express music, and that is a fact about the call rather than a
+gap in it.** A one-shot fires and ends; music loops, ducks under an effect, pauses when
+the app backgrounds and resumes when it returns, and persists across screens instead of
+belonging to a moment. Every one of those needs state and verbs a caller drives, and this
+call deliberately offers none — the one stop this layer performs is its own answer to the
+mute, not something a caller can ask for. Adding music as another moment would produce a
+track that plays once and stops.
+
+A theme supplies its own music (see [Theming](./Theming.md) → Music), and whatever plays
+it is a sibling of this layer rather than an extension of it. It inherits the theme-driven
+rule and the same settings-gate shape, against the Music toggle instead of the sound
+effects one — and none of this layer's interface.
+
+### The audio session is process-wide, and chosen rather than defaulted
+**The session is configured once for the whole app**, and it has to be set explicitly: the
+audio plugin's own default is not neutral, so leaving it alone ships a policy nobody
+picked. Two player-visible behaviors ride on that one choice — whether the game sounds
+over a silenced phone, and whether it interrupts whatever the player is already listening
+to. They come as a pair and are still open; see [Theming](./Theming.md) → Open Questions.
+
+Because the session is process-wide, a music layer added later shares it and cannot choose
+differently. Whatever is settled there binds both.
+
 ### Where sound and art assets come from
 **Generated with Replicate when we actually need them — not now.** This covers both the
 sound assets (the Neon buzz, the Classic splat) and the art (the logo): *"I have used

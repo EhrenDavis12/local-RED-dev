@@ -221,6 +221,10 @@ release/distribution.
   - Reads return "nothing stored", and defaults resolve above this layer
   - Entitlement state is written down, never minted
 - Audio and Assets
+  - One way to play a sound
+  - Silence is a normal outcome
+  - Music is a separate layer, not another moment
+  - The audio session is process-wide, and chosen rather than defaulted
   - Where sound and art assets come from
   - One script, and the per-asset inputs are data
   - The generator is an authoring tool, not a build step
