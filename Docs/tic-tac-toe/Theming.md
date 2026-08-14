@@ -340,6 +340,7 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Opacities** — the locked, claimed and cat-game veils
 - **Modals** — winner, draw
 - **Sheets** — theme select, in-game quick actions
+- **The scrim** — the dimming drawn behind a modal or a sheet
 - **The settings card**
 - **Open-game rows and their chips**
 - **Badges**
@@ -449,6 +450,7 @@ This draws the boundary of the theme system. Compare:
 | Animations | ✅ Yes |
 | **Haptics / vibration** | ❌ No — app setting |
 | **Spacing and padding** | ❌ No — fixed in code |
+| **The words on screen** | ❌ No — copy is fixed in code |
 | **Ownership and price** | ❌ No — answered outside the theme |
 
 Note the asymmetry with the settings toggles: music, sound and animations are
@@ -471,6 +473,10 @@ could not keep.
 Themes still control colour, marks, sounds, icons, animation, radii and the type scale.
 Spacing and padding is the one slot pulled out of the inventory, and "for now" is the
 user's own hedge — this is reversible if the enforcement story changes.
+
+**A theme styles text; it does not write it.** The words themselves are fixed in code —
+the scoreboard's three chip labels, the settings toggles' names and their sub-labels. A
+theme sets their size, weight, tracking and colour; the strings are content, not style.
 
 **Stated in its own terms:** a theme controls **everything visual about the game except the
 placement of objects** — the art, the icons, the images, the music and the sound effects
@@ -517,6 +523,12 @@ the word "padding."
   Red vs Blue has a near-white ground while inheriting Neon's near-white text and its
   veils and glows tuned for a near-black ground, so a theme could be complete, pass every
   stated check, and still be unreadable.
+- **Does motion count as a non-colour distinguishing feature?** **What a Theme Controls**
+  lets a theme tell things apart by shape, icon, outline or pattern, and motion is not on
+  that list. Two things pull against adding it: animations are a channel the player can
+  switch off, so anything carried by motion alone goes with the toggle, and animation
+  scope is the player's marker only. Is the list closed, or may a theme distinguish by
+  motion as well?
 - **Does a theme's music loop?** Not settled by **Sound Decisions** → Music.
 - **Where does the music come from** — composed, licensed, generated? Not settled.
 - **Can two sounds play at once?** One confirming tap can place a mark, claim a quadrant
