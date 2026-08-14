@@ -456,11 +456,48 @@ borders read as 2px — and hairlines can look uneven at fractional device pixel
 The known fix is a hybrid: widgets for cells and marks, plus one thin `CustomPaint`
 overlay drawing only the grid lines. That is an escape hatch, not a decision taken.
 
+**No cell carries a border of its own.** The small-board lines are drawn as their own
+lines, inset inside the quadrant, so two cell borders never meet and the doubling above
+cannot arise. The geometry is [Game Board Design](./Game%20Board%20Design.md) → Board
+Structure.
+
+**The board draws state and gates nothing.** Every one of the 81 cells takes a tap
+whether or not the move is legal, and what a tap means — select, confirm, or nothing at
+all — is decided in the state layer rather than in the board.
+
+**Watch out for:** dropping the tap handler from illegal cells looks like an obvious
+simplification and is a bug. A cell with no handler of its own does not win the tap, so it
+falls through to the tap-away-to-clear surface underneath and wipes the player's pending
+selection — an illegal tap, which is supposed to do nothing at all, would instead undo the
+move they had lined up. For the same reason a cell's tap target is its whole box and not
+the pixels it paints: an empty cell paints nothing, so a board that only took taps where
+it had drawn something would be inert.
+
+**The boundary is a widget, not a rectangle:** a tap a cell takes never clears the
+pending selection; every other tap on the game screen does — the gaps between cells and
+quadrants, the board's margins, the scoreboard, the how-to-play strip. The surface that
+catches them is the screen's, not the board's, and it covers the whole screen rectangle
+rather than only the parts that paint. Taps a control claims never reach it, which is why
+the other half of the rule lives in the navigation layer — see **Navigation** above.
+
 ### Marks — supplied by the theme
 **Marks are asset slots on the theme, not shapes drawn in board code.** The theme supplies
 the mark art; board code places it and draws nothing itself. Which kinds of art a theme
 may supply — and why an image is the real answer for a theme — is
 [Theming](./Theming.md) → What a Theme Controls.
+
+### The screen loads its game before it draws one
+
+**The game screen reads the stored game it was opened for, and draws no board until that
+read lands** — no board and no scoreboard, just the background. The screen is the only
+thing that knows which game it was asked for: the router hands over an id and stops, and
+the storage layer has no idea which game is on screen.
+
+**Watch out for:** the game state the board renders outlives the screen, so a board drawn
+before the read lands is the *previous* game's position sitting on this game's screen. It
+is the same failure as opening a saved game onto an empty board — complete, legal and
+correct-looking, with nothing about it saying the wrong game is on screen. Withholding the
+board until the read lands is what makes that unobservable.
 
 ## The Theme System
 

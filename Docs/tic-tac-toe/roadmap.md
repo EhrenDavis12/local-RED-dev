@@ -208,6 +208,7 @@ release/distribution.
   - Deep links are possible, not wired
 - Rendering the Board
   - Marks — supplied by the theme
+  - The screen loads its game before it draws one
 - The Theme System
   - Flutter's ThemeData vs our own theme object
   - Themes pick their own font
