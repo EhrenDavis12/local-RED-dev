@@ -511,7 +511,29 @@ The persisted "selected theme" preference stores the UUID, not the theme's name.
 [Theming](./Theming.md) → Choosing a Theme.
 
 **Merge over Neon.** Each theme is materialized into a complete theme by merging it over
-Neon.
+Neon — every installed theme, once at startup, not just the selected one and not per
+lookup. See [Theming](./Theming.md) → Neon Is the Base Theme.
+
+**A theme that is not in use is still a complete theme**, so reading another theme's
+values is a read and never a load. The theme list depends on that: its rows draw each
+theme in that theme's own colors and marks, not the active theme's — see
+[Menus and UI](./Menus%20and%20UI.md) → Theme Selection. Materializing only the selected
+theme and resolving the others on demand is the tempting optimisation, and it turns every
+row on that screen into a load.
+
+**A component reads its own key, never a palette value that happens to match.** The theme
+holds palette-level values — the colors, the corner radii — and component-level values
+that name the thing they style. A component binds to the component-level key even where a
+palette value holds the same color today, because the two part company the moment a theme
+wants that one control to differ. The hardcoded-theme-value test does not catch a value
+read from the wrong key, so this one is a convention rather than an enforced rule — see
+**Testing** below.
+
+**Not every slot on a theme is something to play or draw.** A theme's sound entries are
+not a uniform list — alongside the moments the game plays, a theme names its own sonic
+identity in a word, and that word is metadata rather than an asset. Anything that walks a
+theme's sounds as a list of playable assets picks it up and tries to play it. Sounds are
+reached by naming the moment instead, which is **Audio and Assets** below.
 
 ### Flutter's ThemeData vs our own theme object
 **Use Flutter's `ThemeData`/`ThemeExtension` as far as possible**, filled out from our
@@ -521,6 +543,15 @@ ourselves.
 Sounds and animations live in the **same theme object** — not a parallel structure. We
 give Flutter's `ThemeData` what we can and handle the rest ourselves, all from the same
 file.
+
+**Our theme object is the source, and `ThemeData` is the mirror** — populated from it,
+never the other way round. A value read back out of `ThemeData` is reading the copy, so
+consumers read the theme object itself.
+
+**Reaching it takes no `BuildContext`.** That is what lets a service read the same theme a
+widget does: playing a sound is one call that names a moment and carries no context (see
+**Audio and Assets** below), and it still has to resolve which file that moment names. A
+theme reachable only through the widget tree could not answer that call.
 
 ### Themes pick their own font
 **A font is a themeable value like any other**, and the theme object needs somewhere to
