@@ -420,7 +420,15 @@ setting, not a theme property — you can mute any theme.
 - **Global for the whole game**, not per-theme.
 - **Remembered between sessions** — the toggle stays in whatever state it was left in,
   same as the theme selection.
-- Lives in the **Settings menu** (see [Menus and UI](./Menus%20and%20UI.md)).
+- Lives in the **Settings menu** (see [Menus and UI](./Menus%20and%20UI.md)), and is
+  offered again inside the in-game quick actions.
+- **Flipping it mid-game takes effect immediately** — not at the next game, and not at
+  the next launch. **Muting cuts off a sound that is playing right then**; it stops where
+  it is rather than playing out.
+
+**It silences the sound effects and nothing else.** With it off, no sound plays at any of
+the board or button moments, under any theme. Music has its own toggle and keeps playing;
+haptics and animations are untouched.
 
 ## Inheritance Depth
 **One level only.** A theme inherits from Neon, full stop. **Neon is the base level** and
@@ -511,3 +519,15 @@ the word "padding."
   stated check, and still be unreadable.
 - **Does a theme's music loop?** Not settled by **Sound Decisions** → Music.
 - **Where does the music come from** — composed, licensed, generated? Not settled.
+- **Can two sounds play at once?** One confirming tap can place a mark, claim a quadrant
+  and win the whole game all at the same time. Play all of them together, play only the
+  most significant one, or queue them up one after another?
+- **What does a drawn big board sound like?** The cat game — a small board filled with no
+  winner — has its own sound. A straight draw of the whole board has no sound of its own,
+  so as things stand the game that nobody wins ends in silence.
+- **Does the game make a noise when the phone's ringer is switched to silent, and does it
+  interrupt whatever the player is already listening to?** The two come as a pair: the
+  setting that makes the game respect the ringer switch is the same one that leaves the
+  player's own music playing underneath it, and the setting that sounds over a silenced
+  phone is the one that stops their music. Nothing in the app can check which is right —
+  it has to be heard.
