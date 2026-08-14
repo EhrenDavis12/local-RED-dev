@@ -348,7 +348,11 @@ cell is a valid action, and including controls that aren't board cells: menu but
 theme rows, settings toggles, the game-over card's controls, the settings gear. It matches
 the setting's own name, *Vibrate on Touch*.
 
-Paired with the illegal-tap rule below, this produces a clean, consistent system:
+**It's the same buzz every time.** One buzz per action, and no vocabulary of different
+haptics — the settings gear, a theme row and a board cell all feel identical. What that
+buzz feels like is [Menus and UI](./Menus%20and%20UI.md) → Vibrate on Touch.
+
+Paired with the illegal-tap rule above, this produces a clean, consistent system:
 
 > **A buzz means "that registered." No buzz means "that did nothing."**
 
@@ -356,8 +360,15 @@ The haptic becomes the validity signal itself. The player doesn't need an error 
 the *absence* of feedback is the feedback. Nothing scolds them; invalid taps just quietly
 don't happen.
 
-(Subject to the vibrate-on-touch setting being on — see
-[Menus and UI](./Menus%20and%20UI.md).)
+**Cancelling a pending move buzzes too.** Tapping outside the nine quadrants drops the
+pending mark, and that's something happening — so it registers like any other valid
+action.
+
+All of this is subject to the vibrate-on-touch setting being on — see
+[Menus and UI](./Menus%20and%20UI.md). **With it off, it's off**: no buzz, and nothing
+takes its place. The player has the visuals, and that's the whole of the feedback.
 
 ## Open Questions
-<!-- Nothing outstanding on this doc right now. -->
+- **Do things the player didn't tap buzz?** A quadrant getting claimed, a game being won,
+  the turn handing over — the rule is written around taps, and nothing says whether events
+  like these get a buzz of their own or stay silent.
