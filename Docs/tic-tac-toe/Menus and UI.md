@@ -359,7 +359,8 @@ That second one is the important requirement: settings must be available mid-gam
 | **Vibrate on touch** | A little buzz on every tap | Haptic feedback on tap. Fires on every *valid* click. On/off. |
 | **Animations** | Marks that pop and glow | Turn animations on/off. See [Animations](./Animations.md). |
 
-These sub-labels are settled strings — quote them exactly, don't paraphrase.
+These sub-labels are settled strings — quote them exactly, don't paraphrase. Where they
+differ from the wording in the approved handoff, these win.
 
 All four are **global**, **player-controlled**, and **not theme-defined** — a theme can't
 override them. All four are **remembered between sessions**.
@@ -398,6 +399,15 @@ nothing more. It's tactile confirmation of a click or selection.
 - Can be turned **on and off in settings**, sitting right alongside the sound effects
   toggle.
 
+**The switch governs every buzz in the app, not only board taps.** With it off, no valid
+action anywhere buzzes — menu buttons, theme rows, and the settings toggles themselves.
+The rule it switches on and off is [Game Board Design](./Game%20Board%20Design.md) →
+Haptic Rule.
+
+**Flipping it mid-game governs the very next tap.** The vibrate toggle is offered inside
+in-game quick actions, so what the setting reads at the moment of a tap is what decides
+whether that tap buzzes — not what it read when the app or the game started.
+
 Why it earns its place: the board has 81 small tap targets on a phone. A tap that lands
 slightly off, or on a locked quadrant, is easy to misread as "did that register?" A buzz
 answers that question without the player having to look for a change.
@@ -434,12 +444,29 @@ the way out of a game. You don't have to finish a game to leave it.
 - Exit the game / back to main menu
 - The sound effects and vibrate toggles
 
+**Exit is an ordinary button, not a destructive one** — no red, no warning treatment.
+Leaving destroys nothing: the game and its score are saved and the player picks it up
+again from the open-games list. Destructive treatment has to keep meaning "this destroys
+something," which only the delete control in the open-games list does — see **Play Game →
+Where It Takes You** → **Deleting an open game**.
+
+The toggles here are the same values as on the settings screen — one of each, app wide,
+not an in-game copy. Flip one here and it is flipped there.
+
+**Tapping the settings button clears a pending, unconfirmed move** — it is one instance of
+the rule that any tap outside the nine quadrants deselects. See
+[Game Board Design](./Game%20Board%20Design.md) → Changing your mind.
+
 Undecided: whether quick actions is the *same* settings screen as the main menu's, or a
-trimmed-down in-game version with the exit option added.
+trimmed-down in-game version with the exit option added. What that decides is which of the
+four toggles the in-game surface carries — on the *same screen* reading, the Animations
+row, the Music row and the purchases section all arrive in game together.
 
 ## Dynamic Type
 **The app does not scale its text to the iOS Dynamic Type setting in this version.** Not
 for now — *"Lets not do this as of yet."*
+
+So the Settings screen carries no text-size control of its own.
 
 ## Game Over → Rematch
 When a game is won or tied, the scoreboard increments **at game end** — the winner's
@@ -522,3 +549,9 @@ reason for one ("Leave game? Your score will be lost") no longer applies.
 - **What does a player see when a theme file is broken?** The list still renders either
   way, but nothing says whether that theme is quietly missing from it or shown as
   unavailable.
+- **What should the Vibrate on Touch toggle do on a device that produces no haptic?** An
+  iPad has no Taptic Engine, and an iPhone with the OS's own System Haptics switched off
+  feels nothing either — in both cases the app's switch still reads ON and the player has
+  no way to tell that a different switch is responsible.
+- **Does the Settings screen show which theme is active?** The approved handoff draws a
+  read-only theme card there, and nothing here specifies one.
