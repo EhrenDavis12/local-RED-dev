@@ -300,7 +300,8 @@ right now."* already says it.
    (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
 6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
-7. **About Us** — reached from the main menu (About Us button). See Main Menu → About Us.
+7. **About Us** — reached from the main menu (About Us button). A full screen of its own,
+   not an overlay: nothing stays visible behind it. See Main Menu → About Us.
 
 Each of these now has an approved drawing in
 [Design Handoff](./design_handoff_game_ui/README.md):
@@ -331,9 +332,27 @@ should take you to the main menu. Same with most of the screens. I don't think w
 exception to that just yet."* The rule is the default everywhere until a screen turns up
 that needs something else.
 
-What is not decided is the stack mechanics, not the destination — whether exiting a game
-pops to an existing main menu instance or pushes a fresh one, and where the iOS back-swipe
-gesture leads. See Open Questions below.
+**Exiting a game replaces the stack rather than unwinding one step.** The main menu comes
+back with nothing behind it — the game is gone from the back stack, so the iOS back-swipe
+can't carry a player back into a game they just left. That holds the same way whether the
+game was abandoned mid-play from quick actions or finished and left from the result card;
+both leave by the same route.
+
+**Every navigation clears a pending, unconfirmed move** — opening a menu or sheet over the
+board, and leaving the board altogether. It's the same rule as any tap outside the nine
+quadrants, reaching the surfaces that open on top of it — see
+[Game Board Design](./Game%20Board%20Design.md) → Changing your mind.
+
+**The back-swipe can't carry a player out of a live game either — the gesture is turned
+off on the game screen.** The only way off the board is the explicit exit: quick actions
+mid-play, or back to main menu on the result card. It's turned off there because a swipe
+off the board would slip past that clearing, which every other way off the board does. The
+block belongs to the screen rather than to the state of the game, so it holds over a
+finished board as well as a live one — the result card carries its own way out, so nobody
+is stranded on one.
+
+**The open-games list has a back control that leaves it without picking anything.** `1b`
+draws one; where it goes isn't decided — see Open Questions below.
 
 **The main menu is the app's launch screen.** It is assumed throughout this doc (e.g. Main
 Menu is screen 1 in **Screens (so far)**) and stated nowhere else.
@@ -640,10 +659,24 @@ an open game** above.
 
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
-- **Does exiting a game pop back to an existing main menu instance, or push a fresh
-  one?**
-- **Where does the iOS back-swipe gesture lead**, and can it carry a player back into a
-  game they just exited?
+- **Does the back-swipe stay live on every other screen**, or is "you leave a surface by
+  its own control" a rule of the whole app? It's off on the game screen only, because
+  that's the one place a swipe would walk away from a pending move. Everywhere else it
+  unwinds one step, which on the open-games list quietly picks one of the two answers to
+  the question below.
+- **What does the Android system back button do?** Nothing written mentions it, on any
+  screen. Whatever turns the swipe off on the game screen turns Android back off there
+  too, which is a side effect rather than a decision anyone took.
+- **Where does back from the open-games list lead** — one step back, which is the main
+  menu whenever the list was reached from it, or always to the main menu whatever it was
+  reached from? The two only differ once there's a second way into the list.
+- **What control takes you back to the game from the in-game settings surface?** Reaching
+  settings mid-game doesn't abandon the game, but nothing names the control that returns
+  you to it. The handoff gives `1f` a close button and a "Back to the game" action; the
+  docs give it neither.
+- **Does anything render before the main menu?** The main menu is the launch screen, but
+  nothing rules out a splash, or a loading state held while the saved theme is
+  materialized.
 - **Is there also a fuller Rules/How-to-Play screen**, separate from the on-board legend
   and hint, or does the legend/hint fully cover "how to play" for this version? (Already
   listed above as a future menu item to consider.)
