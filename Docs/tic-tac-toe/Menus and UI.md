@@ -220,9 +220,18 @@ not the drawing.
 ## Pass-and-Play Turn Handoff
 - The game switches the active player automatically after each move.
 - The UI has to make it obvious *whose turn it is right now*, since both players are
-  looking at the same screen.
+  looking at the same screen. Two things say it: the turn banner names the active player
+  whenever no move is pending, and the active player's counter on the scoreboard is
+  highlighted — see [Game Board Design](./Game%20Board%20Design.md) → Turn Indicator.
 - Note: tic-tac-toe has no hidden information, so there's no need for a "pass the phone,
-  don't peek" screen between turns. The handoff can be instant.
+  don't peek" screen between turns. The handoff is instant.
+
+**The turn passes on the confirming tap, not on the first one.** Tapping a cell to preview
+a move leaves it the same player's turn — the active player changes only when that move
+is confirmed, and it changes there and then. Nothing sits between the confirming tap and
+the opponent's turn: no interstitial, no "pass the phone" screen, no intermediate state
+of any kind. The approved handoff says it the same way — *"Turn handoff is instant —
+no 'pass the phone' screen; there is no hidden info."*
 
 ## How to Play — the On-Board Legend and Hint
 **The game explains its own central mechanic — this is in scope to build out.** The
