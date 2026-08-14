@@ -249,6 +249,16 @@ Things the board needs to communicate (driven by the rules so far):
 > and every one of them is theme-driven, so **each theme has to solve this, not just the
 > default one.**
 
+**None of these is carried by its treatment alone.** The board is otherwise silent — a
+player handed the phone sees dimmed quadrants, a glowing one, and a ring around somebody
+else's mark, with nothing telling them what any of that means. So the how-to-play strip
+below the board says the same things in words: the three quadrant states, what each ring
+means, and what the pending preview is. What it says in each board state is in
+[Menus and UI](./Menus%20and%20UI.md) → How to Play — the On-Board Legend and Hint.
+
+The words are the redundant channel, not a substitute — every state above still gets its
+own treatment whether or not the strip is currently naming it.
+
 ## Move Input — Tap to Select, Tap Again to Confirm
 Placing a mark takes **two taps**, not one.
 
