@@ -15,12 +15,13 @@ Snappy and playful, not slow and cinematic. It should feel alive and fun — thi
 aimed partly at kids.
 
 ## Scope For Now
-Keep it simple to start. We are **not** animating the board, the layout, or transitions
-between screens yet. For now animations apply to **the player's marker** — whatever the
-theme says that marker is (an X, an O, a checkbox, an icon, an image, whatever goes along
-with the theme).
+Animations apply to **the player's marker** — whatever the theme says that marker is (an
+X, an O, a checkbox, an icon, an image, whatever goes along with the theme). That is
+settled, not a starting scope.
 
 The marker is the thing that moves.
+
+We are **not** animating the board, the layout, or transitions between screens.
 
 ## The Animation Vocabulary
 The building blocks, as described:
@@ -67,19 +68,25 @@ can tell the application what animations are and everything else the application
 know to execute one of them… we just want to make sure the themes control as much as we
 can. This way new themes are easy to design and control customizations."*
 
-What this means, without designing the format:
+What this means:
 - A theme author adds a theme file and gets new motion. **Adding an animation must not
   require changing game code.**
 - What a theme supplies is therefore a *description* of motion — what changes, by how
   much, over what time, with what easing, and whether it repeats — not the name of a
   behaviour the runtime already knows.
-- Neon's current animation entries (`type`, `durationMs`, `easing`, `loop`) are a
-  starting point that does not yet reach this bar, since `type` names a behaviour rather
-  than describing one.
 
-Consequence: this is a larger piece of work than a fixed set of named animations, and the
-schema for describing motion has to be designed. The schema itself belongs to the theme
-system's PRD and is not settled here.
+A theme describes each animated moment as a **duration, a repeat rule, and a list of
+tracks**. Each track names one property to move, its own easing, and the keyframes it
+interpolates between. The runtime executes that description rather than recognising
+animations by name.
+
+The properties a track can move are a **fixed set**, and new motion composed from them
+needs no code — that is the bar, and it is met. A property outside the set is a runtime
+change, not something a theme can introduce on its own.
+
+The vocabulary above reaches that description: grow and shrink is scale, glow and
+backlight are a glow radius and colour, jiggle and dance are rotation and translation.
+Shadowbox is the one that doesn't sit comfortably in it — see **Open Questions**.
 
 There is **no shared animation library or menu to pick from**. The vocabulary above
 (grow/shrink, glow, shadowbox, jiggle, dance) is the *direction* — not a fixed set of
@@ -90,20 +97,26 @@ picking from a menu, and whatever it doesn't write it inherits from Neon. See
 **Animations Inherit From Neon** below.
 
 ## Where Animations Fire
-Not yet decided in detail, but the obvious moments:
-- **Placing a marker** — the primary one. The mark appears with a pop.
-- Winning a small board / claiming a quadrant.
-- Cat game.
-- Winning the whole game.
-- The last-move highlight and active-quadrant highlight (see
-  [Game Board Design](./Game%20Board%20Design.md)) — these could be animated rather than
-  static, e.g. a pulsing glow on the legal quadrant.
+**Placing a marker** — the mark appears with a pop. That is the moment the game animates,
+and under the scope above it is the only one.
+
+Winning a small board / claiming a quadrant, cat game, and winning the whole game are the
+obvious candidates if that scope ever widens. None of them animates — they are quadrant-
+and board-level, not marker-level.
+
+The last-move highlight and active-quadrant highlight are **static**: they are drawn, not
+animated. See [Game Board Design](./Game%20Board%20Design.md).
 
 The handoff puts a starting value on each of these:
 `Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` → `animation` has `placeMark`,
 `claimQuadrant`, `catGame`, `winGame`, `activeQuadrant` and `lastMove`, each with a type
 and a duration; the last two are drawn as looping glow-pulses. Starting values, in the
-handoff's own words — not decisions.
+handoff's own words — not decisions, and only the marker's is used.
+
+Adding an animated moment is a design decision first. It then costs a schema change, a
+Neon definition and a code change, so it isn't something a theme can do on its own.
+Changing *how* the marker animates is theme data alone — including motion the runtime has
+never executed before.
 
 ## Animations Inherit From Neon
 Animations follow the same inheritance rule as everything else: **Neon is the base
@@ -119,6 +132,13 @@ Neon definition, because it's the fallback for every other theme.
 
 ## How Animations Play
 Animations **never overlap**. Strictly one at a time.
+
+**One animation means one moment, not one property.** A single animation can move several
+properties at once — that is one animation with several tracks running together, not two
+animations overlapping.
+
+An animation that repeats forever never ends, so it would hold the slot against
+everything else. Nothing in the game plays on a permanent loop.
 
 **Speed is specified in the animation itself**, not globally. Each animation carries its
 own timing, so a theme controls its own pacing.
@@ -147,4 +167,16 @@ Practical consequence: animations are a **pure layer on top**. The game has to b
 playable and fully readable with every animation stripped out.
 
 ## Open Questions
-<!-- Nothing outstanding on this doc right now. -->
+- **Can a theme describe a shadowbox as drawn?** The vocabulary describes shadowbox as
+  lifting the marker off the board, which is directional and offset — a symmetric glow is
+  not. Does the set of animatable properties need one more member for it, or is a glow
+  close enough?
+- **What should happen when a theme describes motion the runtime cannot execute?** Play
+  nothing and change state instantly, treat it as a theme that failed to load (see
+  [Theming](./Theming.md)), or fall back to Neon's motion for that moment?
+- **If a second animation is triggered while one is playing, does it queue or is it
+  dropped?** "Never overlap" rules out playing both, and "never interrupted" rules out
+  replacing the one that's running — which leaves queueing it or dropping it.
+- **What happens if animations are switched off while one is playing?** Does the running
+  animation finish, or stop where it is? "It isn't interrupted or skipped" and "with the
+  toggle off nothing runs" both fit.
