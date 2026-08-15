@@ -148,9 +148,10 @@ playing as normal — it isn't interrupted or skipped, and the game doesn't wait
 
 ## Turning Animations Off
 There is an **animations on/off toggle**, and it is **not theme-defined**. It's a global
-player setting sitting **right alongside the vibration and mute toggles** in the Settings
-menu (see [Menus and UI](./Menus%20and%20UI.md)). Same shape as the other two: global,
-player-controlled, independent of theme.
+player setting sitting **right alongside the music, sound-effects and vibration toggles**
+in the Settings menu (see [Menus and UI](./Menus%20and%20UI.md)). Same shape as the other
+three: global, player-controlled, independent of theme. No theme file key sets, overrides
+or reads it, and switching themes never changes its value.
 
 iOS Reduce Motion does not drive it — the toggle stays a player setting: *"no lets leave
 this as a game setting for user to command."* So there is exactly one control, and the
