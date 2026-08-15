@@ -61,6 +61,8 @@ quadrant it sent you to are drawn in the same 3x3 position.
 ## Winning a Sub-Board
 - Standard tic-tac-toe: three in a row (row, column, or diagonal) on the small board.
 - The winner **claims** that quadrant on the big board.
+- **A claimed quadrant is closed to further play**, including any cells in it that are
+  still empty.
 
 ## Winning the Game
 - Get three claimed quadrants in a row on the big board (row, column, or diagonal).
@@ -95,8 +97,12 @@ which is a real strategic cost. Players will learn to avoid it — and sometimes
 deliberately.
 
 ### Big board full with no three-in-a-row → straight draw
-If the whole big board fills and nobody has three claimed quadrants in a row, it is a
-**straight draw**. Most-quadrants-claimed does *not* win — the count is irrelevant.
+If **no quadrant is left open** — every one is either claimed or a cat game — and nobody
+has three claimed quadrants in a row, it is a **straight draw**. Most-quadrants-claimed
+does *not* win — the count is irrelevant.
+
+This is *not* "all 81 cells are filled". A claimed quadrant closes with empty cells still
+inside it, so the big board runs out of open quadrants with plenty of cells never played.
 
 - The result is a tie.
 - **The Ties counter on the scoreboard goes up one.**
