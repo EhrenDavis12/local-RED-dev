@@ -94,11 +94,11 @@ lib/
     loader.dart    ← YAML → theme
   state/           ← Riverpod providers
   navigation/      ← the app's routing layer
-  audio/           ← sound playback, owned by P2-02-audio
-  haptics/         ← haptic feedback, owned by P2-03-haptics
-  entitlements/    ← StoreKit entitlement state, owned by P1-07-entitlements
-  diagnostics/     ← crash catching/reporting, owned by P1-06-crash-reporting
-  purchase/        ← store integration, owned by P4-05-purchase-flow
+  audio/           ← sound playback
+  haptics/         ← haptic feedback
+  entitlements/    ← StoreKit entitlement state
+  diagnostics/     ← crash catching/reporting
+  purchase/        ← store integration
   ui/
     board/
     menus/
@@ -164,8 +164,7 @@ lands with the first real file put into it, never before — Flutter fails the b
 declared asset directory holds no files.
 
 `audio/`, `haptics/`, `entitlements/`, `diagnostics/` and `purchase/` follow the same
-one-folder-per-layer convention, each owned by the PRD named in the tree above. File names
-inside each are that PRD's to decide, not this doc's.
+one-folder-per-layer convention. File names inside each are not this doc's to decide.
 
 ## The Rules Engine
 
@@ -343,7 +342,7 @@ need for persistent chrome; and it scales past this game's seven screens without
 migration.
 
 Consequences, recorded honestly rather than as caveats:
-- It adds a dependency, which `P1-01`'s exhaustive dependency list has to carry.
+- It adds a dependency.
 - Dismissing a route becomes `context.pop()` rather than `Navigator.pop`, so the
   navigation layer's internals are shaped by this choice even though its public
   operations are not.
