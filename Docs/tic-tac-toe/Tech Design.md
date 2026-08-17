@@ -172,6 +172,11 @@ one-folder-per-layer convention. File names inside each are not this doc's to de
 win/cat-game detection and free-choice state are **pure Dart with zero Flutter imports**,
 and the UI layer reads from it.
 
+**The purity check rejects any import of `package:flutter/…` and any import of
+`dart:ui`** — both, not the first alone. Both are unimportable from a pure Dart VM
+test, so a scan that let `dart:ui` through would keep passing while the layer stopped
+being testable without a widget harness, which is the purpose the scan serves.
+
 **It imports no Hive package either, whatever the spelling.** `storage/` owns the store —
 see **Persistence and Serialization** below — and the purity check matches any package
 whose name begins `hive`, so it keeps holding if that choice is ever revisited.
@@ -278,14 +283,16 @@ the first board of every rematch.
 whatever announces or highlights the win reads it rather than re-deriving it. It is absent
 on an in-progress board and on a draw, and there is no stand-in value to test for.
 
-Absence carries two meanings and is not a draw signal: a consumer reads the outcome first
-and asks for the line only in the two winning cases. The three come back in ascending
-order — a list needs some order, no doc gives one, and anything wanting the order a line
-is drawn in sorts them itself. When one claim completes two lines at once, exactly one
-comes back: the first in a fixed order — rows top to bottom, then columns left to right,
-then the top-left-to-bottom-right diagonal, then the top-right-to-bottom-left diagonal —
-so the value is deterministic. Which line a *player* should be shown in that case is an
-open question below.
+Absence carries two meanings and is not a draw signal: a consumer reads the outcome
+first and asks for the line only in the two winning cases. The three come back in
+ascending order — a list needs some order, no doc gives one, and anything wanting the
+order a line is drawn in sorts them itself. When one claim completes two lines at once,
+exactly one comes back: the first in a fixed order — rows top to bottom, then columns
+left to right, then the top-left-to-bottom-right diagonal, then the
+top-right-to-bottom-left diagonal — so the value is deterministic. That order is
+**total**: it separates the two diagonals rather than treating them as one slot,
+because a claim can complete both of them and no row or column. Which line a *player*
+should be shown in that case is an open question below.
 
 The line is derivable from the quadrant states, so nothing turns on whether it is stored
 with a saved game or recomputed on load.
@@ -309,6 +316,9 @@ silently. The engine's own share of that contract:
   *rendered* from it is **Crash Reporting** → *The one error that carries game state
   renders none of it* below; the engine's own tests assert that rendering this error as
   text prints no board content.
+- **A move carrying a quadrant or cell index outside 0–8 is an illegal move**, and is
+  refused the same way as any other. What comes back from *reading* a cell or a
+  quadrant out of range is a separate matter, and is an open question below.
 
 ### What the engine is not
 
