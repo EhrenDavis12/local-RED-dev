@@ -245,7 +245,10 @@ always offers at least one move.
 already incremented on the state the game-ending move returns. See
 [Menus and UI](./Menus%20and%20UI.md) → When does the scoreboard increment. Starting the
 next game resets the board and moves no counter, because the finished game was counted
-when it ended.
+when it ended. Starting the next game is reachable only from a finished game — from the
+game-over modal that offers it, or by starting fresh from the main menu. There is no path
+to it from a game in progress, so the engine defines no behaviour for that case and
+nothing tests it.
 
 **Whose turn it is, is engine state, never derived from move parity.** Turn order across
 games ([Rules](./Rules.md) → Turn Order Across Games) makes Player Two the first player of
@@ -280,8 +283,9 @@ and asks for the line only in the two winning cases. The three come back in asce
 order — a list needs some order, no doc gives one, and anything wanting the order a line
 is drawn in sorts them itself. When one claim completes two lines at once, exactly one
 comes back: the first in a fixed order — rows top to bottom, then columns left to right,
-then the two diagonals — so the value is deterministic. Which line a *player* should be
-shown in that case is an open question below.
+then the top-left-to-bottom-right diagonal, then the top-right-to-bottom-left diagonal —
+so the value is deterministic. Which line a *player* should be shown in that case is an
+open question below.
 
 The line is derivable from the quadrant states, so nothing turns on whether it is stored
 with a saved game or recomputed on load.
@@ -1658,10 +1662,6 @@ block other work.
   publishes, not what a player should be shown — and "both" is not expressible in what it
   returns today. Widening that later is a change at every consumer; widening which one it
   picks is not.
-- What happens if the next game is started while a game is still in progress? Starting the
-  next game is settled for a *finished* game — reset the board, carry the score, apply the
-  turn-order rule — and there is no first player to derive from a board with no result.
-  The candidates are throw, reset and discard the game in progress, or leave it undefined.
 - What comes back from reading a cell or a quadrant with an index outside 0–8? An
   out-of-range index on the write path is an illegal move; the read path has no stated
   answer, so today it is whatever the underlying collection happens to do.
