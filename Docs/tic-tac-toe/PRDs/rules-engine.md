@@ -27,8 +27,11 @@ harness.
 
 **R1.** `lib/engine/` is pure Dart with **zero Flutter imports**, and imports no package
 whose name begins `hive`, whatever the spelling. This is held by a test that scans the
-layer's imports rather than by discipline. *(Tech Design → Project Structure; → The Rules
-Engine)*
+layer's imports rather than by discipline. **The scan rejects any import of
+`package:flutter/…` and any import of `dart:ui`** — both, not the first alone, because both
+are unimportable from a pure Dart VM test, and a scan that let `dart:ui` through would pass
+while the layer stopped being testable without a widget harness, which is the purpose the
+scan serves. *(Tech Design → Project Structure; → The Rules Engine)*
 
 **R2.** Game state is **immutable**. Applying a move never mutates a board in place; it
 produces a new state object. The API is `Board applyMove(Board, Move)`, not
@@ -123,9 +126,11 @@ stand-in value** — a consumer reads the outcome first and asks for the line on
 winning cases. *(Tech Design → The engine publishes which three quadrants won)*
 
 **R21.** When one claim completes **two big-board lines at once, exactly one is returned**:
-the first in the fixed order — rows top to bottom, then columns left to right, then the two
-diagonals — so the value is deterministic. *(Tech Design → The engine publishes which three
-quadrants won)*
+the first in the fixed order — rows top to bottom, then columns left to right, then the
+diagonal from top-left to bottom-right, then the diagonal from top-right to bottom-left — so
+the value is deterministic. The order is **total**: it separates the two diagonals rather
+than treating them as one slot, because a claim can complete both of them and no row or
+column. *(Tech Design → The engine publishes which three quadrants won)*
 
 ### Turn order, within a game and across games
 
@@ -154,6 +159,13 @@ Over → Rematch)*
 was counted when it ended. The series score carries across unchanged. *(Tech Design → The
 series lives in the same state; Game Overview → Session Structure)*
 
+**R26a.** **Starting the next game applies to a finished game only.** There is no path to it
+from a game in progress: a new game is reached from the menu screen or from the result card
+over a finished game, and from nowhere else. The engine therefore defines no behaviour for
+starting the next game while a game is still in progress — the case does not arise, and R26
+is not to be read as licensing a reset that discards a game in progress. *(Menus and UI →
+Game Over → Rematch; Game Overview → Session Structure)*
+
 **R27.** **Turn order across games:** Player One goes first in game 1 of a series; from game 2
 on, **the winner of the last game goes first**; **after a tie, the player that went first in
 the tied game goes first again.** *(Rules → Turn Order Across Games)*
@@ -163,8 +175,9 @@ the tied game goes first again.** *(Rules → Turn Order Across Games)*
 **R28.** The engine **throws** on an illegal move and on any move applied to an
 already-finished game, rather than returning silently. There are two reasons, and **the
 already-finished game is checked first**, so a move applied to a finished game reports that
-rather than "not a legal move". *(Rules → Engine Contract; Tech Design → What the engine
-refuses)*
+rather than "not a legal move". **A move carrying a quadrant or cell index outside 0–8 is an
+illegal move** and is refused the same way. *(Rules → Engine Contract; Tech Design → What the
+engine refuses; → Open Questions → 9. The rules engine, which settles the write path)*
 
 **R29.** It raises an **`Error`, not an `Exception`** — a contract violation rather than a
 recoverable condition, and no caller is meant to catch it. *(Tech Design → What the engine
@@ -206,10 +219,6 @@ blocks the requirements above; each bounds one of them.
   returns one so the value is deterministic, but that fixes what the engine publishes, not
   what a player should be shown — and "both" is not expressible in what it returns today.
   Widening that later is a change at every consumer; widening which one it picks is not.
-- What happens if the next game is started while a game is still in progress? Starting the
-  next game is settled for a *finished* game — reset the board, carry the score, apply the
-  turn-order rule — and there is no first player to derive from a board with no result. The
-  candidates are throw, reset and discard the game in progress, or leave it undefined.
 - What comes back from reading a cell or a quadrant with an index outside 0–8? An
   out-of-range index on the write path is an illegal move; the read path has no stated
   answer, so today it is whatever the underlying collection happens to do.
