@@ -89,11 +89,9 @@ future" — so a later reordering is expected rather than a reversal.
 Because Settings and About Us share a row, that pairing is the part a later reorder has to
 revisit — nothing else in the menu depends on About Us being last.
 
-Two things this doesn't settle:
+One thing this doesn't settle:
 - The screen's **content** is not specified by any doc. The handoff draws team photos;
   where those come from is not decided.
-- **No PRD currently owns the About Us screen.** The main-menu PRD covers the button; the
-  screen itself has no owner yet.
 
 ## Play Game → Where It Takes You
 Play Game branches on whether there are existing open games.
@@ -318,7 +316,7 @@ Each of these now has an approved drawing in
 | Game over | `1g — Modal: winner`, `1h — Modal: draw` |
 | About Us | `1c — About Us` |
 
-Content and PRD ownership for About Us are still unsettled — see Main Menu → About Us.
+Content for About Us is still unsettled — see Main Menu → About Us.
 
 ## Navigation and the Back Stack
 **The app has a defined navigation model — this is in scope to build out.** The routing
