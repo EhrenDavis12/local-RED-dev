@@ -53,12 +53,19 @@ the same player first as it would have without the restart. *(Tech Design → Wh
 open game holds; [Rules](../Rules.md) → Turn Order Across Games)*
 
 **R5.** Every record written carries a stamp identifying the app version that wrote it, from
-the first release. Nothing branches on the stamp today — what the app does on reading a
-record written by an older version is unanswered (see Open Questions). *(Tech Design → Every
-persisted record carries a version stamp)*
+the first release, and the repository owns that stamp exactly as it owns the timestamps
+(R9): the caller supplies no version and anything it passes is discarded. The stamp means
+*the app version that last wrote this record*, so a record created under one version and
+saved under a later one carries the later one. Nothing branches on the stamp today — what the
+app does on reading a record written by an older version is unanswered (see Open Questions).
+*(Tech Design → Every persisted record carries a version stamp; → What a stored open game
+holds, for the same choke-point reasoning applied to the timestamps)*
 
-**R6.** The opponent name is stored on the record as supplied and is never the record's key:
-it is a title, and duplicate titles are the ordinary case. *(Tech Design → What a stored open
+**R6.** The opponent name is stored on the record as supplied at create and is never the
+record's key: it is a title, and duplicate titles are the ordinary case. A save is not a
+rename — it preserves the stored name and discards whatever the caller passed, the same way
+it preserves the created timestamp (R9), so a caller holding a stale copy cannot overwrite a
+title. No doc specifies a rename and none is added here. *(Tech Design → What a stored open
 game holds; [Menus and UI](../Menus%20and%20UI.md) → Play Game → Where It Takes You)*
 
 ### The id
@@ -84,47 +91,70 @@ Design → What a stored open game holds; → The open-games list has a defined 
 
 **R10.** The layer publishes a repository interface in `lib/storage/` covering create, read
 one, read all, save, and delete. Every caller depends on that interface rather than on any
-implementation. *(Tech Design → Serialization and the storage layer; Project Structure)*
+implementation. **Create takes the opponent name and the board the game starts from, and
+nothing else** — no id, no timestamps, no version (R5, R7, R9) — and on success answers the
+stored record, its minted id included, because the id is store-minted and the caller has no
+other way to learn it (R7). *(Tech Design → Serialization and the storage layer; → What a
+stored open game holds; Project Structure)*
 
 **R11.** Every operation is asynchronous. *(Tech Design → Reads return "nothing stored", and
 defaults resolve above this layer)*
 
-**R12.** Every read returns "nothing stored" — never a default, and never a throw. Reading an
-id that is not held answers "nothing stored"; reading the list of an empty store answers an
-empty list, which is a valid state rather than an error. *(Tech Design → Reads return
+**R12.** Every read returns "nothing stored" — never a default, and never a throw. An id that
+is not held and an id whose stored record cannot be read back — malformed JSON, a missing or
+wrong-typed field — answer identically: nothing stored. Reading the list of an empty store
+answers an empty list, which is a valid state rather than an error. A read stays a read: a
+record that failed to decode is neither rewritten nor deleted. *(Tech Design → Reads return
 "nothing stored", and defaults resolve above this layer)*
 
-**R13.** Reading the open-games list returns most-recent-first on the updated timestamp,
+**R13.** A record that cannot be read back is skipped by the list read, and every other
+stored game comes back. Failing the whole read on one bad record would hide every game the
+player still has. *(Tech Design → Reads return "nothing stored", and defaults resolve above
+this layer)*
+
+**R14.** Reading the open-games list returns most-recent-first on the updated timestamp,
 tiebroken by the created timestamp, most recent first — never the box's iteration order, and
 never the id. Hive's iteration order is not stable across compaction. The tiebreaker is
 load-bearing: a freshly created record has both stamps equal, so two games created before
-either is played tie on the primary key, and Dart's `List.sort` is not stable. The order is
-deterministic — the same stored set produces the same sequence on every read and across
-relaunches. *(Tech Design → The open-games list has a defined order;
+either is played tie on the primary key, and Dart's `List.sort` is not stable. Records tying
+on **both** stamps are separated by a final key of the implementation's choosing, so the
+comparator is total; ordering by that key is not the rule and it is never a display order.
+The result is deterministic — the same stored set produces the same sequence on every read
+and across relaunches. *(Tech Design → The open-games list has a defined order;
 [Menus and UI](../Menus%20and%20UI.md) → Play Game → Where It Takes You)*
 
-**R14.** Any save moves its record to the top of that order, including a save that is not a
+**R15.** Any save moves its record to the top of that order, including a save that is not a
 move — taking the next game puts that series first before a mark is placed in it. *(Tech
 Design → The open-games list has a defined order)*
 
-**R15.** Creating an open game is refused when it would exceed the current ceiling. Reaching
+**R16.** A save against an id the store does not hold writes nothing and creates nothing. It
+is not an upsert: creating that way would bypass the create-time cap (R17, R19) and could
+resurrect a game that R20 deleted permanently. It does not throw either — it comes back as a
+value the caller can act on, in the same spirit as a refused create (R17), because a silent
+no-op that discards a player's move is the other failure. *(Tech Design → The cap is enforced
+on create, and the store never evicts; → Reads return "nothing stored", and defaults resolve
+above this layer)*
+
+**R17.** Creating an open game is refused when it would exceed the current ceiling. Reaching
 the cap is an ordinary, player-reachable condition rather than an error, so a refused create
 comes back as a value carrying the effective ceiling and how many games are held — enough for
 the caller to say "3 of 3" without a second round trip — and never as a throw. *(Tech Design
 → The cap is enforced on create, and the store never evicts)*
 
-**R16.** The ceiling is read from entitlement state. This layer defines neither number: no
-file under `lib/storage/` states 3 or 100. *(Tech Design → The cap is enforced on create, and
-the store never evicts; → In-App Purchases and Entitlements → Ownership is keyed by product;
+**R18.** The ceiling is read from entitlement state and reaches the repository from outside
+it — supplied to the implementation when it is constructed, or read through a source it is
+given, never looked up by `storage/` itself. This layer defines neither number: no file under
+`lib/storage/` states 3 or 100. *(Tech Design → The cap is enforced on create, and the store
+never evicts; → In-App Purchases and Entitlements → Ownership is keyed by product;
 [Menus and UI](../Menus%20and%20UI.md) → How many open games we keep)*
 
-**R17.** The cap is a create-time check and not a standing invariant: it constrains what may
+**R19.** The cap is a create-time check and not a standing invariant: it constrains what may
 be added and nothing else. The store never evicts — a create at the ceiling removes nothing —
 and if the ceiling drops below the number already stored, nothing here deletes anything.
 *(Tech Design → The cap is enforced on create, and the store never evicts;
 [Menus and UI](../Menus%20and%20UI.md) → How many open games we keep)*
 
-**R18.** Deleting removes one open game and its whole series — board, scoreboard and all —
+**R20.** Deleting removes one open game and its whole series — board, scoreboard and all —
 permanently, leaves every other stored game untouched, and touches no preference. Nothing
 else in this layer discards a record: a game left mid-play is still there, with its
 scoreboard, on the next read. *(Tech Design → The cap is enforced on create, and the store
@@ -133,36 +163,62 @@ game mid-play)*
 
 ### Boundaries the layer has to hold
 
-**R19.** Only `lib/storage/` knows the store is Hive. No file outside it imports `hive_ce` or
-`hive_ce_flutter`, and `lib/engine/` imports neither — `hive_ce_flutter` is not pure Dart, and
-the engine's existing purity check already matches any package whose name begins `hive`. Hold
-this the way the neighbouring rules are held, with a check rather than discipline. *(Tech
-Design → Serialization and the storage layer; → The Rules Engine)*
+**R21.** Only `lib/storage/` knows the store is Hive. No file outside it imports `hive_ce` or
+`hive_ce_flutter`, and `lib/engine/` imports neither — `hive_ce_flutter` is not pure Dart.
+This is held with a check rather than discipline, like the neighbouring boundary rules, and
+the check is a **new, app-wide one**: the existing engine-purity test scans `lib/engine/`
+only, so it cannot see a Hive import in `lib/ui/` or `lib/state/`. *(Tech Design →
+Serialization and the storage layer; → The Rules Engine)*
 
-**R20.** The box holds JSON. No Hive `TypeAdapter` is written or registered anywhere in the
+**R22.** The box holds JSON. No Hive `TypeAdapter` is written or registered anywhere in the
 app. *(Tech Design → Serialization and the storage layer)*
 
-**R21.** Serialization lives with the model and is generated, not hand-written: the engine's
-game-plus-series state serializes from `lib/engine/`, in pure Dart with no Flutter import,
-and the storage layer writes no hand-rolled encoding of its own. *(Tech Design →
-Serialization and the storage layer)*
+**R23.** The box has one name, fixed by this document rather than by whoever writes the code
+first: **`open_games`**. It becomes on-disk identity the moment a record ships, so it is
+schema, and renaming it later orphans every stored game. *(Tech Design → Serialization and
+the storage layer — the Hive box lives in `storage/`; naming it here follows the same
+reasoning as the preference store's fixed key namespace under → Reads return "nothing
+stored")*
 
-**R22.** The layer is testable against an in-memory fake of the repository interface with no
+**R24.** Serialization lives with the model, in pure Dart with no Flutter import: the
+engine's game-plus-series state converts to and from JSON in `lib/engine/`, and the storage
+layer writes no encoding of the game state of its own. The existing hand-written engine
+models — `Board`, `Move`, `QuadrantState`, `PlacementState`, `Score` — are **kept as they
+are** and gain conversion; they are not rewritten through `freezed`. Generated serialization
+is permitted where it is simpler and required nowhere. *(Tech Design → Serialization and the
+storage layer — see Notes for the Design Docs below, where that section is now wrong on
+`freezed`)*
+
+**R25.** The layer is testable against an in-memory fake of the repository interface with no
 Hive initialized. *(Tech Design → Serialization and the storage layer)*
 
-### When a write happens
+### The wiring that makes the writes real
 
-**R23.** A game is written to storage after every confirmed move, as the move is confirmed
+Persistence nothing calls is not persistence. These five are the minimum that connects the
+layer to the game being played, and nothing beyond them is in scope.
+
+**R26.** A game is written to storage after every confirmed move, as the move is confirmed
 rather than on leaving the game. *(Menus and UI → Persistence → When a game is written to
 storage)*
 
-**R24.** Taking the next game is written straight away too, even though it is not a move —
+**R27.** Taking the next game is written straight away too, even though it is not a move —
 otherwise a player who takes the rematch and quits before playing reopens the finished board
 with the result card still over it. *(Menus and UI → When a game is written to storage)*
 
-**R25.** Leaving a game performs no write of its own. A force-quit, a crash and a deliberate
+**R28.** Leaving a game performs no write of its own. A force-quit, a crash and a deliberate
 walk back to the main menu all leave the same thing on disk. *(Menus and UI → Leaving a game
 mid-play)*
+
+**R29.** The game in play is identified by its record id in the state layer, so a save knows
+which record it is saving. *(Tech Design → What a stored open game holds — the id is the only
+thing that identifies an open game; → The screen loads its game before it draws one)*
+
+**R30.** The game screen reads the stored game it was opened for, by that id, and draws no
+board and no scoreboard until the read lands. Starting a brand-new game creates its record
+first (R10), and the id that create answers with is what the session then holds.
+*(Tech Design → The screen loads its game before it draws one;
+[Menus and UI](../Menus%20and%20UI.md) → Play Game → Where It Takes You: "Opening a game from
+the list shows that game… the board is not drawn until the saved position has loaded")*
 
 ## Out of Scope
 
@@ -172,7 +228,12 @@ mid-play)*
   it. *(Menus and UI → Play Game → Where It Takes You; → Deleting an open game)*
 - What the app offers a player who is already at the cap. This layer refuses the create and
   reports the numbers; what is shown is not settled — see Open Questions.
-- Any widget, route, navigation, theming, animation, audio or haptic behaviour.
+- Every widget, route, navigation, theming, animation, audio and haptic behaviour **except
+  the wiring named in R26–R30** — holding the played game's id, loading a game by id before
+  drawing it, saving on a confirmed move and on the next game, and creating a record for a
+  brand-new game. Nothing beyond those five.
+- What the caller does with R16's "no such record" answer, and with R12's "nothing stored"
+  when a game the player opened is gone — see Open Questions.
 - The five player preferences, already built on `shared_preferences`, and the preference
   store's key namespace.
 - Entitlements and purchases beyond reading a ceiling. Nothing here queries the store, and
@@ -186,6 +247,25 @@ mid-play)*
 - Persisting crash reports. They are held in memory today. *(Tech Design → Reports are held
   in memory)*
 
+## Notes for the Design Docs
+
+Not open questions — settled things the docs do not yet say correctly. Recorded here for
+whoever revises them; this PRD does not fix a design doc.
+
+- **`Tech Design.md` → *Serialization and the storage layer* is wrong on `freezed`.** It says
+  "`freezed` + `json_serializable` for the domain models in `engine/`". The engine's models
+  ship hand-written, with 193 tests pinning them, and they stay that way (R24) — regenerating
+  them buys no behaviour change while putting the purity guarantee through a generator. What
+  the doc is actually asking for, and what survives, is that serialization live with the
+  model in pure Dart.
+- **The shipped `PreferencesRepository` writes no version stamp**, though Tech Design → *Every
+  persisted record carries a version stamp* requires one on both stores. The
+  `shared_preferences` implementation does write a `version` key; the interface and the
+  in-memory implementations do not carry the rule. Out of scope here — flagged so it is not
+  lost.
+- **`lib/state/open_game_count.dart` is hardcoded to zero**, with a comment saying game
+  persistence does not exist yet. It becomes wrong the day this ships.
+
 ## Open Questions
 
 **1. Reading a record written by an older app version.** Carried unchanged from
@@ -198,46 +278,28 @@ mid-play)*
 Every record carries the stamp (R5) and nothing reads it, which is where the preferences
 implementation already stands.
 
-**2. `freezed` for the engine's models — the doc and the code disagree.**
-[Tech Design](../Tech%20Design.md) → Serialization and the storage layer states
-**"`freezed` + `json_serializable` for the domain models in `engine/`"**, and R21 states it as
-the docs state it. But those models already exist, hand-written: `Board`, `Move`,
-`QuadrantState`, `PlacementState` and `Score` implement their own immutability and defensive
-copying, `Move` implements value equality, and 193 tests pin the behaviour. The two ways out
-cost different things, and this PRD does not pick:
+**2. What the player sees when the game they opened is gone or unreadable.** R12 and R13
+settle what the *storage layer* answers; what the app does with that answer is open. Carried
+from [Menus and UI](../Menus%20and%20UI.md) → Open Questions: **"What should happen when a
+player opens a game that is no longer there, or that can't be read back?"** — *"Going quietly
+back to the main menu tells them nothing about why, and an error surface would need copy and
+a control that nothing specifies."*
 
-- *Rewriting them through `freezed`* is churn against working code, moves the engine's public
-  surface into generated files, and puts the purity guarantee through a generator.
-- *`json_serializable` alone* satisfies "serialization lives with the model" and leaves the
-  hand-written models alone, but leaves the doc's `freezed` half unmet — and `Board`, unlike
-  `Move`, has no value equality today, which R2's round-trip test has to compare field by
-  field either way.
-
-The new stored-record type is greenfield and this tension does not touch it.
-
-**3. What a caller gets for a record that cannot be read back.** R12 settles the *absent*
-case. A record that is present but corrupt is not settled: the preferences implementation
-funnels every malformed record to "nothing stored", but no doc extends that to games, and
-nothing says whether one bad record makes the whole list read fail or is skipped.
-[Menus and UI](../Menus%20and%20UI.md) → Open Questions asks the player-facing half —
-**"What should happen when a player opens a game that is no longer there, or that can't be
-read back?"** — and leaves the storage half unstated.
-
-**4. What supplies the ceiling before entitlements exist** — *my question, not the docs'.*
-R16 forbids `storage/` from defining 3 or 100, and entitlement state does not exist yet, so
+**3. What supplies the ceiling before entitlements exist** — *my question, not the docs'.*
+R18 forbids `storage/` from defining 3 or 100, and entitlement state does not exist yet, so
 something outside this layer has to state the default 3 in the meantime.
 
-**5. Games already stored above the cap if the unlock goes away.** Carried from
+**4. Games already stored above the cap if the unlock goes away.** Carried from
 [Menus and UI](../Menus%20and%20UI.md) → Open Questions: *"A player with 60 open games whose
-ceiling drops back to 3 has 57 games nothing is willing to touch."* R17 settles that this
+ceiling drops back to 3 has 57 games nothing is willing to touch."* R19 settles that this
 layer deletes none of them; what the app does about it is open.
 
-**6. Which store holds entitlement state.** Carried from [Tech Design](../Tech%20Design.md) →
+**5. Which store holds entitlement state.** Carried from [Tech Design](../Tech%20Design.md) →
 Open Questions → *5.* — `shared_preferences` alongside the five preferences, or Hive, which
 "means a second box beside the open-games one." It decides whether this layer's box is the
 only one.
 
-**7. How a test builds a mid-game board.** Carried from [Tech Design](../Tech%20Design.md) →
+**6. How a test builds a mid-game board.** Carried from [Tech Design](../Tech%20Design.md) →
 Open Questions → *9.*: *"The tempting shortcut is building fixtures from stored JSON, and that
 binds the whole suite to a serialized shape 1. Persisted data — migration above leaves open —
 where the breakage then looks like a rules failure rather than a fixture one."* This feature

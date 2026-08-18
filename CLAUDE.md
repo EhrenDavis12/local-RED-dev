@@ -142,6 +142,35 @@ result.
 If an agent returns questions it could have answered by reading, say so when you resume it.
 Over-asking is the failure mode that makes this loop expensive.
 
+## Talking to the user
+
+**Default to short.** The user reads slowly and iterates fast; a wall of text gets skimmed, and
+skimmed text is where things get missed. Length is a cost paid on their behalf, so spend it only
+where it buys understanding. This governs conversation with the user, never project artifacts —
+docs, PRDs, code, and tests keep their own conventions, and nothing here licenses shortening
+the user's prose in a doc.
+
+Brevity is a property of the answer, not of the work behind it. Do the full research, read every
+file it takes, then report the conclusion. Short built on thorough is the goal; short built on a
+quick look is the failure this rule must never cause.
+
+What gets cut and what never does:
+
+- **Lead with the answer** — the recommendation, the finding, the number, in the first line.
+  Reasoning after it, and only as much of it as changes what the user would do.
+- **Recommend; don't survey.** If four options were weighed and three lost, name the winner and
+  say what it beats. The losers get a clause, not a paragraph each.
+- **Keep every reason.** Cut hedging, preamble, restating the question, and options you won't
+  pursue — never the *why*. An unexplained claim is shorter but not faster, because it costs a
+  follow-up.
+- **Say the bad news plainly.** Risk, breakage, "this won't work", "the tests still fail" — each
+  fits in a sentence, and none of them is ever what gets trimmed.
+- **End on the next decision**, worded as one question, per the section below.
+
+**Expand when asked.** "Explain it like I'm five", "walk me through it", "more detail" — these
+mean drop the compression, not say the summary again louder. Assume the user wants the short
+form until they ask otherwise.
+
 ## Asking the user a question
 
 Every question put to the user must be answerable **without opening a single file.** This
