@@ -597,8 +597,8 @@ This is what makes [Menus and UI](./Menus%20and%20UI.md) → Persistence and
 implementable.
 
 ### Serialization and the storage layer
-**`freezed` + `json_serializable` for the domain models in `engine/`, and a `storage/`
-layer holding the repository interfaces with Hive and `shared_preferences`
+**Hand-written domain models in `engine/` carrying their own `toJson`/`fromJson`, and a
+`storage/` layer holding the repository interfaces with Hive and `shared_preferences`
 implementations that store JSON. No Hive `TypeAdapter`s.**
 
 Two consequences worth naming, because they cut across other sections:
@@ -608,9 +608,20 @@ Two consequences worth naming, because they cut across other sections:
   file outside it imports either Hive package, and every caller depends on the repository
   interfaces rather than their implementations. That is also what lets tests run against
   in-memory fakes with no Hive initialized.
-- **Serialization lives with the model.** `toJson`/`fromJson` are generated into `engine/`
-  by json_serializable — pure Dart, Flutter-free — while the Hive box, adapters-free,
-  lives in `storage/`. The storage layer writes no hand-rolled encoding of its own.
+- **Serialization lives with the model.** `toJson`/`fromJson` are hand-written in
+  `engine/` — pure Dart, Flutter-free — while the Hive box, adapters-free, lives in
+  `storage/`. The storage layer writes no encoding of the game state of its own; what it
+  does encode by hand is the record envelope around it — the opponent name, the two
+  timestamps and the version stamp. The engine's models are kept as they are and gain
+  conversion rather than being rewritten through `freezed`: regenerating working, tested
+  code buys no behaviour change, and it would put the engine's purity guarantee through a
+  generator. Generated serialization stays permitted where it is simpler, and is required
+  nowhere.
+
+**The box has one name, `open_games`, and it holds JSON-encoded strings rather than
+decoded maps.** Both are on-disk identity the moment a record ships, so both are schema
+rather than a choice whoever writes the code first gets to make — renaming the box orphans
+every stored game.
 
 ### Every persisted record carries a version stamp
 **Every record written to either store carries a stamp identifying the app version that
@@ -621,6 +632,11 @@ afterward: without it, a record written by an older version is indistinguishable
 written by the current version, and the app is left inferring a version from the shape of
 the data. What the app *does* when it reads a record written by an older version is a
 separate question, and an open one — see **Open Questions** below.
+
+**The repository owns the stamp, exactly as it owns the timestamps.** It is applied on
+every write and whatever the caller passes is discarded, so the stamp means *the app
+version that last wrote this record*: a record created under one version and saved under a
+later one carries the later one.
 
 ### What a stored open game holds
 **A stored open game is the engine's whole game-plus-series state, plus three things that
@@ -643,6 +659,11 @@ and it is never reused after a delete. Nothing parses it, derives ordering from 
 displays it. The opponent name cannot serve as the key, because it is a title and
 duplicate titles are the ordinary case.
 
+**The opponent name is set at create and a save never changes it.** A save preserves the
+stored name and discards whatever the caller passed, the same way it preserves the created
+timestamp — otherwise every save is a rename, and no doc specifies a rename or a control
+that would perform one.
+
 **The record carries both a created and an updated timestamp, not one or the other.** That
 leaves the sort key a *display* choice rather than a *schema* one — a list that wanted
 creation order, or a row that wanted "started on", can be served later without migrating
@@ -658,7 +679,9 @@ immutability becomes enforceable at the one choke point instead of merely conven
 **Both timestamps are UTC.** A local `DateTime` serialized to ISO-8601 carries no offset at
 all, so a record written in one timezone and read in another compares as though it had
 been written at a different instant — and the open-games list is ordered on exactly that
-comparison, so the list would reorder itself after a flight or a DST change.
+comparison, so the list would reorder itself after a flight or a DST change. The
+repository forces UTC on whatever its clock answers rather than trusting it to be UTC
+already, so the guarantee is structural rather than something each caller has to honour.
 
 ### The open-games list has a defined order
 **Reading the open-games list returns most-recent-first on the updated timestamp,
@@ -672,6 +695,11 @@ The tiebreaker is not decoration: a freshly created record has both stamps equal
 games created before either is played can tie on the primary key, and Dart's `List.sort`
 is not stable.
 
+Two records can tie on **both** stamps, so the comparator ends in a final key of the
+implementation's choosing and is total. Ordering by that key is not the rule and it is
+never a display order — it is only what stops a tie from resolving differently between two
+reads.
+
 **Any save moves its record to the top, including a save that is not a move** — taking a
 rematch puts that series first before a mark is placed in the new game.
 
@@ -680,7 +708,13 @@ rematch puts that series first before a mark is placed in the new game.
 a create-time check rather than a standing invariant: it constrains what may be added and
 nothing else. The ceiling is not a constant — see [Menus and UI](./Menus%20and%20UI.md) →
 How many open games we keep — and the storage layer reads it from entitlement state rather
-than defining either number itself.
+than defining either number itself. Entitlement state does not exist yet, so the default
+of 3 is resolved at startup, above the storage layer, and handed to the repository when it
+is constructed — no file under `lib/storage/` states 3 or 100.
+
+**The cap counts only the records that can be read back.** A record that cannot be read is
+not in the list the player sees, so counting it would refuse a create against games the
+player has no way to find or delete.
 
 **The store never evicts.** A create at the ceiling does not silently remove an existing
 game; a slot is freed only by an explicit, player-initiated delete. If the ceiling ever
@@ -690,6 +724,12 @@ deleting any of them.
 **Reaching the cap is an ordinary, player-reachable condition, not an error**, so a refused
 create reports it as a value carrying the effective ceiling and how many are held, rather
 than throwing. That lets the caller say "3 of 3" without a second round trip.
+
+**A save against an id the store does not hold writes nothing and creates nothing.** It is
+not an upsert: creating that way would be a second creation path past the cap, and it
+could resurrect a game a player deleted. It does not throw either — it comes back as a
+value the caller can act on, in the same spirit as a refused create, because a save that
+silently discards a player's move is the other failure.
 
 **Deleting removes one open game and its whole series** — board, scoreboard and all —
 permanently, leaves every other stored game untouched, and touches no preference. Nothing
@@ -707,6 +747,28 @@ layer resolves the default theme because only it knows Neon's UUID, and the stat
 resolves the four toggle defaults because they are plain booleans with a doc-settled
 value. Putting a theme constant in `storage/` would trip the hardcoded-theme-value test —
 see **Testing** below.
+
+**A record that is present but cannot be read back answers as "nothing stored", exactly as
+an id the store never held.** Malformed JSON, a missing or wrong-typed field, and a record
+that is well-typed but not a legal board — cell rows of the wrong length, a forced
+placement naming no quadrant — all answer the same way. The last of those matters because
+such a record decodes without complaint and only fails later, above this layer, where the
+failure no longer looks like a storage one.
+
+**A record that cannot be read back is skipped by the list read, and every other stored
+game comes back.** Failing the whole read on one bad record would hide every game the
+player still has.
+
+**A read stays a read.** A record that failed to decode is left on disk exactly as it is,
+neither rewritten nor deleted.
+
+**When the box itself cannot be opened, the app falls back to an in-memory store and still
+launches.** A bad documents directory, a stale lock file or a corrupt box tail would
+otherwise throw on every relaunch with no UI and no error to show for it. Every read then
+answers "nothing stored" — the same doctrine one unreadable record already gets, applied
+to the whole store — and nothing written in that session survives. The box on disk is left
+exactly as it was: deleting or recreating it to recover would destroy a player's saved
+games to fix a read error, which is worse than the error.
 
 **The selected theme is stored as the theme's UUID, not its name**, so renaming a theme
 neither changes the stored value nor loses the player's selection.
@@ -1284,10 +1346,10 @@ flag, tag or separate command.
 
 **Two exclusions, both by path.** `lib/theme/` is exempt — it holds the merged theme
 object and the loader, so it is the one place a literal theme value legitimately appears.
-Generated files are exempt too, `*.g.dart` and `*.freezed.dart` anywhere under `lib/`:
-`freezed` and json_serializable generate into `engine/`, inside the scan root, and a
-developer cannot fix a violation in a file `build_runner` rewrites. Everything else under
-`lib/` is scanned.
+Generated files are exempt too, `*.g.dart` and `*.freezed.dart` anywhere under `lib/`: a
+developer cannot fix a violation in a file `build_runner` rewrites. Nothing generates into
+`lib/` today — the engine's models are hand-written — so the exemption is a standing rule
+rather than one anything currently relies on. Everything else under `lib/` is scanned.
 
 The scope comes from [Theming](./Theming.md) → Architectural Rule, which derives its slot
 list from what the screens actually consume rather than a closed category list. The

@@ -642,6 +642,11 @@ that game to carry it. Otherwise a player who takes the next game and quits befo
 reopens the *finished* board with the result card still over it, having already asked for
 a new one.
 
+**A brand-new game is written the moment it starts**, before a single mark is placed — the
+record has to exist for anything later to be saved against it. So a player who starts a
+game and walks away without playing still finds it in the open-games list, empty, holding
+one of their slots until they delete it.
+
 ### Leaving a game mid-play
 Since a game in progress is saved, going back to the main menu doesn't discard anything —
 the game stays in the open-games list with its own scoreboard, and you can pick it up
