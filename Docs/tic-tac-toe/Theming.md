@@ -237,6 +237,13 @@ with electric audio. That's a fine default (it works, nothing is missing), but R
 may want to override more than just colors to feel coherent. Worth checking once it's
 real; not a problem to solve now.
 
+### The quadrant fill and its veils move together
+The locked, claimed and cat-game veils are drawn on top of the quadrant's fill, not on the
+theme's own ground, so their correctness is relative to the fill, not to the ground. A
+theme that overrides the fill while inheriting the veils, or the other way around, gets
+veils tuned for a fill they are no longer drawn over. The fill and the veils have to be
+overridden together or not at all.
+
 ---
 
 ## Theme Catalog

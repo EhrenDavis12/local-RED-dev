@@ -138,6 +138,7 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
   - Why this matters for the build
   - Closing Neon's value gaps
   - Watch out for
+  - The quadrant fill and its veils move together
 - Theme Catalog
   - Theme 1 — Neon (base)
   - Theme 2 — Classic Red vs Blue
