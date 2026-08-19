@@ -171,6 +171,26 @@ What gets cut and what never does:
 mean drop the compression, not say the summary again louder. Assume the user wants the short
 form until they ask otherwise.
 
+## Momentum — never stop to ask "continue?"
+
+When the next step is already defined — by the pipeline, by a plan the user approved, or by
+an agent's report — take it in the same turn. Ending a turn to announce the next step and
+wait for "please continue" is the failure mode: naming the step that precisely proves you
+had everything needed to take it, so the announcement cost a round trip and bought nothing.
+Report progress *while* moving, in a line or two, not as a stopping point.
+
+A turn ends only when one of these is true:
+
+- The next step needs the user's **intent or preference** — a real question, per the
+  section below. Ask it and keep working on whatever doesn't depend on the answer.
+- The next action is **expensive or irreversible** and the user hasn't already authorized
+  it, in this session or durably.
+- **The requested work is done.** Report the outcome. Suggest what's next if useful, but as
+  a recommendation you'd act on with a word — never as a menu waiting for a selection.
+- You are **genuinely blocked** and research cannot unblock you.
+
+"Shall I proceed?" against a step the user already asked for is never one of them.
+
 ## Asking the user a question
 
 Every question put to the user must be answerable **without opening a single file.** This
