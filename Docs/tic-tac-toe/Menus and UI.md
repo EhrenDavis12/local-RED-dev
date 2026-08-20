@@ -408,10 +408,9 @@ the new theme, no restart — and the overlay closes. The choice persists betwee
 see [Theming](./Theming.md) → Choosing a Theme. **The overlay can also be closed without
 changing anything**, with the close control in its header.
 
-**If the theme fails to load, the overlay does not close.** The "sorry this theme is
-unavailable" modal sits on top of the overlay, which stays underneath it, and the app
-falls back to Neon — so Neon is the highlighted row behind the modal. The modal and the
-fallback are [Theming](./Theming.md) → Choosing a Theme.
+**A theme file the app cannot read never reaches this list.** It is dropped rather than
+shown, so there is no unavailable row to tap and no failure message on this overlay —
+see [Theming](./Theming.md) → Choosing a Theme.
 
 ```
 ┌─────────────────────────┐
@@ -703,17 +702,9 @@ an open game** above.
   fortieth game pays for them every turn. If they can fade, nothing says what triggers
   it — a move count, a games-played count, a setting, a dismiss control — and a dismiss
   control needs a way to bring them back.
-- **After the "this theme is unavailable" modal is dismissed, does the overlay stay open
-  on the Neon list, or close along with the modal?**
-- **Where does the "theme is unavailable" message go when the load fails at launch**,
-  before the overlay is even open — fall back to Neon quietly and show it the next time
-  theme selection is opened, or say something at launch?
 - **Is the Neon fallback remembered?** When a theme fails to load and the app drops back
   to Neon, does Neon become the saved choice, or is the player's original pick kept and
   tried again next launch?
-- **What does a player see when a theme file is broken?** The list still renders either
-  way, but nothing says whether that theme is quietly missing from it or shown as
-  unavailable.
 - **What should the Vibrate on Touch toggle do on a device that produces no haptic?** An
   iPad has no Taptic Engine, and an iPhone with the OS's own System Haptics switched off
   feels nothing either — in both cases the app's switch still reads ON and the player has

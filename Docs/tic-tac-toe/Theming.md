@@ -103,11 +103,12 @@ selection to device storage.
 **You can't change the theme mid-game** — leave it out for now. Theme changes happen from
 the main menu only. Possible later feature if we decide we want it.
 
-**If a theme fails to load, a modal on the Theme screen says the theme is unavailable, and
-the app falls back to Neon.** *"From the Theme screen if a theme fails to load put up a
-modal with sorry this theme is unavailable please try another theme. Then fallback to
-neon."* Neon is the one theme with nothing to fall back to — see **Neon Is the Base
-Theme** below.
+**A theme file the app cannot read is left out of the theme list, and nothing tells the
+player it exists.** There is no "this theme is unavailable" message anywhere — the broken
+file is simply absent from the picker, and every other theme still lists normally. The
+same holds when the unreadable file is the one the player last chose: the app falls back
+to Neon at launch and says nothing about it. Neon is the one theme with nothing to fall
+back to — see **Neon Is the Base Theme** below.
 
 **If Neon itself fails to load, the app does not start.** The first screen is a
 **Failed to load Neon Theme** screen and the player cannot get past it: *"If Neon fails to

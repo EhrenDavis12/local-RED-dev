@@ -876,6 +876,18 @@ Because the session is process-wide, a music layer added later shares it and can
 differently. Whatever is settled there binds both.
 
 ### Where sound and art assets come from
+**Generation lives in its own project-agnostic framework, not a script inside this
+project.** The framework lives directly inside the `local-RED-dev` mono repo at
+`src/Asset-Gen-Framework`. It is not a separate repository and not a submodule — unlike this
+project's own source, which is — it is a shared utility that projects in the mono repo call.
+It holds only the plumbing: the Replicate API calls, credential handling, reading the prompt
+manifest, the drafts fence, the per-asset record, and checking that a downloaded file's bytes
+match the format its entry declared. It holds nothing about any particular asset — no prompt,
+no model choice, no filename, no knowledge of themes or slots — which is what lets one
+framework serve games that have nothing in common. This project's side of the arrangement is:
+it writes the prompt manifest, it says what it wants and what to call it, and it approves what
+comes back.
+
 **Generated with Replicate when we actually need them — not now.** This covers both the
 sound assets (the Neon buzz, the Classic splat) and the art (the logo): *"I have used
 Replicate in the past so will need to build out a clean Replicate API calling mechanism
@@ -923,8 +935,9 @@ data. The script reads it and never writes it, and it invents nothing that belon
 prompts, formats and model ids are the user's to write. A prompt an agent made up would be
 recorded as provenance and read back later as a decision.
 
-**The script is Dart**, so generation needs no second toolchain — the SDK already ships
-with Flutter.
+**The framework is Python.** It is shared across projects rather than being this project's
+script, so matching this project's toolchain is not what matters — Python is on every
+machine already, and it handles HTTP, the manifest, and the file checks cleanly.
 
 **fey-tactics is consulted for the API call and for nothing else.** It is not part of this
 project and is not reachable from it, and Replicate's HTTP API is publicly documented, so
@@ -952,11 +965,13 @@ outside all of this: it lives in the iOS asset catalog rather than the Flutter `
 tree (see **Distribution and Release** → **The app icon**), so if it is ever generated
 here, this rule has to widen to reach it.
 
-**The generator computes filenames; nobody types one.** A file is named from the theme and
-the slot it fills, so there is one source of truth for the path a theme's YAML points at,
-and the name an asset is drafted under is the name it ships under. Every generated file is
-theme-prefixed, the logo included, which is what lets one theme override a slot without
-colliding with another theme's file in a flat folder.
+**Every prompt manifest entry carries the exact output filename, and the framework writes
+that name and never invents one** — that is what keeps it free of any knowledge about
+themes or slots. Computing that name from the theme and the slot it fills is this project's
+rule: it is what gives one source of truth for the path a theme's YAML points at, makes the
+name an asset is drafted under the name it ships under, and theme-prefixes every generated
+file, the logo included, so one theme can override a slot without colliding with another
+theme's file in a flat folder.
 
 **What it owes is per theme, not per game** — each theme's playable sound slots and its
 main-menu logo (see [Theming](./Theming.md) → What a Theme Controls). Mark art is produced
@@ -989,9 +1004,12 @@ As stated:
 > it into a Draft folder first. Approval is my just saying yes use this assest X then move
 > it along."*
 
-So generation is two stages. **The generator writes into a drafts area kept separate from
-the shipped asset folders, and that is the only place it writes.** What that area is
-called is code's to settle — the decision here is the fence, not the path.
+So generation is two stages. **The drafts area lives inside this project, kept separate
+from the shipped asset folders, and it is the only place the framework writes.** A draft
+sits next to where it would eventually ship, so approving one is a move within this
+repository rather than a copy across repositories. The framework is told where to write and
+can reach nowhere else. What that area is called is still code's to settle — the decision
+here is the fence, not the path.
 
 **Approval is a person saying yes, and it is the user's to give.** There is no score, no
 threshold and nothing automatic: the user says use this one, and only then does the asset
