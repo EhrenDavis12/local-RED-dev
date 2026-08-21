@@ -1,0 +1,11 @@
+{
+  "name": "asset-gen-framework",
+  "aliases": ["agf"],
+  "title": "Asset-Gen-Framework",
+  "summary": "Project-agnostic asset generation via Replicate — the plumbing (API calls, credentials, manifest, drafts fence, records), never the assets themselves.",
+  "docsRoot": "Docs/asset-gen-framework",
+  "prds": "Docs/asset-gen-framework/PRDs",
+  "roadmap": "Docs/asset-gen-framework/roadmap.md",
+  "srcRoots": ["src/Asset-Gen-Framework"],
+  "stack": "Python"
+}
