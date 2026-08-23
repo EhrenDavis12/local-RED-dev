@@ -9,6 +9,7 @@ Covers the project-agnostic asset generation framework: what it is, how it is ca
 plumbing.
 
 - What this is
+  - A CLI, driven by an agent
   - Called from another project's session
   - Language
   - fey-tactics
@@ -20,6 +21,9 @@ plumbing.
   - Filenames
   - Format checking
 - What it generates
+  - What the framework does not generate
+  - Sprite sheets
+  - Video
   - Artistic consistency
   - Looping
 - Drafts and approval
