@@ -1,0 +1,26 @@
+[project]
+name = "agf"
+version = "1.0.0"
+description = "Asset-Gen-Framework — project-agnostic asset generation via Replicate."
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "pillow",
+    "requests",
+    "av",
+]
+
+[project.scripts]
+agf = "agf.cli:run"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agf*"]
+
+[tool.pytest.ini_options]
+# `pythonpath = ["."]` is what lets `import agf...` resolve without an install.
+testpaths = ["tests"]
+pythonpath = ["."]
