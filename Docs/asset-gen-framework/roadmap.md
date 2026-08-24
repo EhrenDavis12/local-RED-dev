@@ -15,6 +15,7 @@ plumbing.
   - fey-tactics
 - The prompt manifest
   - One script, per-asset inputs are data
+  - One entry is one call
   - Choosing a model
   - Sample images
   - Providing base assets to build from

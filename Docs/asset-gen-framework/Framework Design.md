@@ -39,14 +39,14 @@ under one active project at a time. A project such as Tic-Tac-Toe-Extreme calls 
 framework as a utility while that project is the active one; nothing in that session edits
 the framework. Changing the framework means making the framework the active project.
 Project scoping already enforces this — an agent working under another project resolves
-that project's paths and never this one's source — so the separation is structural rather
-than a rule anyone has to remember.
+that project's paths and never this one's source — so the separation is structural
+rather than a rule anyone has to remember.
 
 ### Language
 
 The framework is Python. It is shared across projects rather than being any one project's
-script, so matching a caller's toolchain is not what matters — Python is on every machine
-already, and it handles HTTP, the manifest, and the file checks cleanly.
+script, so matching a caller's toolchain is not what matters — Python is on every
+machine already, and it handles HTTP, the manifest, and the file checks cleanly.
 
 ### fey-tactics
 
@@ -60,14 +60,35 @@ requirement is a clean framework that generates no junk.
 ### One script, per-asset inputs are data
 
 Adding an asset adds an entry to a list, never a second script. The script reads a
-hand-written prompt manifest — one entry per asset — and generates whichever entry it is
-asked for. Asking is by name: name the asset you want and the framework generates that
+hand-written prompt manifest — one entry per asset — and generates whichever entry it
+is asked for. Asking is by name: name the asset you want and the framework generates that
 one. What varies per asset is data the calling project writes, not code in the framework.
 
 The manifest is YAML, because it is hand-authored project data. The script reads it and
 never writes it, and it invents nothing that belongs in it: prompts, formats, model ids
 and inputs are the calling project's to write. A prompt an agent made up would be recorded
 as provenance and read back later as a decision.
+
+### One entry is one call
+
+An entry is exactly one API call, and the framework holds no notion of a multi-step asset.
+A list of assets to generate is a list of calls, one per entry, and that is the whole
+model.
+
+An asset that takes several steps is several entries, each naming the previous entry's
+output file as one of its inputs. That works because an entry may already start from
+assets that exist — see `### Providing base assets to build from` — and because every
+entry declares the exact filename it writes, so the file an earlier entry produced is a
+file a later entry can name.
+
+The order is the order the calling project runs them in. Nothing in the framework
+sequences entries, resolves dependencies between them, or knows that one entry's input
+came from another. This is what keeps a sprite sheet's several steps from turning into
+machinery: the caller writes the entries and runs them, and each one is the same single
+call as a plain image.
+
+Rerunning an early step does not cascade. A later entry is rerun deliberately, by name,
+like any other — which is the same rule as everywhere else in the framework.
 
 ### Choosing a model
 
@@ -87,8 +108,8 @@ not enumerate its output file formats beyond the transparency capability implyin
 Music is generated with `stability-ai/stable-audio-2.5`. It produces instrumentals and
 sound effects up to roughly three minutes from a text prompt. It is chosen for a specific
 capability rather than for fidelity or length: it supports audio inpainting and
-continuation — given a clip, it fills a gap or extends the clip. That primitive is what a
-seamless loop needs, and no other music model on Replicate offers it. Models with higher
+continuation — given a clip, it fills a gap or extends the clip. That primitive is what
+a seamless loop needs, and no other music model on Replicate offers it. Models with higher
 fidelity or longer output exist and none of them can close a loop.
 
 Every model has its own inputs, and the manifest carries them. Models do not share an
@@ -100,8 +121,8 @@ them mean. This is what keeps a new model from being a code change.
 
 Most models take sample images, and more is better. Sample and reference images are inputs
 like any other and are named by the manifest entry. They are the calling project's files,
-not the framework's — the framework reads the paths it is given and holds no opinion about
-what a good sample is.
+not the framework's — the framework reads the paths it is given and holds no opinion
+about what a good sample is.
 
 ### Providing base assets to build from
 
@@ -127,10 +148,11 @@ Five kinds of asset: images, sound clips, music, sprite sheets, and video.
 ### What the framework does not generate
 
 Code-driven animation is out of scope, because it produces no asset. A transform applied
-to art that already exists — growing a mark to double size and shrinking it back, a pulse,
-a spin, a fade, a slide — is written in the calling project's code and generates no file,
-so there is nothing for the framework to make. The framework's business is assets; motion
-that is arithmetic over an existing asset belongs to whoever draws the frame.
+to art that already exists — growing a mark to double size and shrinking it back, a
+pulse, a spin, a fade, a slide — is written in the calling project's code and generates
+no file, so there is nothing for the framework to make. The framework's business is
+assets; motion that is arithmetic over an existing asset belongs to whoever draws the
+frame.
 
 A sprite sheet is what an animation becomes when the art itself has to change rather than
 merely move — a jaw that opens, a mark that transforms into something else. No transform
@@ -143,9 +165,9 @@ A sprite sheet is a sequence of frames, and every frame is PNG with alpha, like 
 other image the framework produces. How many frames, what size, and how they are laid out
 are per-entry data the calling project writes, like every other model input.
 
-The two paths — the pixel-art model and the image-to-video-and-matte chain — are a choice
-with a framework default, and an entry names the other path when it wants it. Which one is
-the default is unsettled — see Open Questions.
+The two paths — the pixel-art model and the image-to-video-and-matte chain — are a
+choice with a framework default, and an entry names the other path when it wants it. Which
+one is the default is unsettled — see Open Questions.
 
 Pixel art comes back as a finished sheet from a single call.
 `retro-diffusion/rd-animation` returns a sprite sheet directly, with consistent framing
@@ -153,20 +175,24 @@ and frame counts sized for game engines, and it accepts input images, palette im
 background removal and seamless tiling. It is a pixel-art model, so it fits a theme drawn
 in pixel art and nothing else.
 
-Every other art style is a chain. An image-to-video model animates a reference image, the
-subject is matted out of the video, and the frames become the sheet. Models that hold a
-character consistent across frames from reference images include Veo 3.1, Seedance 2.0 —
-which takes up to nine reference images — and Wan 2.7 R2V. Matting is its own step:
-`arielreplicate/robust_video_matting` is built for video rather than stills and tracks the
-subject across frames, which is what stops the edge flicker that matting each frame
-independently produces.
+Every other art style is a chain of several entries rather than one entry doing several
+things — see `### One entry is one call`. An image-to-video model animates a reference
+image, the subject is matted out of the video, and the frames become the sheet. Models
+that hold a character consistent across frames from reference images include Veo 3.1,
+Seedance 2.0 — which takes up to nine reference images — and Wan 2.7 R2V. Matting is
+its own step: `arielreplicate/robust_video_matting` is built for video rather than stills
+and tracks the subject across frames, which is what stops the edge flicker that matting
+each frame independently produces.
 
 Pulling a whole frame sequence out of a video is not a solved step.
 `lucataco/frame-extractor` returns only the first or last frame of a video, so a full
 sequence needs something else — and ffmpeg is an external binary this project does not
-otherwise depend on.
+otherwise depend on. Extracting frames is local image handling the framework does itself,
+not a Replicate call.
 
-How assembly is expressed for the chained path is unsettled — see Open Questions.
+The steps that produce the frames are separate manifest entries the calling project writes
+and runs in order, per `### One entry is one call`. Assembling those frames into one sheet
+is likewise the framework's own work, not a Replicate call.
 
 Frame-to-frame consistency is the hard part of a sprite sheet and is a sharper version of
 the consistency requirement already stated under `### Artistic consistency`: frames that
@@ -200,9 +226,14 @@ animation asset.
 ### Artistic consistency
 
 Artistic consistency is a requirement. Assets generated across a project have to look like
-they belong together, and the framework needs a mechanism that makes that hold rather than
-leaving it to how each prompt happens to be worded. Which mechanism is not settled — see
-Open Questions.
+they belong together, and the first version holds that with reference images — the same
+reference assets passed as inputs to each generation, which is what the image model
+already accepts.
+
+Fine-tuning a model on already-approved assets is a second-version concern, and it is
+wanted: consistency deserves a real mechanism rather than being left to how each prompt is
+worded. Building it would give the framework a second verb beyond generating. What that
+plan is has not been worked out.
 
 ### Looping
 
@@ -216,10 +247,10 @@ afterward.
 ### An authoring tool, not a build step
 
 No application interacts with it at all, in any direction. Its only invocation is an agent
-running the CLI on a developer's machine — a calling project builds and ships on a machine
-that has never held a Replicate credential. The credential is read from the environment,
-never from a committed file, a flag or a prompt, and never lands in anything the tool
-writes.
+running the CLI on a developer's machine — a calling project builds and ships on a
+machine that has never held a Replicate credential. The credential is read from the
+environment, never from a committed file, a flag or a prompt, and never lands in anything
+the tool writes.
 
 ### Drafts, then approval
 
@@ -238,8 +269,8 @@ holds even if the tool is wrong about everything else.
 ### The per-asset record
 
 One record per asset, holding the last generation only. Not a history and not an
-append-only log — regenerating an asset replaces that asset's entry rather than adding to
-it. An entry holds the pinned model version, the prompt, the seed and the inputs that
+append-only log — regenerating an asset replaces that asset's entry rather than adding
+to it. An entry holds the pinned model version, the prompt, the seed and the inputs that
 produced the asset. The model version is always pinned, never a bare model name, which is
 the whole reason the record is worth keeping. What the record is for is knowing what was
 last asked for, so the next request is a change from it rather than a fresh invention.
@@ -262,23 +293,19 @@ an existing draft is replaced only when the rerun says so explicitly.
 
 - Which default model for sound clips, sprite sheet frames, and video? Images and music
   have one; the other three do not.
-- What mechanism guarantees artistic consistency across a project's assets — reference
-  images passed on every call, a model fine-tuned on already-approved assets, a fixed
-  seed, or something else? Fine-tuning would mean the framework grows a second verb beyond
-  generating.
-- Which of the two paths — the pixel-art model or the image-to-video-and-matte chain — is
-  the sprite-sheet framework default?
+- What does managing artistic consistency look like beyond passing reference images on
+  every call — fine-tuning a model on already-approved assets, or something else?
+- Which of the two paths — the pixel-art model or the image-to-video-and-matte chain —
+  is the sprite-sheet framework default?
 - What format and codec does generated video use, given that transparency is not
   available?
-- Is a seamless music loop closed by inpainting across the wrap-around seam — joining the
-  track's end to its start and filling the join — and does that make a looping music entry
-  a chain rather than a single call?
-- How does a manifest entry express a chain of steps, given that some entries are a single
-  call and others are not?
+- Is a seamless music loop closed by inpainting across the wrap-around seam — joining
+  the track's end to its start and filling the join — and does that make a looping
+  music entry a chain rather than a single call?
 - How is the CLI told where a calling project's manifest, sample images, base assets,
   drafts area and record live — flags on the command, a config file in the calling
   project, or a convention?
 - Are generated asset files committed to git by the calling project?
-- What is the CLI's command surface — which commands exist, what they take, and what they
-  print for an agent to read?
+- What is the CLI's command surface — which commands exist, what they take, and what
+  they print for an agent to read?
 
