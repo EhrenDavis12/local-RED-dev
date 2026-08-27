@@ -4,3 +4,6 @@
 [submodule "src/privacy-policy-standalone"]
 	path = src/privacy-policy-standalone
 	url = git@github.com:EhrenDavis12/privacy-policy-standalone.git
+[submodule ".claude"]
+	path = .claude
+	url = git@github.com:EhrenDavis12/.claude.git

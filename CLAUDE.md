@@ -12,12 +12,26 @@ Today the only project is `tic-tac-toe` (Tic-Tac-Toe-Extreme, a recursive tic-ta
 3x3 big board where each quadrant holds its own 3x3 board). It has **no application code yet**;
 it is design documentation only, and the game is still being specified.
 
-## `srcRoots` are git submodules
+## `srcRoots` are git submodules — and so is `.claude`
 
 A `git diff` from the repo root shows only a **changed submodule pointer**, never the code
 change inside it. Anything that scopes itself by diff must use `git -C <srcRoot> diff`. Getting
 this wrong produces an empty diff and a confident "nothing to do" — a bug this repo has already
 shipped once.
+
+`.claude` is a submodule too, of `git@github.com:EhrenDavis12/.claude.git`, so the agent system
+can be installed into other projects. It is the same fact with a sharper edge: **a change to
+`.claude` is not saved by committing at the repo root.** Committing there only moves the
+pointer, and the pointer cannot move to a commit that does not exist yet. The change has to be
+committed inside the submodule first:
+
+```
+git -C .claude add -A && git -C .claude commit -m "..." && git -C .claude push
+git add .claude && git commit -m "Point the agent system at ..."
+```
+
+Push the submodule before moving the pointer, or the root commit references a commit no clone
+can fetch. `.claude/README.md` covers installing it elsewhere.
 
 ## The active project
 
