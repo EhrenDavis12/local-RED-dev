@@ -962,8 +962,8 @@ generator writes to neither.** Everything it produces lands in a drafts area fir
 the next subsection — and reaches those folders only by being approved and moved.
 `assets/themes/` holds theme YAML and is a destination at neither stage. The app icon sits
 outside all of this: it lives in the iOS asset catalog rather than the Flutter `assets/`
-tree (see **Distribution and Release** → **The app icon**), so if it is ever generated
-here, this rule has to widen to reach it.
+tree (see **Distribution and Release** → **The app icon**), and this rule widens to reach
+it — it is generated here too, and lands in the asset catalog rather than `assets/`.
 
 **Every prompt manifest entry carries the exact output filename, and the framework writes
 that name and never invents one** — that is what keeps it free of any knowledge about
@@ -1483,8 +1483,12 @@ screenshots, categories — which is what **Release tooling — fastlane** below
 ### The app icon
 **The app ships an icon, and it is not the main-menu logo.** App Store submission cannot
 happen without a 1024×1024 icon. It lives in the iOS asset catalog rather than the
-Flutter `assets/` tree, and it is a separate asset from the logo. Who produces it, and
-whether it is generated, is open — see Open Questions.
+Flutter `assets/` tree, and it is a separate asset from the logo. It is generated through
+the Asset-Gen-Framework like the game's other art, from its own prompt-manifest entry, and
+it stays a deliberately simpler asset than the main-menu logo — the logo's detail does not
+survive the small sizes an icon is rendered at. The generated draft is transparent PNG and
+is flattened onto the theme's ground colour on the way into the catalog, because an iOS app
+icon must carry no alpha channel or App Store Connect rejects the build.
 
 ### CI — local builds only
 **No CI. Local builds only.** `flutter test` and `flutter analyze` run locally.
@@ -1733,9 +1737,7 @@ block other work.
   code, or should timing and opacity that aren't theme values be exempt?
 
 ### 8. Generated assets
-- **Which image model and which audio model?** Nothing can be generated until both are
-  chosen, and the image model has to be one that emits transparent PNG and can be asked
-  for a square render.
+- **Which audio model?** Nothing audio can be generated until one is chosen.
 - If no audio model emits mp3, do we ship wav instead, or transcode with **ffmpeg**? The
   second adds an external binary nothing else in the project needs.
 - **What is the logo, actually?** Nothing states its subject. The approved handoff draws a
