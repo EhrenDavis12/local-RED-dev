@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: agf
+Version: 1.0.0
+Summary: Asset-Gen-Framework — project-agnostic asset generation via Replicate.
+Requires-Python: >=3.10
+Requires-Dist: pyyaml
+Requires-Dist: pillow
+Requires-Dist: requests
+Requires-Dist: av

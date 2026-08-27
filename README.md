@@ -54,6 +54,7 @@ git submodule update --init --recursive
 
 # add a new submodule
 git submodule add git@github.com:EhrenDavis12/Tic-Tac-Toe-Extreme.git src/Tic-Tac-Toe-Extreme
+git submodule add git@github.com:EhrenDavis12/privacy-policy-standalone.git src/privacy-policy-standalone
 ```
 
 ## Where things live

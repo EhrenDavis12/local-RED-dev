@@ -1,0 +1,4 @@
+pyyaml
+pillow
+requests
+av
