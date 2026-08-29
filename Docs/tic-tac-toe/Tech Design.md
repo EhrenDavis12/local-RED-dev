@@ -21,7 +21,7 @@ here so they don't get re-litigated:
 | **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. | Two players, one phone; qualified by In-App Purchases and Entitlements |
 | **Local persistence** for 5 values: theme, music, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
-| **Audio playback** for one-shot sound effects (no music yet) | [Theming](./Theming.md) |
+| **Audio playback** for one-shot sound effects, and for looping music the app fades in and out itself | [Theming](./Theming.md) |
 | **Haptics** on every valid click | [Game Board Design](./Game%20Board%20Design.md) → Haptic Rule |
 | **A theme system with fallback** — every visual/audio/motion value resolves through the active theme, falling back to Neon | [Theming](./Theming.md) |
 | **Animations toggleable off entirely**, with instant state changes instead | [Animations](./Animations.md) |
@@ -865,6 +865,20 @@ it is a sibling of this layer rather than an extension of it. It inherits the th
 rule and the same settings-gate shape, against the Music toggle instead of the sound
 effects one — and none of this layer's interface.
 
+**What that sibling offers is one call.** A caller says "play the active theme's music" and
+nothing else — no stop, no pause, no is-playing, no ducking, and no background or
+foreground handling. Stopping is the layer's own, exactly as it is for sound effects: it
+happens from a listener on the Music setting rather than from anything a caller can reach.
+Calling that one call again while a track is already playing is what swaps themes, so the
+launch call site and a theme change share one mechanism rather than two.
+
+**The loop and its fade are the app's, never the file's.** The player is set to loop, and
+the app ramps the volume down before the wrap and back up after it, on timers it schedules
+from the track's own duration. It deliberately does not wait on a playback-complete event:
+the Android player suppresses that event while looping, so a fade cycle depending on it
+would ramp to silence at the first wrap and never come back there, while working by
+accident on iOS.
+
 ### The audio session is process-wide, and chosen rather than defaulted
 **The session is configured once for the whole app**, and it has to be set explicitly: the
 audio plugin's own default is not neutral, so leaving it alone ships a policy nobody
@@ -973,11 +987,11 @@ name an asset is drafted under the name it ships under, and theme-prefixes every
 file, the logo included, so one theme can override a slot without colliding with another
 theme's file in a flat folder.
 
-**What it owes is per theme, not per game** — each theme's playable sound slots and its
-main-menu logo (see [Theming](./Theming.md) → What a Theme Controls). Mark art is produced
-here too when a theme names it: that section calls an image *"the real answer for a
-theme."* Both themes that exist today draw their marks as glyphs, so no mark image is
-needed yet.
+**What it owes is per theme, not per game** — each theme's playable sound slots, its
+music track and its main-menu logo (see [Theming](./Theming.md) → What a Theme Controls).
+Mark art is produced here too when a theme names it: that section calls an image *"the
+real answer for a theme."* Neon and Classic draw their marks as glyphs; Sewing's scissors
+and button are mark art, so it owes mark images.
 
 **Logos ship as PNG with alpha at 1x, 2x and 3x, all three downscaled from one render.**
 Flutter treats the three as the same artwork at different densities, so generating each
@@ -988,12 +1002,15 @@ mangle a logo, so the fix belongs in what was asked for, not in the tool.
 
 **A sound's format is declared per entry and checked against the bytes that arrive**, so a
 file never contradicts its own extension. `.mp3` is what the audio layer is written
-against, but most Replicate audio models emit wav or flac — which format ships is open
-below.
+against, and `stability-ai/stable-audio-2.5` returns `.mp3` natively — so nothing is
+transcoded and there is no ffmpeg dependency to add. That model exposes no loop and no fade
+input of any kind, which is why the seamless-loop request lives in the prompt text alone
+and may not be honoured, and why the fade at the loop point is the app's job at playback.
 
-**Music is not part of this.** A theme supplies its own music (see
-[Theming](./Theming.md) → Music), and where that audio comes from — composed, licensed or
-generated — is open there, not here.
+**Music is generated here too.** A theme supplies its own music (see
+[Theming](./Theming.md) → Music), and its track is a prompt manifest entry like any
+other sound. The track carries no fade of its own — the app fades it in and out at
+playback — so what the generator owes is the bare track.
 
 ### Nothing generated is applied directly — drafts, then approval
 As stated:
@@ -1063,8 +1080,8 @@ control; and an existing draft is replaced only when the rerun says so explicitl
 
 ## In-App Purchases and Entitlements
 
-**The game now sells two things.** Themes beyond the two free ones (Neon and Classic Red
-vs Blue), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
+**The game now sells two things.** A paid theme beyond the free set (Neon, Classic Red vs
+Blue and Sewing), and a **$4.99 unlock that raises the open-game cap from 3 to 100.** See
 [Theming](./Theming.md) → Free and Paid Themes, and [Menus and UI](./Menus%20and%20UI.md)
 → Play Game → Where It Takes You → How many open games we keep.
 
@@ -1115,14 +1132,14 @@ paid for. What gets written down, and under what rule, is **Persistence and Seri
 → *Entitlement state is written down, never minted*.
 
 **Paid-ness is derived, not recorded.** A theme is paid because it is not one of the free
-ones — see [Theming](./Theming.md) → Free and Paid Themes. No theme file, catalog entry or
-ownership marker records it, so there is no second list of paid themes to keep in step with
-the first.
+themes — see [Theming](./Theming.md) → Free and Paid Themes. No theme file, catalog
+entry or ownership marker records it, so there is no second list of paid themes to keep
+in step with the first.
 
-**The purchasable theme is a third theme, and it does not exist yet.** Neither of the two
-free themes becomes the paid one — the product is a theme beyond them, and building it is
-deliberately deferred rather than pending. What that means for the store record is
-**Distribution and Release** → *The store-side products*; when the theme lands is
+**The purchasable theme is Sewing, once purchasing is built.** Sewing ships free at first
+release and becomes the paid theme once the purchase flow lands — none of the other free
+themes becomes the paid one. What that means for the store record is
+**Distribution and Release** → *The store-side products*; when the purchase flow lands is
 **Open Questions**.
 
 **Every theme is in exactly one of three states — free, owned, or locked**, and that is what
@@ -1356,9 +1373,9 @@ states appear. Skip golden image tests.
 inventory the Architectural Rule names.** An ordinary test in the suite, not a custom
 analyzer plugin — and not an `analyzer`/AST-based scanner either. It scans the source
 under `lib/` for banned patterns outside the theme layer itself, and it holds a per-file
-baseline that fails when a new violation appears. There is no application code yet, so
-**the baseline starts at zero**. It runs in the default `flutter test` run, with no extra
-flag, tag or separate command.
+baseline that fails when a new violation appears. Nothing under `lib/` violates it, so
+**the baseline is empty and stays empty**. It runs in the default `flutter test` run, with
+no extra flag, tag or separate command.
 
 <!-- "The theme layer" is concretely `lib/theme/`. See Project Structure. -->
 
@@ -1460,6 +1477,27 @@ which is the false assurance this whole test exists to prevent.
 This is the structural enforcement that **The theme system is the main architectural
 risk** above asks for, and it is what makes [Theming](./Theming.md) → Architectural Rule a
 checkable rule rather than a matter of discipline.
+
+### Every asset path a theme names must resolve
+
+**A path named in a theme file with no file behind it fails the suite.** At runtime a
+missing image behaves exactly like an absent slot — no crash, no blank, the fallback draws
+(see [Theming](./Theming.md) → How a Theme's Art Is Drawn), which is the right thing for a
+player and the wrong thing for a build: it means nothing anywhere failed loudly when a
+theme's art silently never shipped. A theme's art and its music track sat unbundled through
+an entire build cycle with every test green before this check existed.
+
+**The check walks the merged theme document rather than a list of slots.** It iterates
+whatever keys the merge actually produced under a theme's art, mark, icon and sound
+sections, so a slot added to Neon later is covered the moment it exists, with no edit to
+the test. A hand-written slot list goes stale exactly when the schema grows, which is the
+one moment it matters most — and that is not hypothetical: a hand-listed version of this
+check missed the text-patch slot on the day it was added.
+
+**No test reads a generated file's bytes, dimensions or duration.** Tests assert the
+wiring — that a slot parses, merges, falls back and reaches the widget that draws it — from
+their own tiny fixtures. The shipped art is drafts, regenerated on the user's word, and a
+test reading it would break on a change that is purely cosmetic and correct.
 
 ## Distribution and Release
 
@@ -1579,12 +1617,11 @@ raises the open-game cap from 3 to 100**, sold from the Settings screen's purcha
 section, and **one purchasable theme**. The theme product belongs to first release, not
 to the MVP that comes before it.
 
-**A purchasable theme needs a theme to sell.** One beyond the two free ones has to exist
-and ship in the submitted build, and no third theme is specified today — so that product
-cannot be configured until one is. Which theme is the paid one is open, and so is
-whether paid themes are ultimately one product, one per theme, or a bundle: one
-purchasable theme at first release settles the launch shape, not the model. See Open
-Questions.
+**A purchasable theme needs a theme to sell.** Sewing is now specified and ships free in
+the submitted build, so what blocks this product is the purchase flow, not the absence of
+a theme. Whether paid themes are ultimately one product, one per theme, or a bundle is
+still open: one purchasable theme at first release settles the launch shape, not the
+model. See Open Questions.
 
 **Products are created as non-consumables**, which is what the entitlement model already
 assumes: restore is largely automatic, and a refunded purchase simply stops appearing in
@@ -1737,9 +1774,6 @@ block other work.
   code, or should timing and opacity that aren't theme values be exempt?
 
 ### 8. Generated assets
-- **Which audio model?** Nothing audio can be generated until one is chosen.
-- If no audio model emits mp3, do we ship wav instead, or transcode with **ffmpeg**? The
-  second adds an external binary nothing else in the project needs.
 - **What is the logo, actually?** Nothing states its subject. The approved handoff draws a
   placeholder of 81 dots — the game itself — and says *"Replace with real art"*, which
   reads either as the brief for the real logo or as a description of the thing being

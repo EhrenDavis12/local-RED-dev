@@ -294,8 +294,9 @@ right now."* already says it.
    **ItSaMeMaRiO** as the default. Undecided whether it's its own screen or an overlay.
 4. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
 5. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
-   the Theme button. Two themes at launch, **Neon** and **Classic Red vs Blue**
-   (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection) below.
+   the Theme button. Three themes at launch — **Neon**, **Classic Red vs Blue** and
+   **Sewing** (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection)
+   below.
 6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
 7. **About Us** — reached from the main menu (About Us button). A full screen of its own,
@@ -360,12 +361,13 @@ Opened by the **Theme** button on the main menu, and by nothing else. This is an
 **overlay** on the main menu, not its own screen — see [Theming](./Theming.md). The main
 menu stays mounted and painted underneath it, dimmed — see **Main Menu** above.
 
-**The sheet's header is "Pick your look"**, with **"Both free. Switch any time."** on a
-second line under it.
+**The sheet's header is "Pick your look"**, with **"Switch any time."** on a second line
+under it.
 
-**Two options at launch:**
+**Three options at launch:**
 - **Neon** — black background, electric neon colors. The base theme.
 - **Classic Red vs Blue** — the plain, familiar look. Red player vs blue player.
+- **Sewing** — a soft blue cloth ground, scissors and buttons for marks.
 
 See [Theming](./Theming.md) → Theme Catalog for the full look of each.
 
@@ -378,7 +380,8 @@ the overlay or stops the other rows from appearing.
 from that theme's own file.** The preview tile is a miniature quadrant rendered in that
 theme's own colors and marks — that theme's grid lines, and one mark from each player — so
 two themes side by side are told apart by the tile alone. An empty grid, or a grid drawn
-in the *active* theme's colors, isn't this.
+in the *active* theme's colors, isn't this. The tile is a single quadrant, so it shows a
+theme's small-board lines and never its big-board separators.
 
 **The currently active theme is highlighted** in the list, so it's obvious which one is in
 use before you change anything. The active row carries both treatments — a ring around
@@ -394,7 +397,7 @@ Purchases and Entitlements. The row draws all three without reshaping, so a paid
 drops into the list later without redrawing the screen.
 
 **Nothing on this overlay is buyable, and no purchase or restore control lives here.**
-Both themes that ship are free, so no row is locked at launch. The purchases section and
+Every theme that ships is free, so no row is locked at launch. The purchases section and
 the global **Restore purchases** control are on the Settings screen — see **Settings
 Menu** → **Purchases**. The approved handoff draws a *Restore purchases* link in this
 overlay's footer; that link isn't built here, because one global control on Settings keeps
@@ -411,6 +414,11 @@ changing anything**, with the close control in its header.
 **A theme file the app cannot read never reaches this list.** It is dropped rather than
 shown, so there is no unavailable row to tap and no failure message on this overlay —
 see [Theming](./Theming.md) → Choosing a Theme.
+
+**A theme whose art is missing still reaches it.** Art is resolved when it is drawn, not
+when the theme is loaded, so a theme naming a file that is not there still parses, still
+lists, and is still selectable — it simply draws what a theme with no art draws. Only an
+unreadable theme *file* is dropped.
 
 ```
 ┌─────────────────────────┐

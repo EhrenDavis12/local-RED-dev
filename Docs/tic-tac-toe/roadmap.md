@@ -142,8 +142,10 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
 - Theme Catalog
   - Theme 1 — Neon (base)
   - Theme 2 — Classic Red vs Blue
+  - Theme 3 — Sewing
 - Free and Paid Themes
 - What a Theme Controls
+- How a Theme's Art Is Drawn
 - Sound Decisions
   - Sound falls back to Neon
   - Music
@@ -253,6 +255,7 @@ release/distribution.
   - Unit tests for the rules engine
   - Widget tests for the board — no golden tests
   - A test that fails on hardcoded theme values
+  - Every asset path a theme names must resolve
 - Distribution and Release
   - App name
   - Bundle identifier

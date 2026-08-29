@@ -40,10 +40,44 @@ In the sketch above: thick lines = big board, thin lines = small boards.
 
 Exact geometry — gaps, padding, radii, grid-line insets, line weights — is in
 [Design Handoff](./design_handoff_game_ui/README.md) → *The board (the important part)*.
-The small-board crosses are drawn lines inset inside the quadrant border, not gaps. The
+The small-board crosses are drawn lines inset within the small board, not gaps. The
 big/small hierarchy this section asks for is carried by glow, presence and that inset —
 both grids are the same color at the same line weight, so neither a second color nor a
 heavier line is what separates them.
+
+The nine quadrants are separated by a gap, and that gap can carry the theme's own
+separator art — four lines across the big board, drawn by the theme the way the
+small-board lines are. A theme that supplies none leaves the quadrants separated by the
+gap alone; there is no stroked version of these lines, because there is nothing here to
+fall back to.
+
+Each separator is centred in the gap it runs down and spans the big board edge to edge.
+Where it sits is code's, not the theme's — the gap does not widen to hold the art, so a
+theme cannot buy itself room. How thick it is is the theme's, up to the width of the gap;
+anything wider is simply hidden, because the art is drawn *beneath* the nine quadrants.
+Drawing it underneath is the whole point: every quadrant's fill, border, forced ring and
+last-move ring paints over it, which is what makes it structurally impossible for a
+theme's separator art to hide a gameplay-critical highlight. A pretty theme that hides
+the last move is a broken theme, and this is the one place the board enforces that rather
+than asking a theme author to be careful. The separator sits *in the channel between* the
+quadrants, not on top of the board, and that is the trade taken deliberately.
+
+**A separator never takes a tap.** It is decoration behind a tap surface, so a tap landing
+on one reaches whatever handles that point already — in the gaps between quadrants, the
+tap-away catcher that clears a pending selection.
+
+**Where two lines cross, the horizontal one is on top** — on the big board and inside
+every small board alike. There are four crossings on the big board and four in each of
+the nine quadrants, forty seams in all, and one consistent order means the answer is the
+same everywhere instead of being whatever each paint call happened to do. Weaving the
+lines over and under each other would suit fabric and is deliberately not done: it needs
+per-intersection clipping for one theme's benefit, where a single order is free.
+
+**A small board's lines stay inside the gutter between cells: at most 2pt.** The gutters
+are 3pt wide, but the lines are not drawn down their centres — each line has 2pt of
+gutter on one side and only 1pt on the other, so a line thicker than 2pt overlaps a cell.
+That ceiling is also what keeps a 3x3 of roughly 35pt cells from reading as cramped,
+which is why the sewing theme's small-board art is a needle rather than a ribbon.
 
 ## Scoreboard
 A **scoreboard sits at the top of the game screen**, above the board. Three counters:
@@ -396,11 +430,11 @@ the two-tap confirm makes a mis-tap free. See
 **The haptic fires on every valid click, anywhere in the app.** Any valid selection or
 valid action buzzes — including the first tap of a two-tap move, since selecting a legal
 cell is a valid action, and including controls that aren't board cells: menu buttons,
-theme rows, settings toggles, the game-over card's controls, the settings gear. It matches
-the setting's own name, *Vibrate on Touch*.
+theme rows, settings toggles, the game-over card's controls, the settings button. It
+matches the setting's own name, *Vibrate on Touch*.
 
 **It's the same buzz every time.** One buzz per action, and no vocabulary of different
-haptics — the settings gear, a theme row and a board cell all feel identical. What that
+haptics — the settings button, a theme row and a board cell all feel identical. What that
 buzz feels like is [Menus and UI](./Menus%20and%20UI.md) → Vibrate on Touch.
 
 Paired with the illegal-tap rule above, this produces a clean, consistent system:

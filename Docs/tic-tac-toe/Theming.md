@@ -27,7 +27,7 @@ screens actually consume, not from a category list written in the abstract:
 - Corner radii — cell, quadrant, modal, chip, control, button.
 - The type scale — sizes and weights, distinct from "fonts" meaning a typeface.
 - Opacities — the locked, claimed and cat-game veils.
-- Chrome icons — the settings gear, close X, chevrons, plus, and the trash button on an
+- Chrome icons — the settings icon, close X, chevrons, plus, and the trash button on an
   open-game row.
 - Every surface: modals (winner, draw), sheets (theme select, in-game quick actions), the
   scrim behind them, the settings card, open-game rows and their chips, badges, the
@@ -193,6 +193,17 @@ whole, because there is no stable identity for "the second item" to merge agains
 theme's identity, its display name and its one-line description are never inherited**: a
 theme that omits its name fails to load rather than quietly showing Neon's.
 
+**A theme may only name a key Neon already defines.** A key the base does not define, at
+any depth, is refused and the theme fails to load — it reads as a typo rather than as an
+intentional override. That runs the other way too: a slot Neon does not spell out is a slot
+no theme can ever use. So Neon carries every slot explicitly, with `null` where it draws
+nothing, and Neon's null is a deliberate clear rather than an unfilled gap.
+
+**A section is cleared key by key, never wholesale.** A theme writing `images: null`
+replaces the whole section with a scalar rather than clearing the slots inside it, the
+parser refuses it, and the theme is dropped from the picker. The colour and mark sections
+have the same shape; none of them is nullable.
+
 See [Tech Design](./Tech%20Design.md) → The Theme System.
 
 **Consequence:** `neon.theme.json` ships `sound.music` as an explicit `null`. Under this
@@ -245,11 +256,16 @@ theme that overrides the fill while inheriting the veils, or the other way aroun
 veils tuned for a fill they are no longer drawn over. The fill and the veils have to be
 overridden together or not at all.
 
+A theme may also clear the quadrant fill entirely, leaving no card behind the small board
+at all — in that case the veils fall on the page background instead of on a fill. The same
+point holds there, more so: a theme that clears the fill owns its veils all the more,
+because they now have to read against the background rather than against a card.
+
 ---
 
 ## Theme Catalog
 
-**Two themes ship at launch — Neon and Classic Red vs Blue.**
+**Three themes ship at launch — Neon, Classic Red vs Blue and Sewing.**
 
 ### Theme 1 — Neon (base)
 The first theme. The look:
@@ -317,14 +333,55 @@ it — which is why the three anchors are anchors.
 The two themes now have distinct sonic identities: Neon **buzzes** like a light,
 Classic **splats** like a water balloon.
 
+### Theme 3 — Sewing
+A sewing box on the board. The marks are the tools, and everything has a 3D-like texture
+to it, achieved with shadows.
+
+- **The X is a pair of fabric cutting scissors** — the blades on top and the handles on
+  the bottom of the X, opened wide and drawn thick and dark so they read in a board cell.
+- **The O is a button** with the four holes in the centre.
+- **The background is a soft blue cloth** with a gentle drape and soft folds, like a
+  curtain or the folds of a dress. It is smooth and fine rather than coarse and woven,
+  and deliberately calm, so the board and the text read over it.
+- **The nine small boards sit directly on the cloth.** There is no card or box drawn
+  behind a small board — the boards are separated by the ribbon alone, which is what lets
+  the ribbon stand out.
+- **Text that would otherwise sit straight on the background sits on a light-blue denim
+  patch** — a scrap of blue jean drawn behind the words so they can be read easily.
+- **Every button is a spool of thread**, at every tier — not only the large main-menu
+  pair: *"We allso need the spools of threads to be for all the buttens this include the
+  Settings and About Us on the main page. The saved games, and the Exit to Main Menu"*
+- **The settings icon is a thimble.**
+- **The four lines inside each small board are sewing needles.**
+- **The four separator lines on the big board are a deep blue twisting ribbon**, with a
+  V-cut at each end, drawn in the gap between the quadrants. It is deep so it stays
+  clearly darker than the pale blue cloth it is drawn on.
+
+*"What if the inner boards are sewing needles those would be thin as needed to prevent
+the crouded ness. And the large board is the ribbons. This should add a deabth of detail
+a user would like."*
+
+**Sewing's palette is blue**, and the look it is aiming for is a fabric workshop or a desk
+full of sewing things. This theme is judged on being pretty — *"The objective is pritty
+for this theme."*
+
+**Sewing is a full theme, not an inheritance proof.** Classic exists to demonstrate the
+merge; Sewing is designed to be looked at, so its art is authored rather than inherited.
+
+**Sewing snips.** Its signature sound is a scissor snip — a short, crisp cut of fabric
+scissors, as distinct from Neon's electric buzz and Classic's wet splat.
+
 ---
 
 ## Free and Paid Themes
-**Neon and Classic Red vs Blue are free. Every theme beyond those two is paid.** The theme
-selection list **labels** which themes are free and which are paid.
+**Which themes are free is answered outside the theme file, and today every theme that
+ships is free.** Neon, Classic Red vs Blue and Sewing all ship free. Sewing is intended
+to become a paid theme once purchasing is in place, and that flow is not built yet. The
+theme selection list **labels** which themes are free and which are paid, so a paid theme
+drops in without redrawing the screen.
 
-*"We will label what themes are free as of now we will have 2 free themes the neon and
-the red Vs Blue themes any other themes will be a paid for theme."*
+*"Ship it now for free but this will morelikly become a paid theme after we get payments
+inplace."*
 
 **Ownership is not part of a theme definition.** A theme file carries no ownership or
 price key — whether a theme is free, owned or locked is answered outside the theme, so the
@@ -335,7 +392,16 @@ Everything visual and audible. Rough list, not exhaustive:
 
 **Visual**
 - Board background / page background — "really cool backgrounds"
-- Big board and small board grid lines (colors, thickness, style)
+- **A patch drawn behind text.** A theme may supply a patch image that is drawn behind
+  text which would otherwise fall straight on the page background, so the words stay
+  readable over a busy or low-contrast ground. A theme that supplies none draws its text
+  straight on the background.
+- **Grid lines, and there are two sets of them.** The four lines inside each small board,
+  and four separator lines across the big board, drawn in the gap between the quadrants
+  — colors, thickness, style and art, for both sets. Each set carries its own thickness,
+  so a theme sizes the small board's lines and the big board's separators independently.
+  A theme that supplies no big-board art leaves the quadrants separated by the gap alone.
+  See [Game Board Design](./Game%20Board%20Design.md) → Board Structure.
 - **The player marks themselves** — marks are not locked to X and O. A theme supplies its
   own mark art as a **glyph, an image or an icon** — those three kinds, and nothing else.
   **The image is the real answer for a theme;** the glyph and the icon are the short
@@ -349,6 +415,10 @@ Everything visual and audible. Rough list, not exhaustive:
   dinosaur theme might use a T-Rex — and the theme system must be built so that's
   possible. Neon still uses X and O; that's Neon's choice of art, not a constraint on the
   system.
+
+  **Mark art is authored to read at the size it is drawn.** A mark fills one cell of an
+  81-cell board on a phone, so fine detail and photoreal shading collapse into a smudge
+  there. Marks are drawn with thick, dark, well-separated shapes that survive that size.
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
@@ -358,6 +428,13 @@ Everything visual and audible. Rough list, not exhaustive:
 - Turn indicator styling
 - Scoreboard styling
 - Main menu styling (background, button look, title)
+- **Menu button art, at both tiers.** A theme may supply art drawn behind a big-tier
+  button and art drawn behind a small-tier button — two slots, never one plus a switch,
+  because the two tiers are two distinct treatments. A theme that supplies neither gets
+  the outline and label the button draws today. Both tiers are one shared widget each, so
+  a theme's button art turns up wherever those widgets are reused — the open-games list's
+  **New Game** control and the in-game quick-actions sheet — and not only on the main
+  menu.
 - **Board geometry** — grid-line width, grid-line inset, mark sizes. Spacing and padding
   (outer gap, quadrant padding, inner gap) are fixed in code, not theme-controlled — see
   **What a Theme Does NOT Control** below.
@@ -375,9 +452,10 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Badges**
 - **The main-menu logo**
 - **Page background** — gradient-capable
-- **Chrome icons** — the settings gear, close X, chevrons, plus, and the trash button on
+- **Chrome icons** — the settings icon, close X, chevrons, plus, and the trash button on
   an open-game row. A theme may either name a glyph from a bundled icon set or ship its
-  own image.
+  own image. The gear is Neon's art for the settings icon, not the name of the slot —
+  Sewing draws a thimble there.
 
 > **Every theme must keep these legible.** The last-move highlight and active-quadrant
 > highlight are *gameplay-critical*, not decoration — a theme that makes them hard to spot
@@ -412,6 +490,90 @@ This is separate from the legibility requirement above, which every theme must s
 - The animation set applied to the player's marker — grow/shrink, glow/backlight,
   shadowbox, jiggle, dance. See [Animations](./Animations.md) for the full vocabulary.
 
+## How a Theme's Art Is Drawn
+
+**Every art slot is optional.** Absent, cleared, or naming a file that will not load all
+draw exactly what the app draws with no art at all — which is why Neon and Classic Red vs
+Blue, which name none of them, look the same as they did before any art slot existed. What
+a theme may name is **What a Theme Controls** above; this section is how each one gets
+drawn once it is named. An art slot names one still image — there is no multi-frame or
+animated art.
+
+**A mark's image lives in a key of its own, beside the glyph rather than on top of it.** An
+image mark names its file in its own key, never in the glyph's. Because the merge is deep,
+an image mark written over Neon's glyph keeps Neon's glyph, its font and its weight
+standing underneath it — and that inherited glyph is exactly what gets drawn if the image
+will not load. Reusing the glyph's key would overwrite it with a path and leave nothing to
+fall back to, and a blank cell in the middle of a game is the one failure this must not
+have. Chrome icons work the same way, from the same slot shape.
+
+**One image serves all four lines of a cross.** The art is authored running horizontally;
+the two horizontal lines draw it as authored and the two vertical lines draw it rotated a
+quarter turn clockwise, so all four read as running in the same rotational sense. That
+matters because art has a direction where a stroke does not — a needle has a point at one
+end and an eye at the other, and without a rule four needles meeting in a cross would point
+whichever way each call site happened to choose.
+
+**Art is measured by its opaque pixels, not by its file.** Generated art arrives centred in
+a wide transparent margin — a needle can occupy 6% of its frame's height — so fitting the
+file would draw a hairline inside a box that is almost entirely nothing. Marks, chrome
+icons, grid-line art and the text patch are positioned and scaled by the smallest rectangle
+holding every pixel whose alpha is at least 0.05, computed once when the image loads.
+
+The threshold is load-bearing, not a tidiness detail. The art is drawn with soft drop
+shadows, so "alpha greater than zero" would catch the faintest tail of a shadow and hand
+back nearly the whole frame — trimming nothing while appearing to work. It sits below
+anything a player can see against any ground and above the shadow tails. And the code trims
+rather than the file being cropped by hand, because a rule that holds only when somebody
+remembered to crop is not a rule the theme system can rely on: the next theme drops in an
+untrimmed file and gets a hairline with no error anywhere.
+
+Two slots are exempt, because they are authored to fill their slot rather than to sit
+inside a margin: the page background and the two menu-button tiers are drawn from the
+whole file.
+
+**A mark's image is centred and contained in a square whose side is the theme's own mark
+size** — the in-cell size, or the claim size when a whole quadrant has been won. It keeps
+its aspect ratio and is never cropped. Reusing the sizes the glyph already used keeps the
+art proportional to the glyph it replaces and adds no second geometry slot. A chrome icon
+gets the square its own type size gives it, for the same reason.
+
+**A grid-line image is stretched along the line it replaces and takes its thickness from
+the theme.** Length and thickness are set independently and the source aspect ratio is not
+preserved — it cannot be, because no line's rect matches the art's shape. When the art
+draws, the stroked line and its blur glow are not drawn underneath it, and the grid-line
+opacity is not applied to it either: that value tints the stroke this art replaces, and
+fading a theme's own artwork by a number authored for a colour is not what a theme author
+asked for.
+
+**A page-background image covers the whole screen, centred, cropping whatever overflows,
+and sits beneath everything.** It replaces the flat ground fill on every screen and the
+radial gradient on the main menu. It is never tiled — nothing guarantees generated art
+tiles seamlessly, and a seam grid running across the background is worse than a crop. The
+ground colour still fills the screen underneath, so nothing is ever blank while the image
+resolves, and the three places that read the ground colour for something that is not a
+screen background — the settings toggle's off track, the result card's REMATCH label, the
+new-game prompt's text field — keep reading the colour.
+
+**A menu-button image fills the button's box exactly, beneath the label, and replaces the
+outline.** The art is clipped to the button's themed corner radius rather than drawn square
+into the corners, so a themed radius still describes the button's shape instead of being
+silently overruled by the artwork. The label still draws on top, in its own type style and
+colour. The button's box is what the player taps, so the art has to occupy exactly that
+rect or the art and the tap target disagree.
+
+**Art that will not load is silent.** A named image that is missing or unreadable renders
+as though the slot were absent — no crash, no blank region, no dialog, no banner, and
+nothing said to the player. A bad mark path draws the glyph beneath it, a bad background
+draws the ground colour, a bad small-board line draws the stroke, a bad big-board line
+draws nothing at all, and a bad button draws its outline. A named audio file that will not
+load is simply silent, the same way a sound that cannot load already is.
+
+**Naming a file that is not there is not a parse failure.** Art is resolved when it is
+drawn, not when the theme is loaded, so a theme whose art is missing still parses, still
+appears in the picker and is still selectable. Only a theme file the app cannot *read* is
+dropped from the list — see **Choosing a Theme** above.
+
 ## Sound Decisions
 
 ### Sound falls back to Neon
@@ -428,8 +590,41 @@ baised on selected theme."* Music does not differ by screen.
 All four settings toggles ship — Music, Sound Effects, Vibrate on Touch, Animations. See
 [Menus and UI](./Menus%20and%20UI.md) → Settings Menu.
 
-Nothing currently produces any music. Whether music loops and where the audio comes from
-are not settled — see Open Questions.
+**The music is long and it loops seamlessly.** The track fades in at the start of each
+loop pass and fades out at the end, so the loop point lands on silence rather than a hard
+cut. **The app applies that fade at playback, not the file** — *"this way any music
+works."* Nothing depends on a track carrying its own fade, which is what keeps a future
+theme's music from having to fade itself.
+
+**There are two fade lengths, not one.** The loop point fades over a second and a half
+each way, because a seam nobody should notice needs a long dip that is never heard as one;
+the first pass at launch fades in over the same length, since it is the start of a pass
+like any other. A theme change, or the Music toggle coming back on, fades in over half a
+second instead, because that is a reaction to a tap the player just made and three seconds
+of near-silence after tapping a theme reads as the app being slow. The two answer different
+questions, so one number would be a bad compromise on both. Neither is a theme value — both
+are properties of how this app plays audio rather than of how a theme sounds.
+
+**The music starts once, at launch, and keeps playing across screens.** Nothing starts it
+per screen; that would restart the track on every navigation, which is not one track for
+the whole app.
+
+**Selecting a theme swaps the music immediately.** The old track stops where it is and the
+newly selected theme's track fades in, in the same session with no relaunch. A theme that
+names no music goes silent on selection rather than keeping the previous theme's track.
+Letting the old track run until the next launch would make a theme's own music unreachable
+in the very session a player picked that theme.
+
+**Turning Music off cuts the track off where it is; turning it back on restarts it from the
+beginning.** Off takes effect at that instant, not at the end of the pass, and the track
+does not play out — the same behaviour the sound-effects toggle already has, so the two
+toggles that silence a theme channel behave the same way rather than one stopping dead and
+the other finishing its bar. The stop is not faded: a fade there would soften a change the
+player just asked for and be heard as the switch being slow. Coming back on restarts rather
+than resumes, because carrying a playback position across a stop buys nothing.
+
+The audio is generated through the same pipeline as the art — see
+[Tech Design](./Tech%20Design.md) → Where sound and art assets come from.
 
 ### The tap sound
 **One tap sound, everywhere.** Every button, row and toggle plays the same short tap
@@ -550,8 +745,6 @@ the word "padding."
   switch off, so anything carried by motion alone goes with the toggle, and animation
   scope is the player's marker only. Is the list closed, or may a theme distinguish by
   motion as well?
-- **Does a theme's music loop?** Not settled by **Sound Decisions** → Music.
-- **Where does the music come from** — composed, licensed, generated? Not settled.
 - **Can two sounds play at once?** One confirming tap can place a mark, claim a quadrant
   and win the whole game all at the same time. Play all of them together, play only the
   most significant one, or queue them up one after another?
