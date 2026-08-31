@@ -105,7 +105,7 @@ This is *not* "all 81 cells are filled". A claimed quadrant closes with empty ce
 inside it, so the big board runs out of open quadrants with plenty of cells never played.
 
 - The result is a tie.
-- **The Ties counter on the scoreboard goes up one.**
+- **The Cat counter on the scoreboard goes up one.**
 
 ## Turn Order Across Games
 - Game 1: Player One goes first.

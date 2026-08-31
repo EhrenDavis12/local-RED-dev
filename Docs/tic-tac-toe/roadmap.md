@@ -148,6 +148,7 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
 - How a Theme's Art Is Drawn
 - Sound Decisions
   - Sound falls back to Neon
+  - Placing a mark may sound different for each player
   - Music
   - The tap sound
   - Global mute
@@ -233,6 +234,7 @@ release/distribution.
   - One script, and the per-asset inputs are data
   - The generator is an authoring tool, not a build step
   - What gets generated, and where it lands
+  - Sound effects are normalised after generation
   - Nothing generated is applied directly — drafts, then approval
   - Declared in `pubspec.yaml`, or it does not ship
   - Regenerating, and leaving nothing behind

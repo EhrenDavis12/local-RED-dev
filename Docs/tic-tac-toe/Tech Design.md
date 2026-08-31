@@ -803,7 +803,10 @@ network path is the purchase flow.
 ### One way to play a sound
 **Playing a sound is one call that names a moment**, and nothing else in the app plays
 audio. A caller says which moment just happened and never constructs a player, names an
-asset, or waits for anything. Which file a moment resolves to is the active theme's
+asset, or waits for anything. Placing a mark also names whose mark it is, because a theme
+may sound the two players differently (see [Theming](./Theming.md) → Placing a mark may
+sound different for each player) — it is still one moment, and the only one whose call
+takes anything beyond its own name. Which file a moment resolves to is the active theme's
 business — see [Theming](./Theming.md) → Architectural Rule — so the layer that plays it
 holds no asset path of its own.
 
@@ -1002,15 +1005,35 @@ mangle a logo, so the fix belongs in what was asked for, not in the tool.
 
 **A sound's format is declared per entry and checked against the bytes that arrive**, so a
 file never contradicts its own extension. `.mp3` is what the audio layer is written
-against, and `stability-ai/stable-audio-2.5` returns `.mp3` natively — so nothing is
-transcoded and there is no ffmpeg dependency to add. That model exposes no loop and no fade
-input of any kind, which is why the seamless-loop request lives in the prompt text alone
-and may not be honoured, and why the fade at the loop point is the app's job at playback.
+against, and `stability-ai/stable-audio-2.5` returns `.mp3` natively. That model exposes no
+loop and no fade input of any kind, which is why the seamless-loop request lives in the
+prompt text alone and may not be honoured, and why the fade at the loop point is the app's
+job at playback.
 
 **Music is generated here too.** A theme supplies its own music (see
 [Theming](./Theming.md) → Music), and its track is a prompt manifest entry like any
 other sound. The track carries no fade of its own — the app fades it in and out at
 playback — so what the generator owes is the bare track.
+
+### Sound effects are normalised after generation
+**Every sound effect is levelled to sit under the music by a tool in this repo, not by
+asking the prompt for it.** Each effect plays over a continuously looping music track, so
+each one has to sit under it — and the generator cannot hit a loudness reliably however
+the prompt is worded. One effect came back six decibels louder than the music, on the
+sound that fires on every single move. So the level is set mechanically after generation
+rather than asked for again.
+
+**The tool measures first and applies only the difference.** Running it twice never
+attenuates a file twice, and a file already at level is left alone rather than re-encoded.
+It refuses a theme's music track — the music is the reference the effects are measured
+against, not something to normalise against itself — and it fails loudly when a file lands
+outside the band it aims for, rather than reporting success on a file it did not fix.
+Re-run it unmodified after any effect is regenerated; it measures whatever the model
+produced next rather than encoding today's levels.
+
+**It measures and re-encodes with `ffmpeg`.** That is a developer's dependency, the same
+as the generator itself: the app does not use it, and nothing in the build runs either
+one — see **The generator is an authoring tool, not a build step** above.
 
 ### Nothing generated is applied directly — drafts, then approval
 As stated:

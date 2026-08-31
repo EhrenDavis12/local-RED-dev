@@ -15,9 +15,9 @@ Snappy and playful, not slow and cinematic. It should feel alive and fun — thi
 aimed partly at kids.
 
 ## Scope For Now
-Animations apply to **the player's marker** — whatever the theme says that marker is (an
-X, an O, a checkbox, an icon, an image, whatever goes along with the theme). That is
-settled, not a starting scope.
+Animations apply to **the player's marker as it is placed** — whatever the theme says that
+marker is (an X, an O, a checkbox, an icon, an image, whatever goes along with the theme).
+That is settled, not a starting scope.
 
 The marker is the thing that moves.
 

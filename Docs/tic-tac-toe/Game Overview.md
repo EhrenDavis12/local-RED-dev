@@ -36,7 +36,7 @@ Variants we've considered but aren't building live in
 The app isn't built around a single one-off game. It's built around **playing several in
 a row on the same phone**:
 
-- A **scoreboard** at the top of the game screen tracks **Player One / Ties / Player Two**.
+- A **scoreboard** at the top of the game screen tracks **Player One / Cat / Player Two**.
 - When a game is won or tied, the player is offered an option to **continue playing**.
 - Continuing **resets the board**. The score increments at game end, not when continuing
   is taken — see [Menus and UI](./Menus%20and%20UI.md) → Game Over → Rematch.

@@ -82,12 +82,12 @@ which is why the sewing theme's small-board art is a needle rather than a ribbon
 ## Scoreboard
 A **scoreboard sits at the top of the game screen**, above the board. Three counters:
 
-| Player One | Ties | Player Two |
-|:----------:|:----:|:----------:|
+| Player One | Cat | Player Two |
+|:----------:|:---:|:----------:|
 
 ```
 ┌─────────────────────────────────┐
-│▓PLAYER 1▓     TIES     PLAYER 2 │
+│▓PLAYER 1▓      CAT     PLAYER 2 │
 │     2          1          0     │
 ├─────────────────────────────────┤
 │                                 │
@@ -97,18 +97,28 @@ A **scoreboard sits at the top of the game screen**, above the board. Three coun
 ```
 PLAYER 1 highlighted above — their turn to play.
 
-**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `TIES` between them), not
+**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `CAT` between them), not
 `PLAYER ONE` / `PLAYER TWO`.
 
 This does **not** change the settled term for the player — the players are still called
 "Player One" and "Player Two." The chip uses the numeral because that is what every drawn
 screen shows and because the spelled-out form is materially wider in a fixed-width column.
 
+**The middle chip reads `CAT`, not `TIES`.** The engine, the theme files and the rest of
+these docs all call a tied board a cat game (see [Game Overview](./Game%20Overview.md) →
+Terminology), so the chip says the same word rather than being the one place a second term
+for it survives.
+
+**Each player's chip carries that player's own mark**, drawn from the theme's own mark art
+and sitting beside the number — the scissors and the button under Sewing, ✕ and ○ under
+Neon. It is what makes a chip obviously that player's rather than leaving the label to
+carry it alone. The Cat chip carries no mark, because it belongs to neither player.
+
 - Tracks results across multiple games played back to back.
 - A **settings button sits at the top right**, alongside the scoreboard — the mid-game
   entry point to quick actions and exiting the game. See
   [Menus and UI](./Menus%20and%20UI.md).
-- Increments when a game ends: the winner's column, or the Ties column on a tie.
+- Increments when a game ends: the winner's column, or the Cat column on a tie.
 - Styling is theme-driven like everything else.
 - Takes vertical space away from the board — worth noting given the board already has
   81 cells to fit on a phone.
@@ -129,6 +139,11 @@ turn banner, which names the active player whenever no move is pending (see
 are built. It matters because both players share one phone, so the screen is the only
 thing telling them who's up.
 
+**The turn banner sits below the board**, in the space left under the grid, with a large
+rendering of the current player's own mark beside it. Its top is anchored to the bottom
+of the grid, not to whatever sits under it, so neither the banner nor the mark moves as
+the how-to-play strip below them changes length.
+
 Like everything else, what the highlight looks like is theme-driven — see
 [Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
 
@@ -136,7 +151,8 @@ Like everything else, what the highlight looks like is theme-driven — see
 - Nesting needs to stay readable at a glance: the big board has to read heavier than the
   small boards inside it. How that hierarchy is carried is in
   [Board Structure](#board-structure).
-- Vertical stack: **scoreboard on top, board below.**
+- Vertical stack: **scoreboard on top, the board below it, then the turn banner, then the
+  how-to-play strip.**
 
 ## Last Move Highlight
 **Player-stated requirement:** *"As a player, what I want to be able to see is where my
@@ -209,9 +225,9 @@ single-quadrant forced highlight — the still-open quadrants read as available 
 each getting a copy of the forced highlight — and a text cue ("Free choice — pick any open
 board") as well.
 
-**The free-choice cue lives in the how-to-play strip below the board — not in a turn banner
-above it.** That strip already exists, already swaps its content by board state, and
-already has an owner and a theme slot.
+**The free-choice cue lives in the how-to-play strip, not in the turn banner.** That
+strip already exists, already swaps its content by board state, and already has an owner
+and a theme slot.
 
 ### Taps outside the legal quadrant
 Illegal cells shouldn't accept input. They also shouldn't *look* like they would — the

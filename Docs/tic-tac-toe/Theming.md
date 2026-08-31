@@ -227,9 +227,8 @@ worth noting so nobody later mistakes it for an unfilled slot.
 `assets/themes/neon.yaml` is our file and the handoff README is the design source, so
 writing those values into it is **authoring Neon**, not editing an approved asset.
 
-The gap between the approved `neon.theme.json` and the drawn handoff — the pending-move
-highlight, badges, modal and sheet surfaces, several radii and glows — closes by
-transcription into Neon's YAML.
+The gap between the approved `neon.theme.json` and the drawn handoff — badges, modal and
+sheet surfaces, several radii and glows — closes by transcription into Neon's YAML.
 
 Two consequences:
 - The read-only `neon.theme.json` stays as it is; it is a reference, and Neon's shipped
@@ -348,6 +347,9 @@ to it, achieved with shadows.
   the ribbon stand out.
 - **Text that would otherwise sit straight on the background sits on a light-blue denim
   patch** — a scrap of blue jean drawn behind the words so they can be read easily.
+- **Each of the three scoreboard chips sits on its own scrap of fabric**, a different cut
+  behind Player One, Cat and Player Two, so the three read as three rather than as one
+  strip.
 - **Every button is a spool of thread**, at every tier — not only the large main-menu
   pair: *"We allso need the spools of threads to be for all the buttens this include the
   Settings and About Us on the main page. The saved games, and the Exit to Main Menu"*
@@ -422,11 +424,21 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
-- **Pending-move preview styling** — the provisional select-before-confirm state
+- **Pending-move preview styling** — the provisional select-before-confirm state. The
+  outline round the pending cell, and round the quadrant that move would send the
+  opponent to, is drawn from a colour of its own rather than from the theme's body text:
+  a theme is free to put dark text on a light ground, and that choice must not darken a
+  highlight that still has to read against the board.
 - Claimed-quadrant styling
 - Cat-game quadrant styling
 - Turn indicator styling
-- Scoreboard styling
+- **Scoreboard styling, and art behind each chip.** A theme may supply its own image
+  behind each of the three chips — Player One's, Cat's and Player Two's — so the three are
+  tellable apart at a glance rather than sharing one cut of the same cloth. A theme that
+  supplies none gets the flat chip fill it draws today.
+- **`chipTextOnFabric`** — the chip label and value colour used only when a chip is backed
+  by art, because the active/inactive ink split that works on a flat fill stops reading on
+  fabric.
 - Main menu styling (background, button look, title)
 - **Menu button art, at both tiers.** A theme may supply art drawn behind a big-tier
   button and art drawn behind a small-tier button — two slots, never one plus a switch,
@@ -435,6 +447,9 @@ Everything visual and audible. Rough list, not exhaustive:
   a theme's button art turns up wherever those widgets are reused — the open-games list's
   **New Game** control and the in-game quick-actions sheet — and not only on the main
   menu.
+- **`menuButtonSmallFill`** — a fill behind a small menu button's label. Without one the
+  label sits straight on the ground: fine on a near-black ground, unreadable on a busy
+  light one.
 - **Board geometry** — grid-line width, grid-line inset, mark sizes. Spacing and padding
   (outer gap, quadrant padding, inner gap) are fixed in code, not theme-controlled — see
   **What a Theme Does NOT Control** below.
@@ -443,7 +458,10 @@ Everything visual and audible. Rough list, not exhaustive:
   **Neon's** font choice, not as an app-wide font constant. See
   [Tech Design](./Tech%20Design.md) → The Theme System → Themes pick their own font.
 - **The type scale** — sizes and weights, distinct from a theme's choice of font
-- **Opacities** — the locked, claimed and cat-game veils
+- **`accentOnSurface`** — the accent step that must read on a *card*, distinct from the
+  one that must read on the *ground*. No single value serves both.
+- **Opacities** — the locked, claimed and cat-game veils, and `pendingGhostOpacity`, the
+  pending cell's ghost-mark opacity
 - **Modals** — winner, draw
 - **Sheets** — theme select, in-game quick actions
 - **The scrim** — the dimming drawn behind a modal or a sheet
@@ -517,8 +535,9 @@ whichever way each call site happened to choose.
 **Art is measured by its opaque pixels, not by its file.** Generated art arrives centred in
 a wide transparent margin — a needle can occupy 6% of its frame's height — so fitting the
 file would draw a hairline inside a box that is almost entirely nothing. Marks, chrome
-icons, grid-line art and the text patch are positioned and scaled by the smallest rectangle
-holding every pixel whose alpha is at least 0.05, computed once when the image loads.
+icons, grid-line art, the text patch and the scoreboard chips' art are positioned and
+scaled by the smallest rectangle holding every pixel whose alpha is at least 0.05, computed
+once when the image loads.
 
 The threshold is load-bearing, not a tidiness detail. The art is drawn with soft drop
 shadows, so "alpha greater than zero" would catch the faintest tail of a shadow and hand
@@ -579,6 +598,16 @@ dropped from the list — see **Choosing a Theme** above.
 ### Sound falls back to Neon
 A specific case of the general inheritance rule above — themes don't need a full sound
 set; anything undefined comes from Neon.
+
+### Placing a mark may sound different for each player
+**A theme may give Player One and Player Two their own placing sound**, so each player's
+move sounds like their own piece — Sewing snips its scissors for Player One and rubs
+fabric for Player Two. A theme that names only the one shared placing sound gives both
+players that, which is what every theme without a per-player pair does.
+
+This is still **one** moment, not two. Placing a mark is a single thing that happens, and
+which of a theme's two files it reaches is that theme's business — the same way every
+other sound in the game resolves.
 
 ### Music
 **A theme supplies its own music**, the same way it supplies its sounds. *"Do all four

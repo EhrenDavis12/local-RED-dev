@@ -269,15 +269,15 @@ the fact — *"that's what sent you"* — without the mapping, and only to a pla
 already read the rings. The sentence itself isn't written and no approved screen draws
 it — see Open Questions below.
 
-**The turn banner is built, it is always visible, and it carries two things.** Normally
-it says whose turn it is — the approved handoff draws this as *"Player One, you're up!"*.
-When a move is pending it switches to the pending-move prompt: the two lines *"Play
-here?"* and *"Tap again to lock it in."* that appear when a player taps a square to
-preview a move before confirming it. That is what the approved handoff draws on screen
-`2d`.
+**The turn banner is built, and it is visible whenever there is a turn to announce, not
+only while a move is pending, and it carries two things.** Normally it says whose turn it
+is — the approved handoff draws this as *"Player One, you're up!"*. When a move is
+pending it switches to the pending-move prompt: the two lines *"Play here?"* and *"Tap
+again to lock it in."* that appear when a player taps a square to preview a move before
+confirming it. That is what the approved handoff draws on screen `2d`.
 
-Because the banner is always visible, it takes vertical space on every board screen, not
-only while a move is pending.
+Because the banner is visible whenever there is a turn to announce, it takes vertical
+space on every board screen with a turn to announce, not only while a move is pending.
 
 The free-choice cue is a separate matter and lives in the how-to-play strip below the
 board — see [Game Board Design](./Game%20Board%20Design.md) → The free-choice state. On a
@@ -525,7 +525,7 @@ the way out of a game. You don't have to finish a game to leave it.
 
 ```
 ┌─────────────────────────────────┐
-│  PLAYER 1   TIES   PLAYER 2  ⚙  │  ← settings, top right
+│  PLAYER 1   CAT    PLAYER 2  ⚙  │  ← settings, top right
 │     2        1        0         │
 ├─────────────────────────────────┤
 │                                 │
@@ -564,7 +564,7 @@ So the Settings screen carries no text-size control of its own.
 
 ## Game Over → Rematch
 When a game is won or tied, the scoreboard increments **at game end** — the winner's
-column, or Ties, as soon as the game is won or tied, not when a rematch is taken. A
+column, or Cat, as soon as the game is won or tied, not when a rematch is taken. A
 **rematch button is available as an option**. Taking it only resets the board for the next
 game. See [Game Overview](./Game%20Overview.md) → Session Structure.
 
