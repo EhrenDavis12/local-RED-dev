@@ -21,6 +21,12 @@ That is settled, not a starting scope.
 
 The marker is the thing that moves.
 
+**Winning a small board and winning the whole game are also in scope now.** A
+three-in-a-row — on a small board or on the big board — draws a **win line** over the
+winning triple, progressively over roughly one second, followed by the claim mark's
+animated appearance on a small-board win. See **Where Animations Fire** below for the full
+sequences.
+
 We are **not** animating the board, the layout, or transitions between screens.
 
 ## The Animation Vocabulary
@@ -97,12 +103,27 @@ picking from a menu, and whatever it doesn't write it inherits from Neon. See
 **Animations Inherit From Neon** below.
 
 ## Where Animations Fire
-**Placing a marker** — the mark appears with a pop. That is the moment the game animates,
-and under the scope above it is the only one.
+**Placing a marker** — the mark appears with a pop. That is the moment that started the
+scope, and it stays marker-level and unconditional.
 
-Winning a small board / claiming a quadrant, cat game, and winning the whole game are the
-obvious candidates if that scope ever widens. None of them animates — they are quadrant-
-and board-level, not marker-level.
+**Winning a small board, and winning the whole game, now animate too.** Cat game still
+does not animate — a cat-game quadrant simply reads as claimed, with no celebration, the
+same as it always has.
+
+Small-board win sequence: winning mark lands (the place-mark animation as always) → a win
+line draws over the winning triple on that small board, progressively over roughly one
+second → the claim mark that covers the quadrant pops out (an animated appearance of the
+existing claim overlay — grow/pop; the handoff's `claimQuadrant` values are the starting
+point) → play resumes.
+
+Game-win sequence: the final quadrant's small-board celebration plays as above → the
+big-board win line draws across the three winning quadrants, over roughly one second → an
+"X wins" display appears — the space below the board that the turn banner vacates is its
+natural home → the result card appears. The result card is now the end of this sequence,
+not an instantaneous appearance.
+
+The win line is drawn with the active theme's art, through a theme image slot of its own —
+the same pattern as the game's other image slots. See [Theming](./Theming.md).
 
 The last-move highlight and active-quadrant highlight are **static**: they are drawn, not
 animated. See [Game Board Design](./Game%20Board%20Design.md).
@@ -111,12 +132,16 @@ The handoff puts a starting value on each of these:
 `Docs/tic-tac-toe/design_handoff_game_ui/neon.theme.json` → `animation` has `placeMark`,
 `claimQuadrant`, `catGame`, `winGame`, `activeQuadrant` and `lastMove`, each with a type
 and a duration; the last two are drawn as looping glow-pulses. Starting values, in the
-handoff's own words — not decisions, and only the marker's is used.
+handoff's own words — not decisions. The marker's, the claim pop's and the win line's are
+now used.
 
-Adding an animated moment is a design decision first. It then costs a schema change, a
-Neon definition and a code change, so it isn't something a theme can do on its own.
-Changing *how* the marker animates is theme data alone — including motion the runtime has
-never executed before.
+Widening the animated scope this way costs a schema change — new animation slots beyond
+`placeMark` for the win line — a Neon definition for every new slot, since Neon's set must
+stay complete, a new theme image slot for the win-line art, and a code change. None of
+that is something a theme can do on its own. Changing *how* any of these animates, once
+the slot exists, is theme data alone — including motion the runtime has never executed
+before. The timings above (~1s per line, the handoff's pop values) are starting values to
+be tuned by playtesting, not commitments.
 
 ## Animations Inherit From Neon
 Animations follow the same inheritance rule as everything else: **Neon is the base
@@ -137,14 +162,22 @@ Animations **never overlap**. Strictly one at a time.
 properties at once — that is one animation with several tracks running together, not two
 animations overlapping.
 
+**A win sequence is several animated moments in a row, not one.** The win line, the claim
+pop, and — on a game win — the big-board win line all play under the same one-at-a-time
+rule: each is queued after the one before it finishes, never simultaneous.
+
 An animation that repeats forever never ends, so it would hold the slot against
 everything else. Nothing in the game plays on a permanent loop.
 
 **Speed is specified in the animation itself**, not globally. Each animation carries its
 own timing, so a theme controls its own pacing.
 
-Animations **never block input**. You can tap through them, and the animation keeps
-playing as normal — it isn't interrupted or skipped, and the game doesn't wait on it.
+**Place-mark animations never block input.** You can tap through them, and the animation
+keeps playing as normal — it isn't interrupted or skipped, and the game doesn't wait on it.
+
+**Win sequences do block input.** From the moment a win is detected until its celebration
+finishes — the win line, the claim pop, and on a game win the big-board line and the
+"X wins" display — taps do nothing.
 
 ## Turning Animations Off
 There is an **animations on/off toggle**, and it is **not theme-defined**. It's a global
@@ -159,7 +192,9 @@ player owns it. Reduce Motion being on does not change what the game does.
 
 With animations turned off, the game does the thing **instantly**. The mark simply
 appears, the quadrant is simply claimed — no animation, no substitute effect, no fade or
-transition standing in for one.
+transition standing in for one. A win is the same: no win line, no claim pop, no input
+lock — the quadrant is simply claimed, the game is simply won, and the result card appears
+instantly.
 
 Don't worry about animations at all in this mode. The game state changes and the screen
 shows the new state. That's it.

@@ -587,6 +587,13 @@ stays finished — reopen it from the open-games list and you get that finished 
 the result card over it, both buttons live, exactly as it was left.
 
 ### The result card
+**On a win, the result card is preceded by the game-win sequence** — the deciding
+quadrant's small-board celebration, then the big-board win line drawing across the three
+winning quadrants, then an "X wins" display — and the result card appears once that
+finishes. See [Animations](./Animations.md) → Where Animations Fire. With animations off,
+none of that plays and the result card appears instantly, same as today. Once the card is
+showing, its own behavior is unchanged.
+
 **A result card drawn over the board, with the board dimmed behind it** — not a separate
 screen and not a banner. The finished position stays visible behind the card.
 
