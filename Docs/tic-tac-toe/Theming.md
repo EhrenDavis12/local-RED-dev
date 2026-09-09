@@ -358,6 +358,8 @@ to it, achieved with shadows.
 - **The four separator lines on the big board are a deep blue twisting ribbon**, with a
   V-cut at each end, drawn in the gap between the quadrants. It is deep so it stays
   clearly darker than the pale blue cloth it is drawn on.
+- **The win line is the same ribbon art** — Sewing binds its win-line slot to the same
+  ribbon used for the big-board grid lines.
 
 *"What if the inner boards are sewing needles those would be thin as needed to prevent
 the crouded ness. And the large board is the ribbons. This should add a deabth of detail
@@ -421,6 +423,10 @@ Everything visual and audible. Rough list, not exhaustive:
   **Mark art is authored to read at the size it is drawn.** A mark fills one cell of an
   81-cell board on a phone, so fine detail and photoreal shading collapse into a smudge
   there. Marks are drawn with thick, dark, well-separated shapes that survive that size.
+- **The win line.** A theme may supply art for the line that animates over a winning
+  triple, on a small-board or a big-board win — a theme image slot of its own, the same
+  pattern as the game's other image slots. See [Animations](./Animations.md) → Where
+  Animations Fire.
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in

@@ -270,8 +270,10 @@ one marks a **single cell** (what just happened), the other marks a **whole quad
 sitting in a quadrant that's now locked — that's the normal case, not the odd one — so the
 locked treatment dims that quadrant without hiding what's highlighted inside it. The claim
 mark is different: on a won quadrant it covers the whole quadrant, and the cell that won
-it isn't picked out separately underneath. What changed there is that the quadrant was
-won, and that's what the player sees.
+it isn't picked out separately underneath — once the celebration finishes. During the win
+itself, a win line animates over the winning triple, picking those cells out transiently;
+once it finishes, the quadrant shows only the claim mark, same as before. See
+[Animations](./Animations.md) → Where Animations Fire.
 
 Between them they answer the only two questions a player has when handed the phone:
 *what changed, and what can I do?*
@@ -420,9 +422,11 @@ from the selected theme. This doc describes *what needs to be communicated*; the
 decides *what it looks like*.
 
 ## Animation & Juice
-Animations are **theme-controlled** and currently scoped to the player's marker —
-poppy grow/shrink, glow, shadowbox, jiggle, dance. Full detail in
-[Animations](./Animations.md).
+Animations are **theme-controlled**, and the scope now covers the mark being placed —
+poppy grow/shrink, glow, shadowbox, jiggle, dance — plus the small-board and game-win
+celebration sequences: a win line drawn over the winning triple, the claim mark's pop, and
+the game-win handoff to the result card. Full detail, including the sequencing and what
+still doesn't animate, is in [Animations](./Animations.md).
 
 ## Responsive / Screen Size
 - **Phone is the primary target** — two players passing one device.
