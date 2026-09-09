@@ -81,7 +81,7 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
   it into "best of" bragging rights between two people sharing a phone.
 
 ## Target Audience & Platform
-- **Phone.** Two players sharing one device.
+- **Phone.** Two players sharing one device, or one player against the AI on their own.
 - **Kids are a target audience** — swappable themes exist specifically to make it fun
   for kids. See [Theming](./Theming.md).
 
@@ -89,11 +89,18 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
 <!-- Ultimate Tic Tac Toe, other games, mechanics you liked elsewhere -->
 
 ## Modes
-**Current scope — one mode only:**
+**Current scope — two modes:**
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
-  Player One → Player Two. Started from the **Play Game** button on the main menu.
+  Player One → Player Two.
+- **One player against the AI**, at one of three levels — Beginner, Medium or Advanced.
+  **The AI is Player Two**, and everything else about a game is the same: the same board,
+  the same scoreboard, the same series. See [AI](./AI.md).
 
-**No single-player mode and no AI opponent** — two players on one phone is the only mode.
+Both start from the **Play Game** button on the main menu, and starting a game asks which
+of them it is before it asks anything else.
+
+**No online play** — it is offered in that prompt as **Versus** and disabled, so it is
+visibly coming rather than absent.
 
 See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
 
