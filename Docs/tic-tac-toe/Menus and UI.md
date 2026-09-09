@@ -584,7 +584,7 @@ time (see [Rules](./Rules.md) → Turn Order Across Games).
 
 **Nothing resets the board on its own.** A game the players finished and never rematched
 stays finished — reopen it from the open-games list and you get that finished board with
-the result card over it, both buttons live, exactly as it was left.
+its win line drawn and the result card below it, both buttons live, exactly as it was left.
 
 ### The result card
 **On a win, the result card is preceded by the game-win sequence** — the deciding
@@ -594,14 +594,15 @@ finishes. See [Animations](./Animations.md) → Where Animations Fire. With anim
 none of that plays and the result card appears instantly, same as today. Once the card is
 showing, its own behavior is unchanged.
 
-**A result card drawn over the board, with the board dimmed behind it** — not a separate
-screen and not a banner. The finished position stays visible behind the card.
+**The result card is a bottom-anchored panel** — it sits at the bottom of the screen, below
+the board, with no scrim and no dim. Not a separate screen and not a banner. The finished
+board and its big-board win line stay fully visible while the card is up, so there is
+nothing to put aside to look at the finished board — the board is never covered in the
+first place.
 
-This matches what the approved handoff draws. The board keeps being drawn behind the card
-rather than replaced by it — dimmed, but still legible enough to read the finished
-position. The scrim, the dim behind it, and the card's own fill, border and radius are
-theme values like everything else; its spacing and padding are not, since those are fixed
-in code app-wide (see [Theming](./Theming.md) → What a Theme Does NOT Control).
+The card's own fill, border and radius are theme values like everything else; its spacing
+and padding are not, since those are fixed in code app-wide (see
+[Theming](./Theming.md) → What a Theme Does NOT Control).
 
 **The card says what happened, in words, and a win and a tie read differently.** A win
 names the winning player. A tie names nobody — most quadrants claimed does not win it (see
@@ -732,9 +733,6 @@ an open game** above.
 - **What does the result card call a drawn big board?** The drawn draw modal words it as a
   "cat game," which [Game Overview](./Game%20Overview.md) → Terminology defines as a small
   board filled with no winner and [Rules](./Rules.md) → Edge Cases calls a straight draw.
-- **Can the result card be put aside to look at the finished board?** The board is visible
-  behind it either way, but neither drawn result modal carries a close control the way the
-  in-game settings sheet does.
 - **Does the `+1` under the column that just moved show again when a finished game is
   reopened later**, or only on the result that has just happened?
 - **What does New Game do when the player is already at the cap** — refuse and say the list

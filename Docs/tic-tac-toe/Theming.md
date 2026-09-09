@@ -359,7 +359,9 @@ to it, achieved with shadows.
   V-cut at each end, drawn in the gap between the quadrants. It is deep so it stays
   clearly darker than the pale blue cloth it is drawn on.
 - **The win line is the same ribbon art** — Sewing binds its win-line slot to the same
-  ribbon used for the big-board grid lines.
+  ribbon used for the big-board grid lines, drawn thicker than the separator ribbon so it
+  reads: `winLineWidth` 5 and `bigBoardWinLineWidth` 14 as starting values, tuned by
+  playtesting, since the ribbon was too thin to see at grid-line thickness.
 
 *"What if the inner boards are sewing needles those would be thin as needed to prevent
 the crouded ness. And the large board is the ribbons. This should add a deabth of detail
@@ -427,6 +429,13 @@ Everything visual and audible. Rough list, not exhaustive:
   triple, on a small-board or a big-board win — a theme image slot of its own, the same
   pattern as the game's other image slots. See [Animations](./Animations.md) → Where
   Animations Fire.
+- **Win-line thickness is themed**, under `board:`, following the existing small/big
+  naming convention — `winLineWidth` for the small-board win line and
+  `bigBoardWinLineWidth` for the big-board win line. Neon's values reproduce today's
+  rendering exactly: `winLineWidth` 1.5, `bigBoardWinLineWidth` 8. These widths are the win
+  line's own, not the grid lines'; they are NOT bounded by the small-board line's gutter
+  ceiling or the big-board separator's gap-width ceiling, because the win line draws over
+  cells and quadrants, not inside a fixed gap.
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
