@@ -68,3 +68,16 @@ Docs/<project>/project.json  that project's paths
 
 If a session opens complaining about a half-finished swap or a missing system, re-run
 `/set-system <name>` and restart.
+
+## New feature workflow
+
+Once the docs for a feature are ready to build from:
+
+1. Start a fresh Claude Code terminal.
+2. `/set-system forge` — usually already set; check once if unsure.
+3. `/set-project ttt` — same, usually already set.
+4. `/model` and `/effort` — pick what fits the work (Opus high is the usual).
+5. Optionally Shift+Tab into plan mode — forge handles planning already, so this is extra.
+6. Drag and drop the feature's docs into the prompt.
+7. Ask Claude to build the feature those docs describe.
+
