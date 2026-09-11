@@ -47,3 +47,31 @@
     $4.99 but never price the theme. This is typed into App Store Connect, not code —
     changeable anytime, even after launch.
     A:
+- Research: Supabase as a backend for user accounts, saved user data, and purchase records — what would it take, what does it cost, and what does it change for this app? [research] · branch none
+  - **What was found (checked 2026-09-11):** the app doesn't need a backend for anything
+    it currently does. Purchases: Apple already keeps the record of who bought what,
+    syncs it across the buyer's devices, handles restore, and revokes on refund — with
+    no server. Saved games: pass-and-play games live on one phone; there is no second
+    player or second device to sync with. So Supabase would add cost and risk while
+    buying nothing the shipped game uses.
+  - **The kids-app problem is the big one.** A kids-category app that sends any
+    identifying information to a third party is heavily restricted by Apple, and US
+    children's-privacy law (COPPA, tightened in 2025 and actively enforced) treats even
+    a backend user ID as personal information. Collecting an email from a child requires
+    verifiable parental consent through heavyweight methods (credit card check, ID
+    scan, etc.) — the math gate in the app explicitly does not count, per Apple's own
+    guidelines. Accounts would also trigger Apple's mandatory in-app account-deletion
+    flow. Today's answer on the App Store privacy form is "no data collected" — the
+    strongest possible review position for a kids app — and any backend forfeits it.
+  - **The money:** free tier pauses after 7 days of inactivity (fatal for a live app),
+    so real use means the $25/month Pro tier (~$300/year) for usage that would be
+    kilobytes. One paid project could later serve all ten games.
+  - **Recommendation:** no backend for this game — ship as designed (local saves, Apple
+    keeps purchase records, no accounts). For the ten-games picture, park Supabase until
+    a game actually needs online features (multiplayer, leaderboards, cross-platform
+    purchases); it is a reasonable choice then. The code is already shaped so a backend
+    can slot in later without rework, and the tech design already says so.
+  - Q: Agree to ship this game with no backend and park Supabase until some future game
+    actually needs online features? This is what the goal and tech design already say —
+    a yes just confirms it. Free to revisit whenever a future game wants online play.
+    A:

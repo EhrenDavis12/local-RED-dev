@@ -7,4 +7,3 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
-- Research: Supabase as a backend for user accounts, saved user data, and purchase records — what would it take, what does it cost, and what does it change for this app? [research] · started 2026-09-11T20:18:37Z · branch none · session https://claude.ai/code/session_01TkX2f1TCbPJ1cJ3BAEwf26
