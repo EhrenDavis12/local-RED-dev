@@ -7,5 +7,4 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
-- Research: App Store in-app purchase vs Stripe for paying for features — what are the advantages of each, which should we use given we want Android one day, and can an app like this connect to Stripe at all? [research] · started 2026-09-11T20:18:37Z · branch none · session https://claude.ai/code/session_01TkX2f1TCbPJ1cJ3BAEwf26
 - Research: Supabase as a backend for user accounts, saved user data, and purchase records — what would it take, what does it cost, and what does it change for this app? [research] · started 2026-09-11T20:18:37Z · branch none · session https://claude.ai/code/session_01TkX2f1TCbPJ1cJ3BAEwf26
