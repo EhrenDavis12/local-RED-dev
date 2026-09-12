@@ -18,7 +18,7 @@ here so they don't get re-litigated:
 
 | Requirement | Comes from |
 |---|---|
-| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. | Two players, one phone; qualified by In-App Purchases and Entitlements |
+| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception today, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. Apple Game Center becomes a second sanctioned exception if online multiplayer lands; it is not built, and both exceptions are Apple's rather than ours. | Two players, one phone; qualified by In-App Purchases and Entitlements |
 | **Local persistence** for 5 values: theme, music, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Audio playback** for one-shot sound effects, and for looping music the app fades in and out itself | [Theming](./Theming.md) |
@@ -117,9 +117,14 @@ rewrite.
 `storage/` is local persistence only — the repository interfaces and the implementations
 that back them. Which repositories exist, which store each is backed by, and what each
 holds is **Persistence and Serialization** below. There is **no backend data layer**:
-nothing in the app talks to a server. Online multiplayer is an intended future direction,
-so tech choices must not foreclose syncing board state over a network — a backend layer
-gets added if multiplayer arrives.
+nothing in the app talks to a server, and none gets added. Online multiplayer is an
+intended future direction, and when it comes it is remote play over **Apple Game Center
+turn-based matches** — Apple holds the match data, the matchmaking, the invites, the
+player identity and the "your turn" push, so the app still runs no service of its own and
+still collects no identity of its own. Tech choices must not foreclose handing a board
+position to a match and picking one up again. Online play being iPhone-only is accepted.
+Same-room play — Bluetooth, peer-to-peer, two phones in one room — is not wanted. None of
+this is built, and the current game ships without it.
 
 That rule is checked rather than trusted: a scan over `lib/` finds no HTTP client and no
 network target other than the store SDK. It covers `lib/` only, so build-time tooling
@@ -1112,6 +1117,26 @@ Blue and Sewing), and a **$4.99 unlock that raises the open-game cap from 3 to 1
 access and a restore-purchases path tied to the Apple ID. StoreKit is the one exception to
 **Fully offline** under **What the Design Docs Already Imply** above.
 
+### The store plugin — Flutter's official `in_app_purchase`
+**The purchase layer is the official Flutter `in_app_purchase` plugin**, with
+`in_app_purchase_storekit` under it on iOS. That package's StoreKit 2 path is the default
+on iOS 15 and up, which is the floor **Platform and Targets** → *Minimum iOS version*
+sets — so the `Transaction.currentEntitlements` semantics this section is built on are
+what the app actually gets, rather than something it has to opt into.
+
+**Stripe and third-party purchase services — RevenueCat and the like — are out.** Apple
+requires digital goods to be sold through in-app purchase, and a purchase service of our
+own would mean a server and player accounts. There is no server and there are no accounts.
+
+**`restorePurchases()` is silent, and `AppStore.sync()` is the one the player sees.** The
+plugin's `restorePurchases()` reads `Transaction.currentEntitlements` without showing the
+player anything, and delivers what it finds as a batch of `restored` events on the
+purchase stream. A player who owns nothing produces no events at all, so the events are
+not what says the read finished — only the returned Future completing says that.
+`AppStore.sync()` is a separate call, reached through
+`InAppPurchaseStoreKitPlatformAddition`, and it does prompt for an Apple ID. **Restore
+purchases runs the sync first, then the silent read.**
+
 ### Entitlements — Apple stores them, no backend needed
 **No receipt-validation server, and no backend of ours.** StoreKit provides
 `Transaction.currentEntitlements` — the set of currently-valid transactions for this app
@@ -1121,15 +1146,25 @@ full purchase history if it is ever needed.
 
 Restore for non-consumables is largely automatic: signing in on a new device repopulates
 entitlements without the player doing anything. The visible **Restore purchases** control
-is still required by Apple's review guidelines, and `AppStore.sync()` is the explicit call
-behind it — so the control is a compliance requirement more than a functional one.
+is still required by Apple's review guidelines, and what it runs is `AppStore.sync()`
+followed by the silent `currentEntitlements` read — see *The store plugin — Flutter's
+official `in_app_purchase`* above. The sync is the half the player sees, because it
+prompts for an Apple ID; the read is the half that produces the answer. So the control is
+a compliance requirement more than a functional one.
 
 On-device verification is sufficient for an app this size.
 
+**Purchases are per platform.** An entitlement lives with the Apple ID that bought it, so
+if the game ever ships on Android a theme bought on an iPhone is bought again there.
+Nothing links a purchase across platforms, because linking them needs accounts and a
+server of ours, and there are neither.
+
 **Consequence for the architecture: Apple is the record of truth and it is queryable at
 runtime.** Any locally stored entitlement state is an offline convenience, not the record.
-A refunded or lapsed purchase simply stops appearing in `currentEntitlements` — that is what
-answers "what happens when an entitlement goes away."
+A refunded or lapsed purchase stops appearing in `currentEntitlements` — that is what
+answers "what happens when an entitlement goes away." What the purchase stream says about
+it is a different matter: see *Committing an answer — all of it, in order, to memory and
+disk* below.
 
 **The entitlement provider's shape — last-known plus refresh.** Entitlement state is exposed
 as a plain value, seeded from the locally cached copy and refreshed when the store answers —
@@ -1192,6 +1227,13 @@ session on a stale answer.
 set assembled from a single transaction that happened to arrive. Partial answers and replace
 semantics cannot coexist: a fragment applied as a replacement silently drops everything it
 does not mention.
+
+**No event on the purchase stream is trusted for what it claims to be.** The plugin
+forwards a refund or a revocation tagged `purchased`, so an app that read an entitlement
+off the event's status would hand back the thing Apple just took away. Every event is a
+signal to re-read the whole owned set and commit that, and `currentEntitlements` already
+leaves revoked products out — so the re-read is the answer and the event is only the
+prompt.
 
 **An older answer never overwrites a newer one, and "older" means asked earlier, not arrived
 earlier.** Two questions can be in flight at once — the one every launch asks, and the one a
@@ -1840,12 +1882,6 @@ block other work.
 - What is the player shown for each of the four purchase endings? Pending is the one that
   needs real copy — the player is being told to wait for someone else, and under the Kids
   Category that is the common case rather than the rare one.
-- Which store plugin sits behind the purchase layer. Nothing is chosen, and it is the
-  largest single thing standing between this section and a build. Whichever it is has to
-  expose the StoreKit 2 semantics this section depends on — the current-entitlements query,
-  the ability to re-issue it on demand, the explicit restore call, and the stream of
-  transactions that resolve out of band. Not every Flutter plugin surfaces all four. See
-  Platform and Targets → Minimum iOS version.
 - Can a paid theme ever be a product whose theme file is not on the device? If every paid
   theme ships in the build and a purchase merely unlocks it, the model only ever gates
   content the device already has. If a paid theme can arrive any other way, it has to handle

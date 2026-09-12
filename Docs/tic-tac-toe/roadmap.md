@@ -239,6 +239,7 @@ release/distribution.
   - Declared in `pubspec.yaml`, or it does not ship
   - Regenerating, and leaving nothing behind
 - In-App Purchases and Entitlements
+  - The store plugin — Flutter's official `in_app_purchase`
   - Entitlements — Apple stores them, no backend needed
   - Ownership is keyed by product, and only the store may change it
   - Committing an answer — all of it, in order, to memory and disk
