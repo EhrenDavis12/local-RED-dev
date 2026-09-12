@@ -7,3 +7,4 @@
 > skips triage — tag it, or the queue tags it on pickup.
 
 ---
+- Entitlements and store gateway: the app reads what the Apple ID owns at launch and on demand, caches it, and drives the open-games limit from it — plugin, entitlement state, store gateway with a test fake, launch wiring; no buy button and no purchase UI [prd] [M]
