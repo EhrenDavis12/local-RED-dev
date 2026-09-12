@@ -7,4 +7,3 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
-- Research: pulling purchase records back from the App Store so the app knows which themes were paid for — what it takes, which API calls (StoreKit / the Flutter in_app_purchase plugin) restore ownership to a device, and a plan we can build from [research] · started 2026-09-12T16:56:00Z · branch none · session https://claude.ai/code/session_01Tg5TfDJnUi9NWvDqTE3aoW

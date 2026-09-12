@@ -105,3 +105,58 @@
     we host with room codes, at the cost of building notifications and reconnects
     ourselves. Cheap to decide now; changing after the bridge is built means rewriting it.
     A:
+- Research: pulling purchase records back from the App Store so the app knows which themes were paid for — what it takes, which API calls (StoreKit / the Flutter in_app_purchase plugin) restore ownership to a device, and a plan we can build from [research] · branch none
+  - **What was found (checked 2026-09-12):** yes — Apple keeps the record, and the app can
+    read it straight off the device with no server of ours. Apple signs the list of what
+    the signed-in Apple ID owns; the phone verifies that signature itself; a refunded or
+    revoked purchase simply drops off the list. Reinstalling or installing on a new device
+    gets the list automatically at first launch. Family Sharing is a checkbox in App Store
+    Connect and needs no app code.
+  - **Where the app stands:** nothing purchase-related is built. The purchase and
+    entitlement folders are empty, the store plugin isn't a dependency yet, the open-games
+    limit is hardcoded to 3 with a note saying "read from entitlements, which don't exist
+    yet", every theme row shows FREE, and Settings has no Purchases section or Restore
+    button. The iOS 15 floor (needed for the modern StoreKit) is already set.
+  - **The calls, in plain terms** (official Flutter `in_app_purchase` plugin, StoreKit 2 is
+    now its default):
+    - *Every cold launch:* subscribe to the purchase event stream first (this is also
+      how a parent's later Ask-to-Buy approval or a refund reaches the app), then ask
+      "what does this Apple ID own?" — silent, no password prompt, returns the owned
+      product IDs. Save that set as a whole replacement; if the store can't be reached,
+      keep the last saved set.
+    - *Restore button:* tell Apple to re-sync this device from its servers (this one
+      shows an Apple ID password prompt — Apple says use it only behind the button),
+      then run the same "what do I own" read.
+    - *Buying:* fetch the price from the store, show the parental gate, start the buy,
+      then handle the four endings: bought, waiting for a parent, cancelled, error. On
+      bought, tell Apple it's finished and re-read the owned set.
+    - *Refund:* re-read the owned set whenever any purchase event arrives; the refunded
+      item is gone from it. (The plugin quirk: it reports a refund as if it were a
+      purchase, so trusting the event's label alone would grant on refund. Re-reading
+      the full set sidesteps it and matches the tech design's replace-the-whole-set rule.)
+  - **Needs a server?** No. On-device verification is what Apple recommends for this
+    shape of app; a server is only for server-side gating or refund webhooks, which the
+    design doesn't want. The tech design already says this.
+  - **The build plan** (App Store Connect steps marked ASC; the rest is code, in order):
+    1. ASC: sign the Paid Applications agreement (banking, tax) — days of lead time, gates all of it.
+    2. ASC: create the two non-consumable products (open-games unlock, Sewing theme), Family Sharing on. Product IDs are permanent.
+    3. Add the store plugin; add a local StoreKit test file with the same product IDs for Simulator testing; enable the In-App Purchase capability.
+    4. Entitlements: a small "what's owned" value (product-ID set + provisional flag + sequence number), cached on disk, with one commit path that never goes backwards.
+    5. Store gateway: a thin interface over the plugin (read owned set, sync, buy, prices) plus a fake for tests.
+    6. Launch wiring: replace the hardcoded open-games limit with a read from entitlements; read the owned set after first frame; re-read on every purchase event.
+    7. Purchase flow: parental gate → buy → the four endings, with "waiting for approval" copy.
+    8. Settings → Purchases: unlock row with the store price, Restore button (ungated, as designed).
+    9. Theme select: FREE / OWNED / locked per row, from entitlements.
+    10. Tests for the commit rules and the gateway against the fake.
+    11. Manual: Simulator (buy, refund, Ask-to-Buy approve/decline, clear history + restore), then a sandbox account on a device, then TestFlight.
+  - **Contradicts the docs:** the tech design says the Restore button's call *is* Apple's
+    sync call. In the plugin those are two different calls — a silent "what do I own"
+    read and a separate sync — and the button needs both. It also says a refund "simply
+    stops appearing"; true of Apple, but the plugin additionally pushes the refund as an
+    event labelled like a purchase (handled above). Doc left alone until you answer.
+  - Q: Build the purchase system from this plan now? Saying yes puts it in Ready as a
+    [prd] item — it touches money and saved entitlement data, so a wrong guess is
+    expensive. The two App Store Connect steps are on you and have the longest lead
+    time, so they're worth starting today either way. Nothing here is hard to change
+    before code is written.
+    A:
