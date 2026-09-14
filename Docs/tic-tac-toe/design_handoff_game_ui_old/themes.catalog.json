@@ -1,0 +1,76 @@
+{
+  "note": "Theme catalog as shown on screen 2a. Ownership is NOT part of a theme definition — a theme is an audio-visual package; entitlement is account/device state. Kept in one file here only so the handoff shows both together.",
+
+  "baseThemeId": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
+  "defaultThemeId": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
+  "inheritanceDepth": 1,
+  "inheritanceRule": "Every theme is materialized at startup by merging its overrides over the base (Neon). At runtime every lookup hits a complete theme; there is no per-lookup fallback.",
+
+  "ownershipStates": {
+    "free": { "badge": "FREE", "badgeBg": "#292b31", "badgeText": "#9397ab", "playable": true },
+    "owned": { "badge": "OWNED", "badgeBg": "rgba(45,255,158,0.16)", "badgeText": "#a5ffd8", "playable": true },
+    "locked": {
+      "badge": null,
+      "playable": false,
+      "action": "price-button",
+      "rowTreatment": "preview tile at 45% opacity, name #b2b6ca, description #75798c",
+      "buttonStyle": "accent outline 2px #9184d9, radius 11, padding 9px 13px, 14px, padlock icon + price"
+    }
+  },
+  "activeBadge": { "badge": "ACTIVE", "badgeBg": "rgba(79,195,255,0.18)", "badgeText": "#a9e4ff", "rowRing": "0 0 0 2px #4fc3ff, 0 0 22px rgba(79,195,255,0.30)" },
+
+  "themes": [
+    {
+      "id": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
+      "name": "Neon",
+      "blurb": "Black night, electric lines. Buzzes like a neon sign.",
+      "isBase": true,
+      "ownership": "free",
+      "price": null,
+      "status": "specified",
+      "definition": "neon.theme.json",
+      "signatureSound": "buzz",
+      "marks": { "playerOne": "✕", "playerTwo": "○" }
+    },
+    {
+      "id": "3d1a8b52-9c47-4b16-8f2e-7a5d0c9e1b34",
+      "name": "Classic Red vs Blue",
+      "blurb": "The plain old one. Red you, blue them.",
+      "ownership": "free",
+      "price": null,
+      "status": "preview-only — overrides not yet authored",
+      "overrides": ["color", "art"],
+      "inherits": ["sound (except the splat)", "animation", "everything else"],
+      "signatureSound": "splat",
+      "previewColors": { "ground": "#f3f5fe", "playerOne": "#d92d3f", "playerTwo": "#2453c4" },
+      "marks": { "playerOne": "✕", "playerTwo": "○" }
+    },
+    {
+      "id": "c58f2e07-4a3b-4d91-b6c2-1e8f7a204d55",
+      "name": "Splat",
+      "blurb": "Paint-balloon marks. Gloriously messy.",
+      "ownership": "locked",
+      "price": { "amount": 1.99, "currency": "USD", "display": "$1.99" },
+      "status": "PLACEHOLDER — does not exist. Shown only to demonstrate the locked state. Preview tile is a dashed-border stand-in.",
+      "marks": { "playerOne": "splat image (TBD)", "playerTwo": "splat image (TBD)" }
+    },
+    {
+      "id": "9e4b06d3-71c8-42af-a0d5-3b6c2f81e7a9",
+      "name": "Dinosaurs",
+      "blurb": "T-Rex versus Stegosaurus. Roars included.",
+      "ownership": "owned",
+      "price": { "amount": 2.99, "currency": "USD", "display": "$2.99" },
+      "purchasedAt": "example — entitlement lives outside the theme",
+      "status": "PLACEHOLDER — does not exist. Shown only to demonstrate the owned state. Preview tile is a dashed-border stand-in.",
+      "marks": { "playerOne": "T-Rex icon (TBD)", "playerTwo": "Stegosaurus icon (TBD)" }
+    }
+  ],
+
+  "storeRequirements": [
+    "A 'Restore purchases' affordance must be present wherever paid content is listed.",
+    "Prices must be read from the store SDK at runtime, localized — never hardcoded. The $1.99 above is mock data.",
+    "A locked theme must still render its preview; buying is the only gate."
+  ],
+
+  "failureBehavior": "If a theme fails to load, show a modal saying the theme is unavailable and asking the player to pick another, then fall back to Neon. See Theming.md."
+}

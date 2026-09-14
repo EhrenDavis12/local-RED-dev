@@ -39,16 +39,18 @@
   - Q: Apply it? Saying yes runs `iap_sync` against App Store Connect and creates the
     two products with the identifiers above. The identifiers are permanent; everything
     else about a product can be changed later by editing the file and re-running.
-    A:
+    A: Yes — set up all the purchases so they're ready to go. (relayed from the user,
+    2026-09-14)
   - Q: Sewing theme price — $2.99 (recommended) or $4.99? Typed into the products file;
     changeable anytime.
-    A:
+    A: $1.99. (relayed from the user, 2026-09-14)
   - Q: The goal says Sewing is the paid theme at launch, but the design docs say in
     four places that every theme ships free and Sewing becomes paid "once the purchase
     flow lands", and the theme picker shows no locked row. Confirm Sewing is locked and
     for sale at first release? Yes means the docs and the theme picker's locked row
     get revised; cheap, but it is a screen behaviour, not just wording.
-    A:
+    A: Not yet — for now keep the themes free in the app; the store setup can be done.
+    (relayed from the user, 2026-09-14)
   - Q: Two App Store Connect steps only you can do, with the longest lead time: sign the
     Paid Applications Agreement (Agreements, Tax, and Banking — needs banking and tax
     info) and set the app's Pricing and Availability. Done, or when?
