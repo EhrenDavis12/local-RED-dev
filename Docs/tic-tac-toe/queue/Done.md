@@ -183,3 +183,12 @@
     must be `${local-id}`), fixed on the branch. Branch queue/iap-products-as-code
     (6 commits) awaits your review; the Game Center capability row will stack on it
     because both touch the Xcode project file.
+- 2026-09-14 · Game Center capability: the entitlement in the Xcode project, the capability on the bundle ID through fastlane, and re-pulled provisioning profiles [look] [S] · 2h 10m · 00b46e5 · http://localhost:3000/d/claude-agents?from=1789407600000&to=1789415400000
+  - Live and verified: Game Center is enabled on the bundle ID, the app-level Game
+    Center record exists in App Store Connect, the entitlement is in the Xcode project,
+    and the App Store profile was regenerated and carries it (pushed to the
+    certificates repo). Two lanes: `capabilities_sync` (idempotent) and
+    `capabilities_status` (read-only, checks both the store side and the installed
+    profile). Branch queue/game-center-capability, stacked on
+    queue/iap-products-as-code (both edit the Xcode project). Still by hand at release
+    time: enabling Game Center on the app *version* in App Store Connect.
