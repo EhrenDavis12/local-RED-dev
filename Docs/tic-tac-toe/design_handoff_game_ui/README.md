@@ -23,6 +23,12 @@ Covered here:
 | 2b | Settings page (from the main menu) | Menus and UI → Settings Menu |
 | 2c | New Game — opponent name prompt | Menus and UI → New Game Name Prompt |
 | 2d | Game Board — pending-move preview | Game Board Design → Move Input |
+| 4a | **Robot Workshop theme** — menu, board, winner | Theming → what a theme can replace |
+| 4b | Dino Jungle theme (alternate) — menu, board, winner | Theming → what a theme can replace |
+
+> Turn 3 in the design file (`3a`–`3k`) is a **rejected** earlier theme attempt ("Dino Dig",
+> a realistic sandstone dig site). It is left in the file as a record of what not to do —
+> muddy palette, unrecognizable marks. Do not build it.
 
 Everything is drawn in the **Neon** theme, which per `Theming.md` is the base
 theme every other theme merges over.
@@ -431,6 +437,62 @@ valid action.
 
 ---
 
+## Themes: what a theme actually replaces
+
+The reference app's Sewing theme set the bar, and it is higher than a palette swap. A
+theme replaces, at minimum:
+
+1. the **ground** (texture, not a flat color),
+2. the **two player marks** (objects, not letters),
+3. the **small-board grid lines** (a material — needles, bones, welded seams),
+4. the **big-board grid lines** (a second, heavier material laid across the gaps),
+5. every **button and panel** (spools of thread, stone slabs, steel plates),
+6. the **dead-board** concept and its label (cat game / tar pit / SCRAP / MUD),
+7. the **copy voice** and player names,
+8. the **sound signature** and animation character.
+
+If a candidate theme cannot fill all eight slots naturally, it is a color scheme, not a
+theme. Build the theme loader against that list.
+
+## Robot Workshop — the approved new theme
+
+Full machine-readable spec in **`robot-workshop.theme.json`**; screens `4a` in the design
+file (main menu, mid-game board, winner modal). Built for **ages 5–8**, which drives the
+whole treatment:
+
+- **Flat saturated fills**, no soft gradients-as-decoration.
+- **A 3–5px `#16202b` outline on every element** — this is the theme's signature and the
+  thing that makes it read as a kids' game rather than an app.
+- **Solid offset drop shadows** (`0 7px 0 <darker>`), never blurred ones. Buttons look
+  pressable because they have a visible bottom edge.
+- **Type is heavier and bigger than Neon everywhere** — 700 weight is the default, buttons
+  are 26px, the result title is 34px.
+- Players are **Red** and **Blue**, not Player One and Two. Marks are a **red gear** and a
+  **blue hex bolt** — different silhouette as well as different color.
+- Small grid = scored seams in the plate. Big grid = **yellow/black hazard girders** laid
+  across the gaps, never touching a quadrant. Dead board = a **rust patch labelled SCRAP**.
+- Ties column is relabelled **SCRAP**; copy is "Blue, your turn!", "RED WINS!",
+  "PLAY AGAIN", "Play in here!".
+
+### Two contrast rules that must not be undone
+
+Both were measured failures before they were fixed; a well-meaning "brighten it up" pass
+will reintroduce them:
+
+- The wordmark plate is **dark** (`#2b3a4c`). On the light plate the `#ffc82c` wordmark
+  measured 2.14:1. It is now 7.48:1.
+- Labels on saturated chips use a **near-black of their own hue**, not white. White on
+  `#2bc4f5` measured 2.04:1; white on `#ff4433` measured 3.44:1.
+
+### Alternate: Dino Jungle
+
+`4b`, and `dino-jungle.theme.json`. Same construction rules, jungle-green ground, orange
+T-Rex footprint vs violet Stegosaurus plate, bamboo poles as the big grid, MUD as the
+dead board. Kept as a second candidate — not approved, but specified well enough to build
+if you want a second paid or free theme.
+
+---
+
 ## Interactions & behavior
 
 Design-level only; game logic lives in `Rules.md`.
@@ -499,9 +561,15 @@ Derived for rendering: a quadrant is **forced** when `activeQuadrant === i`;
 design_handoff_game_ui/
 ├── README.md                 ← this file
 ├── neon.theme.json           ← the complete Neon theme, machine-readable
+├── robot-workshop.theme.json ← the approved new theme (ages 5-8)
+├── dino-jungle.theme.json    ← alternate theme candidate
 ├── themes.catalog.json       ← the four themes + ownership/paywall states
 └── design-files/
-    ├── Tic Tac Toe Extreme - Screens.dc.html   all 12 screens (turn 2 at the top)
+    ├── Tic Tac Toe Extreme - Screens.dc.html   all screens (newest turn at the top)
+    ├── Board.dc.html                           the Neon board renderer
+    ├── Board Robot.dc.html                     the Robot Workshop board renderer
+    ├── Board Jungle.dc.html                    the Dino Jungle board renderer
+    ├── Board Dino.dc.html                      rejected — kept for the record
     ├── Board.dc.html                            the board renderer
     ├── ios-frame.jsx                            presentation bezel — do not port
     └── nocturne-styles.css                      token sheet the neutrals came from
@@ -511,8 +579,11 @@ Open the two `.dc.html` files in a browser to see the designs.
 
 ## Still to design
 
-1. The Classic Red vs Blue theme itself (only its two-color preview exists).
-2. Splat and Dinosaurs — art, sound and animation sets, and the purchase sheet.
-3. The "theme failed to load" modal (`Theming.md`: apologise, then fall back to Neon).
-4. Real logo and About Us copy.
-5. Leave-game confirmation, if you decide one is still warranted now that nothing is lost.
+1. Robot Workshop: the remaining eight screens (select game, about us, both settings,
+   theme select, name prompt, pending move, draw modal). Turn 4 covers menu, board and
+   winner only.
+2. Sound and animation sets for Robot Workshop.
+3. The Classic Red vs Blue theme itself (only its two-color preview exists).
+4. Splat — art and the purchase sheet.
+5. The "theme failed to load" modal (`Theming.md`: apologise, then fall back to Neon).
+6. Real logo and About Us copy.

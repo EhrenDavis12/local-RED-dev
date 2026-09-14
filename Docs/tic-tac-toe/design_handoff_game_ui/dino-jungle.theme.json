@@ -1,0 +1,136 @@
+{
+  "id": "9e4b06d3-71c8-42af-a0d5-3b6c2f81e7a9",
+  "name": "Dino Jungle",
+  "blurb": "T-Rex against Stegosaurus. Footprints, plates and bamboo.",
+  "ownership": "owned",
+  "status": "CANDIDATE, not approved. Colors and geometry are final; kept as a second theme option. Screens 4b in the design file.",
+  "note": "Same construction rules as Robot Workshop: flat saturated fills, a 3-4px #10382a outline on every element, solid offset drop shadows, chunky radii, 700-weight type. Replaces the rejected 'Dino Dig' attempt (turn 3), which was muddy and unreadable.",
+
+  "color": {
+    "ground": "#2fa374",
+    "groundGradient": "linear-gradient(180deg,#3dbe88,#1f8760)",
+    "groundTexture": "repeating-linear-gradient(115deg,rgba(16,56,42,.09) 0 16px,transparent 16px 38px) — leaf-blade stripes",
+    "outline": "#10382a",
+    "panel": "#6fd49b",
+    "panelGradient": "linear-gradient(180deg,#6fd49b,#45b378)",
+    "cream": "#fff8e3",
+    "creamDark": "#e8dcb8",
+    "titlePlate": "#0f3d2c",
+    "vine": "#27865c",
+
+    "text": "#10382a",
+    "textOnDark": "#dff0e7",
+    "textGreen": "#18664a",
+    "textMutedOnDark": "#a6d9bf",
+
+    "playerOne": "#ff8a1e",
+    "playerOneLight": "#ffa645",
+    "playerOneShadow": "#f47a06",
+    "playerOneInk": "#2e1500",
+    "playerTwo": "#7b5cf6",
+    "playerTwoLight": "#9b7ffb",
+    "playerTwoShadow": "#6f4de8",
+
+    "accent": "#ffd12e",
+    "accentGradient": "linear-gradient(180deg,#ffdf5e,#ffc812)",
+
+    "highlightForced": "#ffd12e",
+    "highlightLastMove": "#ffffff",
+    "highlightPending": "#ffffff (dashed)",
+
+    "catGame": "#7a5a3a",
+    "catGameLabel": "#fff3e0",
+    "veilLocked": "rgba(16,56,42,0.50)",
+    "scrim": "rgba(12,49,35,0.60)"
+  },
+
+  "marks": {
+    "playerOne": {
+      "kind": "shape",
+      "name": "T-Rex footprint",
+      "build": "a 20-point clip-path polygon: three claw-tipped toes over a rounded pad, in #ff8a1e over a #10382a silhouette 2px larger",
+      "polygon": "polygon(50% 0,58% 14%,62% 32%,70% 22%,84% 6%,80% 28%,74% 46%,88% 60%,85% 80%,68% 95%,50% 100%,32% 95%,15% 80%,12% 60%,26% 46%,20% 28%,16% 6%,30% 22%,38% 32%,42% 14%)",
+      "sizes": { "cell": 24, "claimedQuadrant": 72, "resultModal": 84 }
+    },
+    "playerTwo": {
+      "kind": "shape",
+      "name": "Stegosaurus plate",
+      "build": "clip-path polygon(50% 0,90% 32%,76% 100%,24% 100%,10% 32%) in #7b5cf6 over a #10382a pentagon 2.5px larger, plus a soft white-50% rounded highlight on the upper left",
+      "sizes": { "cell": 23, "claimedQuadrant": 68, "resultModal": 68 }
+    },
+    "catGame": {
+      "kind": "patch",
+      "name": "mud puddle",
+      "build": "two overlapping brown radial-gradients (#966e46, #604428) on #7a5a3a, with a 700-weight 11px MUD label in #fff3e0",
+      "label": "MUD"
+    }
+  },
+
+  "board": {
+    "outerGap": 13,
+    "quadrantPadding": 6,
+    "quadrantRadius": 12,
+    "innerGap": 2,
+    "quadrant": "linear-gradient(180deg,#6fd49b,#45b378), 0 0 0 3px #10382a, inset 0 3px 0 rgba(255,255,255,.35), inset 0 -3px 0 rgba(16,56,42,.22)",
+    "smallGridLines": "3px #27865c rounded bars, inset 7% from each end, with a 1px white-30% lit edge — vines",
+    "bigGridLines": "12px bamboo poles laid ACROSS the gaps (never touching a quadrant): linear-gradient(#9bbd3a,#d6e86a 40%,#bcd352 70%,#8aa832), 0 0 0 2.5px #10382a, radius 5, positioned at 32.8% and 67.2%, each carrying 1-2 darker node bands at irregular offsets",
+    "openRing": "inset 0 0 0 3px rgba(255,209,46,.8)",
+    "forcedRing": "4px solid #ffd12e, offset -5, radius 16, 0 0 0 2px #10382a + 0 0 20px 5px rgba(255,209,46,.7)",
+    "lastMoveRing": "3px solid #ffffff, offset -2, radius 6, 0 0 0 2px #10382a + 0 0 12px rgba(255,255,255,.8)",
+    "pendingRing": "3px dashed #ffffff, offset -2, radius 6",
+    "destinationRing": "3px dashed #ffffff, offset -5, radius 16, over rgba(255,255,255,0.12)"
+  },
+
+  "controls": {
+    "buttonPrimary": "linear-gradient(180deg,#ffa645,#f47a06), text #fff, 0 0 0 4px #10382a + 0 7px 0 #10382a + inset 0 4px 0 rgba(255,255,255,.45), radius 18, 26px/700",
+    "buttonSecondary": "linear-gradient(180deg,#9b7ffb,#6f4de8), text #fff, same outline and shadow, radius 18",
+    "buttonTertiary": "linear-gradient(180deg,#fff8e3,#f0e4bf), text #10382a, 0 0 0 4px #10382a + 0 6px 0 #10382a, radius 15, 17px/700",
+    "iconButton": "48x48, accent gradient, radius 14, 0 0 0 3px #10382a + 0 4px 0 #10382a",
+    "scoreChip": "#fff8e3, radius 13, 0 0 0 3px #10382a + 0 4px 0 #10382a; the active player's chip swaps to their color",
+    "panel": "#fff8e3, radius 26, 0 0 0 5px #10382a + 0 9px 0 #10382a",
+    "titlePlate": "#0f3d2c, radius 20 — dark so the #ffa645 wordmark clears contrast",
+    "versionPill": "#ffd12e, radius 999, 0 0 0 3px #10382a"
+  },
+
+  "type": {
+    "family": "Inter",
+    "weights": { "body": 600, "bold": 700 },
+    "scale": "identical to robot-workshop.theme.json"
+  },
+
+  "copy": {
+    "voice": "Short, loud, kid-facing. Players are named by dinosaur.",
+    "playerOneName": "T-Rex",
+    "playerTwoName": "Stego",
+    "tiesLabel": "MUD",
+    "turnBanner": "Stego, your turn!",
+    "win": "T-REX WINS!",
+    "draw": "Nobody wins this one!",
+    "rematch": "PLAY AGAIN"
+  },
+
+  "sound": {
+    "signature": "roar",
+    "placeMark": "TODO: stomp",
+    "claimQuadrant": "TODO: roar",
+    "catGame": "TODO: wet squelch",
+    "winGame": "TODO: big roar",
+    "buttonTap": "TODO: wooden knock",
+    "music": null
+  },
+
+  "animation": {
+    "note": "Same timings as Neon; character is heavy and bouncy.",
+    "placeMark": { "type": "stomp-in", "durationMs": 220 },
+    "claimQuadrant": { "type": "stomp-shake", "durationMs": 420 },
+    "catGame": { "type": "splat-settle", "durationMs": 320 },
+    "winGame": { "type": "roar-pulse", "durationMs": 900 },
+    "activeQuadrant": { "type": "sun-pulse", "durationMs": 1600, "loop": true }
+  },
+
+  "contrastNotes": [
+    "The wordmark plate is dark green, not cream. #ff8a1e on cream measured 2.22:1.",
+    "Labels on the orange chip use near-black of the hue, not white — white measured 2.36:1.",
+    "Mid-green on cream must be #18664a or darker; #27865c measured 4.25:1 and just missed."
+  ]
+}

@@ -264,7 +264,9 @@ because they now have to read against the background rather than against a card.
 
 ## Theme Catalog
 
-**Three themes ship at launch — Neon, Classic Red vs Blue and Sewing.**
+**Five themes ship — Neon, Classic Red vs Blue, Sewing, Robot Workshop and Dino Jungle.**
+Robot Workshop and Dino Jungle are built from the design handoff's
+`robot-workshop.theme.json` and `dino-jungle.theme.json`.
 
 ### Theme 1 — Neon (base)
 The first theme. The look:
@@ -377,14 +379,74 @@ merge; Sewing is designed to be looked at, so its art is authored rather than in
 **Sewing snips.** Its signature sound is a scissor snip — a short, crisp cut of fabric
 scissors, as distinct from Neon's electric buzz and Classic's wet splat.
 
+### Theme 4 — Robot Workshop
+Steel plates and hazard stripes; red gear against blue bolt. Built for ages 5–8, which
+drives the whole treatment.
+
+- **The construction rules are the theme's signature:** flat saturated fills; a 3–5px dark
+  (`#16202b`) outline on every element; solid offset drop shadows (a visible bottom edge),
+  never blurred ones; chunky radii; nothing soft-glowed except the forced-quadrant ring.
+- **Type is heavier and bigger than Neon everywhere** — 700 weight is the default for
+  anything a child reads, not an emphasis.
+- **Marks:** a red gear (Player One) and a blue hex bolt (Player Two) — different
+  silhouette as well as different color.
+- **The ground is riveted blue-grey steel.** Small-board lines are scored seams in the
+  plate. Big-board separators are yellow/black hazard girders laid across the gaps, never
+  touching a quadrant. The dead board is a rust patch labelled SCRAP.
+- **Buttons and panels are steel plates** with the outline and the solid shadow step; the
+  primary button is the accent yellow.
+- **Two contrast rules that must not be undone** (both were measured failures before they
+  were fixed): the wordmark/title plate is dark (`#2b3a4c`) because the `#ffc82c` wordmark
+  measured 2.14:1 on the light plate and 7.48:1 on the dark one; labels on the saturated
+  player chips use a near-black of their own hue, not white — white on `#2bc4f5` measured
+  2.04:1, white on `#ff4433` 3.44:1.
+- **Copy is not part of the theme:** the JSON names the players Red and Blue and relabels
+  the ties chip SCRAP, but the words on screen are fixed in code (see **What a Theme Does
+  NOT Control**), so only the art carries those names — the SCRAP label lives inside the
+  dead-board patch's own image.
+
+**Signature sound:** a **clank**. Its sound set and animation set are still to author;
+until then it inherits Neon's sounds by the fallback rule and Neon's animation timings.
+
+**Robot Workshop as drawn:**
+`Docs/tic-tac-toe/design_handoff_game_ui/robot-workshop.theme.json`; screens 4a in the
+design file (menu, board, winner).
+
+### Theme 5 — Dino Jungle
+A candidate kept as a second theme option: colors and geometry are final, the direction
+is not approved. Built and shipped so it can be tested.
+
+- Same construction rules as Robot Workshop (flat fills, a 3–4px `#10382a` outline on
+  every element, solid offset shadows, chunky radii, 700-weight type) on a jungle-green
+  ground with leaf-blade stripes.
+- **Marks:** an orange T-Rex footprint (Player One) and a violet Stegosaurus plate
+  (Player Two).
+- Small-board lines are vines. Big-board separators are bamboo poles laid across the
+  gaps, carrying darker node bands. The dead board is a mud puddle labelled MUD.
+- Panels and secondary buttons are cream; the title plate is dark green because the
+  orange wordmark measured 2.22:1 on cream. Labels on the orange chip use a near-black of
+  the hue, not white (2.36:1). Mid-green text on cream must be `#18664a` or darker —
+  `#27865c` measured 4.25:1 and just missed.
+- Copy is not part of the theme, same as Robot Workshop: T-Rex/Stego and MUD are art
+  only.
+
+**Signature sound:** a **roar**. Sound and animation sets still to author; inherits
+Neon's by the fallback rule for now.
+
+**Dino Jungle as drawn:**
+`Docs/tic-tac-toe/design_handoff_game_ui/dino-jungle.theme.json`; screens 4b in the
+design file.
+
 ---
 
 ## Free and Paid Themes
 **Which themes are free is answered outside the theme file, and today every theme that
-ships is free.** Neon, Classic Red vs Blue and Sewing all ship free. Sewing is intended
-to become a paid theme once purchasing is in place, and that flow is not built yet. The
-theme selection list **labels** which themes are free and which are paid, so a paid theme
-drops in without redrawing the screen.
+ships is free.** Neon, Classic Red vs Blue, Sewing, Robot Workshop and Dino Jungle all
+ship free. Sewing is intended to become a paid theme once purchasing is in place, and
+that flow is not built yet. Robot Workshop and Dino Jungle ship free for now too, so they
+can be tested — *"For now make them free so we can test them."* The theme selection list
+**labels** which themes are free and which are paid, so a paid theme drops in without
+redrawing the screen.
 
 *"Ship it now for free but this will morelikly become a paid theme after we get payments
 inplace."*

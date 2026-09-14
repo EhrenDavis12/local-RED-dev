@@ -143,6 +143,8 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
   - Theme 1 — Neon (base)
   - Theme 2 — Classic Red vs Blue
   - Theme 3 — Sewing
+  - Theme 4 — Robot Workshop
+  - Theme 5 — Dino Jungle
 - Free and Paid Themes
 - What a Theme Controls
 - How a Theme's Art Is Drawn

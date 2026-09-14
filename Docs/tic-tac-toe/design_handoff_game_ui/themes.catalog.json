@@ -1,5 +1,5 @@
 {
-  "note": "Theme catalog as shown on screen 2a. Ownership is NOT part of a theme definition — a theme is an audio-visual package; entitlement is account/device state. Kept in one file here only so the handoff shows both together.",
+  "note": "Theme catalog. Screen 2a shows the ownership states; 4a/4b show the two new themes. Ownership is NOT part of a theme definition — a theme is an audio-visual package; entitlement is account/device state. Kept in one file here only so the handoff shows both together.",
 
   "baseThemeId": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
   "defaultThemeId": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
@@ -20,6 +20,17 @@
   "activeBadge": { "badge": "ACTIVE", "badgeBg": "rgba(79,195,255,0.18)", "badgeText": "#a9e4ff", "rowRing": "0 0 0 2px #4fc3ff, 0 0 22px rgba(79,195,255,0.30)" },
 
   "themes": [
+    {
+      "id": "5f2c9a41-8e63-4b07-9d15-6a4e3b81c2f7",
+      "name": "Robot Workshop",
+      "blurb": "Steel plates and hazard stripes. Red gear against blue bolt.",
+      "ownership": "free",
+      "price": null,
+      "status": "APPROVED — colors and geometry specified; sound and animation sets still to author",
+      "definition": "robot-workshop.theme.json",
+      "signatureSound": "clank",
+      "marks": { "playerOne": "red gear", "playerTwo": "blue hex bolt" }
+    },
     {
       "id": "b7c1f0a6-2f5e-4d3a-9c88-0f5a1e2d3c40",
       "name": "Neon",
@@ -56,13 +67,15 @@
     },
     {
       "id": "9e4b06d3-71c8-42af-a0d5-3b6c2f81e7a9",
-      "name": "Dinosaurs",
-      "blurb": "T-Rex versus Stegosaurus. Roars included.",
+      "name": "Dino Jungle",
+      "blurb": "T-Rex against Stegosaurus. Footprints, plates and bamboo.",
       "ownership": "owned",
       "price": { "amount": 2.99, "currency": "USD", "display": "$2.99" },
       "purchasedAt": "example — entitlement lives outside the theme",
-      "status": "PLACEHOLDER — does not exist. Shown only to demonstrate the owned state. Preview tile is a dashed-border stand-in.",
-      "marks": { "playerOne": "T-Rex icon (TBD)", "playerTwo": "Stegosaurus icon (TBD)" }
+      "status": "candidate — fully specified, not approved",
+      "definition": "dino-jungle.theme.json",
+      "signatureSound": "roar",
+      "marks": { "playerOne": "T-Rex footprint", "playerTwo": "Stegosaurus plate" }
     }
   ],
 
