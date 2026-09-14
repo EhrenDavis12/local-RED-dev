@@ -171,3 +171,15 @@
     A: Yes — start building the systems, including the App Store setup, and do that
     setup as code through fastlane so it's all infrastructure-as-code. No purchase
     point in the app itself yet; just the setup. (relayed from the user, 2026-09-12)
+- 2026-09-14 · App Store in-app purchase products as code: a products file plus a fastlane lane that creates and updates the two non-consumable products (open-games unlock, Sewing theme) in App Store Connect, with a dry-run, and the Xcode In-App Purchase capability and a StoreKit test config generated from the same file [look] [M] · 2d 1h · a248369 · http://localhost:3000/d/claude-agents?from=1789232160000&to=1789404000000
+  - Applied 2026-09-14: both products now exist in App Store Connect — the open-games
+    unlock at $4.99 and the Sewing theme at $1.99, Family Sharing off, English names
+    and descriptions set. Re-running the plan lane reports nothing left except
+    territory availability, which is deferred until the app's own Pricing and
+    Availability is set in App Store Connect (a by-hand step); the next `iap_sync`
+    then applies it. Also still by hand: a review screenshot per product, and
+    submitting the products with the first app version. The apply surfaced two live
+    API facts the docs don't state (a missing schedule is a 404, and inline price ids
+    must be `${local-id}`), fixed on the branch. Branch queue/iap-products-as-code
+    (6 commits) awaits your review; the Game Center capability row will stack on it
+    because both touch the Xcode project file.
