@@ -83,9 +83,12 @@ record is created, and a save never changes it — the same lifecycle the typed 
 already has. The New Game prompt's 16-character limit does **not** reach it. (Menus and UI →
 *Play Game → Where It Takes You*; Tech Design → *What a stored open game holds*)
 
-**R39.** **The storage layer applies no name fallback.** A create whose title is empty or
-whitespace-only is refused, and the refusal is distinct from the cap refusal so the caller
-can tell them apart; nothing is stored. Supplying a title is the caller's, and the bridge
+**R39.** **The storage layer applies no name fallback.** An **online** create whose title is
+empty or whitespace-only is refused, and the refusal is distinct from the cap refusal so the
+caller can tell them apart; nothing is stored. This reaches the online create alone — the
+existing local `createGame` contract is untouched, and a local New Game with an empty name
+still stores what it is handed, because the New Game prompt has already applied its own
+default by then. Supplying a title is the caller's, and the bridge
 supplies `ItSaMeMaRiO` — the one fallback string the app already holds, in the state layer —
 if Game Center ever hands back a blank display name. It never does for an authenticated
 player, so this is the defensive path rather than the ordinary one, and it stays out of
@@ -168,10 +171,15 @@ because Game Center's match data is bytes. Nothing above this seam handles a JSO
 
 **R14.** The encoded payload for a full board — 81 cells marked, nine quadrant states with
 winning lines, a long-running score — stays well inside Apple's 64 KB match-data ceiling.
-**The encoder refuses to produce a payload over 48 KB**, with an error of its own rather
-than a silent oversized send: 48 KB keeps headroom under Apple's hard ceiling, and *"anything
-later added to the record spends against it"*. A test asserts both the refusal and that a
-worst-case board is nowhere near it. (Tech Design → *Online Play*)
+**The encoder refuses to produce a payload over 48 KB**, by **throwing an error type of its
+own**, rather than making a silent oversized send: 48 KB keeps headroom under Apple's hard
+ceiling, and *"anything later added to the record spends against it"*. Throwing is right here
+and nowhere else in this PRD — the encoder runs before anything is sent, on this device's own
+data, so an oversized payload is a defect in what was built rather than something arriving
+from outside. R22's never-throw rule governs the receive path, which handles whatever another
+device sends. A test asserts both the refusal and that a worst-case board is nowhere near the
+limit. (Tech Design → *Online Play*; Rules → *Engine Contract* for the shape of a
+contract-violation throw)
 
 **R15.** Encoding then decoding a payload yields a board JSON-equal to the one encoded, for
 every board an engine replay can produce — including a fresh series, a board with no last
@@ -190,10 +198,13 @@ Design → *Online Play*: *"Which folder under `lib/` holds the Dart side is a P
 deeply equal. `Board` defines no `==`, and comparing identity or references would reject
 every received board. (Derived from `lib/engine/board.dart`)
 
-**R44.** The apply takes **three things: the record, the arriving match id, and the payload
-bytes**. The match id is not in the payload (R13) — it is what Game Center delivered the
-data under — and it is passed alongside because R24 and R43 both turn on it. (Derived from
-R13, R24, R43)
+**R44.** The apply takes **three things: a record id, the arriving match id, and the payload
+bytes**. A record **id**, not a record, so the store reads the current one itself rather than
+validating against a copy the caller may be holding stale — which is also what makes
+`noSuchRecord` (R22) a reachable outcome rather than an unreachable branch. The match id is
+not in the payload (R13) — it is what Game Center delivered the data under — and it is passed
+alongside because R24 and R46 turn on it. (Derived from R13, R22, R24; existing
+`GameRepository.readGame` contract, which already answers by id)
 
 **R45.** **Which branch runs is decided by the stored board, not by the match id.** A stored
 board still in progress takes the in-game branch (R18); a stored board that is finished
@@ -203,12 +214,29 @@ first payload of a rematch that happens to arrive before the record was re-point
 from R18, R24; Tech Design → *The series lives in the same state*, where the finished game
 is what makes a next game reachable)
 
-**R43.** **A payload is applied only when it is the opponent's turn to have sent it** — that
-is, when the stored board's current player is the side this device does **not** play (R7). A
-payload arriving while it is this device's turn is rejected as `outOfTurn` and nothing is
-written, even if its board would otherwise pass R18. Both tests hold; neither replaces the
-other. Reachability alone would accept a board this device itself produced and had echoed
-back to it. (Derived from R7, R18)
+**R43.** **A payload is applied only when it is the opponent's turn to have sent it**, and
+the turn test runs on **the board the received one is measured against** — the stored board
+on the in-progress branch, `startNextGame(stored board)` on the rematch branch. The payload
+is applied only when that board's current player is the side this device does **not** play
+(R7); otherwise it is `outOfTurn`, and nothing is written even where the board would pass
+R18. Both tests hold; neither replaces the other. Reachability alone would accept a board
+this device itself produced and had echoed back to it.
+
+Three consequences, because each is a case a test has to name:
+
+- **Rematch, zero moves** — a board equal to `startNextGame(stored board)` is accepted
+  whoever is to move on it. Nobody moved; the initiator only ended its turn (R25), so there
+  is no move for the turn test to be about.
+- **Rematch, one move** — accepted only if `startNextGame(stored board).currentPlayer` is
+  the opponent's side, because that move was theirs to make. If it is this device's side, the
+  opponent played a move that was not theirs: `outOfTurn`.
+- **The finished board's own `currentPlayer` is never read for this test.** The engine leaves
+  it on the last mover — the winner of the game that just ended — which is not who goes first
+  in the next one. Reading it would invert the rematch turn test for every game a series
+  plays.
+
+(Derived from R7, R18, R25; Tech Design → *The move that ends the game does not alternate*,
+which is why the finished board's value cannot serve)
 
 **R18.** **Stored board in progress — a turn in the current game.** A received board is
 applied only if some legal move from the record's stored board produces a board equal to it.
@@ -268,8 +296,10 @@ legal move from that next board produces a board equal to it — **zero or one m
 are ordinary.** Game Center makes the rematch's initiator the current participant whoever the
 engine says goes first, so an initiator whose side is *not* the first player of the next game
 ends its turn immediately with the fresh board and no move on it, and that untouched next
-board is what arrives. Acceptance stamps the updated timestamp and moves the record to the
-top, as R24 says. (Derived from R18, R24; Rules → *Turn Order Across Games*, which is what
+board is what arrives. **The turn test applies here too, against that next board and never
+against the finished one** — R43 spells out what it means for a zero-move payload and for a
+one-move payload. Acceptance stamps the updated timestamp and moves the record to the top, as
+R24 says. (Derived from R18, R24, R43; Rules → *Turn Order Across Games*, which is what
 `startNextGame` encodes; GameKit's documented rematch behaviour)
 
 **R46.** **An arriving match id that differs from the stored one while the stored board is
