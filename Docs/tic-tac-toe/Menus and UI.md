@@ -103,8 +103,10 @@ Play Game branches on whether there are existing open games.
 - **Selecting New Game prompts for the opponent's name**, with a default of
   **ItSaMeMaRiO**. That prompt is for a game on this phone.
 - **An online game is titled with the opponent's Game Center nickname**, taken when the
-  match is created. Nobody types it and nothing renames it — see
-  [Tech Design](./Tech%20Design.md) → Online Play.
+  match is created. Nobody types it. Nothing renames it either, with one exception: a
+  random-opponent game comes back from Apple's sheet before the opponent exists, so it is
+  titled ItSaMeMaRiO as a placeholder and takes the real nickname once Game Center resolves
+  it — see [Tech Design](./Tech%20Design.md) → Online Play.
 
 ```
 ┌─────────────────────────┐
@@ -149,8 +151,10 @@ Session Structure — Games and Continuing.
 
 **The name field comes up pre-filled with ItSaMeMaRiO and the text selected**, so typing
 replaces it. Leaving it empty falls back to ItSaMeMaRiO rather than blocking, and the
-field takes at most 16 characters. Cancelling the prompt creates nothing. None of this
-reaches an online game, whose title is the opponent's Game Center nickname.
+field takes at most 16 characters. Cancelling the prompt creates nothing. The prompt never
+comes up for an online game, whose title is the opponent's Game Center nickname — though an
+online game whose opponent has not resolved yet borrows ItSaMeMaRiO as its placeholder until
+that nickname arrives.
 
 **Opening a game from the list shows that game.** The board is not drawn until the saved
 position has loaded, so a player never sees an empty board, or the game they were in

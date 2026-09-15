@@ -90,6 +90,7 @@ lib/
     rules.dart
   storage/         ← repository interfaces + their store implementations
   online/          ← pure Dart: the turn payload codec and the receive validator
+  gamecenter/      ← the Game Center bridge: the platform channel and session
   theme/
     theme.dart     ← merged theme object
     loader.dart    ← YAML → theme
@@ -139,10 +140,20 @@ store layer lands.
 `engine/`'s purity is held by a test that scans the layer's imports rather than by
 discipline — see **The Rules Engine** below for what that check matches.
 
-`online/` holds the Dart side of online play and its purity is held the same way, by a
+`online/` holds the pure Dart side of online play and its purity is held the same way, by a
 scan over the layer's imports — no Flutter, no `dart:ui`, no Hive and no platform channel.
 It imports the engine and nothing else of the app's, which is what keeps the two decisions
-a turn turns on testable with no GameKit in sight. See **Online Play** below.
+a turn turns on testable with no GameKit in sight. The series id's minter lives there too,
+with the payload that carries a series id across the wire. See **Online Play** below.
+
+`gamecenter/` holds the other half of online play — everything that faces the platform
+channel: the channel-backed bridge, the fake that stands in for it, the session providers,
+and the handoff from a found match to a stored game. Keeping it out of `online/` is what
+lets that layer's purity scan stay true. The two channel-name strings are written in exactly
+one file on each side — one under `lib/gamecenter/`, one under `ios/Runner/` — and a scan
+test holds that, so the string contract between the two languages has one place to be
+checked against. The Swift half is registered from `AppDelegate` alongside the generated
+plugin registrant.
 
 `theme/` holds more than the merged theme object and its loader. Resolving a theme's icon
 slot to a concrete `IconData`, and a stored integer weight to a `FontWeight`, both live in
@@ -683,7 +694,9 @@ that would perform one.
 **An online game's name is the opponent's Game Center nickname, captured when the match is
 created.** The rule above holds unchanged for it: set at create, and a save never changes
 it. So the field has two sources — typed by the player for a game on this phone, taken from
-Game Center for an online one — and one lifecycle. See **Online Play** below.
+Game Center for an online one — and one lifecycle, with a single narrow exception for an
+online game whose opponent has not resolved yet, in **What an online game adds to the
+record** below. See **Online Play** below.
 
 **The record carries both a created and an updated timestamp, not one or the other.** That
 leaves the sort key a *display* choice rather than a *schema* one — a list that wanted
@@ -746,6 +759,18 @@ could suggest.
 **Creating an online game takes the opponent's nickname, the starting board, the match id,
 the series id and this device's side — all five from the caller.** The store mints the record
 id and nothing else; it mints no series id, and it substitutes no title.
+
+**One operation renames a stored game, and it exists for one case.** A random-opponent match
+comes back from Apple's sheet before the opponent exists, so the record has to be created —
+and therefore titled — with a name Game Center cannot yet supply; it takes the placeholder
+title and is renamed exactly once, when the opponent resolves. Setting the online opponent
+name is the only way a stored title ever changes after create, and a save still never renames.
+It is allowed on an online record only: a local record answers the same "nothing stored" an id
+the store never held gets. An empty or whitespace-only nickname is refused, distinctly from
+"nothing stored", and neither refusal writes or emits anything. A successful rename touches
+the title alone — the board, the three `online` values, the created timestamp and the id are
+unchanged — and otherwise behaves exactly as a save does: it stamps the updated timestamp,
+moves the record to the top of the list, and emits on the change stream.
 
 **A save never touches the three.** Only the board is honoured, exactly as the title and the
 created timestamp already are. **The match id changes on exactly two paths and no others** —
@@ -1424,11 +1449,14 @@ two phones in one room — is not wanted and is not built.
 
 **The bridge is a Swift platform channel.** No Flutter package wraps Game Center's
 turn-based matches, so the GameKit calls are written in Swift on the iOS side and reached
-from Dart over a channel. **The Dart side lives in `lib/online/`, and it is pure Dart** — a
-scan over the layer's imports finds no Flutter, no `dart:ui`, no Hive and no platform
+from Dart over a channel. **The Dart side is split in two: the pure decisions live in
+`lib/online/`, and everything that faces the channel lives in `lib/gamecenter/`.** A scan
+over `lib/online/`'s imports finds no Flutter, no `dart:ui`, no Hive and no platform
 channel, held the way `engine/`'s purity is. Both decisions a turn turns on — what the bytes
 a match carries look like, and whether bytes that arrived may be applied — are made there,
-against the engine alone, so the channel code cannot creep into them.
+against the engine alone, so the channel code cannot creep into them. `lib/gamecenter/`
+holds the channel-backed bridge, the fake that stands in for it, the session state and the
+handoff from a found match to a stored game.
 
 **Finding an opponent is Apple's matchmaker screen, not ours.** It offers Play Now, which
 pairs the player with a random opponent, and Invite Friends, which covers Game Center
@@ -1534,6 +1562,155 @@ enforced on create, and the store never evicts*.
 
 The parental gate that online play raises for a child's account is **Kids Category** below.
 
+### The channel contract
+
+**Two channels carry everything, and each side names them in exactly one file.** A method
+channel, `com.ehrendavis.tictactoeextreme/gamecenter`, carries calls and their replies; an
+event channel, `com.ehrendavis.tictactoeextreme/gamecenter/session`, carries session changes
+GameKit originates. The prefix is the bundle identifier. Both use Flutter's standard message
+codec, and both are hand-written — no channel generator is a dependency this app takes.
+
+**The method channel exposes exactly three methods, and none of them takes an argument**:
+`authenticate`, `presentMatchmaker` and `loadMatches`. Any other name answers
+not-implemented.
+
+**No outcome on this channel is an error.** A declined sign-in, a restricted account, a
+cancelled matchmaker and a GameKit failure are all reply values: the Swift side never answers
+a `FlutterError`, and nothing on the Dart interface throws — including on a build with no
+Swift side at all, which is every `flutter test` run. Every failure value carries a non-empty
+message, and nothing branches on that text.
+
+**`authenticate` answers a session map** keyed `state` — `unauthenticated`, `authenticated`
+or `restricted` — carrying `nickname` and `isUnderage` when authenticated, `isUnderage` alone
+when restricted, and an optional `message` saying why an unauthenticated result came back.
+The event channel emits the same map: the current value on subscribe, and every later change.
+The in-flight `authenticating` state never crosses the channel in either direction — the Dart
+side publishes that one itself.
+
+**`presentMatchmaker` answers `found`, `cancelled` or `failed`** — a match map on `found`, a
+message on `failed`. **`loadMatches` answers `ok` with a list of match maps, possibly empty,
+or `failed` with a message.**
+
+**A match map is exactly six keys**: `matchId`, `status` (`matching`, `open`, `ended` or
+`unknown`), `participants`, `localParticipantIndex`, `currentParticipantIndex` — null when the
+match has no current participant — and `hasData`. A participant is a nickname and whether it
+is the local player, and the list is in GameKit's own order, which is the order turns rotate
+in; a participant Apple has not resolved carries the empty string, the ordinary case for a
+Play Now match whose opponent does not exist yet. `hasData` is read from *loaded* match data —
+GameKit leaves a match's data nil until it is loaded, so the Swift side loads it before
+describing a match, or every match of a series would look like a fresh one. Whose turn it is
+on the board is still engine state and is never read off `currentParticipantIndex`.
+
+**Decoding what arrives is strict, per key, and all-or-nothing.** Nothing is coerced, no
+missing key is defaulted, and no value is half-filled: a reply that is not a map, an
+unrecognised `state` or `status`, a wrong-typed field, a participant list that is not exactly
+two entries with exactly one local player, or an index that does not index that list — each
+makes the whole call answer its own failure value. One bad match fails a whole `loadMatches`
+reply rather than yielding a list with a hole in it. A malformed event on the session channel
+is ignored and the last known session stands, as it does on an error or a close.
+
+**`flutter test` reaches the Dart half only.** The channel is exercised against a mock handler
+and every other layer tests against the fake bridge; the Swift half carries no test target and
+is checked by running the app on a device signed into Game Center.
+
+### Signing in, and the session anything can read
+
+**Registering the channel does no GameKit work, and neither does subscribing.** The sign-in
+handler is installed on the first `authenticate` call and never on a listen, so something
+subscribing at launch presents no sign-in view controller and shows no banner. Before that
+first call the session channel reports unauthenticated on subscribe and nothing else; after
+it, a change GameKit originates with no call behind it — the player signing out in iOS
+Settings — arrives through that same handler. A later call re-installs the handler **only
+while the player is not authenticated**, which is what makes a declined sign-in retryable;
+re-installing it over a signed-in player would re-present Apple's sheet for nothing. Once the
+player is signed in, the call answers from the cached local player and presents nothing.
+
+**`authenticate` is safe to call any number of times.** A second call while one is in flight
+joins the first rather than starting a second sign-in, so at most one sheet is ever on screen.
+Events on the session channel are not published while a call is in flight — the reply is what
+publishes the outcome, and without that the channel's on-subscribe replay would overwrite the
+in-flight state the moment the first call was made.
+
+**The session is one plain value anything can read**, through a provider holding it directly
+rather than an async wrapper, since the in-flight state is already one of the four values it
+can hold: unauthenticated, optionally with a reason; authenticating; authenticated, with the
+nickname and whether the account is a child's; and restricted, with whether the account is a
+child's. **Restricted is a state of its own and not a flag on authenticated**, so a caller
+deciding whether to offer online play branches on the state rather than on a boolean it can
+forget to read — the same shape the engine's placement state uses. The stream is broadcast and
+replays the current value to each new subscriber, and one subscriber cancelling tears nothing
+down for the others.
+
+**A fake bridge ships as app code rather than test code**, behind the same interface, because
+it is the double every other layer tests against. It matches the real bridge on the stream's
+replay behaviour and on every refusal, and holds no shortcut the real one could not honour.
+
+### Presenting Apple's matchmaker
+
+**The match request is minimum two players, maximum two, and sets no matchmaking mode at
+all** — that is where "never forces automatch-only" is honoured concretely.
+
+**A found match does not arrive through the matchmaker's delegate.** Its found callback has
+been deprecated since iOS 9 and is not delivered at all on this app's iOS floor, so a bridge
+waiting on it waits forever. The match arrives instead on the local player listener's turn
+event, which is why that listener is registered on the first successful sign-in — and not
+before, since a player who never enters online play must never see Game Center at all. The
+delegate still supplies the other two outcomes. Found, cancelled and failed stay three
+distinct values rather than one failure carrying a message, because a caller that cannot tell
+a cancel from an error cannot behave differently on them.
+
+**One sheet at a time, and the guard that makes it testable is on the Dart side**: a second
+presentation while one is in flight fails without reaching the platform. The Swift side
+refuses a second sheet as a backstop and clears its own guard only once the dismissal has
+completed, so the next presentation cannot race the dismissal animation.
+
+**Everything is presented on the topmost presented controller of the foreground-active scene's
+key window, never the window's root** — the root is Flutter's own view controller, and
+presenting on it while a Flutter surface is already up throws. When nothing can present, the
+call answers rather than waiting: `authenticate` comes back unauthenticated with a reason,
+`presentMatchmaker` comes back failed. A call that cannot present is never left pending. Every
+reply and every event is delivered on the main thread, since GameKit's completion handlers
+promise nothing about which thread they call on.
+
+**Neither the matchmaker nor a match load signs the player in on the caller's behalf.** Called
+while the session is not authenticated, the matchmaker answers "unavailable" carrying the
+current session and the match load answers failed, and neither sends a platform call.
+
+**Asking Apple which matches it holds reads only.** It creates, stores, reconciles and deletes
+nothing, and imposes no order of its own on what GameKit answers — nothing may depend on the
+order matches come back in. A match whose local participant GameKit cannot identify is left
+out of the answer and the rest still come back, the same doctrine the store applies to a
+record it cannot read; nothing is defaulted, because a defaulted index would name the opponent
+and make this device look like the starter. That same match arriving as a *found* result fails
+instead, there being nothing left for the caller to act on.
+
+### A found match becomes a stored game
+
+**The handoff takes a found match and the store, and answers one of four values**: the stored
+record, awaiting-the-first-turn, refused at the cap — carrying the ceiling and the current
+count, so a caller can say "3 of 3" without a second round trip — or refused for an empty
+title. It never throws, and it writes at most once: only the starter path writes at all.
+
+**A match whose id the store already holds answers that existing record** — nothing created,
+nothing re-titled, no series id minted. **This device is the starter exactly when the match
+carries no data yet and the local participant is the current participant.** Everything else is
+awaiting the first turn and stores nothing, which is the accepting device's ordinary state
+until the starter's first payload lands.
+
+**The starter's create hands the store a freshly minted series id, a new series board, the
+match id, Player One as this device's side, and the other participant's nickname as the
+title.** When that nickname is blank — or the participant does not exist yet, which is the
+ordinary Play Now case — the title falls back to the same **ItSaMeMaRiO** a game on this phone
+defaults to, as a placeholder; the store applies no fallback of its own and would refuse an
+empty title. The placeholder is replaced once, when the opponent resolves — see **Persistence
+and Serialization** → *What an online game adds to the record*.
+
+**The series id is 32 lowercase hex characters minted from 128 bits of a secure random
+source**, on the starting device, on that one call. It has to be unique across devices rather
+than merely within this process, since the accepting device copies it out of the first payload
+and both then hold it — the store's own record-id minter does not satisfy that and is not
+reused here.
+
 ## Kids Category
 
 **The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
@@ -1551,7 +1728,10 @@ A separate, consequent fact: the age rating is **4+.**
 
 **The parental gate guards purchases and online play.** Every purchase raises it. Entering
 online play raises it **only when Apple reports the signed-in account is a child's** —
-`GKLocalPlayer.isUnderage` — so an adult account is never gated on the way into a match.
+`GKLocalPlayer.isUnderage` — so an adult account is never gated on the way into a match. That
+flag rides on the session state the bridge publishes, for a restricted account as well as an
+authenticated one, so whatever raises the gate reads it from app state rather than asking
+GameKit again.
 Entering means the deliberate step: tapping **Play online** to find or invite an opponent,
 or accepting an invitation. Opening an online game that already exists — from the
 open-games list or from a "your turn" notification — is playing, not entering, and raises
@@ -2133,3 +2313,7 @@ block other work.
 - What happens when a payload arrives carrying a version this build does not recognise,
   beyond the rejection itself — whether the player is told the other device is on a newer
   version, and whether that is distinguishable to them from a corrupt payload.
+- What does the player see for a sign-in that fails or is declined, for a cancelled
+  matchmaker, and for a GameKit error the bridge reports? Each comes back as its own value
+  and nothing renders any of them; the calm, kid-facing message a restricted account gets is
+  decided in **Online Play** above, but its wording is not.

@@ -266,3 +266,16 @@
     bridge item: the bridge must save the local move only after Game Center accepts the
     turn, so a stored board never shows the opponent to move on a turn this device did
     not hand off (dropped from the docs as not yet built; the bridge PRD re-decides it).
+- 2026-09-15 · Game Center bridge, part one: authenticate, session state, and find a player through Apple's matchmaker [prd] [L] · 9h · f3cb691 · http://localhost:3000/d/claude-agents?from=1789432800000&to=1789465200000
+  - Full PRD path: 50 requirements, tests first, 1004 tests green, iOS simulator build
+    green, four review rounds (three were Swift-only defects no test can see), harvested
+    into Tech Design (four new subsections under Online Play; the one-rename exception
+    under Persistence) and Menus and UI; PRD deleted. Branch queue/game-center-bridge-1,
+    stacked on queue/online-game-record. Device-pass items for the two-devices row:
+    (1) Play Now, invite, cancel, and a declined sign-in on a real device; (2) selecting
+    an existing match where it is not your turn fires no completion — the sheet just sits
+    until cancelled; (3) while the matchmaker sheet is up, the first turn event wins, so
+    an unrelated opponent's turn landing in that window would open the wrong game — part
+    two's match-id routing must be verified to close it; (4) UIKit refusing a present
+    skips the completion, so that wedge is only mitigated by presenting from the topmost
+    controller.
