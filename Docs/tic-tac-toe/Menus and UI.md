@@ -101,7 +101,10 @@ Play Game branches on whether there are existing open games.
   option at the **top of the list**.
 - **Each open game is titled with its opponent's name** — that's what a row shows.
 - **Selecting New Game prompts for the opponent's name**, with a default of
-  **ItSaMeMaRiO**.
+  **ItSaMeMaRiO**. That prompt is for a game on this phone.
+- **An online game is titled with the opponent's Game Center nickname**, taken when the
+  match is created. Nobody types it and nothing renames it — see
+  [Tech Design](./Tech%20Design.md) → Online Play.
 
 ```
 ┌─────────────────────────┐
@@ -146,7 +149,8 @@ Session Structure — Games and Continuing.
 
 **The name field comes up pre-filled with ItSaMeMaRiO and the text selected**, so typing
 replaces it. Leaving it empty falls back to ItSaMeMaRiO rather than blocking, and the
-field takes at most 16 characters. Cancelling the prompt creates nothing.
+field takes at most 16 characters. Cancelling the prompt creates nothing. None of this
+reaches an online game, whose title is the opponent's Game Center nickname.
 
 **Opening a game from the list shows that game.** The board is not drawn until the saved
 position has loaded, so a player never sees an empty board, or the game they were in
@@ -172,6 +176,10 @@ freed only by the player deleting one — see **Deleting an open game** below, a
 [Tech Design](./Tech%20Design.md) → The cap is enforced on create, and the store never
 evicts. What the New Game action offers a player who is already at the cap is not settled
 — see Open Questions.
+
+**Online games count against the same cap.** An online game holds a slot exactly as a game
+on this phone does, so a player at the cap can neither start one nor accept an invite to
+one until they delete a game. There is no separate online allowance.
 
 ### Deleting an open game
 **The open-games list carries a delete action, so a slot can be freed.** With a cap of 3
@@ -213,7 +221,8 @@ not the drawing.
   **Player One** to move (see [Rules](./Rules.md) → Turn Order Across Games).
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
-- No AI opponent, no online play in this version.
+- No AI opponent. This section is the game on this phone; an online game is started from
+  **Play online** — see [Tech Design](./Tech%20Design.md) → Online Play.
 
 ## Pass-and-Play Turn Handoff
 - The game switches the active player automatically after each move.
@@ -676,7 +685,11 @@ Nothing but deleting a game from the open-games list ever removes one — see **
 an open game** above.
 
 ## Open Questions
-- Future menu items to consider later: Rules/How to Play, Settings, vs. AI, Online.
+- Future menu items to consider later: Rules/How to Play, Settings, vs. AI.
+- **Where does "Play online" live?** The main menu is settled at four buttons — Play Game,
+  Theme, Settings, About Us, with Settings and About Us sharing a row — and nothing says
+  whether online play is a fifth button, a choice inside Play Game, or something on the
+  open-games list.
 - **Does the back-swipe stay live on every other screen**, or is "you leave a surface by
   its own control" a rule of the whole app? It's off on the game screen only, because
   that's the one place a swipe would walk away from a pending move. Everywhere else it
@@ -737,9 +750,10 @@ an open game** above.
   reopened later**, or only on the result that has just happened?
 - **What does New Game do when the player is already at the cap** — refuse and say the list
   is full, route the player into the delete flow, offer the $4.99 unlock at the moment the
-  limit bites, or some combination of those? The cap itself and the rule that only a
-  player-initiated delete frees a slot are settled; this is only what the player is offered
-  instead.
+  limit bites, or some combination of those? The same is unsettled for starting an online
+  game and for accepting an invite to one, which hit the same cap. The cap itself and the
+  rule that only a player-initiated delete frees a slot are settled; this is only what the
+  player is offered instead.
 - **What happens to games already stored above the cap if the unlock goes away?** A player
   with 60 open games whose ceiling drops back to 3 has 57 games nothing is willing to
   touch.

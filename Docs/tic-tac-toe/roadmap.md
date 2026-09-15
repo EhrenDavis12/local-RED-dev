@@ -249,6 +249,7 @@ release/distribution.
   - Buying ends one of four ways, and one of them ends later
   - Prices come from the store at runtime
   - The parental gate — a word problem, every time
+- Online Play
 - Kids Category
 - Crash Reporting
   - What gets caught

@@ -18,7 +18,7 @@ here so they don't get re-litigated:
 
 | Requirement | Comes from |
 |---|---|
-| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception today, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. Apple Game Center becomes a second sanctioned exception if online multiplayer lands; it is not built, and both exceptions are Apple's rather than ours. | Two players, one phone; qualified by In-App Purchases and Entitlements |
+| **Fully offline, except for Apple's own services.** No backend of ours and no accounts of ours — StoreKit and Game Center are the two exceptions, and both are Apple's rather than ours. StoreKit needs network access and a restore-purchases path tied to the Apple ID; Game Center holds the turn-based match, its data and the player identity. Neither is a service we run — see In-App Purchases and Entitlements and Online Play below. | Two players, one phone or two; qualified by In-App Purchases and Entitlements, and Online Play |
 | **Local persistence** for 5 values: theme, music, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Audio playback** for one-shot sound effects, and for looping music the app fades in and out itself | [Theming](./Theming.md) |
@@ -117,22 +117,23 @@ rewrite.
 `storage/` is local persistence only — the repository interfaces and the implementations
 that back them. Which repositories exist, which store each is backed by, and what each
 holds is **Persistence and Serialization** below. There is **no backend data layer**:
-nothing in the app talks to a server, and none gets added. Online multiplayer is an
-intended future direction, and when it comes it is remote play over **Apple Game Center
-turn-based matches** — Apple holds the match data, the matchmaking, the invites, the
-player identity and the "your turn" push, so the app still runs no service of its own and
-still collects no identity of its own. Tech choices must not foreclose handing a board
-position to a match and picking one up again. Online play being iPhone-only is accepted.
-Same-room play — Bluetooth, peer-to-peer, two phones in one room — is not wanted. None of
-this is built, and the current game ships without it.
+nothing in the app talks to a server of ours, and none gets added. Online play is remote
+play over **Apple Game Center turn-based matches** — Apple holds the match data, the
+matchmaking, the invites, the player identity and the "your turn" push, so the app still
+runs no service of its own and still collects no identity of its own. The board position
+crosses the wire to Apple's match and comes back; `storage/` still holds only what is on
+this device. Online play is iOS only, and same-room play — Bluetooth, peer-to-peer, two
+phones in one room — is not wanted. It is being built: what it is, and how the bridge to
+GameKit works, is **Online Play** below.
 
 That rule is checked rather than trusted: a scan over `lib/` finds no HTTP client and no
-network target other than the store SDK. It covers `lib/` only, so build-time tooling
-outside that tree is out of its reach by construction. What is fixed is that property, not
-a list of banned symbols — widening it when a new transport appears is ordinary
-maintenance, narrowing it to let a real network call through is not. It must **not** be
-written as "no networking API is reachable from `lib/`": in-app purchases are the one
-sanctioned network path, so the stricter form fails the day the store layer lands.
+network target other than the store SDK and GameKit. It covers `lib/` only, so build-time
+tooling outside that tree is out of its reach by construction. What is fixed is that
+property, not a list of banned symbols — widening it when a new transport appears is
+ordinary maintenance, narrowing it to let a real network call through is not. It must
+**not** be written as "no networking API is reachable from `lib/`": in-app purchases and
+Game Center are the two sanctioned network paths, so the stricter form fails the day the
+store layer lands.
 
 `engine/`'s purity is held by a test that scans the layer's imports rather than by
 discipline — see **The Rules Engine** below for what that check matches.
@@ -458,9 +459,11 @@ itself is [Game Board Design](./Game%20Board%20Design.md) → Changing your mind
 ### Deep links are possible, not wired
 
 The route structure is link-shaped, because that is part of what `go_router` was chosen
-for. But nothing asks for an external entry point and the app is otherwise fully offline,
-so no URL scheme, universal link or associated-domain configuration is specified. The
-capability is retained; nothing is wired to it.
+for. The app does have an external entry point — it can be launched from a Game Center
+invite or a "your turn" notification — but that arrives through GameKit rather than as a
+URL, and there is no invite-link API to wire up, so no URL scheme, universal link or
+associated-domain configuration is specified. The capability is retained; nothing is wired
+to it.
 
 The route table and route paths are not designed here — that is a PRD's job.
 
@@ -669,6 +672,11 @@ stored name and discards whatever the caller passed, the same way it preserves t
 timestamp — otherwise every save is a rename, and no doc specifies a rename or a control
 that would perform one.
 
+**An online game's name is the opponent's Game Center nickname, captured when the match is
+created.** The rule above holds unchanged for it: set at create, and a save never changes
+it. So the field has two sources — typed by the player for a game on this phone, taken from
+Game Center for an online one — and one lifecycle. See **Online Play** below.
+
 **The record carries both a created and an updated timestamp, not one or the other.** That
 leaves the sort key a *display* choice rather than a *schema* one — a list that wanted
 creation order, or a row that wanted "started on", can be served later without migrating
@@ -716,6 +724,12 @@ How many open games we keep — and the storage layer reads it from entitlement 
 than defining either number itself. Entitlement state does not exist yet, so the default
 of 3 is resolved at startup, above the storage layer, and handed to the repository when it
 is constructed — no file under `lib/storage/` states 3 or 100.
+
+**An online game is an open game and counts against the same ceiling.** Creating one and
+accepting an invite to one are both creates, so both are refused at the ceiling exactly as
+a local New Game is, and a player at the cap frees a slot the only way there is — by
+deleting a game. There is no separate online allowance and no exemption for a match
+somebody else started.
 
 **The cap counts only the records that can be read back.** A record that cannot be read is
 not in the list the player sees, so counting it would refuse a create against games the
@@ -973,10 +987,10 @@ to it; and the app builds, tests and archives on a machine that has never held a
 credential. The credential is read from the environment, never from a committed file, a
 flag or a prompt, and never lands in anything the tool writes.
 
-This is what keeps **Fully offline, except for in-app purchases.** under **What the Design
-Docs Already Imply** above true — the app makes no Replicate call, because generation
-happened on a developer's machine long before the build. It also has to be true because
-**CI — local builds only** below leaves nowhere to hold a build-time secret.
+This is what keeps **Fully offline, except for Apple's own services.** under **What the
+Design Docs Already Imply** above true — the app makes no Replicate call, because
+generation happened on a developer's machine long before the build. It also has to be true
+because **CI — local builds only** below leaves nowhere to hold a build-time secret.
 
 ### What gets generated, and where it lands
 **`assets/images/` and `assets/audio/` are where art and audio ship from, and the
@@ -1114,8 +1128,9 @@ Blue and Sewing), and a **$4.99 unlock that raises the open-game cap from 3 to 1
 → Play Game → Where It Takes You → How many open games we keep.
 
 **Consequence for offline status:** in-app purchases require StoreKit, which needs network
-access and a restore-purchases path tied to the Apple ID. StoreKit is the one exception to
-**Fully offline** under **What the Design Docs Already Imply** above.
+access and a restore-purchases path tied to the Apple ID. StoreKit is one of the two
+exceptions to **Fully offline** under **What the Design Docs Already Imply** above; Game
+Center is the other.
 
 ### The store plugin — Flutter's official `in_app_purchase`
 **The purchase layer is the official Flutter `in_app_purchase` plugin**, with
@@ -1309,13 +1324,66 @@ conventionally observed, which is the whole thing the gate exists for.
 
 Why the gate exists at all is **Kids Category** below.
 
+## Online Play
+
+**Online play is remote play over Apple Game Center turn-based matches**, and it is being
+built as part of this game's work. Apple holds the match data, the matchmaking, the invites,
+the player identity and the "your turn" push, so the app runs no service of its own and
+collects no identity of its own. It is iOS only. Same-room play — Bluetooth, peer-to-peer,
+two phones in one room — is not wanted and is not built.
+
+**The bridge is a Swift platform channel.** No Flutter package wraps Game Center's
+turn-based matches, so the GameKit calls are written in Swift on the iOS side and reached
+from Dart over a channel. Which folder under `lib/` holds the Dart side is a PRD's job, not
+this doc's.
+
+**Finding an opponent is Apple's matchmaker screen, not ours.** It offers Play Now, which
+pairs the player with a random opponent, and Invite Friends, which covers Game Center
+friends and contacts and can send the invite through Messages. There is no invite-link API,
+so nothing generates a shareable link and nothing has to.
+
+**The match carries the board as JSON, and Apple caps match data at 64 KB.** A whole
+position and its series is a few KB, so the cap is headroom rather than a constraint today —
+but it is a hard ceiling, and anything later added to the record spends against it.
+
+**Turns never time out.** A match is created with `GKTurnTimeoutNone`, so it waits as long
+as it takes for the other player to move — days, or forever. A player who wants out of an
+online game deletes it from the open-games list, the same as any other open game. See
+[Menus and UI](./Menus%20and%20UI.md) → Deleting an open game.
+
+**A rematch online is a new match with a new id.** Apple's rematch mints a fresh match
+rather than reopening the finished one, so nothing may treat a match id as stable across a
+series.
+
+**Game Center sign-in happens when the player first enters online play**, not at cold
+launch. The app authenticates on the tap that enters online play, and again when the app is
+opened from a Game Center invite or a "your turn" notification, since that is entering
+online play from outside. A player who never touches online play never sees Game Center's
+sign-in banner.
+
+**When Apple reports multiplayer is not allowed for the account, online play is not
+offered.** `GKLocalPlayer.isMultiplayerGamingRestricted` carries a parent's "don't allow"
+setting; the entry point is hidden or disabled, and the player gets a calm, kid-facing
+message rather than an error.
+
+**Random opponents versus friends-only is the parent's Game Center setting, and the app
+adds nothing of its own.** Game Center enforces the friends-only choice itself. The app
+never forces automatch-only mode — that throws for a friends-only child — and it never
+imposes a restriction Apple has not.
+
+**Online games count against the open-game cap**, the same 3-by-default, 100-with-the-unlock
+ceiling as games on this phone — see **Persistence and Serialization** → *The cap is
+enforced on create, and the store never evicts*.
+
+The parental gate that online play raises for a child's account is **Kids Category** below.
+
 ## Kids Category
 
 **The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
 changes what gets built in features that ship long before release work:
 
-- A **parental gate** is required before any purchase flow and before any link that leaves
-  the app.
+- A **parental gate** is required before any purchase flow, before any link that leaves the
+  app, and — for a child's account — before entering online play.
 - Third-party analytics and behavioural advertising are restricted.
 - A privacy policy is mandatory.
 
@@ -1324,11 +1392,17 @@ exist before those are built rather than being added at submission.
 
 A separate, consequent fact: the age rating is **4+.**
 
-**The parental gate's scope is purchases only.** The game has no outbound links today — no
-in-app support URL, no social links, no advertising — so purchases are the only trigger that
-currently exists. If an outbound link is ever added, it needs the gate too — that is a thing
-to remember rather than a thing already handled. What the gate asks, and how long a pass
-lasts, is **In-App Purchases and Entitlements** above.
+**The parental gate guards purchases and online play.** Every purchase raises it. Entering
+online play raises it **only when Apple reports the signed-in account is a child's** —
+`GKLocalPlayer.isUnderage` — so an adult account is never gated on the way into a match.
+Entering means the deliberate step: tapping **Play online** to find or invite an opponent,
+or accepting an invitation. Opening an online game that already exists — from the
+open-games list or from a "your turn" notification — is playing, not entering, and raises
+nothing. The game has no outbound links today — no in-app support URL, no social links, no
+advertising — so purchases and online play are the only triggers that currently exist. If
+an outbound link is ever added, it needs the gate too — that is a thing to remember rather
+than a thing already handled. What the gate asks, and how long a pass lasts, is **In-App
+Purchases and Entitlements** above. What online play is, is **Online Play** above.
 
 ## Crash Reporting
 
@@ -1344,10 +1418,10 @@ So the error handling and the report object are day-one work; the transport is n
 destination is deliberately left for later rather than being an open question — today's
 answer is "nowhere."
 
-This keeps **Fully offline, except for in-app purchases.** under **What the Design Docs
-Already Imply** above true for now. StoreKit being permitted does not make a report
-destination permitted — those are two separate exceptions, and this one stops being true
-the day a destination is chosen.
+This keeps **Fully offline, except for Apple's own services.** under **What the Design
+Docs Already Imply** above true for now. StoreKit and Game Center being permitted does not
+make a report destination permitted — those are separate exceptions, and this one stops
+being true the day a destination is chosen.
 
 **No off-the-shelf crash SDK is used.** Crashlytics, Sentry and the rest all assume a
 destination and a network, and there is neither — so none is added, and no HTTP or socket
@@ -1414,9 +1488,9 @@ redirected later — to wherever reports are eventually sent — without touchin
 caller.
 
 The console is a developer-facing log, not a transmission. It does not make a report
-destination chosen, and **Fully offline, except for in-app purchases.** stays true. What
-reaches the console is the report rendered as text, so the contract above governs what it
-can say.
+destination chosen, and **Fully offline, except for Apple's own services.** stays true.
+What reaches the console is the report rendered as text, so the contract above governs what
+it can say.
 
 ### Reports are held in memory
 **A report is kept in memory and goes no further.** It is written to no file and to
@@ -1717,11 +1791,13 @@ answered by hand on every upload — a step to forget rather than a decision to 
 the app ever ships its own cryptography, the answer changes and so does the filing.
 
 ### What the record declares about data collection
-**Nothing is transmitted, so the privacy nutrition label's answer for the build being
-submitted is "no data collected."** The app operates no server of its own: entitlements
-live with Apple and are verified on device, crash reports are built and never sent, and
-there is no analytics or advertising SDK to declare — see **Crash Reporting** and
-**In-App Purchases and Entitlements** above.
+**Nothing of the player's is transmitted to anyone but Apple, so the privacy nutrition
+label's answer for the build being submitted is "no data collected."** The app operates no
+server of its own: entitlements live with Apple and are verified on device, an online
+game's board and the player's identity live in an Apple Game Center match, crash reports
+are built and never sent, and there is no analytics or advertising SDK to declare — see
+**Crash Reporting**, **In-App Purchases and Entitlements** and **Online Play** above. Game
+Center is Apple, not a third party, which is what keeps the answer "no data collected".
 
 **It is not settled beyond that build.** Whatever a crash report ends up carrying is
 what a future destination would send, and that is what the label would then have to

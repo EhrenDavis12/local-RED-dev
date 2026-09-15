@@ -81,7 +81,8 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
   it into "best of" bragging rights between two people sharing a phone.
 
 ## Target Audience & Platform
-- **Phone.** Two players sharing one device.
+- **Phone.** Two players sharing one device, or two players each on their own phone over
+  Game Center — see Modes below.
 - **Kids are a target audience** — swappable themes exist specifically to make it fun
   for kids. See [Theming](./Theming.md).
 
@@ -89,13 +90,18 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
 <!-- Ultimate Tic Tac Toe, other games, mechanics you liked elsewhere -->
 
 ## Modes
-**Current scope — one mode only:**
+**Two modes:**
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
   Player One → Player Two. Started from the **Play Game** button on the main menu.
+- **Two player, online.** Remote play against someone on their own phone, over Apple Game
+  Center turn-based matches. A match waits as long as it takes for the other player to
+  move, so a game can run over days. Started from **Play online**. iOS only, and there is
+  no same-room play.
 
-**No single-player mode and no AI opponent** — two players on one phone is the only mode.
+**No single-player mode and no AI opponent** — every mode is two real players.
 
-See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
+See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow, and
+[Tech Design](./Tech%20Design.md) → Online Play for how an online game works.
 
 ## Terminology (working vocabulary)
 - **Big board / bigger board** — the outer 3x3.
