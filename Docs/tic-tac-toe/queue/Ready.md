@@ -7,7 +7,6 @@
 > skips triage — tag it, or the queue tags it on pickup.
 
 ---
-- Game Center bridge, part two: end a turn with the board, receive the opponent's turn, quit and resign [prd] [M] — this is the move itself crossing the wire, and a turn sent twice or applied twice leaves two phones holding different boards, which no test catches after the fact.
 - The board screen drives a remote turn: input locked when it is not your turn, confirm sends, an arriving turn replaces the board [prd] [M] — decides which board wins when a remote turn lands on a local pending selection, and getting it wrong overwrites a player's move or corrupts the saved series.
 - Online games in the Open Games list: your turn, waiting on them, and which games are online [look] [M] — a player cannot open a game they cannot play without knowing why, and the list is the only place an invited match first appears.
 - Game over online: report the outcome, end the match, and make the rematch button start the next match in the same series [prd] [M] — Apple's rematch mints a new match id, so whether the scoreboard survives is persistence semantics, and a wrong guess silently resets a series players have been running for days.
