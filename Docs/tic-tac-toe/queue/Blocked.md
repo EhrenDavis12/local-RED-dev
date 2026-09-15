@@ -16,6 +16,15 @@
     delete resigns the match, so they see "game over" instead of waiting forever), or
     should it only leave this phone (their copy keeps waiting for a turn that never comes,
     until they delete it as well)? Resigning is the kinder default.
+  - **Assumption I'm building on (2026-09-15; reverse before merge if you disagree):**
+    deleting resigns. It is also what makes a delete stick — a resigned match sends this
+    phone no more turns, so the game can't quietly reappear when the opponent's next move
+    arrives. The alternative would mean remembering deleted games on the phone.
+    A:
+  - Q: If your move can't be handed to Game Center (no signal, Apple refuses it), the app
+    keeps the move on screen so you can try again. Until it goes through, the app stops
+    you making another move in that game — otherwise the two phones can end up on boards
+    neither can continue. Assumption I'm building on; OK?
     A:
 - decide: a random-opponent online game is renamed once when the opponent joins [prd] · branch queue/game-center-bridge-1
   - Found while specifying the Game Center bridge: when a player taps Play Now, Apple hands
