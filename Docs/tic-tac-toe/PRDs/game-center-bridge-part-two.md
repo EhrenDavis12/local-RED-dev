@@ -330,8 +330,13 @@ and after is the next row's, not this one's.
 **R33.** On an online game, the local move is written to the store **only after Game Center
 accepts the turn**. The confirming tap on an online game applies the move to the session
 board and sets `pendingHandoff`, saves nothing, and calls `sendTurn`; `sendTurn` encodes the
-session board with the record's series id, calls `endTurn` under the record's match id, and
-**only on ok** saves that board through the ordinary save path and clears `pendingHandoff`.
+session board with the record's series id and calls `endTurn` under **the session's held new
+match id when one is present — a rematch in flight — and the record's stored match id
+otherwise**. **Only on ok** is that board written, under the same match id it was sent
+under: through the ordinary save path for a move, and through R46's next-game write for a
+rematch handoff. `pendingHandoff` clears there and nowhere else. The match id is chosen once,
+before the send, and the write reuses it rather than re-reading the record — re-reading is
+what would let the send and the write disagree about which match the board belongs to.
 Nothing is written before the ok. A stored board that showed the opponent to move on a turn
 this device never handed off would be a game neither device can continue, and it survives a
 relaunch. *This decision is made here: Menus and UI → When a game is written to storage says
@@ -360,9 +365,10 @@ nowhere else in online play".)
 The initiator creates Apple's rematch, holds the new match id **in the session only**, hands
 off the next game's board under that new match id — the fresh board, plus its own first move
 if the engine says it goes first — and only on `ok` writes
-`startNextOnlineGame(recordId, newMatchId)`, together with that move if there was one.
-Advancing to the next game and pointing the record at the new match stays the one write it
-is by contract; it just happens after the handoff rather than before. On a failed send
+`startNextOnlineGame(recordId, newMatchId, board: sentBoard)` (R46). The board that was sent
+and the new match id land together in **one** write, so advancing to the next game and
+pointing the record at the new match stays the single operation it is by contract; it just
+happens after the handoff rather than before. On a failed send
 nothing is written, the record still shows the finished game, and a retry re-sends on the
 held new match id. **A relaunch loses the held id**: the player taps rematch again, Apple
 mints another match, and the first one is abandoned with nothing stored pointing at it —
@@ -375,8 +381,12 @@ from — Apple's rematch — is the game-over row's, not this one's.
 
 **R42.** `GameSession` gains the record's online triple — match id, series id and which side
 this device plays — set by `loadGame` and by the create paths from the record they read, and
-absent on a local game. It gains `pendingHandoff` and `lastSendFailed` alongside them, both
-session-only and neither persisted. The confirm path branches on the triple's presence and
+absent on a local game. It gains `pendingHandoff`, `lastSendFailed` and the rematch's held
+new match id alongside them: all three are session-only and none is persisted. The held new
+match id is what R33 sends and writes under while it is present, and it is set only by the
+rematch path and cleared by the write that consumes it — so an online game not in the middle
+of a rematch has none, and both the send and the write fall back to the record's stored match
+id. The confirm path branches on the triple's presence and
 on nothing else, which is the same test the store already uses to tell an online record from
 a local one. (Tech Design → Persistence and Serialization → What an online game adds to the
 record: "The presence of that key is the only thing that tells an online game from a local
@@ -389,6 +399,22 @@ A second move on a turn the first one has not handed off would produce a board t
 ahead of the opponent's, which their device refuses as unreachable and nothing can repair.
 The refusal is what makes R34's retry safe: the board `sendTurn` re-sends is provably the
 one the player confirmed.
+
+**R46.** `startNextOnlineGame` gains an optional `board` argument, and it is the one change
+this feature makes to the store's surface. Without it the operation behaves exactly as it
+does today — it stores `startNextGame(stored board)` with the new match id. With it, the
+given board is stored with the new match id in the same single write, and it is validated
+first: it must be `startNextGame(stored board)` followed by at most one legal move, judged by
+the same `evaluateReceivedTurn` the receive rules already apply on the rematch branch, where
+zero or one move are both ordinary. A board that fails — two moves ahead, from another
+series, anything unreachable — is refused with its own distinct value, alongside the two
+refusals the operation already answers, and **nothing is written on a refusal**. The
+operation still never throws. Without the argument the initiator would need a second write to
+add the move it already sent, which is the one thing this operation exists to prevent. (Tech
+Design → Persistence and Serialization: "Advancing to the next game and pointing the record
+at the new match is one write … so a record can never sit with the next game's board under
+the finished game's match id, or the reverse"; → Online Play: "zero or one move, and both are
+ordinary".)
 
 ### The launch path
 
@@ -437,8 +463,15 @@ device:
   saves it, that a second move while `pendingHandoff` is set changes nothing, that a second
   send while one is in flight sends no platform call, and each of the five `SendTurnResult`
   values.
-- The rematch order (R37): that `startNextOnlineGame` is not called until the new match's
-  `endTurn` has answered ok.
+- The rematch order (R37, R42): that `startNextOnlineGame` is not called until the new
+  match's `endTurn` has answered ok, that the send goes out under the held new match id
+  rather than the record's stored one, and that the write lands under that same id.
+- `startNextOnlineGame`'s new argument (R46), added to the shared contract battery every
+  `GameRepository` implementation already runs — so `InMemoryGameRepository` and
+  `HiveGameRepository` cannot drift on it: without a board (today's behaviour, unchanged);
+  with a board equal to `startNextGame(stored)`; with that board plus one legal move; a board
+  two moves ahead refused with the new value; and nothing written and nothing emitted on the
+  change stream for any refusal.
 - The delete flow (R45): that `resignMatch` is called for an online record and not for a
   local one, and that a failed resign still deletes.
 
@@ -457,7 +490,9 @@ after a resign; and the matchmaker-window routing part one's device pass flagged
   receiver's outcome stream) and nothing it draws. It is the next Ready row.
 - **The open-games list's online states** — your turn, waiting, which games are online.
 - **Game over and rematch** — reporting the outcome, ending the match with Apple, and what
-  the rematch button does. R37 defines only what `startNextOnlineGame` needs from the wire.
+  the rematch button does. R37 and R46 define only what the wire needs of
+  `startNextOnlineGame`: the order of the handoff, and the board argument that keeps it one
+  write.
 - **Any player-facing message.** What is shown for a re-delivery, an unrecognised payload
   version, a failed send or a refused turn is unsettled in Tech Design → Open Questions →
   *Online play — what the player is told* and Menus and UI → Open Questions.
