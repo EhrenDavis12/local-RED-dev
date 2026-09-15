@@ -323,9 +323,10 @@ open-games list once that first turn lands".)
 **R32.** The state layer gains one operation, `Future<SendTurnResult> sendTurn(recordId)`,
 and it is the only caller of `endTurn`. It answers a sealed value and never throws:
 `TurnSent`, `TurnSendFailed` (carrying a non-empty message), `TurnSendInFlight`,
-`TurnNotOnline` (the session holds no online triple), and `NoPendingMove` (nothing is
-waiting to be handed off). The board screen calls it; what that screen draws before, during
-and after is the next row's, not this one's.
+`TurnNotOnline` (the session holds no online triple), `NoPendingMove` (nothing is waiting to
+be handed off), and `TurnSentNotStored` (carrying the store's own refusal — see R33). The
+board screen calls it; what that screen draws before, during and after is the next row's, not
+this one's.
 
 **R33.** On an online game, the local move is written to the store **only after Game Center
 accepts the turn**. The confirming tap on an online game applies the move to the session
@@ -337,6 +338,14 @@ under: through the ordinary save path for a move, and through R46's next-game wr
 rematch handoff. `pendingHandoff` clears there and nowhere else. The match id is chosen once,
 before the send, and the write reuses it rather than re-reading the record — re-reading is
 what would let the send and the write disagree about which match the board belongs to.
+A send Apple accepted whose write the store then refuses answers `TurnSentNotStored`,
+carrying that refusal: `pendingHandoff` clears there too and the session keeps the board as
+sent, because the turn is gone — the opponent has it, and re-sending would be a second
+handoff of a board they already hold. It is unreachable whenever R46's validation and the
+board actually sent agree, which is a property of this code rather than of anything a player
+can do, so in practice it names a programmer error rather than a condition; it exists so that
+"accepted but not stored" is a value a caller can see instead of a silent divergence between
+the two devices. Tests pin it only by making the fake store refuse.
 Nothing is written before the ok. A stored board that showed the opponent to move on a turn
 this device never handed off would be a game neither device can continue, and it survives a
 relaunch. *This decision is made here: Menus and UI → When a game is written to storage says
@@ -404,9 +413,12 @@ one the player confirmed.
 this feature makes to the store's surface. Without it the operation behaves exactly as it
 does today — it stores `startNextGame(stored board)` with the new match id. With it, the
 given board is stored with the new match id in the same single write, and it is validated
-first: it must be `startNextGame(stored board)` followed by at most one legal move, judged by
-the same `evaluateReceivedTurn` the receive rules already apply on the rematch branch, where
-zero or one move are both ordinary. A board that fails — two moves ahead, from another
+first, by this rule directly: **the given board must equal `startNextGame(stored board)`, or
+be produced by exactly one legal move from it.** Legal moves are enumerated and applied, as
+the receive rules do, never a board fed to the engine and its throw caught. No turn test runs
+and no `localPlayer` is consulted — `evaluateReceivedTurn` is not reused here, because this
+board is the initiator's own rather than one that arrived, and its turn and re-delivery
+branches would refuse the ordinary case. A board that fails — two moves ahead, from another
 series, anything unreachable — is refused with its own distinct value, alongside the two
 refusals the operation already answers, and **nothing is written on a refusal**. The
 operation still never throws. Without the argument the initiator would need a second write to
@@ -461,8 +473,9 @@ device:
   repository sees no write until `endTurn` has answered ok, that a failure writes nothing and
   leaves `pendingHandoff` set, that re-sending after a failure sends the same board and then
   saves it, that a second move while `pendingHandoff` is set changes nothing, that a second
-  send while one is in flight sends no platform call, and each of the five `SendTurnResult`
-  values.
+  send while one is in flight sends no platform call, and each of the six `SendTurnResult`
+  values — `TurnSentNotStored` reachable only by making the fake store refuse a write the
+  send had already succeeded at.
 - The rematch order (R37, R42): that `startNextOnlineGame` is not called until the new
   match's `endTurn` has answered ok, that the send goes out under the held new match id
   rather than the record's stored one, and that the write lands under that same id.
