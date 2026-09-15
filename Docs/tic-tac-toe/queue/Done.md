@@ -286,3 +286,12 @@
     UI (a Parental Gate section; wording and drawing still open); PRD deleted. Branch
     queue/parental-gate, stacked on queue/game-center-bridge-1. Not yet reachable from
     any screen — the Play online item and the purchase flow call it.
+- 2026-09-15 · "Play online" on the main menu, behind the parental gate [look] [S] · 7h · f9f00c4 · http://localhost:3000/d/claude-agents?from=1789495200000&to=1789520400000
+  - Look path: plan, tests first (controller table + button), 1159 tests green, played on an
+    iPhone SE simulator — which caught the five-button menu clipping on short screens, and
+    at large Dynamic Type the title wrapping mid-word; both fixed (compact hero, scroll
+    fallback, title scales down). Docs updated: Play online is the fifth main-menu button,
+    the flow, short-screen behaviour; the "where does Play online live" question closed.
+    Branch queue/play-online-button, stacked on queue/parental-gate. Message wording still
+    open. The Game Center flow itself needs a real device with a sandbox account (the
+    two-devices row).
