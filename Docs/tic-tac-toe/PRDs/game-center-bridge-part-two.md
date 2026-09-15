@@ -28,9 +28,9 @@ A confirmed move on an online game is encoded and handed to Game Center, and onl
 Apple has accepted it does it reach this device's store; a turn the opponent ends arrives
 as an event, is routed to its own stored record by match id — or, for the first turn of a
 series this device does not yet hold, creates that record — and is applied through the
-receive rules already built; and a match can be resigned through one bridge operation
-whose trigger is left to an unanswered question. The board screen, the open-games list and
-the game-over flow are not built here; each gets the state-layer seam it calls.
+receive rules already built; and deleting an online game resigns the match, so the other
+player is not left waiting on a turn that will never come. The board screen, the open-games
+list and the game-over flow are not built here; each gets the state-layer seam it calls.
 
 ## Requirements
 
@@ -53,8 +53,11 @@ Signing in, and the session anything can read.)
 
 **R3.** All three channel-name strings are written in exactly one Dart file under `lib/`
 and exactly one Swift file under `ios/Runner/`, and the existing scan test that holds that
-for the first two covers the third. (Tech Design → Project Structure: "The two channel-name
-strings are written in exactly one file on each side … and a scan test holds that".)
+for the first two covers the third. The third Dart constant lives in the same file as the
+other two — `lib/gamecenter/channel_game_center_bridge.dart` — because the scan matches the
+name by substring, so a second file naming it anywhere would fail the scan regardless of
+which layer wanted it. (Tech Design → Project Structure: "The two channel-name strings are
+written in exactly one file on each side … and a scan test holds that".)
 
 **R4.** No outcome on either new method is an error: the Swift side never answers a
 `FlutterError`, and nothing on the Dart interface throws — including on a build with no
@@ -97,21 +100,34 @@ outcome: `participantQuitInTurn` when the local player is the match's current pa
 `participantQuitOutOfTurn` when it is not. GameKit offers no single call covering both, and
 calling the in-turn form out of turn fails.
 
-**R11.** The in-turn form is handed the match's own currently loaded match data, unchanged,
-and `GKTurnTimeoutNone`. Resigning is not a move, so the board the other device sees must
-not change — and GameKit's in-turn quit requires match data, so passing empty data here
-would wipe the opponent's board.
+**R11.** The in-turn form is handed the other participant as its next participants, the
+match's own currently loaded match data unchanged, and `GKTurnTimeoutNone`. Resigning is not
+a move, so the board the other device sees must not change — and GameKit's in-turn quit
+requires match data, so passing empty data here would wipe the opponent's board.
 
-**R12.** Nothing in this feature calls `resignMatch`. Deleting an online game does exactly
-what it does today — it removes this device's record and touches Game Center not at all
-(Tech Design → Persistence and Serialization: "Deleting removes one open game and its whole
-series"). Whether a delete should resign the match is unanswered; see Open Questions.
+**R12.** Deleting an online game resigns the match. The delete flow calls `resignMatch` for
+the record's match id and then removes the record — see R45 for the ordering and for what a
+failed resign does. *This is the main loop's recorded assumption, not a doc-settled
+decision: the queue's Blocked question "when a player deletes an online game, should the
+other player's copy end too" is still unanswered, and resigning is the kinder default it
+names. Reversing it later removes one call; nothing is persisted either way.* (Tech Design →
+Online Play: "A player who wants out of an online game deletes it from the open-games list";
+→ Persistence and Serialization: "Deleting removes one open game and its whole series".)
+
+**R45.** The delete flow calls `resignMatch` for the record's match id first and removes the
+record after, and **the resign is best-effort: its failure is an answered value that is
+never allowed to block or undo the delete.** A player who asked for a game to be gone gets
+it gone whether or not Apple could be reached — the alternative is a game that cannot be
+deleted while the phone is offline, which is worse than an opponent left waiting. Deleting a
+local game calls nothing. Nothing is written to mark a resigned match: the record is gone, so
+there is nowhere to write it and no schema change. An event that later arrives for that match
+is dropped by R25 step 1.
 
 ### Turn events on the wire
 
 **R13.** Every `player(_:receivedTurnEventFor:didBecomeActive:)` the registered
 `GKLocalPlayerListener` receives is emitted on the turn event channel, as a map of exactly
-four keys:
+five keys:
 
 | Key | Value |
 |---|---|
@@ -119,12 +135,14 @@ four keys:
 | `match` | the six-key match map part one already defines, built from this match |
 | `matchData` | the match's loaded data as bytes, or null when the match holds none |
 | `didBecomeActive` | GameKit's own flag, verbatim |
+| `localParticipantQuit` | whether the local participant's status is `.done` with a `.quit` outcome |
 
 The match id is a top-level key as well as a field of `match` because it is what routes the
 event and it travels alongside the bytes rather than inside them. (Tech Design → Online
 Play: "The match id is not in the payload; it is what the match was delivered under, and it
 travels alongside the bytes to whatever handles them"; → The channel contract for the match
 map's six keys.)
+
 
 **R14.** The Swift side loads the match's data before emitting, exactly as `loadMatches`
 already does for `hasData` — GameKit leaves a match's data nil until it is loaded, so an
@@ -138,14 +156,17 @@ consumes the first such event into the matchmaker's reply and emits nothing; it 
 both. This is what closes part one's device-pass finding that an unrelated opponent's turn
 landing while the sheet is up is swallowed: the event still reaches the receiver and is
 routed to its own record by match id. It does not change which event completes the pending
-presentation — the first one still wins. (Part one's device-pass note, queue `Done.md`,
-2026-09-15.)
+presentation — the first one still wins. (Tech Design → Presenting Apple's matchmaker, on
+the found match arriving on the listener's turn event rather than the delegate; part one's
+own note in `ios/Runner/GameCenterChannel.swift`: "discriminating an unrelated, concurrent
+turn event by match id is part two's, once every match is routed to its own stored record".)
 
-**R16.** Events that arrive before Dart has subscribed to the turn channel are buffered and
-replayed, in arrival order, on the first `onListen`. The buffer holds at most one event per
-match id — the most recent — so it cannot grow without bound if Dart never subscribes, and
-a superseded board for the same match is never worth replaying. Buffering resumes whenever
-no subscriber is attached.
+**R16.** Events that arrive while no Dart subscriber is attached to the turn channel are
+buffered and replayed, in arrival order, on the next `onListen` — before the first one, and
+again after an `onCancel`. The buffer holds at most one event per match id: a second event
+for a match already buffered replaces that entry in place, keeping its original position in
+the order, so the buffer cannot grow without bound if Dart never subscribes and a superseded
+board is never replayed. The buffer is cleared as it is replayed.
 
 **R17.** Subscribing to the turn channel does no GameKit work and registers no listener, so
 a player who never enters online play still never sees Game Center. The listener stays
@@ -168,10 +189,13 @@ as app code rather than test code … and holds no shortcut the real one could n
 - `Future<EndTurnResult> endTurn({required String matchId, required Uint8List payload})`
 - `Future<ResignMatchResult> resignMatch({required String matchId})`
 
-**R19.** `turnEvents` replays nothing on subscribe. A turn event is an occurrence, not a
-value with a current state, so the session stream's replay behaviour is deliberately not
-copied; what a late subscriber would have missed is covered by R16's platform-side buffer
-instead.
+**R19.** The platform turn channel is subscribed **lazily, on the first Dart listener** —
+not eagerly at construction, which is what the session channel does. The receiver (R24) is
+that listener, and until something listens the platform side holds its events in R16's
+buffer rather than into a Dart stream nobody is reading. `turnEvents` itself replays
+nothing on subscribe: a turn event is an occurrence, not a value with a current state, so
+the session stream's replay behaviour is deliberately not copied, and what a late
+subscriber would have missed is the platform buffer's to deliver.
 
 **R20.** `EndTurnResult` and `ResignMatchResult` are each a sealed pair — an ok value and a
 failed value carrying a non-empty message. Neither throws, for any outcome, on any build.
@@ -183,12 +207,16 @@ failed value carrying a non-empty message. Neither throws, for any outcome, on a
 behalf. (Tech Design → Presenting Apple's matchmaker: "Neither the matchmaker nor a match
 load signs the player in on the caller's behalf".)
 
-**R22.** A turn event whose map violates any row of the decode table — not a map, a missing
-or wrong-typed key, a `match` value that fails part one's match-map decode, an empty
-`matchId` — is dropped, and nothing is emitted on `turnEvents`. Decoding is strict, per key
-and all-or-nothing; nothing is coerced and no missing key is defaulted. (Tech Design → The
-channel contract: "Decoding what arrives is strict, per key, and all-or-nothing … A
-malformed event on the session channel is ignored".)
+**R22.** Decoding a turn event is strict and per key: nothing is coerced and no missing key
+is defaulted. An event that is not a map, or whose `matchId` is missing, wrong-typed or
+empty, or whose `matchData`, `didBecomeActive` or `localParticipantQuit` is wrong-typed, is
+dropped and nothing is emitted on `turnEvents`. **A `match` value that fails part one's
+match-map decode is the one exception:** it is carried through as absent rather than
+dropping the event, because the event routes by `matchId` and applying a turn reads no field
+of the match map. The only thing an absent match map costs is the rename step (R28), which
+needs a nickname. Dropping the whole event instead would lose a legal move to a field the
+move never reads. (Tech Design → The channel contract: "Decoding what arrives is strict, per
+key, and all-or-nothing … A malformed event on the session channel is ignored".)
 
 **R23.** `FakeGameCenterBridge` gains a way to push a turn event and to script the next
 `endTurn` and `resignMatch` answers, and records both calls in its existing `calls` list, so
@@ -203,18 +231,27 @@ double-apply every arriving turn. (Tech Design → State Management.)
 
 **R25.** For each event, in this order:
 
-1. Read the record held for the event's match id (`readGameByMatchId`).
-2. If one is held → `applyReceivedTurn(recordId: record.id, matchId: event.matchId,
-   payload: event.matchData)`.
-3. If none is held and the event carries no payload → nothing is applied; continue at
-   step 6.
-4. If none is held → decode the payload and read the record whose series is the payload's
-   series id (`readGameBySeriesId`). If one is held → `applyReceivedTurn` against that
-   record's id, with the event's match id. This is the rematch's fresh match id finding the
-   record it belongs to.
-5. If neither lookup holds a record → this is the first payload of a series this device does
-   not hold, and it is created (R26).
-6. Resolve the opponent's name (R28).
+1. If the event carries `localParticipantQuit` true and no record is held for its match id
+   → the event is dropped: this device has already left that match and there is nothing to
+   apply it to. Published as its own outcome (R29) and nothing else runs.
+2. Read the record held for the event's match id (`readGameByMatchId`).
+3. If one is held **and the event carries a payload** → `applyReceivedTurn(recordId:
+   record.id, matchId: event.matchId, payload: event.matchData)`, then continue at step 7.
+4. If one is held **and the event carries no payload** → nothing is applied, and the event
+   continues at step 7. This is the ordinary starter's-own-match event: GameKit reports the
+   match the sheet just produced before either side has put data in it, and the participant
+   it resolves is exactly what the rename step wants.
+5. If none is held and the event carries no payload → nothing is applied and nothing is
+   renamed; published as ignored (R29).
+6. If none is held → decode the payload. A payload that will not decode, or names a version
+   this build does not recognise, is dropped and published as its own refusal (R29); there
+   is no record to route it to and no stored series to measure it against. Otherwise read
+   the record whose series is the payload's series id (`readGameBySeriesId`): if one is
+   held → `applyReceivedTurn` against that record's id, with the event's match id, which is
+   the rematch's fresh match id finding the record it belongs to; if neither lookup holds a
+   record → this is the first payload of a series this device does not hold, and it is
+   created (R26).
+7. Resolve the opponent's name (R28).
 
 (Tech Design → Online Play, on the series id: "a device receiving the first payload of a
 series it does not hold copies it out of that payload"; → Persistence and Serialization →
@@ -238,26 +275,34 @@ board to measure against — without this it is the one path where an arbitrary 
 stored unchecked. A refused create writes nothing. (Tech Design → Online Play: "A board that
 arrives is replayed against the rules engine before it is believed".)
 
-**R28.** When the event's match map carries a non-empty nickname for the opponent
-participant and the record's stored title is still the placeholder, the receiver calls
-`setOnlineOpponentName` once with that nickname. This runs on every well-formed event,
-whether or not a payload was applied, and whether the record was just created or already
-held. A record whose title is anything else is never renamed. (Tech Design → Persistence and
+**R28.** The receiver calls `setOnlineOpponentName` once, with the opponent participant's
+trimmed nickname, when **all three** hold: the event's match map is present and names that
+nickname non-empty; the record's stored title is still the placeholder; and the trimmed
+nickname differs from that title. If any fails, no store call is made at all — not a call
+the store then refuses. This runs on every event that reaches step 7, whether or not a
+payload was applied, and whether the record was just created or already held. A record whose
+title is anything else is never renamed. (Tech Design → Persistence and
 Serialization → What an online game adds to the record: "it takes the placeholder title and
 is renamed exactly once, when the opponent resolves"; → A found match becomes a stored
 game.) The stored title equalling the placeholder is the only signal available for "not yet
 resolved", so an opponent whose real Game Center nickname is `ItSaMeMaRiO` is renamed to
 itself — a no-op rename, not a defect.
 
-**R29.** The receiver answers, and publishes on a broadcast stream, one value per event
-naming what happened: applied (with the record id), created (with the record id), a
-re-delivery, each of the store's distinct refusals (not reachable, out of turn, stale match,
-undecodable, unsupported version, no such record), refused at the cap (carrying the ceiling
-and the count), refused as unreachable-from-a-fresh-series, and ignored. It never throws.
-Nothing in this feature renders any of them; that stream is the seam the board screen and
-the open-games list read. (Tech Design → Online Play: "Each is a distinct value the caller
-can branch on rather than one failure carrying a message"; what the player is told is an
-open question in that doc.)
+**R29.** The receiver's work for one event is a callable entry point,
+`Future<TurnEventOutcome> handleTurnEvent(TurnEvent event)`, which the subscription calls
+and a test calls directly. Every outcome is a returned value, never a throw, and each one is
+also published on a broadcast outcome stream. The values are distinct rather than one
+failure carrying a message, because a caller that cannot tell a re-delivery from a corrupt
+payload cannot behave differently on them: applied (with the record id), created (with the
+record id), a re-delivery, each of the store's distinct refusals (not reachable, out of
+turn, stale match, undecodable, unsupported version, no such record), refused at the cap
+(carrying the ceiling and the count), refused as unreachable-from-a-fresh-series, undecodable
+with no record to route it to, dropped as already quit, and ignored. `didBecomeActive` is
+not among them — it is a fact the receiver reads off the event, not something that happened
+to a game. Nothing in this feature renders any outcome; the stream is the seam the board
+screen and the open-games list read. (Tech Design → Online Play: "Each is a distinct value
+the caller can branch on rather than one failure carrying a message"; what the player is
+told is an open question in that doc.)
 
 **R30.** The receiver never creates a record the matchmaker path would also create. The two
 cannot collide: `startOnlineGame` creates only on the starter path — no match data and the
@@ -275,29 +320,34 @@ open-games list once that first turn lands".)
 
 ### Sending a move
 
-**R32.** The state layer gains one operation, `sendTurn(recordId)`, and it is the only
-caller of `endTurn`. The board screen calls it; what the screen draws before, during and
-after is the next row's, not this one's.
+**R32.** The state layer gains one operation, `Future<SendTurnResult> sendTurn(recordId)`,
+and it is the only caller of `endTurn`. It answers a sealed value and never throws:
+`TurnSent`, `TurnSendFailed` (carrying a non-empty message), `TurnSendInFlight`,
+`TurnNotOnline` (the session holds no online triple), and `NoPendingMove` (nothing is
+waiting to be handed off). The board screen calls it; what that screen draws before, during
+and after is the next row's, not this one's.
 
 **R33.** On an online game, the local move is written to the store **only after Game Center
-accepts the turn**. The sequence for a confirmed move is: hold the confirmed board in the
-session → encode it with the record's series id → `endTurn` → on ok, save the confirmed
-board through the ordinary save path. Nothing is written before the ok. A stored board that
-showed the opponent to move on a turn this device never handed off would be a game neither
-device can continue, and it survives a relaunch. *This decision is made here: Menus and UI →
-When a game is written to storage says a game is written after every confirmed move, and
-says nothing about online play; the online exception is not in any design doc and belongs in
-one at harvest.*
+accepts the turn**. The confirming tap on an online game applies the move to the session
+board and sets `pendingHandoff`, saves nothing, and calls `sendTurn`; `sendTurn` encodes the
+session board with the record's series id, calls `endTurn` under the record's match id, and
+**only on ok** saves that board through the ordinary save path and clears `pendingHandoff`.
+Nothing is written before the ok. A stored board that showed the opponent to move on a turn
+this device never handed off would be a game neither device can continue, and it survives a
+relaunch. *This decision is made here: Menus and UI → When a game is written to storage says
+a game is written after every confirmed move, and says nothing about online play; the online
+exception is not in any design doc and belongs in one at harvest.*
 
-**R34.** When `endTurn` fails, nothing is written to the store, the confirmed board stays in
-the session marked as not handed off, and the outcome is readable from the state layer so a
-screen can say so and offer the move again. A relaunch therefore shows the board as it stood
-before the move — which is what the opponent sees too.
+**R34.** When `endTurn` fails, nothing is written to the store, `pendingHandoff` stays set
+with the confirmed board still on the session, and the session records that the last send
+failed. `sendTurn` called again on that record re-sends the same board — a retry, not a
+second move — so the same `TurnSent` path closes it. A relaunch loses the unsent move and
+shows the board as it stood before it, which is what the opponent sees too.
 
 **R35.** One send is in flight per record at a time; a second `sendTurn` for a record whose
-send has not answered yet sends no platform call and answers as already in flight. (Same
-shape as the in-flight guards on `authenticate` and `presentMatchmaker`, Tech Design →
-Signing in; → Presenting Apple's matchmaker.)
+send has not answered yet sends no platform call and answers `TurnSendInFlight`. (Same shape
+as the in-flight guards on `authenticate` and `presentMatchmaker`, Tech Design → Signing in;
+→ Presenting Apple's matchmaker.)
 
 **R36.** The payload is produced by `encodeTurnPayload` with the record's stored series id
 and the board being handed off, and by nothing else. `PayloadTooLargeError` is a defect in
@@ -306,26 +356,54 @@ into a send failure. (Tech Design → Online Play: "The encoder refuses to produ
 over 48 KB, throwing rather than making a silent oversized send … Throwing is right here and
 nowhere else in online play".)
 
-**R37.** For a rematch, the order is reversed: `startNextOnlineGame(recordId, newMatchId)`
-is written first, and `sendTurn` then hands off the stored next-game board under the new
-match id and the same series id. Advancing to the next game and pointing the record at the
-new match is one write by contract, so it cannot be deferred behind an `endTurn`. A failed
-send there leaves the record on the new match with the fresh board and is retried; unlike a
-lost move, nothing the player did is lost. The board handed off may be the fresh board
-untouched — a zero-move handoff is ordinary when the engine says the other side goes first.
-(Tech Design → Persistence and Serialization: "Advancing to the next game and pointing the
-record at the new match is one write"; → Online Play: "zero or one move, and both are
-ordinary".) Where `newMatchId` comes from — Apple's rematch — is the game-over row's, not
-this one's.
+**R37.** A rematch follows the same save-after-accept rule, and stores no marker to do it.
+The initiator creates Apple's rematch, holds the new match id **in the session only**, hands
+off the next game's board under that new match id — the fresh board, plus its own first move
+if the engine says it goes first — and only on `ok` writes
+`startNextOnlineGame(recordId, newMatchId)`, together with that move if there was one.
+Advancing to the next game and pointing the record at the new match stays the one write it
+is by contract; it just happens after the handoff rather than before. On a failed send
+nothing is written, the record still shows the finished game, and a retry re-sends on the
+held new match id. **A relaunch loses the held id**: the player taps rematch again, Apple
+mints another match, and the first one is abandoned with nothing stored pointing at it —
+acceptable, because an abandoned match the player never played is invisible to both devices
+and costs no slot. The board handed off may be the fresh board untouched; a zero-move
+handoff is ordinary when the other side goes first. (Tech Design → Persistence and
+Serialization: "Advancing to the next game and pointing the record at the new match is one
+write"; → Online Play: "zero or one move, and both are ordinary".) Where `newMatchId` comes
+from — Apple's rematch — is the game-over row's, not this one's.
+
+**R42.** `GameSession` gains the record's online triple — match id, series id and which side
+this device plays — set by `loadGame` and by the create paths from the record they read, and
+absent on a local game. It gains `pendingHandoff` and `lastSendFailed` alongside them, both
+session-only and neither persisted. The confirm path branches on the triple's presence and
+on nothing else, which is the same test the store already uses to tell an online record from
+a local one. (Tech Design → Persistence and Serialization → What an online game adds to the
+record: "The presence of that key is the only thing that tells an online game from a local
+one"; → *Whose turn it is is not a stored field* — the side is read from the record, never
+re-derived.)
+
+**R43.** While `pendingHandoff` is true, the state layer refuses another move on that game:
+`tapCell` answers a refusal value and changes nothing — no selection, no preview, no board.
+A second move on a turn the first one has not handed off would produce a board two moves
+ahead of the opponent's, which their device refuses as unreachable and nothing can repair.
+The refusal is what makes R34's retry safe: the board `sendTurn` re-sends is provably the
+one the player confirmed.
 
 ### The launch path
 
 **R38.** Nothing about the receiver's wiring depends on how the app was launched: the
 receiver subscribes at app start, the platform buffer replays whatever arrived before that,
 and an event that launched the app is handled exactly as one that arrived while it was
-running. `didBecomeActive` is carried through to the receiver's published outcome and
-nothing branches on it — Apple defines it as "this event launched or foregrounded the app",
-which is true of the ordinary case as well.
+running. `didBecomeActive` is carried through to the receiver and nothing branches on it —
+Apple defines it as "this event launched or foregrounded the app", which is true of the
+ordinary case too, so it is a fact about the event rather than anything a game can act on.
+
+**R44.** The receiver is constructed at app start by the root widget — `App.build` in
+`lib/app.dart` reads `turnEventReceiverProvider`, the same way it already reads the router
+and the theme. Constructing it is what subscribes to `turnEvents` (R19) and therefore what
+drains the platform buffer (R16), so the read is not incidental: nothing else in the app
+reaches that provider, and without it every arriving turn would sit in the buffer unread.
 
 **R39.** *(Proposed — not settled by any design doc; see Open Questions.)* The app calls
 `authenticate` once at launch when, and only when, the store holds at least one online
@@ -345,20 +423,31 @@ device:
 - The channel calls and their decode table, against a mock method-channel handler: the exact
   method names and argument keys sent, every reply shape in R6/R9, a reply that is not a
   map, a missing `status`, and a `MissingPluginException`.
-- Turn-event decoding (R22), against a mock event-channel stream.
-- The receiver's whole routing table (R25–R31), against `InMemoryGameRepository` and
-  `FakeGameCenterBridge`: found by match id, found by series id, created, cap refusal,
-  every `ApplyTurnResult` variant, the rename firing exactly once and not at all on a
-  non-placeholder title, and a malformed event writing nothing.
-- `sendTurn`'s ordering (R33–R35): that the repository sees no write until `endTurn` has
-  answered ok, that a failure writes nothing, and that a second send while one is in flight
-  sends no platform call.
+- Turn-event decoding (R22), against a mock event-channel stream — including that a bad
+  `match` map still yields a routable event and that a bad `matchId` does not.
+- The receiver's whole routing table (R25–R31), driven through `handleTurnEvent` against
+  `InMemoryGameRepository` and `FakeGameCenterBridge`: found by match id, found by series id,
+  created, cap refusal, every `ApplyTurnResult` variant, the payload-carries-nothing branches,
+  an undecodable payload with no record held, an event dropped for a quit local participant,
+  the rename firing exactly once and making no store call when any of R28's three conditions
+  fails, and a malformed event writing nothing.
+- `sendTurn`'s ordering and the session's confirm path (R32–R35, R42, R43): that the
+  repository sees no write until `endTurn` has answered ok, that a failure writes nothing and
+  leaves `pendingHandoff` set, that re-sending after a failure sends the same board and then
+  saves it, that a second move while `pendingHandoff` is set changes nothing, that a second
+  send while one is in flight sends no platform call, and each of the five `SendTurnResult`
+  values.
+- The rematch order (R37): that `startNextOnlineGame` is not called until the new match's
+  `endTurn` has answered ok.
+- The delete flow (R45): that `resignMatch` is called for an online record and not for a
+  local one, and that a failed resign still deletes.
 
 **R41.** The Swift half carries no test target and is checked by running the app on a device
 signed into Game Center (Tech Design → The channel contract). Device-only: that `endTurn`
 actually advances the match and the opponent's device receives it; the buffer-and-replay
-path on a launch from a your-turn notification; `resignMatch` in and out of turn; and the
-matchmaker-window routing part one's device pass flagged (R15).
+path on a launch from a your-turn notification; `resignMatch` in and out of turn, and what
+the other device sees after one; that `localParticipantQuit` reads true on the other side
+after a resign; and the matchmaker-window routing part one's device pass flagged (R15).
 
 ## Out of Scope
 
@@ -372,17 +461,19 @@ matchmaker-window routing part one's device pass flagged (R15).
 - **Any player-facing message.** What is shown for a re-delivery, an unrecognised payload
   version, a failed send or a refused turn is unsettled in Tech Design → Open Questions →
   *Online play — what the player is told* and Menus and UI → Open Questions.
-- **Changing what deleting a game does**, and any resign trigger (R12).
-- **The design docs themselves.** R1, R2 and R33 each make a statement a design doc does
-  not yet carry; recording them is `forge-doc-writer`'s at harvest.
+- **The delete confirmation and the open-games list's delete affordance**, which already
+  exist (Menus and UI → Deleting an open game). R45 adds one call inside that flow and
+  changes nothing a player sees.
+- **The design docs themselves.** R1, R2, R12 and R33 each make a statement a design doc
+  does not yet carry; recording them is `forge-doc-writer`'s at harvest.
 
 ## Open Questions
 
 - **When a player deletes an online game, should the other player's copy end too (the
   delete resigns the match, so they see "game over" instead of waiting forever), or should
   it only leave this phone (their copy keeps waiting for a turn that never comes, until they
-  delete it as well)?** (queue → Blocked, unanswered.) R9–R11 build the operation either
-  answer needs; R12 leaves it uncalled.
+  delete it as well)?** (queue → Blocked, unanswered.) R12 and R45 build the first answer as
+  the main loop's recorded assumption — reversing it removes one call and one test.
 - **What triggers sign-in when the app is launched from a your-turn notification or an
   invite?** Tech Design → Online Play says the app authenticates then, and also that it does
   not authenticate at cold launch. R39 is this PRD's proposal — authenticate at launch only
