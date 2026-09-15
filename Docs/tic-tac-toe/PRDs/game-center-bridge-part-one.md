@@ -37,8 +37,9 @@ import no platform channel, and → Project Structure groups by kind, one folder
 the bridge is a layer of its own. (The folder *name* is this PRD's choice; no doc names one —
 see Open Questions.)
 
-**R2.** `lib/online/`'s existing purity scan (`test/online/purity_scan_test.dart`) stays
-green unchanged — no file added by this feature goes into `lib/online/`.
+**R2.** `lib/online/`'s existing purity scan (`test/online/purity_scan_test.dart`) stays green
+unchanged — no file this feature adds to `lib/online/` imports a platform channel, Flutter,
+`dart:ui` or Hive. The series-id minter (R32) does go there and imports `dart:math` only.
 Source: [Tech Design](../Tech%20Design.md) → Project Structure, Online Play.
 
 **R3.** The two channel-name strings (R4) appear in exactly one Dart file under `lib/`, which
@@ -72,7 +73,7 @@ generator — see Open Questions.
 ```
 { "state": "unauthenticated" | "authenticating" | "authenticated" | "restricted",
   "nickname": String,     // present only when state == "authenticated"
-  "isUnderage": bool }    // present only when state == "authenticated"
+  "isUnderage": bool }    // present when state == "authenticated" or "restricted"
 ```
 
 `restricted` is what `GKLocalPlayer.isMultiplayerGamingRestricted` being true reports, and
@@ -140,9 +141,11 @@ are all reply *values*. Source: [Tech Design](../Tech%20Design.md) → Online Pl
 Persistence and Serialization, which make every outcome a caller can act on a returned value
 rather than a throw, in both the receive path and the store.
 
-**R46.** Every `message` string a failure value carries (R8, R9) is non-empty. No test pins
-its wording — a caller branches on the value, never on the text, and nothing renders it to a
-player in this feature (see Out of Scope).
+**R46.** Every `message` string a failure value carries is non-empty — the ones that arrive
+over the channel (R8, R9) and the ones the Dart side originates itself (R14's mapped
+exceptions, R25's second presentation) alike. No test pins any wording — a caller branches on
+the value, never on the text, and nothing renders it to a player in this feature (see Out of
+Scope).
 
 **R12.** The Swift side performs no GameKit work until a Dart call arrives: registering the
 channel does not set an authenticate handler, does not present anything, and does not touch
@@ -169,7 +172,9 @@ class GameCenterAuthenticated   extends GameCenterSession {
   final String nickname;
   final bool isUnderage;
 }
-class GameCenterRestricted      extends GameCenterSession {}   // const
+class GameCenterRestricted      extends GameCenterSession {
+  final bool isUnderage;
+}
 
 class GameCenterParticipant { final String nickname; final bool isLocalPlayer; }
 class GameCenterMatch {
@@ -222,6 +227,7 @@ the whole `loadMatches` reply rather than yielding a list with a hole in it.
 | match map | `matchId` | String, non-empty | `MatchmakerFailed` / `MatchesLoadFailed` |
 | match map | `status` | String, one of `matching`, `open`, `ended`, `unknown` | same |
 | match map | `participants` | List of Maps, each with `nickname` String (may be empty) and `isLocalPlayer` bool | same |
+| match map | `participants` | exactly two entries, exactly one of them `isLocalPlayer == true` | same |
 | match map | `localParticipantIndex` | int, a valid index into `participants` | same |
 | match map | `currentParticipantIndex` | int, a valid index into `participants`, or null | same |
 | match map | `hasData` | bool, present | same |
@@ -367,7 +373,7 @@ current participant, so the creator moves first").
 
 | Argument | Value |
 |---|---|
-| `opponentName` | the nickname of the one participant whose `isLocalPlayer` is false, trimmed; `defaultOpponentName` (`lib/state/game_controller.dart`) when that is empty or whitespace-only — the ordinary Play Now case, see R45 |
+| `opponentName` | the nickname of the one participant whose `isLocalPlayer` is false — which always exists, by R15's two-participants row — trimmed; `defaultOpponentName` (`lib/state/game_controller.dart`) when that is empty or whitespace-only — the ordinary Play Now case, see R45 |
 | `board` | `newSeries()` from the engine |
 | `matchId` | the match's `matchId` |
 | `seriesId` | freshly minted here, on this call |
@@ -471,7 +477,9 @@ every test of a caller uses it rather than the channel. It supports:
 - holding a call unresolved, so R18's in-flight case and R25's second-presentation case are
   assertable;
 - recording every call made to it, in order, so "presented nothing" and "sent no platform
-  call" in R12, R23, R27 and R30 are assertable rather than merely stated.
+  call" in R23, R25 and R27 are assertable rather than merely stated. (R12 is Swift-side and
+  R30 is a rule about the handoff, not about the bridge; neither is asserted through the
+  fake.)
 
 **R37.** The fake lives under `lib/gamecenter/`, not under `test/`, because it is the double
 callers in other layers test against. It holds no test-only shortcut that the real bridge
