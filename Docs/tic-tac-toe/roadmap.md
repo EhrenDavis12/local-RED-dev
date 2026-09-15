@@ -51,6 +51,7 @@ game-over rematch flow.
   - What an open game holds
   - How many open games we keep
   - Deleting an open game
+- Play online → Where It Takes You
 - A New Game → What It Starts
 - Pass-and-Play Turn Handoff
 - How to Play — the On-Board Legend and Hint

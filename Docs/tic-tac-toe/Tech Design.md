@@ -1625,10 +1625,12 @@ opened from a Game Center invite or a "your turn" notification, since that is en
 online play from outside. A player who never touches online play never sees Game Center's
 sign-in banner.
 
-**When Apple reports multiplayer is not allowed for the account, online play is not
-offered.** `GKLocalPlayer.isMultiplayerGamingRestricted` carries a parent's "don't allow"
-setting; the entry point is hidden or disabled, and the player gets a calm, kid-facing
-message rather than an error.
+**When Apple reports multiplayer is not allowed for the account, online play is refused
+with a message rather than an error.** `GKLocalPlayer.isMultiplayerGamingRestricted`
+carries a parent's "don't allow" setting. The restriction is only known once the player is
+signed in, so the **Play online** button is neither hidden nor disabled — it sits on the
+menu like any other, and the tap comes back with a calm, kid-facing message. See
+[Menus and UI](./Menus%20and%20UI.md) → Play online → Where It Takes You.
 
 **Random opponents versus friends-only is the parent's Game Center setting, and the app
 adds nothing of its own.** Game Center enforces the friends-only choice itself. The app

@@ -14,17 +14,21 @@ The game needs a main menu.
 - **Play Game** — if there are no existing games, takes the player straight into a new
   two-player same-phone game. If there are existing games, takes the player to a screen
   listing all open games. Large.
+- **Play online** — second in the list, directly under Play Game. Starts a game against
+  someone on their own phone. Large, same weight as Play Game. See **Play online → Where
+  It Takes You** below.
 - **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
-- **Settings** — opens the settings menu. Smaller than the two above it.
+- **Settings** — opens the settings menu. Smaller than the three above it.
 - **About Us** — last in the list, same smaller treatment as Settings.
 
 **Settings and About Us sit side by side in one row**, sharing its width — not two more
-full-width buttons stacked under Play Game and Theme. So the menu has two button tiers:
-the big pair, and the small pair beneath them.
+full-width buttons stacked under the large ones. So the menu has two button tiers: the
+big three, and the small pair beneath them.
 
-**Play Game and Theme are the same tier, not merely similar.** Both draw from one
-treatment, so a change to one is a change to both and no theme can drift them apart.
+**Play Game, Play online and Theme are the same tier, not merely similar.** All three draw
+from one treatment, so a change to one is a change to all of them and no theme can drift
+them apart.
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
 same visual weight as Play Game.
@@ -57,6 +61,10 @@ the app version — `Theme: Neon · v0.1.0` under Neon.
 │   └─────────────────┘   │
 │                         │
 │   ┌─────────────────┐   │
+│   │   PLAY ONLINE   │   │
+│   └─────────────────┘   │
+│                         │
+│   ┌─────────────────┐   │
 │   │      THEME      │   │
 │   └─────────────────┘   │
 │                         │
@@ -67,6 +75,14 @@ the app version — `Theme: Neon · v0.1.0` under Neon.
 │   Theme: Neon · v0.1.0  │
 └─────────────────────────┘
 ```
+
+**The menu compacts itself rather than clipping on a short screen.** At the handoff's own
+390×844 the layout above is drawn exactly as it stands. When the height is too small for
+it — an iPhone SE at 375×667 is the screen that found this — the hero shrinks: a smaller
+icon box, tighter gaps, and the tagline dropped. If even that would not fit, the menu
+scrolls, so nothing is ever lost off the bottom. The height it switches at is worked out
+from the active theme's own type sizes rather than a fixed screen size, so a theme with
+larger text compacts sooner instead of inheriting Neon's threshold.
 
 The entire main menu is itself theme-driven — background, button styling, title. No
 hardcoded styling here either.
@@ -82,9 +98,9 @@ words:
 > "We want the about us but it can be the last button in the list for now we might move it
 > in the future but lets add it here."
 
-So the main menu carries four buttons, in order: Play Game, Theme, Settings, About Us. The
-position is explicitly provisional — the user said "for now we might move it in the
-future" — so a later reordering is expected rather than a reversal.
+So the main menu carries five buttons, in order: Play Game, Play online, Theme, Settings,
+About Us. The position is explicitly provisional — the user said "for now we might move it
+in the future" — so a later reordering is expected rather than a reversal.
 
 Because Settings and About Us share a row, that pairing is the part a later reorder has to
 revisit — nothing else in the menu depends on About Us being last.
@@ -219,6 +235,33 @@ Consequence for theming: the trash button and the modal's **Yes** are the only
 no delete affordance at all on screen `1b` — this section is the source of the affordance,
 not the drawing.
 
+## Play online → Where It Takes You
+Play online starts a game against someone on their own phone, over Game Center. Tapping it
+signs the player in first — Apple's own sign-in sheet comes up if it needs to — then raises
+the parental gate if the account is a child's, then shows Apple's matchmaker, where the
+player picks Play Now or invites a friend. See [Tech Design](./Tech%20Design.md) →
+Online Play.
+
+- **A match is found** — the game is stored and opens on the board, the same as picking it
+  out of the open-games list.
+- **The match is waiting on the other player's first move** — a short message says so and
+  the player stays on the menu. The game turns up in the open-games list once that first
+  turn lands.
+- **The account is not allowed to play online**, **the open-games box is full**, or
+  **Game Center fails** — each shows a short message and the player stays on the menu.
+
+A player at the cap is told the box is full and offered nothing else for now. Whether that
+is where it lands is the same open question New Game has at the cap — see Open Questions.
+
+**What any of those messages say is not settled** — see Open Questions.
+
+**These messages use the themed snackbar the New Game prompt already uses for its own
+full-box message** — one style for one kind of message, whichever door raised it. A new
+message replaces one still on screen rather than queueing behind it.
+
+**A second tap while one is already in flight does nothing.** One sign-in, one gate and one
+matchmaker at a time.
+
 ## A New Game → What It Starts
 - A **two player game on the same exact phone**. One device, passed back and forth.
 - It starts **empty** — no marks anywhere on the nine boards, a score of **0–0–0**, and
@@ -226,7 +269,8 @@ not the drawing.
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
 - No AI opponent. This section is the game on this phone; an online game is started from
-  **Play online** — see [Tech Design](./Tech%20Design.md) → Online Play.
+  **Play online** — see **Play online → Where It Takes You** above, and
+  [Tech Design](./Tech%20Design.md) → Online Play.
 
 ## Pass-and-Play Turn Handoff
 - The game switches the active player automatically after each move.
@@ -300,7 +344,7 @@ else. A forced quadrant needs no cue of its own, since *"The only board you can 
 right now."* already says it.
 
 ## Screens (so far)
-1. **Main Menu** — Play Game + Theme + Settings + About Us buttons.
+1. **Main Menu** — Play Game + Play online + Theme + Settings + About Us buttons.
 2. **Open Games List** — lists all open games, with New Game at the top of the list;
    reached from Play Game when open games exist.
 3. **New Game Name Prompt** — asks for the opponent's name when New Game is picked, with
@@ -331,6 +375,9 @@ The first seven each have an approved drawing in
 | Settings (in game) | `1f — Modal: in-game settings / quick actions` |
 | Game over | `1g — Modal: winner`, `1h — Modal: draw` |
 | About Us | `1c — About Us` |
+
+`1a` draws the menu with four buttons, from before Play online existed — the fifth button
+is built and the drawing has not caught up.
 
 Content for About Us is still unsettled — see Main Menu → About Us.
 
@@ -572,13 +619,13 @@ four toggles the in-game surface carries — on the *same screen* reading, the A
 row, the Music row and the purchases section all arrive in game together.
 
 ## The Parental Gate
-**The gate is its own surface, over whatever raised it** — the purchases section today, the
-**Play online** entry point when it lands. It shows a line addressed to a grown-up, the
-problem in words, a field for the answer, a Submit, and a way out. After the third wrong
-answer it stops asking: the prompt, the problem, the field and Submit all go, and what is
-left is a line saying the tries are used up, with the way out. The way out and a tap on the
-scrim behind the card both leave the gate while attempts remain, and so does anything that
-takes the surface away without either — the platform back-swipe among them.
+**The gate is its own surface, over whatever raised it** — the purchases section, and the
+**Play online** entry point for a child's account. It shows a line addressed to a
+grown-up, the problem in words, a field for the answer, a Submit, and a way out. After the
+third wrong answer it stops asking: the prompt, the problem, the field and Submit all go,
+and what is left is a line saying the tries are used up, with the way out. The way out and
+a tap on the scrim behind the card both leave the gate while attempts remain, and so does
+anything that takes the surface away without either — the platform back-swipe among them.
 
 **None of the wording is settled**, and none of it is drawn: the handoff has no gate screen,
 the same gap [Theming](./Theming.md) records for the settings purchases section. What the
@@ -707,14 +754,16 @@ an open game** above.
 
 ## Open Questions
 - Future menu items to consider later: Rules/How to Play, Settings, vs. AI.
-- **Where does "Play online" live?** The main menu is settled at four buttons — Play Game,
-  Theme, Settings, About Us, with Settings and About Us sharing a row — and nothing says
-  whether online play is a fifth button, a choice inside Play Game, or something on the
-  open-games list.
 - **Where does the parental gate belong among the app's screens, and what does it say?** It
   is built and it works, but nothing draws it and nothing settles its wording — the grown-up
   prompt, the problem line, the Submit and the out-of-attempts line are all the screen's own
   choice for now.
+- **What do the Play online messages say?** Four of them land on the menu — the account is
+  not allowed to play online, the match is waiting on the other player, the open-games box
+  is full, and Game Center couldn't do it — and none of the wording is settled. What a
+  player is told for a declined sign-in, a cancelled matchmaker or a payload that is turned
+  away is [Tech Design](./Tech%20Design.md) → Open Questions → *Online play — what the
+  player is told*.
 - **Does the back-swipe stay live on every other screen**, or is "you leave a surface by
   its own control" a rule of the whole app? It's off on the game screen only, because
   that's the one place a swipe would walk away from a pending move. Everywhere else it

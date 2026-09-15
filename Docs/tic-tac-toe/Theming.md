@@ -353,8 +353,8 @@ to it, achieved with shadows.
   behind Player One, Cat and Player Two, so the three read as three rather than as one
   strip.
 - **Every button is a spool of thread**, at every tier — not only the large main-menu
-  pair: *"We allso need the spools of threads to be for all the buttens this include the
-  Settings and About Us on the main page. The saved games, and the Exit to Main Menu"*
+  buttons: *"We allso need the spools of threads to be for all the buttens this include
+  the Settings and About Us on the main page. The saved games, and the Exit to Main Menu"*
 - **The settings icon is a thimble.**
 - **The four lines inside each small board are sewing needles.**
 - **The four separator lines on the big board are a deep blue twisting ribbon**, with a
