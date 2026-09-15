@@ -226,6 +226,12 @@ The confirmation is there because deleting a game is the only irreversible actio
 app — it destroys the game and its whole running scoreboard — and kids are a stated target
 audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform).
 
+**Deleting an online game resigns the Game Center match**, so the other player's copy ends
+instead of waiting on a turn that never comes. The resign is best-effort and never blocks the
+delete: a player who asked for a game to be gone gets it gone whether or not Apple could be
+reached. Nothing on the phone remembers a deleted game. See
+[Tech Design](./Tech%20Design.md) → Online Play.
+
 **Deleting the last open game leaves the player on the list**, with New Game alone on it,
 rather than dropping them into a new game. Going straight into a game is what Play Game
 does when there are none to begin with, not what deleting your way down to zero does.
@@ -733,6 +739,14 @@ board a rematch starts is saved as it comes up, rather than waiting for the firs
 that game to carry it. Otherwise a player who takes the next game and quits before playing
 reopens the *finished* board with the result card still over it, having already asked for
 a new one.
+
+**On an online game both of those writes wait for Game Center to accept the turn.** The move
+appears on the board as it is confirmed, but nothing is stored until Apple has taken it — so a
+stored board never shows the opponent to move on a turn this phone never handed off — and
+taking the next game of an online series is written with its new match id on the same accept.
+Until a move goes through, that game accepts no further move; a send that fails keeps the move
+on screen to be sent again, and quitting the app before it lands loses it. See
+[Tech Design](./Tech%20Design.md) → Online Play.
 
 **A brand-new game is written the moment it starts**, before a single mark is placed — the
 record has to exist for anything later to be saved against it. So a player who starts a
