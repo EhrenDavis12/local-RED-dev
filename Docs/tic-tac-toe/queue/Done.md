@@ -279,3 +279,10 @@
     two's match-id routing must be verified to close it; (4) UIKit refusing a present
     skips the completion, so that wedge is only mitigated by presenting from the topmost
     controller.
+- 2026-09-15 · Parental gate [prd] [M] · 6h 30m · 30485d6 · http://localhost:3000/d/claude-agents?from=1789465800000&to=1789489200000
+  - Full PRD path: 32 requirements, tests first, 1127 tests green, two review rounds (the
+    second caught a passed raise closing twice when abandoned mid-action), harvested
+    into Tech Design (gate rules, two guards, navigation exception, layer) and Menus and
+    UI (a Parental Gate section; wording and drawing still open); PRD deleted. Branch
+    queue/parental-gate, stacked on queue/game-center-bridge-1. Not yet reachable from
+    any screen — the Play online item and the purchase flow call it.

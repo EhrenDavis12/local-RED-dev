@@ -7,4 +7,5 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
-- Parental gate [prd] [M] · started 2026-09-15T09:30:00Z · branch queue/parental-gate · session https://claude.ai/code/session_01Tg5TfDJnUi9NWvDqTE3aoW
+
+- "Play online" on the main menu, behind the parental gate [look] [S] · started 2026-09-15T18:20:00Z · branch queue/play-online-button · session https://claude.ai/code/session_01Tg5TfDJnUi9NWvDqTE3aoW
