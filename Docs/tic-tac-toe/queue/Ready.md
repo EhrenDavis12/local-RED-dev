@@ -7,7 +7,6 @@
 > skips triage — tag it, or the queue tags it on pickup.
 
 ---
-- The online-game record: match id, which participant is Player One, whose turn it is, online-vs-local, alongside GameRecord [prd] [M] — on-disk schema plus the board payload both devices exchange, so a wrong guess is a migration on records players already hold and a series that desynchronises between two phones with no error anywhere.
 - Game Center bridge, part one: authenticate, session state, and find a player through Apple's matchmaker [prd] [L] — the contract every row after it calls, and sign-in timing is player-visible on first launch; a channel shaped wrong here is re-plumbed through the state layer and the fake that tests it.
 - Parental gate [prd] [M] — the Kids Category requires it before any purchase and it must be enforced at the purchase itself, so a gate that can be reached around is an App Review rejection rather than a bug.
 - "Play online" on the main menu, behind the parental gate [look] [S] — the button the user asked for; depends on the "Parental gate" row already in Proposed, which is not built, and makes the menu five buttons where the docs settle four.
