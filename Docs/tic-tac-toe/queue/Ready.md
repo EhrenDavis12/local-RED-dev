@@ -7,7 +7,6 @@
 > skips triage — tag it, or the queue tags it on pickup.
 
 ---
-- Parental gate [prd] [M] — the Kids Category requires it before any purchase and it must be enforced at the purchase itself, so a gate that can be reached around is an App Review rejection rather than a bug.
 - "Play online" on the main menu, behind the parental gate [look] [S] — the button the user asked for; depends on the "Parental gate" row already in Proposed, which is not built, and makes the menu five buttons where the docs settle four.
 - Game Center bridge, part two: end a turn with the board, receive the opponent's turn, quit and resign [prd] [M] — this is the move itself crossing the wire, and a turn sent twice or applied twice leaves two phones holding different boards, which no test catches after the fact.
 - The board screen drives a remote turn: input locked when it is not your turn, confirm sends, an arriving turn replaces the board [prd] [M] — decides which board wins when a remote turn lands on a local pending selection, and getting it wrong overwrites a player's move or corrupts the saved series.
