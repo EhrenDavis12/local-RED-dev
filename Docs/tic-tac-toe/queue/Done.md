@@ -258,3 +258,11 @@
     allow friends, or trust the parent's Game Center setting as Apple designed it
     (parents choose everyone / friends only / off)? Cheap to change later.
     A: Just the parent's Game Center settings. (relayed from the user, 2026-09-14)
+- 2026-09-14 · The online-game record: match id, which participant is Player One, whose turn it is, online-vs-local, alongside GameRecord [prd] [M] · 5h 20m · d54d4a2 · http://localhost:3000/d/claude-agents?from=1789412200000&to=1789431400000
+  - Full PRD path: 46 requirements, tests first (all 46 covered), 881 tests green, two
+    review rounds, harvested into Tech Design (new "What an online game adds to the
+    record" subsection and the receive rules under Online Play), PRD deleted. Branch
+    queue/online-game-record, stacked on queue/game-center-capability. Note for the
+    bridge item: the bridge must save the local move only after Game Center accepts the
+    turn, so a stored board never shows the opponent to move on a turn this device did
+    not hand off (dropped from the docs as not yet built; the bridge PRD re-decides it).

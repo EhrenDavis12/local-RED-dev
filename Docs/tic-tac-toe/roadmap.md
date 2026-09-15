@@ -223,6 +223,7 @@ release/distribution.
   - Serialization and the storage layer
   - Every persisted record carries a version stamp
   - What a stored open game holds
+  - What an online game adds to the record
   - The open-games list has a defined order
   - The cap is enforced on create, and the store never evicts
   - Reads return "nothing stored", and defaults resolve above this layer
@@ -289,6 +290,7 @@ release/distribution.
   - 9. The rules engine
   - 10. The bundled icon set
   - 11. In-app purchases and entitlements
+  - 12. Online play — what the player is told
 
 ---
 

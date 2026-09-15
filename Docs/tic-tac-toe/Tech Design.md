@@ -89,6 +89,7 @@ lib/
     board.dart
     rules.dart
   storage/         ← repository interfaces + their store implementations
+  online/          ← pure Dart: the turn payload codec and the receive validator
   theme/
     theme.dart     ← merged theme object
     loader.dart    ← YAML → theme
@@ -137,6 +138,11 @@ store layer lands.
 
 `engine/`'s purity is held by a test that scans the layer's imports rather than by
 discipline — see **The Rules Engine** below for what that check matches.
+
+`online/` holds the Dart side of online play and its purity is held the same way, by a
+scan over the layer's imports — no Flutter, no `dart:ui`, no Hive and no platform channel.
+It imports the engine and nothing else of the app's, which is what keeps the two decisions
+a turn turns on testable with no GameKit in sight. See **Online Play** below.
 
 `theme/` holds more than the merged theme object and its loader. Resolving a theme's icon
 slot to a concrete `IconData`, and a stored integer weight to a `FontWeight`, both live in
@@ -620,7 +626,8 @@ Two consequences worth naming, because they cut across other sections:
   `engine/` — pure Dart, Flutter-free — while the Hive box, adapters-free, lives in
   `storage/`. The storage layer writes no encoding of the game state of its own; what it
   does encode by hand is the record envelope around it — the opponent name, the two
-  timestamps and the version stamp. The engine's models are kept as they are and gain
+  timestamps, the version stamp and, on an online game, the three values under **What an
+  online game adds to the record** below. The engine's models are kept as they are and gain
   conversion rather than being rewritten through `freezed`: regenerating working, tested
   code buys no behaviour change, and it would put the engine's purity guarantee through a
   generator. Generated serialization stays permitted where it is simpler, and is required
@@ -647,10 +654,11 @@ version that last wrote this record*: a record created under one version and sav
 later one carries the later one.
 
 ### What a stored open game holds
-**A stored open game is the engine's whole game-plus-series state, plus three things that
-are storage's own: the record id, the opponent name the game is titled with, and two
-timestamps.** No design doc puts any of those three in game state, so they sit alongside
-the board rather than inside it.
+**A stored open game is the engine's whole game-plus-series state, plus what belongs to
+storage rather than to the game: the record id, the opponent name the game is titled with,
+two timestamps, the app version stamp, and — on an online game — the three values that say
+which match it is being played through.** No design doc puts any of those in game state, so
+they sit alongside the board rather than inside it.
 
 **The most recent completed move is persisted as the move itself, not as a derived
 value.** It has two consumers and only the move serves both: the forced quadrant is
@@ -696,6 +704,68 @@ comparison, so the list would reorder itself after a flight or a DST change. The
 repository forces UTC on whatever its clock answers rather than trusting it to be UTC
 already, so the guarantee is structural rather than something each caller has to honour.
 
+### What an online game adds to the record
+**An online game is an open game in the same box** — the same store-minted id, the same
+repository-owned timestamps, the same version stamp, the same position in the open-games
+order, and the same cap. There is no second store, no second box and no second record type.
+It adds exactly three stored values and no others: the Game Center match it is currently
+played through, the series that match belongs to, and which side this device plays.
+
+**The three are written under a single `online` key on the record's JSON**, holding
+`matchId`, `seriesId` and `localPlayer`. The first two are strings; `localPlayer` is the
+player's name string — `playerOne` or `playerTwo` — exactly as the board already encodes a
+player. Those key names and encodings are on-disk identity the moment a record ships, so
+they are schema rather than a naming choice made at implementation time.
+
+**The presence of that key is the only thing that tells an online game from a local one.** A
+record whose `online` key is absent, or present and null, is a local game and loads exactly
+as a record written before online play existed. Nothing infers online-ness from the title,
+the board, or anything else.
+
+**An `online` key that is present but unreadable makes the whole record unreadable** — a
+missing `matchId` or `seriesId`, a `localPlayer` naming no player, any of the three
+wrong-typed — and it gets the answer every other unreadable record gets: "nothing stored"
+for a read by id, skipped by the list read while every other game still comes back, and left
+on disk exactly as it is. **An unrecognised extra key inside the map is ignored** rather than
+treated as unreadable, so a record written by a later version that added a fourth value still
+loads here.
+
+**The record stores no Game Center identity** — not the opponent's player id, not the local
+player's, not a team or an alias beyond the nickname the game is titled with. The players'
+identities live in the match, with Apple. Knowing which side this device plays is what is
+stored instead of an identifier, and it is the reason that is the shape.
+
+**Whose turn it is is not a stored field.** It is the board's current player compared against
+the side this device plays. Whose turn it is is engine state and is never derived a second
+way.
+
+**The side this device plays is set at create and never changes for the life of the record**,
+including across a rematch: the side on the record wins over any assignment the new match
+could suggest.
+
+**Creating an online game takes the opponent's nickname, the starting board, the match id,
+the series id and this device's side — all five from the caller.** The store mints the record
+id and nothing else; it mints no series id, and it substitutes no title.
+
+**A save never touches the three.** Only the board is honoured, exactly as the title and the
+created timestamp already are. **The match id changes on exactly two paths and no others** —
+the initiating device's own next-game write, and an accepted rematch payload.
+
+**Advancing to the next game and pointing the record at the new match is one write.** Taking
+the next game on this phone stores the next board and the new match id together, so a record
+can never sit with the next game's board under the finished game's match id, or the reverse.
+It requires a finished stored board, and answers a value rather than throwing when the board
+is still in progress or the id names no record.
+
+**Applying a turn that arrived takes a record id, not a record** — the store reads the current
+one itself rather than trusting a copy the caller may be holding stale. Every outcome is a
+returned value the caller can branch on, never a throw, and nothing is written on any outcome
+but acceptance. An accepted turn stamps the updated timestamp, moves the record to the top of
+the list exactly as any save does, and emits on the change stream; a re-delivery or a refusal
+emits nothing, because neither changed what the list would show. An apply against a record
+with no online values held answers the same "nothing stored" as an id the store never held.
+Which outcome a payload gets is **Online Play** below.
+
 ### The open-games list has a defined order
 **Reading the open-games list returns most-recent-first on the updated timestamp,
 tiebroken by the created one** — never the box's iteration order, and never the id. The
@@ -729,7 +799,27 @@ is constructed — no file under `lib/storage/` states 3 or 100.
 accepting an invite to one are both creates, so both are refused at the ceiling exactly as
 a local New Game is, and a player at the cap frees a slot the only way there is — by
 deleting a game. There is no separate online allowance and no exemption for a match
-somebody else started.
+somebody else started. On the accepting device the create happens **when the starter's first
+payload lands, not when the invitation is accepted** — before that there is no board to
+store, and this layer stores no record without one — so the cap bites on the arriving
+payload's route rather than on the acceptance.
+
+**Creating an online game for a match id a record already holds is not a second create.** The
+existing record is answered back unchanged — not re-titled, not re-stamped — and nothing is
+emitted on the change stream, because nothing changed. A duplicate delivery would otherwise
+consume a second slot and split one match across two records. That answer comes before both
+the title check and the cap.
+
+**The storage layer applies no name fallback.** An online create whose title is empty or
+whitespace-only is refused, and that refusal is distinct from the cap refusal so the caller
+can tell the two apart; nothing is stored. Supplying a title is the caller's, because a layer
+that substitutes a title is a layer that can rename a game. This reaches the online create
+alone — a local create still stores what it is handed, since the New Game prompt has already
+applied its own default by then. See [Menus and UI](./Menus%20and%20UI.md) → Play Game.
+
+**A rematch is not a create.** No cap check runs on either device when a series moves to its
+next game, no second record appears, and a rematch is accepted while the player is at the
+ceiling — it continues in the same open game.
 
 **The cap counts only the records that can be read back.** A record that cannot be read is
 not in the list the player sees, so counting it would refuse a create against games the
@@ -1334,8 +1424,11 @@ two phones in one room — is not wanted and is not built.
 
 **The bridge is a Swift platform channel.** No Flutter package wraps Game Center's
 turn-based matches, so the GameKit calls are written in Swift on the iOS side and reached
-from Dart over a channel. Which folder under `lib/` holds the Dart side is a PRD's job, not
-this doc's.
+from Dart over a channel. **The Dart side lives in `lib/online/`, and it is pure Dart** — a
+scan over the layer's imports finds no Flutter, no `dart:ui`, no Hive and no platform
+channel, held the way `engine/`'s purity is. Both decisions a turn turns on — what the bytes
+a match carries look like, and whether bytes that arrived may be applied — are made there,
+against the engine alone, so the channel code cannot creep into them.
 
 **Finding an opponent is Apple's matchmaker screen, not ours.** It offers Play Now, which
 pairs the player with a random opponent, and Invite Friends, which covers Game Center
@@ -1346,6 +1439,22 @@ so nothing generates a shareable link and nothing has to.
 position and its series is a few KB, so the cap is headroom rather than a constraint today —
 but it is a hard ceiling, and anything later added to the record spends against it.
 
+**What crosses the wire is the board as JSON in an envelope of exactly three keys** — the
+payload format version, the series id, and the board — encoded as UTF-8 bytes, because Game
+Center's match data is bytes. Nothing else crosses: no nickname, no player id, no turn
+marker, no timestamps, and **no match id**. The match id is not in the payload; it is what
+the match was delivered under, and it travels alongside the bytes to whatever handles them.
+The version key is on the wire for the same reason every persisted record carries a version
+stamp, only more so — two devices on different app versions is the ordinary case here rather
+than the rare one.
+
+**The encoder refuses to produce a payload over 48 KB**, throwing rather than making a silent
+oversized send. That keeps headroom under Apple's hard ceiling, and a worst-case board — 81
+cells marked, nine quadrant states with their winning lines, a long-running score — is
+nowhere near it. Throwing is right here and nowhere else in online play: the encoder runs
+before anything is sent, on this device's own data, so an oversized payload is a defect in
+what was built rather than something that arrived from outside.
+
 **Turns never time out.** A match is created with `GKTurnTimeoutNone`, so it waits as long
 as it takes for the other player to move — days, or forever. A player who wants out of an
 online game deletes it from the open-games list, the same as any other open game. See
@@ -1354,6 +1463,54 @@ online game deletes it from the open-games list, the same as any other open game
 **A rematch online is a new match with a new id.** Apple's rematch mints a fresh match
 rather than reopening the finished one, so nothing may treat a match id as stable across a
 series.
+
+**The series id is what stays constant while the match id changes.** It is opaque, unique
+across devices, never parsed and never displayed, and it exists because the match id cannot
+serve: a rematch continues in the same open game with the scoreboard intact, so something
+stable has to cross the wire, and the record id cannot — it is minted per device. It has
+exactly two sources and no third: the device that **starts** the match mints it, and a device
+receiving the first payload of a series it does not hold **copies it out of that payload**.
+Both devices hold the same series id from the first turn onward, which is what lets a
+rematch's fresh match id find the record it belongs to.
+
+**A board that arrives is replayed against the rules engine before it is believed, and which
+board it is measured against is decided by the stored board — never by the match id.** A
+stored board still in progress is measured against itself: the arriving board is applied only
+if some single legal move from the stored board produces it. A stored board that is finished
+is measured against the next game of the series instead, and there the arriving board is
+accepted if it equals that next board or is one legal move from it — **zero or one move, and
+both are ordinary**, because a rematch's initiator ends its turn with the fresh board
+untouched when the engine says the other side goes first. Validation enumerates the legal
+moves and applies them; it never feeds the engine a board and catches what it throws, since
+the engine's throw on an illegal move is a contract violation no caller is meant to catch.
+
+**A payload is applied only when it is the opponent's turn to have sent it**, tested on the
+board the arriving one is measured against — never on a finished board, whose current player
+the engine leaves on the last mover, the winner of the game that just ended, who is not who
+goes first in the next one. The turn test and the reachability test both hold and neither
+replaces the other: reachability alone would accept a board this device itself produced and
+had echoed back to it.
+
+**A board equal to the stored one is a re-delivery, not a violation** — nothing is written,
+and it is reported as its own outcome. Game Center re-delivers, and treating that as a
+corrupt payload would raise an error on an ordinary event.
+
+**Everything else is refused, and nothing is written on any refusal**: a board two moves ahead
+or otherwise unreachable, a payload that arrived when it was this device's own turn, an
+arriving match id that differs from the stored one while the stored board is still in
+progress, a payload naming a series the record does not hold, a payload that will not decode,
+and one on a version this build does not recognise. Each is a distinct value the caller can
+branch on rather than one failure carrying a message — a caller that cannot tell a
+re-delivery from a corrupt payload cannot behave differently on them. What the player is
+shown for any of them is not settled — see **Open Questions**.
+
+**The device that starts the match plays Player One in the first game of the series; the
+device that accepts plays Player Two.** Game Center makes the match's creator the current
+participant, so the creator moves first, and the first game's first player is Player One. The
+advantage does not accumulate: from the second game the winner of the last game goes first,
+and a tie leaves it where it was — see [Rules](./Rules.md) → Turn Order Across Games. The side
+is stored on the record once, at create, and read from there afterwards rather than
+re-derived from the match.
 
 **Game Center sign-in happens when the player first enters online play**, not at cold
 launch. The app authenticates on the tap that enters online play, and again when the app is
@@ -1968,3 +2125,11 @@ block other work.
   and Release states that the first release carries a theme product, and a theme product
   cannot be configured before the theme it sells exists. The theme itself is deferred as not
   needed right now. Whether those are the same point in time is not stated.
+
+### 12. Online play — what the player is told
+- Should a re-delivered identical board be visible to the player at all, or silently
+  ignored? The data side is settled — nothing is written, and it is reported as its own
+  outcome — but nothing says whether the player sees anything.
+- What happens when a payload arrives carrying a version this build does not recognise,
+  beyond the rejection itself — whether the player is told the other device is on a newer
+  version, and whether that is distinguishable to them from a corrupt payload.
