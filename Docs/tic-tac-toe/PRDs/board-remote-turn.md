@@ -83,26 +83,30 @@ arrives while the screen is up replaces the board and unlocks input where it sta
    and no buzz (Game Board Design → Taps outside the legal quadrant; Haptic Rule: a buzz means
    "that registered", no buzz means "that did nothing").
 
-7. **Nothing removes or blocks the cells' own tap handlers to implement the lock** — no
-   `IgnorePointer`, `AbsorbPointer` or omitted handler over the board. A cell with no handler of
-   its own loses the tap to the tap-away surface underneath, which is the documented bug this
-   codebase has already been warned about (Tech Design → Rendering the Board).
+7. **The lock is taps and nothing else.** While `waitingForOpponent` the board renders exactly
+   as it does on the local side's turn — the forced-quadrant highlight stays drawn, the last-move
+   highlight stays drawn, nothing dims and nothing is added. Drawing the quadrant the opponent
+   must play in is information the player wants, and the two highlights are the board's core
+   readability (Game Board Design → The Two Highlights Together). And **nothing removes or
+   blocks the cells' own tap handlers to implement the lock** — no `IgnorePointer`,
+   `AbsorbPointer` or omitted handler over the board. A cell with no handler of its own loses the
+   tap to the tap-away surface underneath, which is the documented bug this codebase has already
+   been warned about (Tech Design → Rendering the Board).
 
 ### Waiting on the opponent
 
 8. **While `waitingForOpponent` the screen shows a waiting indicator**, keyed
-   `onlineWaitingKey`, which identifies the opponent by the stored record's title — the
-   opponent's Game Center nickname, or the placeholder until Apple resolves it (Menus and UI →
-   Play Game → Where It Takes You). Tests pin the key and that the stored title appears in it;
-   the sentence around it is copy and is not pinned. See Open Questions for the doc line this
-   sits against.
+   `onlineWaitingKey`, naming the **side** whose turn it is — Player One or Player Two, read
+   from the board's current player — and never the opponent's Game Center nickname. In game the
+   players are still Player One and Player Two; the nickname titles the game in the open-games
+   list and nothing else (Menus and UI → Play Game → Where It Takes You). Tests pin the key and
+   which side is named; the sentence around it is copy and is not pinned.
 
-9. **The session carries the loaded record's title as `GameSession.opponentName`**, set by
-   every path that loads a record — `GameController.loadGame` and the reload in R18. The board
-   screen reads the state layer and never the repository, which is the shape every other value
-   it draws already arrives through (`lib/state/game_controller.dart`); the title belongs to
-   storage rather than to game state (Tech Design → Persistence and Serialization → *What a
-   stored open game holds*).
+9. **The screen needs nothing from the stored record's title**, so no session field carries it
+   and no path is added to put one there. This follows from R8: the only thing that wanted the
+   nickname on the board was the waiting line, and it names the side instead. The nickname
+   reaches the player on the list row, which is where the docs put it (Menus and UI → Play Game →
+   Where It Takes You).
 
 10. **Nothing renames the players in game.** On `yourTurn` the turn banner and the scoreboard
     read Player One and Player Two exactly as they do on this phone — the opponent name titles
@@ -170,8 +174,8 @@ arrives while the screen is up replaces the board and unlocks input where it sta
     stays open (Tech Design → Open Questions → *12. Online play — what the player is told*).
 
 21. **On one of those two the screen calls `GameController.reloadFromStore(recordId)`**, which
-    re-reads the record and replaces the session's board, its three online values and its title
-    — and does **not** raise `isLoading`. The load-before-draw gate exists because a board drawn
+    re-reads the record and replaces the session's board and its three online values — and does
+    **not** raise `isLoading`. The load-before-draw gate exists because a board drawn
     before the read lands is the *previous* game's position (Tech Design → Rendering the Board →
     *The screen loads its game before it draws one*); that risk belongs to the first read of a
     screen, not to a refresh of the game already on it, and blanking the board to a spinner on
@@ -237,35 +241,21 @@ is pinned by key, by controller call, or by stored state.
   control that would otherwise do the wrong thing before it lands.
 - **All message wording.** Tests pin structure by key, never copy — which is also what keeps the
   unsettled questions below cheap to answer later.
-- **What the locked board looks like** while waiting — dimming, the active-quadrant highlight,
-  any treatment at all. Appearance is checked by running the app, never asserted.
+- **Any new treatment for the locked board.** R7 settles that it renders unchanged, so there is
+  no dimming, no veil and no online-only highlight to design.
 - **The how-to-play strip's content** in any online state.
 - Notifications themselves, sign-in, the matchmaker, and the parental gate.
 
 ## Open Questions
 
-- **Does the waiting state name the opponent, or say "Player Two"?** Menus and UI → Play Game →
-  Where It Takes You states it flatly: *"The opponent name does not replace 'Player Two' in game.
-  It titles the game in the open-games list and nothing else. In game, the players are still
-  Player One and Player Two."* The queue item this PRD is written for asks for a "waiting for
-  <opponent>" state. R8 builds the indicator and pins its key; which name goes in it is copy and
-  is unsettled.
 - **Should a re-delivered identical board be visible to the player at all, or silently ignored?**
   (Tech Design → Open Questions → 12.) R20 builds today's silence and answers nothing.
 - **What does the player see for a move Game Center would not take, and for a GameKit error the
   bridge reports?** (Tech Design → Open Questions → 12.) R14 gives the failure a keyed message,
   a retry and a way out; what that message says is unsettled.
-- **Does the board stop *looking* playable while it is the opponent's turn?** Game Board Design →
-  Taps outside the legal quadrant requires that *"the visual state and the actual behavior need
-  to agree"*, but nothing says which way that cuts here: the forced quadrant is still where the
-  opponent must play, so drawing it is information, and dimming it is the lock. Neither is built
-  by this PRD.
 - **What does the how-to-play strip say in the waiting, sending and failed states?** Already open
   as *"Which strip content belongs to which board state, and is the set of states exactly the
   three the handoff draws?"* (Menus and UI → Open Questions), with online adding three more.
 - **Do things the player didn't tap buzz?** (Game Board Design → Open Questions.) An opponent's
   turn arriving on screen is exactly such an event; this PRD plays no sound and fires no haptic
   for one.
-- **Does the online result card end up with a rematch control at all?** R26 hides it until the
-  "Game over online" row lands, which narrows Menus and UI → Game Over → Rematch → The result
-  card's *"the result card carries two buttons"* for online games only.
