@@ -51,9 +51,10 @@ child who can count, while the word form defeats pre-readers and early readers a
 same section.
 
 **R3.** One problem per raise, and it is fixed for all three attempts — a wrong answer does
-not swap the question out from under the person answering it. The next raise generates a
-fresh one. Source: same section (*"The problem is randomised each time the gate is raised"*);
-that it holds still across the three attempts is the user's call, 2026-09-15.
+not swap the question out from under the person answering it. The service generates it when
+the raise starts, from the randomness handed to it (R4), and the next raise generates a fresh
+one. The surface never generates a problem. Source: same section (*"The problem is randomised
+each time the gate is raised"*); the rest is the user's call, 2026-09-15.
 
 **R4.** The generator is a pure Dart unit with no Flutter import, and it takes its source of
 randomness as a parameter so a seeded source pins the problem exactly in a test. The problem
@@ -65,8 +66,9 @@ its exact answer.
 
 **R5.** Consecutive raises never show the same problem: the problem a raise generates is never
 the one the previous raise showed. The two operands are interchangeable for this test —
-*"seven times eight"* and *"eight times seven"* are the same problem. Source: the user's call,
-2026-09-15.
+*"seven times eight"* and *"eight times seven"* are the same problem. The service is what
+remembers the previous raise's problem, for the life of the app process — it is not persisted,
+so the first raise after a launch has nothing to avoid. Source: the user's call, 2026-09-15.
 
 ### Attempts, passing and dismissal
 
@@ -119,9 +121,17 @@ Restore spends no money."*).
 **R14.** The gate is an abstract `ParentalGate` — the interface every caller depends on —
 reached through a `Provider<ParentalGate>` and by no other means: no singleton, no global
 instance, no Riverpod codegen. A test substitutes `FakeParentalGate` (R32) by overriding that
-provider. The real implementation holds its pending state internally; nothing outside it can
-read or set what is pending. This mirrors `GameCenterBridge` and `gameCenterBridgeProvider`
-exactly. Source: [Tech Design](../Tech%20Design.md) → State Management; the
+provider. It carries five members: the two guards (R20, R23), a read-only `currentRaise` — the
+raise's problem and how many attempts remain, or nothing when no gate is up — and
+`submitAnswer` and `abandon`, which are the surface's only way to speak to it.
+
+**The service owns everything a raise consists of**: the pending action, the problem (R3), the
+attempt count, the previous raise's problem (R5), and the raise's outcome (R17). Nothing
+outside it can read or set the pending action, and attempt counting lives there rather than in
+the widget — so it is asserted through the service, with R31's widget tests only checking that
+the surface reflects it. The surface rebuilds on what `submitAnswer` answers rather than by
+listening to the service. This mirrors `GameCenterBridge` and `gameCenterBridgeProvider`.
+Source: [Tech Design](../Tech%20Design.md) → State Management; the
 provider-as-injection-point reasoning in → Navigation → The layer is reached through a
 provider; and the existing `gameCenterBridgeProvider` / `FakeGameCenterBridge` shape in the
 code. Confirmed by the user, 2026-09-15.
@@ -138,8 +148,10 @@ code. Confirmed by the user, 2026-09-15.
 | `abandoned` | The gate was left without answering; the action did not run (R18) |
 | `failedAttempts` | Three wrong attempts; the action did not run (R8) |
 
-The returned future completes when the gate closes — after the action has run, for `ran` —
-and completes immediately for the outcomes that put nothing on screen. Six distinct values
+The returned future completes when the gate closes, and for `ran` that is after the action's
+own future has completed — including on the adult online path (R25), where nothing is shown
+but the action is still awaited. Only `refused`, `notSignedIn` and `busy` complete
+immediately, having put nothing on screen and run nothing. Six distinct values
 rather than one flag or a failure carrying a message, for the reason the Game Center bridge
 gives for its own: a caller that cannot tell a refusal from a cancel cannot behave
 differently on them. Source: [Tech Design](../Tech%20Design.md) → Online Play → The channel
@@ -151,19 +163,25 @@ second surface, no second problem, and the pending action is never replaced. Sou
 user's call, 2026-09-15; the same shape as the bridge refusing a second matchmaker
 presentation ([Tech Design](../Tech%20Design.md) → Online Play).
 
-**R17.** The pending action is consumed before it is run, in one step, so a second submit
-arriving while the first is still resolving runs nothing — the action runs exactly once per
-raise. The surface closes once the action's future completes. If the action throws, the
-pending action has already been cleared, the gate still closes, and the error propagates to
-the guard's caller through the returned future rather than being swallowed. Source: the
-user's call, 2026-09-15.
+**R17.** **A raise resolves exactly once, and the service is what decides it.** The first of a
+pass, a third wrong answer, or an abandon wins; every later signal about the same raise is a
+no-op that changes nothing and answers nothing a second time — a disposal arriving after a
+pass, a scrim tap or back-swipe once the attempts have run out, a second tap of the way-out
+control. The pending action is consumed in the same one step that resolves the raise, so a
+second submit arriving while the first is still running runs nothing and the action runs
+exactly once. The surface closes once the action's future completes. If the action throws, the
+pending action has already been cleared, the raise is already resolved, the gate still closes,
+and the error propagates to the guard's caller through the returned future rather than being
+swallowed. Source: the user's call, 2026-09-15.
 
-**R18.** Abandoning the gate — the way-out control, a tap on the scrim, or the platform
-back-swipe — drops the pending action, runs nothing, spends no attempt, and answers
-`abandoned`. The surface's disposal calls the service's abandon, so a gate swiped away by the
-platform rather than closed by a control cannot leave a stale action pending behind it.
-Source: the user's call, 2026-09-15. The failure this closes is the one
-[Tech Design](../Tech%20Design.md) → Navigation records for the back-swipe generally:
+**R18.** **While attempts remain**, leaving the gate without answering — the way-out control,
+a tap on the scrim, or the platform back-swipe — resolves the raise as `abandoned`: the
+pending action is dropped, nothing runs, and no attempt is spent. The surface's disposal calls
+the service's abandon, which is idempotent by R17, so a gate swiped away by the platform
+rather than closed by a control cannot leave a stale action pending behind it, and a disposal
+following any other resolution does nothing. Once the attempts have run out this requirement
+no longer applies — see R30. Source: the user's call, 2026-09-15. The failure this closes is
+the one [Tech Design](../Tech%20Design.md) → Navigation records for the back-swipe generally:
 *"Neither scan sees a gesture… the hole it closes is the absence of a call."*
 
 **R19.** The gate is its own layer folder under `lib/`, not a file inside `purchase/`, since
@@ -245,11 +263,23 @@ player lands back where they were. Source: [Tech Design](../Tech%20Design.md) �
 Nothing outside the layer puts a surface on screen, and → Surfaces that stay on top of
 something are nested; the top-level-push shape is the user's call, 2026-09-15.
 
+**This is a deliberate exception to the navigation layer's standing shape**, where every
+route change is a replacement and *"Both directions are replacements by construction, never a
+`push`"* (`lib/navigation/router.dart`, from
+[Menus and UI](../Menus%20and%20UI.md) → Navigation and the Back Stack). The gate is the one
+surface that must return the player to an unknown caller rather than to a fixed destination,
+which is exactly what a replacement cannot do. Recorded here so it reaches the design docs at
+harvest rather than reading later as a rule someone broke.
+
 **R28.** The navigation layer gains a second small interface alongside `GameLaunchNavigator`,
 reached through its own provider — show the gate, dismiss the gate, and nothing else — and the
 gate service depends on it through that provider. `AppNavigator`'s fixed operations are not
 touched, for the same reason `GameLaunchNavigator` was kept off them. A recording fake
-implementing this interface is what a test asserts the gate was shown through. Source:
+implementing this interface is what a test asserts the gate was shown through. Both of its
+operations go through the navigation layer's existing single choke point — the one that clears
+a pending, unconfirmed move before it touches the router — rather than reaching the router
+directly, so raising the gate over the board cannot leave a pending selection standing.
+Source:
 [Tech Design](../Tech%20Design.md) → Navigation → The layer is reached through a provider
 (*"under a singleton… 'this screen invoked that navigation exactly once' could not be asserted
 at all"*), and the existing `GameLaunchNavigator` precedent in `lib/navigation/`; the user's
@@ -263,15 +293,21 @@ operation reports an outcome back (*"the surface acts on the state itself"*) —
 `DeleteGameConfirmationOverlay` already uses for its own Yes.
 
 **R30.** On the third wrong answer the surface stops asking: it shows the out-of-attempts line
-and the way-out control alone — no problem, no answer field, no submit — and closes when that
-control is tapped, answering `failedAttempts` (R8). Source: the user's call, 2026-09-15.
+and the way-out control alone — no problem, no answer field, no submit. **The third wrong
+answer is what resolves the raise** (R17), as `failedAttempts` (R8); the state it leaves on
+screen is the report of that, not a decision still to be made. So every way out of this state
+answers `failedAttempts` and never `abandoned` — the way-out control, a scrim tap, the
+back-swipe and the disposal that follows any of them alike, since the raise is already
+resolved and R17 makes each of those a no-op. Source: the user's call, 2026-09-15.
 
 **R31.** The screen carries six things, each under a named widget key so a test can find it:
 a prompt addressed to a grown-up, the worded problem (R1, R2), a numeric answer field (R6), a
 submit, the out-of-attempts line (R30), and the way out (R18). **Tests pin that structure —
-each element present or absent, the submit enabled or not, the attempt counting — and never
-the wording.** The wording is the screen's own, chosen when it is built and checked by running
-the app. Source: the user's call, 2026-09-15; the six elements follow R1, R2, R6, R18 and R30.
+each element present or absent, the submit enabled or not, and that what is on screen reflects
+the attempt count the service holds — and never the wording.** Attempt counting itself is
+asserted against the service (R14), not read off the widget. The wording is the screen's own,
+chosen when it is built and checked by running the app. Source: the user's call, 2026-09-15;
+the six elements follow R1, R2, R6, R18 and R30.
 
 ### The double
 
