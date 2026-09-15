@@ -62,6 +62,7 @@ game-over rematch flow.
   - Vibrate on Touch
   - Purchases
   - How you reach settings from gameplay
+- The Parental Gate
 - Dynamic Type
 - Game Over → Rematch
   - The result card
@@ -211,6 +212,7 @@ release/distribution.
   - Nothing outside the layer puts a surface on screen
   - The layer is reached through a provider
   - Surfaces that stay on top of something are nested
+  - The parental gate is pushed, and that is the one exception
   - Deep links are possible, not wired
 - Rendering the Board
   - Marks — supplied by the theme

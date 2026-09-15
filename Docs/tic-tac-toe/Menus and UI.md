@@ -314,9 +314,11 @@ right now."* already says it.
    button → quick actions).
 7. **About Us** — reached from the main menu (About Us button). A full screen of its own,
    not an overlay: nothing stays visible behind it. See Main Menu → About Us.
+8. **Parental Gate** — the grown-up check, over whatever raised it rather than in place of
+   it. See [The Parental Gate](#the-parental-gate) below.
 
-Each of these now has an approved drawing in
-[Design Handoff](./design_handoff_game_ui/README.md):
+The first seven each have an approved drawing in
+[Design Handoff](./design_handoff_game_ui/README.md); the parental gate has none:
 
 | Screen above | Handoff screen |
 |---|---|
@@ -569,6 +571,21 @@ trimmed-down in-game version with the exit option added. What that decides is wh
 four toggles the in-game surface carries — on the *same screen* reading, the Animations
 row, the Music row and the purchases section all arrive in game together.
 
+## The Parental Gate
+**The gate is its own surface, over whatever raised it** — the purchases section today, the
+**Play online** entry point when it lands. It shows a line addressed to a grown-up, the
+problem in words, a field for the answer, a Submit, and a way out. After the third wrong
+answer it stops asking: the prompt, the problem, the field and Submit all go, and what is
+left is a line saying the tries are used up, with the way out. The way out and a tap on the
+scrim behind the card both leave the gate while attempts remain, and so does anything that
+takes the surface away without either — the platform back-swipe among them.
+
+**None of the wording is settled**, and none of it is drawn: the handoff has no gate screen,
+the same gap [Theming](./Theming.md) records for the settings purchases section. What the
+gate asks, what a pass is worth, and what raises it are
+[Tech Design](./Tech%20Design.md) → In-App Purchases and Entitlements → The parental gate — a
+word problem, every time.
+
 ## Dynamic Type
 **The app does not scale its text to the iOS Dynamic Type setting in this version.** Not
 for now — *"Lets not do this as of yet."*
@@ -694,6 +711,10 @@ an open game** above.
   Theme, Settings, About Us, with Settings and About Us sharing a row — and nothing says
   whether online play is a fifth button, a choice inside Play Game, or something on the
   open-games list.
+- **Where does the parental gate belong among the app's screens, and what does it say?** It
+  is built and it works, but nothing draws it and nothing settles its wording — the grown-up
+  prompt, the problem line, the Submit and the out-of-attempts line are all the screen's own
+  choice for now.
 - **Does the back-swipe stay live on every other screen**, or is "you leave a surface by
   its own control" a rule of the whole app? It's off on the game screen only, because
   that's the one place a swipe would walk away from a pending move. Everywhere else it

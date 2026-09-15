@@ -101,6 +101,7 @@ lib/
   entitlements/    ← StoreKit entitlement state
   diagnostics/     ← crash catching/reporting
   purchase/        ← store integration
+  parentalgate/    ← the gate, its fake, and its pure Dart problem generator
   ui/
     board/
     menus/
@@ -154,6 +155,14 @@ one file on each side — one under `lib/gamecenter/`, one under `ios/Runner/` �
 test holds that, so the string contract between the two languages has one place to be
 checked against. The Swift half is registered from `AppDelegate` alongside the generated
 plugin registrant.
+
+`parentalgate/` is the gate's own layer rather than a file inside `purchase/`, since
+purchases and online entry both call it and neither owns it. The service, the fake that
+stands in for it, and the problem generator all live there. The generator is pure Dart and
+takes its source of randomness as a parameter, so a seeded source pins the exact problem and
+its answer in a test; its purity is held by an import scan the same way `engine/`'s and
+`online/`'s are — over that one file rather than the whole folder, since the service beside
+it carries no such guarantee.
 
 `theme/` holds more than the merged theme object and its loader. Resolving a theme's icon
 slot to a concrete `IconData`, and a stored integer weight to a `FontWeight`, both live in
@@ -363,6 +372,12 @@ It also covers the requirement that settings and the theme be readable from
 `Notifier`/`NotifierProvider` — fey-tactics is a reference for the sync shape, not for
 the API surface.
 
+**A layer with one real implementation and a fake is reached through a plain `Provider` of
+its abstract interface, and a test substitutes the fake by overriding that provider** — no
+singleton, no global instance. The Game Center bridge and the parental gate are both shaped
+that way, and both fakes ship as app code rather than test code, because they are the double
+every other layer tests against.
+
 ## Navigation
 
 **The app has an explicit navigation layer, and the routing package is `go_router`.** The
@@ -464,6 +479,30 @@ It also enforces one rule structurally rather than by convention: theme selectio
 under the main menu and not under the game, so it cannot be reached from inside a game
 without leaving it — you can't change the theme mid-game (see
 [Theming](./Theming.md) → Choosing a Theme).
+
+### The parental gate is pushed, and that is the one exception
+
+**The parental gate's surface is a top-level route pushed over whatever is on screen.** It is
+the one exception to this layer's shape, where a route change is a replacement by
+construction rather than a `push` — see [Menus and UI](./Menus%20and%20UI.md) → Navigation
+and the Back Stack. The gate is raised from the main menu, from Settings and from wherever
+the purchase flow lands, so it has no single parent to be nested under, and it has to return
+the player to a caller it does not know, which is exactly what a replacement cannot do.
+Pushing leaves what raised it mounted and visible beneath, and popping lands the player back
+where they were.
+
+**It is reached through a second small interface beside the game-launch one** — show the
+gate, dismiss the gate, and nothing else, with its own provider. `AppNavigator`'s fixed
+operations are left alone, for the same reason the game-launch operations were kept off them:
+every screen and every recording fake already depends on that shape. Both of the gate's
+operations go through the layer's single choke point, so raising the gate over the board
+clears a pending, unconfirmed move like every other navigation does.
+
+**The gate's surface reports its outcome to the gate service, never through the navigator**,
+since no navigation operation reports an outcome back. The service holds the pending action,
+runs it on a pass, and takes the surface off screen itself. The surface's disposal reports an
+abandon too, so a gate the platform took away rather than a control closing cannot leave a
+stale action pending behind it.
 
 **Nothing unmounts when a surface opens over the board, so nothing clears a pending move
 by accident** — which is why clearing it belongs to this layer. Every operation clears the
@@ -1419,11 +1458,34 @@ changed on the record reaches the app without a build.
 **The gate challenges with an arithmetic problem stated in words, answered with a number** —
 *"Enter the answer: seven times eight."* **The operands are spelled out as words rather than
 digits**, and that is the load-bearing part: digits are solvable by a child who can count,
-while the word form defeats pre-readers and early readers alike. The problem is randomised
-each time the gate is raised, and **three wrong attempts dismiss it** without ever reaching
-the store.
+while the word form defeats pre-readers and early readers alike. The problem is a
+multiplication of two whole numbers from 2 to 9, so the smallest answer is 4 and the largest
+81, and it is answered by typing digits into a field that takes no more than two of them.
 
-**A pass is good for one purchase and nothing else.** There is no remembered pass — the next
+**One problem per raise, fixed for all three attempts** — a wrong answer does not swap the
+question out from under the person answering it. The next raise generates a fresh one, and
+two raises in a row never show the same problem; the operands are interchangeable for that
+test, so *"seven times eight"* and *"eight times seven"* are one problem. The gate remembers
+only the previous raise's problem, in memory and never written down, so the first raise after
+a launch has nothing to avoid.
+
+**Three wrong attempts end the raise**, and the third wrong answer is what ends it: the gate
+stops asking, says the tries are used up, and the guarded action never runs — for a purchase,
+without ever reaching the store. Every way out from there reports the same out-of-attempts
+result, never an abandon. Nothing imposes a cooldown, so the gate can be raised again
+straight away, and that raise gets its own three attempts.
+
+**Leaving the gate without answering, while attempts remain, abandons the raise** — the
+pending action is dropped, nothing runs, and no attempt is spent.
+
+**A raise resolves exactly once, and the gate is what decides it.** The first of a pass, a
+third wrong answer or an abandon wins, and no later signal about that raise changes the
+outcome or answers a second time. The pending action is consumed in the same step that
+resolves the raise, so it runs exactly once however many signals arrive. If it throws, the
+gate still closes and the error reaches the guard's caller rather than being swallowed.
+
+**A pass is good for one purchase and nothing else** — or for one entry into online play,
+which is worth exactly one pass the same way. There is no remembered pass — the next
 purchase raises the gate again, immediately after a passed one included. This also avoids
 having to define "session" at all: cold launch, foreground return and dismissing a surface
 are three different answers and none of them is obviously right.
@@ -1436,6 +1498,23 @@ gate of their own — which is what [Menus and UI](./Menus%20and%20UI.md) → Se
 Purchases means by keeping one parental gate in one place. Moving the challenge out to the
 caller and passing an assurance inward would weaken the guarantee from enforced to
 conventionally observed, which is the whole thing the gate exists for.
+
+**The only way past the gate is to hand it the action.** It publishes no pass value a caller
+can hold, store or present back to it, and nothing accepts an assurance that the gate was
+passed somewhere else. A caller hands over the action and learns what happened to it, which
+is a report rather than an authorisation — holding one gets a caller nothing.
+
+**Two guards, and one of six answers.** One guards a purchase; the other guards entry into
+online play and takes a resolved Game Center session alongside the action (**Kids Category**
+below). Each answers exactly one of: the action ran, either after a pass or because no gate
+was owed; refused without asking; no resolved session to decide from; busy; abandoned; or out
+of attempts. Six distinct values a caller branches on rather than one flag or a failure
+carrying a message, for the same reason the Game Center bridge gives for its own. The answer
+arrives when the gate closes, and on a pass that is after the action's own work has finished;
+refused, busy and no-session come back immediately, having put nothing on screen.
+
+**Busy means a raise was already up.** A second raise while one is pending does nothing at
+all — no second surface, no second problem — and never replaces the pending action.
 
 Why the gate exists at all is **Kids Category** below.
 
@@ -1676,6 +1755,12 @@ promise nothing about which thread they call on.
 while the session is not authenticated, the matchmaker answers "unavailable" carrying the
 current session and the match load answers failed, and neither sends a platform call.
 
+**Entering online play signs in first and then calls the parental gate with the session that
+produced.** The gate decides from the session it is handed and never authenticates, so what
+it guards is the second half of entering — presenting the matchmaker, or accepting the
+invitation — and never the sign-in itself. What it does with each session state is **Kids
+Category** below.
+
 **Asking Apple which matches it holds reads only.** It creates, stores, reconciles and deletes
 nothing, and imposes no order of its own on what GameKit answers — nothing may depend on the
 order matches come back in. A match whose local participant GameKit cannot identify is left
@@ -1740,6 +1825,16 @@ advertising — so purchases and online play are the only triggers that currentl
 an outbound link is ever added, it needs the gate too — that is a thing to remember rather
 than a thing already handled. What the gate asks, and how long a pass lasts, is **In-App
 Purchases and Entitlements** above. What online play is, is **Online Play** above.
+
+**The gate exists as one service with two guards** — one for a purchase, one for entry into
+online play — and the online guard is handed a session that has already been resolved. It
+authenticates nothing itself and sends no platform call. A restricted account is refused
+without asking: Apple has said multiplayer is not allowed for it, so there is nothing to
+enter, and `isUnderage` is never read on that path because the refusal comes first. A session
+that is unauthenticated or still in flight is not gated either — the guard answers that there
+is nothing to decide from and runs nothing, because the entry point signs in before it calls
+and the matchmaker refuses an unsigned player anyway. An adult account runs straight through
+with nothing on screen, and a child's account is asked.
 
 ## Crash Reporting
 
