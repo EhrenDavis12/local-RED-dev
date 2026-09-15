@@ -17,3 +17,18 @@
     should it only leave this phone (their copy keeps waiting for a turn that never comes,
     until they delete it as well)? Resigning is the kinder default.
     A:
+- decide: a random-opponent online game is renamed once when the opponent joins [prd] · branch queue/game-center-bridge-1
+  - Found while specifying the Game Center bridge: when a player taps Play Now, Apple hands
+    back the match before anyone has joined — the opponent's name doesn't exist yet, but
+    the starter has to take the first turn from the board screen, so the game must be
+    saved right away. Your docs say an online game is titled with the opponent's nickname
+    when the match is created and nothing ever renames it. Those two can't both hold for
+    Play Now.
+  - **Assumption I'm building on (reverse before merge if you disagree):** the game is
+    saved with the usual placeholder name ("ItSaMeMaRiO") and renamed exactly once, to
+    the opponent's Game Center nickname, when Apple reports who joined. Nothing else can
+    rename an online game. Invited-friend games are never affected — the friend's name is
+    known at creation. The alternative is leaving the placeholder for the life of that
+    game. Cheap now; after merge it's a storage-contract change to undo.
+  - Q: OK with the one rename for random-opponent games?
+    A:
