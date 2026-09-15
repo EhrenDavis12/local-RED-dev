@@ -80,10 +80,20 @@ generator — see Open Questions.
 Online Play (restricted → online play is not offered) and → Kids Category (`isUnderage` is
 what decides whether the parental gate is raised).
 
-**R7.** The event channel emits the same session map (R6) — the current one immediately on
-subscription, and again on every later change the platform reports, including one GameKit
-reports with no Dart call behind it (`GKLocalPlayer.authenticateHandler` may fire again when
-the player signs in or out in iOS Settings). It never emits an error event.
+`"authenticating"` never appears in a *method* reply — it is an event-channel-only value
+(R7). A reply carrying it is handled by R15 like any other unrecognised state.
+
+**R7.** The event channel emits the same session map (R6): the current value immediately on
+subscription, and every later change after that. **Subscribing installs nothing and asks
+GameKit nothing.** `GKLocalPlayer.authenticateHandler` is installed on the first
+`authenticate()` call and never on a listen, so a subscription presents no sign-in view
+controller and shows no banner — which matters because the provider (R20) may subscribe at
+any time, including at app launch. Before that first `authenticate()` the channel replays
+`unauthenticated` on subscribe and reports nothing else. After it, a change GameKit
+originates with no Dart call behind it — the player signing out in iOS Settings — arrives
+through that handler and is emitted here. It never emits an error event. Source:
+[Tech Design](../Tech%20Design.md) → Online Play ("A player who never touches online play
+never sees Game Center's sign-in banner"), which a listen-installed handler would break.
 
 **R8.** `presentMatchmaker` replies with:
 
@@ -113,7 +123,11 @@ the player signs in or out in iOS Settings). It never emits an error event.
 ```
 
 `participants` is in GameKit's own order, which is the order turns rotate in. A participant
-whose player Apple has not resolved carries the empty string as its nickname.
+whose player Apple has not resolved carries the empty string as its nickname — which is the
+ordinary case for a Play Now match, whose `status` is `matching` and whose opponent does not
+exist yet (R45). `hasData` is true only when GameKit's `matchData` is **both non-nil and
+non-empty**: a freshly created match carries one or the other depending on the path that
+created it, and telling those apart would make R30's starter test depend on which path ran.
 `currentParticipantIndex` is "whose turn"; the board's own current player is engine state and
 is never derived from it ([Tech Design](../Tech%20Design.md) → Persistence and Serialization
 → What an online game adds to the record: "Whose turn it is is engine state and is never
@@ -126,11 +140,21 @@ are all reply *values*. Source: [Tech Design](../Tech%20Design.md) → Online Pl
 Persistence and Serialization, which make every outcome a caller can act on a returned value
 rather than a throw, in both the receive path and the store.
 
+**R46.** Every `message` string a failure value carries (R8, R9) is non-empty. No test pins
+its wording — a caller branches on the value, never on the text, and nothing renders it to a
+player in this feature (see Out of Scope).
+
 **R12.** The Swift side performs no GameKit work until a Dart call arrives: registering the
 channel does not set an authenticate handler, does not present anything, and does not touch
-`GKLocalPlayer`. Source: [Tech Design](../Tech%20Design.md) → Online Play ("Game Center
-sign-in happens when the player first enters online play, not at cold launch. … A player who
-never touches online play never sees Game Center's sign-in banner").
+`GKLocalPlayer`. The channel is registered in `ios/Runner/AppDelegate.swift`, alongside the
+generated plugin registrant, and the matchmaker is presented from the key window's root view
+controller. Source: [Tech Design](../Tech%20Design.md) → Online Play ("Game Center sign-in
+happens when the player first enters online play, not at cold launch. … A player who never
+touches online play never sees Game Center's sign-in banner").
+
+R5's method-not-implemented behaviour and this requirement are Swift-side facts: both are
+covered by the device pass (R40–R41) and by nothing in `flutter test`. Part two revises this
+requirement when it installs `GKLocalPlayerListener`.
 
 ### The Dart interface
 
@@ -168,8 +192,8 @@ class MatchesLoaded     extends LoadMatchesResult { final List<GameCenterMatch> 
 class MatchesLoadFailed extends LoadMatchesResult { final String message; }
 
 abstract class GameCenterBridge {
-  Stream<GameCenterSession> get sessions;
-  GameCenterSession get session;               // the last value; never null
+  Stream<GameCenterSession> get sessions;      // broadcast; replays current on listen
+  GameCenterSession get current;               // the last value; never null
   Future<GameCenterSession> authenticate();
   Future<MatchmakerResult> presentMatchmaker();
   Future<LoadMatchesResult> loadMatches();
@@ -182,17 +206,42 @@ implementation included. On a build with no Swift side (`MissingPluginException`
 `presentMatchmaker()` answers `MatchmakerFailed`, and `loadMatches()` answers
 `MatchesLoadFailed`. Same source as R11.
 
-**R15.** A reply that is not a map, or whose `state`/`status` is absent or an unrecognised
-string, or whose match map is missing a key R10 requires, is treated as the failure value for
-that call (`GameCenterUnauthenticated`, `MatchmakerFailed`, `MatchesLoadFailed`) — never a
-throw, never a partially-filled value.
+**R15.** Decoding is strict and per key, with no coercion — no `toString()`, no numeric
+parsing, no defaulting a missing key. A reply that is not a map, or that violates any row
+below, is treated as the failure value for that call, whole: `GameCenterUnauthenticated` for
+a session reply, `MatchmakerFailed` for `presentMatchmaker`, `MatchesLoadFailed` for
+`loadMatches`. Never a throw, and never a partially-filled value — one bad participant fails
+the whole `loadMatches` reply rather than yielding a list with a hole in it.
+
+| Where | Key | Must be | Violation |
+|---|---|---|---|
+| session map | `state` | String, one of `unauthenticated`, `authenticating`, `authenticated`, `restricted` | `GameCenterUnauthenticated` |
+| session map, `state == "authenticated"` | `nickname` | String, present; may be empty | `GameCenterUnauthenticated` |
+| session map, `state == "authenticated"` | `isUnderage` | bool, present | `GameCenterUnauthenticated` |
+| session map, `state == "restricted"` | `isUnderage` | bool, present | `GameCenterUnauthenticated` |
+| match map | `matchId` | String, non-empty | `MatchmakerFailed` / `MatchesLoadFailed` |
+| match map | `status` | String, one of `matching`, `open`, `ended`, `unknown` | same |
+| match map | `participants` | List of Maps, each with `nickname` String (may be empty) and `isLocalPlayer` bool | same |
+| match map | `localParticipantIndex` | int, a valid index into `participants` | same |
+| match map | `currentParticipantIndex` | int, a valid index into `participants`, or null | same |
+| match map | `hasData` | bool, present | same |
+
+A method reply carrying `state: "authenticating"` is an unrecognised state for a reply (R6)
+and decodes to `GameCenterUnauthenticated`. That does not touch R17: the in-flight
+`GameCenterAuthenticating` value is published by the Dart side before the call goes out, not
+read off a reply.
+
+**R42.** An error or a close on the event channel — including no Swift side at all
+(`MissingPluginException`, which is every `flutter test` run) — leaves the last known session
+value standing, `GameCenterUnauthenticated` when there has been none, and surfaces nothing:
+no throw, no error on `sessions`, no change of value. Same source as R11 and R14.
 
 ### Session state and its provider
 
 **R16.** The session starts at `GameCenterUnauthenticated` and reaches any other value only
-through `authenticate()` or an event on the session channel. Constructing the bridge, reading
-the provider, building any widget, and app launch itself all leave it at
-`GameCenterUnauthenticated`. Source: [Tech Design](../Tech%20Design.md) → Online Play
+through `authenticate()` or an event on the session channel. Constructing the bridge,
+subscribing to `sessions`, reading the provider, building any widget, and app launch itself
+all leave it at `GameCenterUnauthenticated`. Source: [Tech Design](../Tech%20Design.md) → Online Play
 (sign-in on entering online play, not at cold launch).
 
 **R17.** `authenticate()` moves the session to `GameCenterAuthenticating` before the platform
@@ -209,8 +258,11 @@ what makes the two entry points in R19 safe to wire independently.
 
 **R19.** The app authenticates on exactly two occasions and no others: the tap that enters
 online play, and the app being opened from a Game Center invite or "your turn" notification.
-Part one owns the second only as far as the hook — `authenticate()` being callable before the
-first frame and before any screen exists, from whatever handles external entry. Source:
+**This is a constraint on part one, not a deliverable of it.** Part one ships no notification
+hook, no launch-from-invite path and no entry point beyond `authenticate()` itself; what it
+owes is that `authenticate()` is callable before the first frame and before any screen
+exists, so whatever handles external entry in part two can call it. `GKLocalPlayerListener`
+and the launch path are part two's, and nothing here is asserted in `flutter test`. Source:
 [Tech Design](../Tech%20Design.md) → Online Play ("the app authenticates on the tap that
 enters online play, and again when the app is opened from a Game Center invite or a 'your
 turn' notification, since that is entering online play from outside") and → Navigation → Deep
@@ -226,6 +278,13 @@ Riverpod codegen; readable from everywhere) and → In-App Purchases and Entitle
 entitlement provider's shape (a plain value with an in-flight indication, not an async
 wrapper every consumer must branch on). Both providers live in `lib/gamecenter/`, the way
 `gameThemeProvider` lives in `lib/theme/` and `audioServiceProvider` in `lib/audio/`.
+
+**R43.** `sessions` is a broadcast stream: any number of listeners may subscribe at any time,
+each one is replayed the current value on subscribe, and a listener cancelling affects no
+other and tears nothing down. `current` answers the same value that the last subscriber would
+be replayed. The fake (R36) behaves identically — a caller's test must not be able to tell
+the two apart on this. A single-subscription stream would make the provider and any second
+reader mutually exclusive, which is what this forbids.
 
 **R21.** `GameCenterRestricted` is a state of its own and not a flag on
 `GameCenterAuthenticated`, so a caller deciding whether to offer online play branches on the
@@ -254,16 +313,19 @@ failure carrying a message, because a caller that cannot tell a cancel from an e
 behave differently on them ([Tech Design](../Tech%20Design.md) → Online Play, on the receive
 path's enumerated outcomes).
 
-**R25.** Only one matchmaker presentation is in flight at a time: a second
-`presentMatchmaker()` while one is open answers `MatchmakerFailed` rather than presenting a
-second sheet. No doc states this; that a second sheet must not stack is not a judgement call,
-but *which* value the second call gets is, and this is the PRD's pick over queueing it.
+**R25.** Only one matchmaker presentation is in flight at a time, and **the guard is in
+Dart**: a second `presentMatchmaker()` while one is in flight resolves `MatchmakerFailed`
+with no platform call made at all, which is what makes it assertable in `flutter test`. The
+Swift side additionally refuses to present a second sheet, as a backstop covered by the
+device pass. No doc states this; that two sheets must not stack is not a judgement call, but
+*which* value the second call gets is, and this is the PRD's pick over queueing it.
 
 ### Loading the player's matches
 
 **R26.** `loadMatches()` answers every turn-based match Apple currently holds for the local
-player (`GKTurnBasedMatch.loadMatches`), as match maps (R10), most recent first as GameKit
-answers them — this feature imposes no order of its own. It reads only; it creates, stores,
+player (`GKTurnBasedMatch.loadMatches`), as match maps (R10), **in whatever order GameKit
+answers them**. The order is unspecified and no test asserts one; this feature imposes none
+of its own and nothing may depend on it. It reads only; it creates, stores,
 reconciles and deletes nothing. Reconciling them against the open-games list is a later row
 (see Out of Scope).
 
@@ -305,7 +367,7 @@ current participant, so the creator moves first").
 
 | Argument | Value |
 |---|---|
-| `opponentName` | the nickname of the one participant whose `isLocalPlayer` is false, trimmed; `defaultOpponentName` (`lib/state/game_controller.dart`) when that is empty or whitespace-only |
+| `opponentName` | the nickname of the one participant whose `isLocalPlayer` is false, trimmed; `defaultOpponentName` (`lib/state/game_controller.dart`) when that is empty or whitespace-only — the ordinary Play Now case, see R45 |
 | `board` | `newSeries()` from the engine |
 | `matchId` | the match's `matchId` |
 | `seriesId` | freshly minted here, on this call |
@@ -319,13 +381,20 @@ mints no series id"); → Online Play ("The series id … has exactly two source
 first game of the series"); [Menus and UI](../Menus%20and%20UI.md) → Play Game ("An online
 game is titled with the opponent's Game Center nickname, taken when the match is created").
 The blank-nickname fallback is this PRD's — no doc addresses a blank nickname; see Open
-Questions.
+Questions. The handoff importing `defaultOpponentName` from `lib/state/` is accepted rather
+than duplicating the constant: it is the one place the app's default title is written down,
+and a second copy is a second answer.
 
-**R32.** The minted series id is opaque, never parsed and never displayed, and unique across
-devices — not merely within this process, because the accepting device copies it out of the
-first payload and both devices then hold it. Source: [Tech Design](../Tech%20Design.md) →
-Online Play. `mintGameId()` in `lib/storage/` does not satisfy "unique across devices" and is
-not reused here.
+**R32.** The series id is **32 lowercase hex characters, from 128 bits of `Random.secure()`**
+— no new package dependency, and no dependence on a clock a test may freeze. The minter is a
+pure-Dart function in `lib/online/`, which is where the payload that carries a series id
+across the wire already lives, and it imports nothing that layer's purity scan forbids
+(`dart:math` only). Tests assert the format and that 10,000 mints collide zero times. The id
+stays opaque, never parsed and never displayed, and it has to be unique across devices — not
+merely within this process — because the accepting device copies it out of the first payload
+and both devices then hold it. Source: [Tech Design](../Tech%20Design.md) → Online Play.
+`mintGameId()` in `lib/storage/` does not satisfy "unique across devices" and is not reused
+here.
 
 **R33.** A match the store does not hold and this device did not start — an accepted invite
 with no data yet, or a match already carrying the opponent's data — answers
@@ -350,6 +419,45 @@ Questions.
 other path. In particular `OnlineGameAwaitingFirstTurn`, both refusals and the
 already-held case write nothing.
 
+### A deliberate exception to "an online game is never renamed"
+
+A Play Now match comes back from Apple's sheet **before the opponent exists** — `status` is
+`matching`, and the other participant carries no player and so no nickname. The starter still
+has to take the first turn from the board screen, so the record has to exist now, which means
+it has to be titled now, with a name Game Center cannot yet supply. That is why the rule in
+[Tech Design](../Tech%20Design.md) → Persistence and Serialization ("The opponent name is set
+at create and a save never changes it"; "An online game's name is the opponent's Game Center
+nickname, captured when the match is created") gains one narrow exception here. It is
+recorded as an exception rather than a softening of the rule: a save still never renames, and
+this is the only operation that does. To be landed in the design docs at harvest.
+
+**R44.** `GameRepository` gains one operation for that rename — e.g.
+`setOnlineOpponentName(String recordId, String nickname)` — with these rules, and it is the
+only way a stored title ever changes:
+
+- It is allowed on an **online** record only: a record with no `online` values held answers
+  the same "nothing stored" value an id the store never held gets, and writes nothing.
+- An empty or whitespace-only `nickname` is refused, distinctly from "nothing stored", and
+  writes nothing — the same shape the online create's empty-title refusal already has
+  ([Tech Design](../Tech%20Design.md) → Persistence and Serialization: "The storage layer
+  applies no name fallback").
+- Every outcome is a returned value; it never throws.
+- A successful rename touches the title and nothing else: the board, the three `online`
+  values, the created timestamp and the record id are all unchanged. It stamps the updated
+  timestamp, moves the record to the top of `readAllGames`'s order, and emits on
+  `GameRepositoryChanges.changes`, exactly as any save does. A refusal emits nothing, because
+  nothing changed.
+- Both shipped implementations (`InMemoryGameRepository`, `HiveGameRepository`) implement it,
+  and it is asserted in the shared repository test battery both already run, so the two
+  cannot answer it differently.
+
+**R45.** A starter's match whose opponent has not resolved is created exactly as R31 says,
+with `defaultOpponentName` as the title — a placeholder, not a chosen name — and is renamed
+exactly once, through R44, when the opponent resolves, to the nickname Game Center then
+reports. Nothing else in the app calls that rename; it exists for this one case. Noticing the
+resolution and making the call is **part two's**: it arrives on the turn event that carries
+the resolved participants (see Out of Scope). Part one ships the operation, not its trigger.
+
 ### The fake
 
 **R36.** `FakeGameCenterBridge` implements `GameCenterBridge` with no platform channel, and
@@ -371,20 +479,24 @@ cannot honour.
 
 ### What is testable where
 
-**R38.** Every requirement from R13 to R37 is asserted in `flutter test`: the Dart side
-against `FakeGameCenterBridge`, and the channel encode/decode (R4–R11, R14, R15) against a
-mock handler installed with `TestDefaultBinaryMessengerBinding` — the pattern already used in
+**R38.** Every requirement from R13 to R37 **except R19** is asserted in `flutter test`,
+along with R42–R46: the Dart side against `FakeGameCenterBridge`, and the channel
+encode/decode (R4–R11, R14, R15, R46) against a mock handler installed with
+`TestDefaultBinaryMessengerBinding` — the pattern already used in
 `test/audio/fake_audioplayers_platform.dart` and across `test/navigation/`. The handoff
-(R28–R35) is asserted against `InMemoryGameRepository`. Source: `project.json` → testing
-(`flutter test`), [Tech Design](../Tech%20Design.md) → Testing.
+(R28–R35, R45) is asserted against `InMemoryGameRepository`, and R44 in the shared repository
+battery both implementations run. R19 is a constraint on what part one does *not* build and
+has nothing to assert. Source: `project.json` → testing (`flutter test`),
+[Tech Design](../Tech%20Design.md) → Testing.
 
 **R39.** R3 is asserted by a scan test, in the same shape as the existing purity scans: the
 channel-name strings occur in exactly one file under `lib/`.
 
 **R40.** The Swift side is verified by a device pass and by nothing automated: no Swift test
 target is added, and no test asserts that GameKit authenticates, that the sign-in or
-matchmaker view controllers present, or what a real account's restricted and underage flags
-say. Source: [Tech Design](../Tech%20Design.md) → Distribution and Release → CI — local builds
+matchmaker view controllers present, that R5 answers `FlutterMethodNotImplemented`, that R12
+holds, that R25's Swift backstop refuses a second sheet, or what a real account's restricted
+and underage flags say. Source: [Tech Design](../Tech%20Design.md) → Distribution and Release → CI — local builds
 only, and → Testing (`flutter test` is the suite; appearance and platform behaviour are
 checked by running the app). The Game Center capability, entitlement and provisioning profile
 this needs are already live — `RELEASE.md` → Game Center.
@@ -392,8 +504,15 @@ this needs are already live — `RELEASE.md` → Game Center.
 **R41.** The device pass covers, on a real device signed into Game Center: sign-in presenting
 and completing; the matchmaker sheet appearing and offering both Play Now and Invite Friends;
 a match created through it producing a stored online game titled with the opponent's
-nickname; cancelling the sheet storing nothing; and `loadMatches` answering the match just
-created. A child account run covers the underage and restricted flags.
+nickname (or the placeholder title, on a Play Now match — R45); cancelling the sheet storing
+nothing; and `loadMatches` answering the match just created. A child account run covers the
+underage and restricted flags.
+
+**R47.** A throwaway debug entry point may be added to drive that pass — a temporary button
+or a debug-only call site that invokes `authenticate()`, `presentMatchmaker()` and
+`loadMatches()`. It is not shipped: it is removed before the branch is merged, and no
+requirement here depends on it. The real entry point is the "Play online" control, which is
+part two's (see Out of Scope).
 
 ## Out of Scope
 
@@ -406,6 +525,11 @@ Part two and later rows, none of which this feature may preclude:
   precludes it.
 - `GKTurnTimeoutNone` — turns never time out ([Tech Design](../Tech%20Design.md) → Online
   Play). That is set where a turn is ended, which is part two.
+- `GKLocalPlayerListener`, the launch-from-invite and launch-from-notification paths, and the
+  call to `authenticate()` from them (R19). Part two revises R12 when it installs the
+  listener.
+- Noticing that a Play Now opponent has resolved, and calling R44's rename — it arrives on
+  the turn event that carries the resolved participants. Part one ships the operation only.
 - Quit, resign, and deleting an online game.
 - The "Play online" button, the online screens, and whatever hides or disables the entry
   point on a `GameCenterRestricted` account or on a non-iOS build.
