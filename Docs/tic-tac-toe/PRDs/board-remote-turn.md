@@ -100,7 +100,11 @@ arrives while the screen is up replaces the board and unlocks input where it sta
    from the board's current player — and never the opponent's Game Center nickname. In game the
    players are still Player One and Player Two; the nickname titles the game in the open-games
    list and nothing else (Menus and UI → Play Game → Where It Takes You). Tests pin the key and
-   which side is named; the sentence around it is copy and is not pinned.
+   which side is named; the sentence around it is copy and is not pinned. **It takes the turn
+   banner's own place**: while waiting, the banner carries the waiting line instead of
+   *"Player One, you're up!"*, and nothing else on the screen moves — the banner is already the
+   one surface that names whose turn it is when no move is pending (Game Board Design → Turn
+   Indicator; `lib/ui/board/turn_banner.dart`).
 
 9. **The screen needs nothing from the stored record's title**, so no session field carries it
    and no path is added to put one there. This follows from R8: the only thing that wanted the
@@ -108,10 +112,11 @@ arrives while the screen is up replaces the board and unlocks input where it sta
    reaches the player on the list row, which is where the docs put it (Menus and UI → Play Game →
    Where It Takes You).
 
-10. **Nothing renames the players in game.** On `yourTurn` the turn banner and the scoreboard
-    read Player One and Player Two exactly as they do on this phone — the opponent name titles
-    the game in the open-games list and nothing else (Menus and UI → Play Game → Where It Takes
-    You).
+10. **Nothing renames the players in game.** On `yourTurn` the turn banner, the waiting line of
+    R8 and the scoreboard all read Player One and Player Two exactly as they do on this phone —
+    the opponent name titles the game in the open-games list and nothing else (Menus and UI →
+    Play Game → Where It Takes You). The scoreboard's turn highlight is untouched by this
+    feature in every state.
 
 ### Confirming sends
 
@@ -134,7 +139,11 @@ arrives while the screen is up replaces the board and unlocks input where it sta
     `onlineSendFailedKey`, a retry control keyed `onlineRetrySendKey`, and a way out keyed
     `onlineSendFailedExitKey`. The confirmed move stays on the board — a send that fails keeps
     the move on screen to be sent again (Menus and UI → Persistence → *When a game is written to
-    storage*; Tech Design → Online Play).
+    storage*; Tech Design → Online Play). **Those two controls play the button-tap sound and
+    fire no haptic**, exactly as the result card's own exit control already does
+    (`_ExitToMainMenuButton`, `lib/ui/board/result_card.dart`). They are the only controls this
+    feature adds: the waiting and sending surfaces carry none, so they sound nothing and buzz
+    nothing.
 
 15. **The retry calls `sendTurn` with the session's record id and does nothing else.** No second
     move is applied and no new board is built: the same board goes out under the same match id —
@@ -161,7 +170,10 @@ arrives while the screen is up replaces the board and unlocks input where it sta
 
 19. **The screen subscribes to the receiver's outcome stream for as long as it is mounted**,
     through a provider that reads `turnEventReceiverProvider` — call it
-    `turnEventOutcomesProvider`. It never constructs a receiver of its own: one receiver
+    `turnEventOutcomesProvider`. **The subscription is made in `initState`, before the screen's
+    own load is kicked off**, so an outcome landing between mount and the load returning is not
+    missed; the stream is broadcast and replays nothing, so anything that arrives before the
+    listen is gone. It never constructs a receiver of its own: one receiver
     subscribes for the app's lifetime, and a second live one would double-apply every arriving
     turn (Tech Design → Online Play → *The channel contract*). The stream is the seam the board
     screen reads (Tech Design → Online Play → *Every outcome of an arriving turn is published on
@@ -175,7 +187,24 @@ arrives while the screen is up replaces the board and unlocks input where it sta
 
 21. **On one of those two the screen calls `GameController.reloadFromStore(recordId)`**, which
     re-reads the record and replaces the session's board and its three online values — and does
-    **not** raise `isLoading`. The load-before-draw gate exists because a board drawn
+    **not** raise `isLoading`. What it applies is guarded:
+
+    - **The result is applied only when `state.gameId` still equals `recordId` once the read
+      lands**, the same token guard `sendTurn` and `startNewGame` already use — otherwise it is
+      dropped whole. The read is asynchronous, and the player may have left this game and opened
+      another in the meantime; applying it then would drop another game's board onto the screen.
+    - **A read that answers nothing — the record is gone — leaves the session exactly as it
+      was**, which is `loadGame`'s own documented answer for an id the store does not hold
+      (Tech Design → Persistence and Serialization → *Reads return "nothing stored"*).
+    - **`isCelebratingWin` is cleared.** An arriving opponent move ends any celebration that was
+      running, and leaving it set would lock input on a board that is now the local side's turn
+      (Animations → How Animations Play: win sequences block input until the celebration
+      finishes).
+    - **`heldNewMatchId` is left untouched.** It belongs to a rematch this device is in the
+      middle of handing off, not to the record that was just re-read (Tech Design → Online Play →
+      *A rematch's handoff follows the same rule and stores no marker to do it*).
+
+    The load-before-draw gate exists because a board drawn
     before the read lands is the *previous* game's position (Tech Design → Rendering the Board →
     *The screen loads its game before it draws one*); that risk belongs to the first read of a
     screen, not to a refresh of the game already on it, and blanking the board to a spinner on
@@ -201,6 +230,17 @@ arrives while the screen is up replaces the board and unlocks input where it sta
 25. **The result card appears on a finished online game exactly as on a local one** — the
     bottom-anchored panel, after the win celebration, naming what happened, the running score
     and who goes first next time (Menus and UI → Game Over → Rematch → The result card).
+
+    **A game the opponent ended shows the card with no celebration at all.** An arriving turn
+    triggers no animation: no claim pop, no small-board line, no big-board line drawing across
+    and no "X wins" display. The finished board is drawn at rest, win line included, and the
+    card is up — the same thing a reopened finished game shows, which the docs already call the
+    resting state of a finished board (Animations → Where Animations Fire: *"Once the result
+    card appears, the big-board win line stays… It is the resting state of a finished board,
+    shown for as long as the finished board is, including a reopened finished game"*). The
+    celebration belongs to the confirming tap that ends the game, which on an online game is the
+    other device's (`GameController.tapCell` sets the celebration lock; the reload in R21 clears
+    it), so a player who wins by the opponent's move sees the result rather than a replay of it.
 
 26. **On an online game the card's rematch control is not rendered**; the exit-to-main-menu
     control stays, so the card still carries its own way out and nobody is stranded on a
@@ -228,8 +268,12 @@ code: `FakeGameCenterBridge` (`pushSession` to reach an authenticated session �
 refuses otherwise; `scriptEndTurnResult` for a failure; `holdNextEndTurn`/`finishHeldEndTurn` to
 hold a send in flight for R12; `pushTurnEvent` to originate an arriving turn; `endTurnCalls` for
 R15) and `InMemoryGameRepository` for the store, with `turnEventReceiverProvider` reached
-through its provider so one receiver routes the pushed event exactly as it does in the app. No
-golden or pixel assertion: this project's testing preferences rule them out, and everything here
+through its provider so one receiver routes the pushed event exactly as it does in the app.
+**A test must read `turnEventReceiverProvider` — or the outcomes provider that reads it, which
+the screen itself does on mount — before calling `pushTurnEvent`.** Constructing the receiver is
+what subscribes to `turnEvents`, and the fake's stream replays nothing, so an event pushed before
+that read is delivered to nobody and the test fails with an unchanged board rather than a missed
+subscription. No golden or pixel assertion: this project's testing preferences rule them out, and everything here
 is pinned by key, by controller call, or by stored state.
 
 ## Out of Scope
