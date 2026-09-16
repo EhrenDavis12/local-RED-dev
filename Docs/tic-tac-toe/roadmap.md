@@ -254,6 +254,7 @@ release/distribution.
   - Prices come from the store at runtime
   - The parental gate — a word problem, every time
 - Online Play
+  - The board screen drives a turn
   - The channel contract
   - Signing in, and the session anything can read
   - Presenting Apple's matchmaker

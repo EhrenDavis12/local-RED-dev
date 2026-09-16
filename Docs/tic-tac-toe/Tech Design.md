@@ -552,6 +552,11 @@ move they had lined up. For the same reason a cell's tap target is its whole box
 the pixels it paints: an empty cell paints nothing, so a board that only took taps where
 it had drawn something would be inert.
 
+**The same holds for a board the player may not play on at all.** While an online game is
+waiting on the opponent, nothing wraps the board in a pointer blocker and no cell loses its
+handler — the refusal is the state layer's, exactly as an illegal tap's is. See **Online
+Play** below.
+
 **The boundary is a widget, not a rectangle:** a tap a cell takes never clears the
 pending selection; every other tap on the game screen does — the gaps between cells and
 quadrants, the board's margins, the scoreboard, the how-to-play strip. The surface that
@@ -1729,6 +1734,68 @@ enforced on create, and the store never evicts*.
 
 The parental gate that online play raises for a child's account is **Kids Category** below.
 
+### The board screen drives a turn
+
+**An online game plays on the same board screen as a game on this phone**, and that screen
+derives one state to say what it may do: waiting on the opponent, your turn, a move being
+sent, a send that failed, or game over. It is derived from the session alone and never
+stored — whose turn it is is the board's current player compared against the side this
+device plays. The order they are tested in is what makes them right: a failed send, then a
+send in flight, then a finished board, and only then whose turn it is. **A send in flight
+and a failed send outrank a finished board**, because the move that ends the game still has
+to be handed off and a failed send of it has to stay retryable — a winning move whose send
+fails shows the retry, not only the result card. A finished board outranks whose turn it
+is, since its current player is the winner rather than someone to move.
+
+**Only your own turn takes a move.** A tap on the opponent's turn is refused by the state
+layer's tap gate, as its own distinct refusal, checked before legality so it answers the
+same whatever cell it lands on. A refused tap does nothing at all — no mark, no pending
+selection, no shake, no message and no buzz.
+
+**The lock is taps and nothing else.** While waiting on the opponent the board renders
+exactly as it does on your own turn: the forced-quadrant highlight and the last-move
+highlight both stay drawn, nothing dims and nothing is added. Which quadrant the opponent
+must play in is information the player wants, and the two highlights are the board's core
+readability — so there is no dimming, no veil and no online-only treatment to design. How
+the lock is *not* built is **Rendering the Board** above.
+
+**The confirming tap makes one call, and the screen never sends of its own accord.** The
+state layer is what applies the move, marks the game awaiting handoff and hands the encoded
+board to Game Center; the retry on a failed send is the only send the screen itself asks
+for. A retry reads as a send in flight rather than as still failed — the record of the last
+failure clears the moment a send is actually attempted, past every refusal and before the
+platform call. A send Apple accepts says nothing of its own: the board simply goes back to
+waiting on the opponent.
+
+**The screen listens to arriving-turn outcomes for as long as it is mounted, and subscribes
+before it loads its own game.** That stream replays nothing, so an outcome landing between
+mount and the load returning would otherwise be lost. It constructs no receiver of its own —
+one receiver subscribes for the app's lifetime. It acts on exactly two outcomes, a turn
+applied and a record created, and only when the record they name is the one on screen;
+every other outcome changes nothing there, including a re-delivery and every refusal.
+
+**On one of those two it re-reads the record and replaces the board and the online values
+from it.** The re-read draws no loading state: withholding the board until a read lands
+belongs to a screen's first read, and blanking the board to a spinner on every opponent
+move would be a defect of its own rather than that rule being honoured. What it applies is
+guarded — it is dropped whole if the player has left for another game by the time the read
+lands, judged by the record id the same way a send is; a read that answers nothing, the
+record being gone, leaves the session exactly as it was; and a rematch's held match id is
+left untouched, belonging to a handoff in flight rather than to the record just re-read.
+The re-read clears the pending, unconfirmed selection and its preview, since one computed
+against the board that was just replaced is no longer a legal move on the board in front of
+the player; it clears any running win celebration, which would otherwise lock input on a
+board that is now this side's to play; and it clears the awaiting-handoff and failed-send
+marks, the stored board being authoritative once a turn has arrived for it. Nothing else
+runs — input unlocks because the board's current player is now the local side, and a
+re-read is safe to run repeatedly, including one landing while the screen's own first load
+is still in flight.
+
+**Opening an online game is playing, not entering.** From the open-games list or from a
+"your turn" notification, the screen shows the current stored board and nothing more: it
+makes no Game Center call, raises no sign-in and raises no parental gate. See **Kids
+Category** below.
+
 ### The channel contract
 
 **Three channels carry everything, and each side names them in exactly one file.** A method
@@ -2553,6 +2620,7 @@ block other work.
   version, and whether that is distinguishable to them from a corrupt payload.
 - What does the player see for a sign-in that fails or is declined, for a cancelled
   matchmaker, for a move Game Center would not take, and for a GameKit error the bridge
-  reports? Each comes back as its own value and nothing renders any of them; the calm,
-  kid-facing message a restricted account gets is decided in **Online Play** above, but its
-  wording is not.
+  reports? Each comes back as its own value; a send the board screen made is the one that
+  now draws something — a message, a retry and a way out — and nothing renders the rest.
+  The calm, kid-facing message a restricted account gets is decided in **Online Play**
+  above, but its wording is not, and neither is the failed send's.

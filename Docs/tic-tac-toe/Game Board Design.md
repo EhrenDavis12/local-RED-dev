@@ -144,6 +144,10 @@ rendering of the current player's own mark beside it. Its top is anchored to the
 of the grid, not to whatever sits under it, so neither the banner nor the mark moves as
 the how-to-play strip below them changes length.
 
+On an online game the banner carries that game's own state instead of naming the active
+player — see [Menus and UI](./Menus%20and%20UI.md) → How to Play — the On-Board Legend and
+Hint. The scoreboard's highlight is unchanged in every one of those states.
+
 Like everything else, what the highlight looks like is theme-driven — see
 [Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
 
@@ -370,6 +374,10 @@ button: pick something else, or tap away.
 **Any tap outside the nine quadrants clears a pending, unconfirmed selection.** That
 includes the legend/how-to-play strip, the scoreboard, the settings button, and opening any
 menu or sheet. One rule, uniformly applied.
+
+**An opponent's turn arriving clears a pending selection too**, on an online game. The
+board it was chosen against has been replaced, and a pending selection is always a legal
+move on the board in front of the player, with the preview being that move applied.
 
 The gutters between cells (3pt) and the quadrant padding (5pt) are outside the cells, so a
 near-miss between two cells clears the selection rather than doing nothing. That is the

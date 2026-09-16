@@ -342,6 +342,18 @@ confirming it. That is what the approved handoff draws on screen `2d`.
 Because the banner is visible whenever there is a turn to announce, it takes vertical
 space on every board screen with a turn to announce, not only while a move is pending.
 
+**On an online game the banner's slot carries that game's own state instead.** While it is
+the opponent's turn it names the side being waited on — Player One or Player Two, read off
+the board and never the opponent's Game Center nickname — in place of *"Player One, you're
+up!"*, with that side's own mark beside it as always, and nothing else on the screen moves.
+While a confirmed move is being handed to Game Center the banner says so, and it reads the
+same whether that send was begun by the confirming tap or by a retry. A send Game Center
+refused says so and carries two controls with it: send it again, and leave for the main
+menu. Those two are the only controls the online states add — each plays the button-tap
+sound and fires no haptic, like the result card's own way out — and the confirmed move
+stays on the board behind them, to be sent again. What any of these say is not settled —
+see Open Questions.
+
 The free-choice cue is a separate matter and lives in the how-to-play strip below the
 board — see [Game Board Design](./Game%20Board%20Design.md) → The free-choice state. On a
 free-choice turn it shows alongside the legend and the hint, not instead of them. It drops
@@ -412,11 +424,11 @@ quadrants, reaching the surfaces that open on top of it — see
 
 **The back-swipe can't carry a player out of a live game either — the gesture is turned
 off on the game screen.** The only way off the board is the explicit exit: quick actions
-mid-play, or back to main menu on the result card. It's turned off there because a swipe
-off the board would slip past that clearing, which every other way off the board does. The
-block belongs to the screen rather than to the state of the game, so it holds over a
-finished board as well as a live one — the result card carries its own way out, so nobody
-is stranded on one.
+mid-play, back to main menu on the result card, or the way out offered beside a send Game
+Center refused. It's turned off there because a swipe off the board would slip past that
+clearing, which every other way off the board does. The block belongs to the screen rather
+than to the state of the game, so it holds over a finished board as well as a live one —
+the result card carries its own way out, so nobody is stranded on one.
 
 **The open-games list has a back control that leaves it without picking anything.** `1b`
 draws one; where it goes isn't decided — see Open Questions below.
@@ -667,7 +679,7 @@ time (see [Rules](./Rules.md) → Turn Order Across Games).
 
 **Nothing resets the board on its own.** A game the players finished and never rematched
 stays finished — reopen it from the open-games list and you get that finished board with
-its win line drawn and the result card below it, both buttons live, exactly as it was left.
+its win line drawn and the result card below it, exactly as it was left.
 
 ### The result card
 **On a win, the result card is preceded by the game-win sequence** — the deciding
@@ -698,8 +710,24 @@ that moved identifiable, and **it says who goes first in the next game**.
 the main menu.** *"On game over result card we should have a button for next game as well
 as back to main menu."*
 
+**On an online game the card shows only the way out.** The rematch control is not rendered
+there, so the card still carries its own exit and nobody is stranded on a finished board.
+It is hidden rather than shown disabled, because nothing defines a disabled-control
+treatment and a hidden control needs no theme value of its own. Taking the local rematch on
+an online game would advance the board and write it under the finished match's id — the
+state the single write of a next game exists to make impossible (see
+[Tech Design](./Tech%20Design.md) → Persistence and Serialization).
+
+**A game the opponent ended shows the card with no celebration.** An arriving turn plays no
+animation at all — no claim pop, no small-board line, no big-board line drawing across and
+no "X wins" display — so the finished board is drawn at rest with its win line and the card
+is up, which is the same thing a reopened finished game shows (see
+[Animations](./Animations.md) → Where Animations Fire). The celebration belongs to the
+confirming tap that ends the game, and on an online game that tap was made on the other
+phone.
+
 The card is self-sufficient, so the player is never dependent on the settings button to
-leave a finished game. The result stays up until one of the two is pressed, and leaving
+leave a finished game. The result stays up until one of its buttons is pressed, and leaving
 destroys nothing — the game and its score are already saved, and the series is picked back
 up from the open-games list exactly as it stands.
 
@@ -801,8 +829,9 @@ an open game** above.
   listed above as a future menu item to consider.)
 - **Which strip content belongs to which board state, and is the set of states exactly the
   three the handoff draws (`1d`, `1e`, `2d`)?** The board has more states than that — game
-  over, and free choice after being sent to a dead quadrant — and it's not decided what,
-  if anything, this strip shows for those.
+  over, free choice after being sent to a dead quadrant, and on an online game waiting on
+  the opponent, a move being sent and a send that failed — and it's not decided what, if
+  anything, this strip shows for those.
 - **What does the strip say to explain the sending rule?** Nothing written or drawn says,
   in words, that the square you play inside a small board is what decides which board your
   opponent plays in next. Whatever it says has to work in the words a player reads —
