@@ -7,7 +7,6 @@
 > skips triage — tag it, or the queue tags it on pickup.
 
 ---
-- Online games in the Open Games list: your turn, waiting on them, and which games are online [look] [M] — a player cannot open a game they cannot play without knowing why, and the list is the only place an invited match first appears.
 - Game over online: report the outcome, end the match, and make the rematch button start the next match in the same series [prd] [M] — Apple's rematch mints a new match id, so whether the scoreboard survives is persistence semantics, and a wrong guess silently resets a series players have been running for days.
 - The network scan the tech design claims, with StoreKit and GameKit as the two sanctioned paths, and the doc's "not built" prose revised [look] [S] — the scan does not exist in the suite at all, so the rule the docs call checked is currently only asserted in prose.
 - Play a full online game between two real devices on a child account [look] [S] — sign-in, find, take turns, the your-turn notification and a rematch; nothing above produces that evidence and the sandbox does not reproduce a restricted child account.
