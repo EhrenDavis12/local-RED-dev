@@ -295,3 +295,14 @@
     Branch queue/play-online-button, stacked on queue/parental-gate. Message wording still
     open. The Game Center flow itself needs a real device with a sandbox account (the
     two-devices row).
+- 2026-09-16 · Game Center bridge, part two: end a turn with the board, receive the opponent's turn, quit and resign [prd] [M] · 14h · 8157b4c · http://localhost:3000/d/claude-agents?from=1789524000000&to=1789574400000
+  - Full PRD path: 46 requirements, tests first (a two-device relay property test among
+    them), 1294 tests green, iOS simulator build green, three review rounds (per-record send
+    state, held rematch id captured once, serialized receiver, a throw never poisons the
+    queue, resign never wipes a board, fake gates on the session), harvested into Tech
+    Design (three channels, receive routing, save-after-accept, rematch handoff, resign on
+    delete) and Menus and UI; PRD deleted. Branch queue/game-center-bridge-2, stacked on
+    queue/play-online-button. Assumptions recorded in Blocked: delete resigns; the board
+    locks while a move awaits handoff. Device-pass notes: the turn-event buffer replays in
+    load-completion order, not strict arrival order; a first-ever invite on a phone with no
+    online game waits for a Play online tap (question in Blocked).
