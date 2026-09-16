@@ -306,3 +306,9 @@
     locks while a move awaits handoff. Device-pass notes: the turn-event buffer replays in
     load-completion order, not strict arrival order; a first-ever invite on a phone with no
     online game waits for a Play online tap (question in Blocked).
+- 2026-09-16 · The board screen drives a remote turn: input locked when it is not your turn, confirm sends, an arriving turn replaces the board [prd] [M] · 10h · 6928993 · http://localhost:3000/d/claude-agents?from=1789574400000&to=1789610400000
+  - Full PRD path: 27 requirements, tests first, 1335 tests green, review clean (two
+    hardenings taken), harvested into Tech Design ("The board screen drives a turn"),
+    Menus and UI (banner states, online result card) and Game Board Design; PRD deleted.
+    Branch queue/board-remote-turn, stacked on queue/game-center-bridge-2. Not yet looked
+    at on a device — the online flow needs two devices with sandbox accounts (last row).
