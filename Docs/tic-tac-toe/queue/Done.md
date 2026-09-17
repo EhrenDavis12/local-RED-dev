@@ -347,5 +347,7 @@
     turn has passed, so the starter passes the turn at once and the joiner moves first (roles are
     derived from whose turn Apple says it is). New Game: On this phone / Invite a friend / Play an
     anonymous game; searching screen with background search, retry of the handoff, 15s catch-up;
-    row says looking for a player. TestFlight build 11, 1600+ tests. Branch queue/anonymous-game.
+    row says looking for a player. A doc check then caught that a searching game was never
+    renamed to the joiner's nickname and the mark never cleared on rename; fixed. TestFlight build
+    12, 1607 tests. Branch queue/anonymous-game (7acfaaf).
   - NOT yet tried on phones.
