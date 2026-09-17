@@ -111,15 +111,15 @@ Play Game branches on whether there are existing open games.
 - **Open games exist** — a new screen listing all open games, with **New Game** as an
   option at the **top of the list**.
 - **Each open game is titled with its opponent's name** — that's what a row shows.
-- **Selecting New Game asks which kind of game first** — on this phone, or online. On this
-  phone then prompts for the opponent's name, with a default of **ItSaMeMaRiO**; online
-  goes to Game Center instead and nobody types a name. See **Starting a game — on this
-  phone or online** below.
-- **An online game is titled with the opponent's Game Center nickname**, taken when the
-  match is created. Nobody types it. Nothing renames it either, with one exception: a
-  random-opponent game comes back from Apple's sheet before the opponent exists, so it is
-  titled ItSaMeMaRiO as a placeholder and takes the real nickname once Game Center resolves
-  it — see [Tech Design](./Tech%20Design.md) → Online Play.
+- **Selecting New Game asks which kind of game first** — on this phone, invite a friend, or
+  play an anonymous game. On this phone then prompts for the opponent's name, with a default
+  of **ItSaMeMaRiO**; the two online choices go to Game Center instead and nobody types a
+  name. See **Starting a game — on this phone or online** below.
+- **An online game is titled with the opponent's Game Center nickname**, taken when the match
+  is created. Nobody types it. Nothing renames it either, with one exception: an anonymous
+  game is started before there is an opponent to name it after, so it carries a placeholder
+  title while it looks for a player and takes the real nickname once one is found — see
+  [Tech Design](./Tech%20Design.md) → Online Play.
 
 ```
 ┌─────────────────────────┐
@@ -146,8 +146,11 @@ the top. It shows every open game — none is hidden, truncated or paginated awa
 the cap raised to 100 the list scrolls.
 
 **A row shows the opponent's name, and on an online game a line saying where that game
-stands.** What else a row carries is not settled: the handoff draws a relative time and three
-score chips on every row, and neither is decided — see Open Questions.
+stands.** An anonymous game that has not found anybody yet says it is looking for a player,
+and that line outranks every other one except the opponent having left; opening that row goes
+to the searching screen rather than the board. What else a row carries is not settled: the
+handoff draws a relative time and three score chips on every row, and neither is decided —
+see Open Questions.
 
 **The footer drawn on `1b` — "Three saved games. Starting a fourth replaces the oldest." —
 does not ship.** Nothing ever removes a game the player did not choose to delete, so the
@@ -163,31 +166,43 @@ Session Structure — Games and Continuing.
 replaces it. Leaving it empty falls back to ItSaMeMaRiO rather than blocking, and the
 field takes at most 16 characters. Cancelling the prompt creates nothing. The prompt never
 comes up for an online game, whose title is the opponent's Game Center nickname — though an
-online game whose opponent has not resolved yet borrows ItSaMeMaRiO as its placeholder until
-that nickname arrives.
+online game whose opponent has not resolved yet carries a placeholder title until that
+nickname arrives.
 
 **Opening a game from the list shows that game.** The board is not drawn until the saved
 position has loaded, so a player never sees an empty board, or the game they were in
 before, standing in for it.
 
 ### Starting a game — on this phone or online
-**New Game asks which kind of game first.** Two choices, weighted the same: **On this
-phone** and **Online**. On this phone goes to the opponent-name prompt above. Online runs
-the online entry — Game Center sign-in, the grown-up question if the account is a child's,
-then Apple's find-a-player sheet, where the player picks Play Now or invites a friend. See
+**New Game asks which kind of game first.** Three choices, weighted the same: **On this
+phone**, **Invite a friend** and **Play an anonymous game**. On this phone goes to the
+opponent-name prompt above. Both online choices run the same online entry first — Game Center
+sign-in, then the grown-up question if the account is a child's — and differ only in how the
+opponent is found: Invite a friend opens Apple's find-a-player sheet, and Play an anonymous
+game is our own door to a random opponent and shows no Apple sheet at all. See
 [Tech Design](./Tech%20Design.md) → Online Play.
 
-**The Online choice is hidden where there is no Game Center**, which today means anything
-that is not iOS. With one choice left the prompt skips the question and opens the name
-prompt straight away.
+**Play an anonymous game exists because Apple's sheet cannot be made to say what it does.**
+Apple's own **Start Game** button says nothing about playing a random person, and it starts a
+game before anybody has been found, so a player who taps it is left on a board with no
+opponent and no explanation. Our own door can say what it is doing: a searching screen while
+it looks, and the game starting once a pair is actually found, so the game knows you found
+somebody.
+
+**Both online choices are hidden where there is no Game Center**, which today means anything
+that is not iOS. With one choice left the prompt skips the question and opens the name prompt
+straight away.
 
 **Local and online games share one limit and one list.** There is no separate online
 allowance and no second list of games — the open-games list is where every game lives, and
 New Game is the only place any of them is started from.
 
-**New Game refuses at the cap before it does anything else**, so Apple's sheet is never
-opened by a player with no slot to put the game in. A match started at the cap would be
-left orphaned in Game Center with nothing on this phone pointing at it.
+**New Game refuses at the cap before anything is asked of Apple**, whichever online choice was
+tapped, so neither Apple's sheet nor a search for a random opponent is ever reached by a player
+with no slot to put the game in. A match started at the cap would be left orphaned in Game
+Center with nothing on this phone pointing at it.
+
+**Invite a friend ends one of these ways:**
 
 - **A match is found** — the game is stored and opens on the board, the same as picking it
   out of the list.
@@ -197,10 +212,33 @@ left orphaned in Game Center with nothing on this phone pointing at it.
 - **The account is not allowed to play online**, **the open-games box is full**, or
   **Game Center fails** — each shows a short message and the player stays on the list.
 
-**On the other phone the game appears the moment the invite is accepted** — Player Two,
-waiting on the other player — because the starting phone puts the fresh board into the
-match as soon as the match is made. If that does not go through, the game turns up with
-the first move instead, and a short message says they joined until it does.
+**On the other phone an invited game appears the moment the invite is accepted** — Player Two,
+waiting on the other player — because the starting phone puts the fresh board into the match as
+soon as the match is made. If that does not go through, the game turns up with the first move
+instead, and a short message says they joined until it does.
+
+**Play an anonymous game ends one of these ways:**
+
+- **Somebody was already waiting** — their game is picked up as it stands, stored here, and
+  opens on the board with the first move to make. The player who joins an anonymous game plays
+  **Player One** and moves first.
+- **Nobody was waiting** — a game is started and stored here straight away, marked as looking
+  for a player, and the searching screen comes up. The player who starts an anonymous game
+  plays **Player Two**, so whoever joins moves first.
+- **The account is not allowed to play online**, **the open-games box is full**, or
+  **Game Center fails** — each shows a short message and the player stays on the list.
+
+**A game that is still looking for a player is an ordinary open game.** It is in the list, it
+holds a slot against the limit like any other, and deleting it is how the search is called off
+— the ordinary delete, with its best-effort resign. Its row says it is looking for a player,
+and opening it goes back to the searching screen rather than to the board.
+
+**The searching screen** is calm: a looping indicator, a line saying it is looking for a
+player, and a button to keep looking in the background, which goes back to the open-games list
+and leaves the game searching. While it is up it keeps checking that the handoff to Game Center
+actually went out — on arrival and on every check after — and a **Retry** appears only when it
+has not. It catches up with Game Center every fifteen seconds, and when the first move arrives
+or the opponent's name resolves it says who was found for a beat and then opens the board.
 
 **An invite that arrives while the box is full creates nothing** — a message says to delete
 a game to make room for it. Deleting one brings the game in: the app catches up with Game
@@ -281,6 +319,11 @@ reached. **Deleting a game the other player already left resigns nothing** — t
 there is nothing to tell them. Either way the game is gone for good: the phone remembers that
 match well enough to throw away anything that turns up for it afterwards, so a deleted game
 never reappears. See [Tech Design](./Tech%20Design.md) → Online Play.
+
+**Deleting an anonymous game that is still looking for a player cancels the search.** There is
+no separate cancel: the search is the game, so the ordinary delete — the same confirmation, the
+same best-effort resign, the same memory of the match so nothing turns up for it afterwards —
+is what stops it.
 
 **Deleting the last open game leaves the player on the list**, with New Game alone on it,
 rather than dropping them into a new game.
@@ -391,9 +434,9 @@ right now."* already says it.
 1. **Main Menu** — Play Game + Theme + Settings + About Us buttons.
 2. **Open Games List** — lists all open games, with New Game at the top of the list;
    reached from Play Game when open games exist.
-3. **New Game Prompt** — asks first whether the game is on this phone or online, then, for a
-   game on this phone, asks for the opponent's name with **ItSaMeMaRiO** as the default.
-   Undecided whether it's its own screen or an overlay.
+3. **New Game Prompt** — asks first whether the game is on this phone, an invite to a friend
+   or an anonymous game, then, for a game on this phone, asks for the opponent's name with
+   **ItSaMeMaRiO** as the default. Undecided whether it's its own screen or an overlay.
 4. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
 5. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
    the Theme button. Three themes at launch — **Neon**, **Classic Red vs Blue** and
@@ -405,9 +448,13 @@ right now."* already says it.
    not an overlay: nothing stays visible behind it. See Main Menu → About Us.
 8. **Parental Gate** — the grown-up check, over whatever raised it rather than in place of
    it. See [The Parental Gate](#the-parental-gate) below.
+9. **Searching** — the waiting room for an anonymous game that has not found a player yet.
+   Reached by starting one, and by opening a still-searching game from the open-games list.
+   See Play Game → Where It Takes You → Starting a game — on this phone or online.
 
 The first seven each have an approved drawing in
-[Design Handoff](./design_handoff_game_ui/README.md); the parental gate has none:
+[Design Handoff](./design_handoff_game_ui/README.md); the parental gate and the searching
+screen have none:
 
 | Screen above | Handoff screen |
 |---|---|
@@ -663,8 +710,8 @@ four toggles the in-game surface carries — on the *same screen* reading, the A
 row, the Music row and the purchases section all arrive in game together.
 
 ## The Parental Gate
-**The gate is its own surface, over whatever raised it** — the purchases section, and
-choosing **Online** in New Game, for a child's account. It shows a line addressed to a
+**The gate is its own surface, over whatever raised it** — the purchases section, and either
+online choice in New Game, for a child's account. It shows a line addressed to a
 grown-up, the problem in words, a field for the answer, a Submit, and a way out. After the
 third wrong answer it stops asking: the prompt, the problem, the field and Submit all go,
 and what is left is a line saying the tries are used up, with the way out. The way out and

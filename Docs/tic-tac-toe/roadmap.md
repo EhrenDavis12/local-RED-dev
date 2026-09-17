@@ -259,6 +259,8 @@ release/distribution.
   - Signing in, and the session anything can read
   - Catching up with Game Center
   - Presenting Apple's matchmaker
+  - Finding a random opponent without a sheet
+  - The searching screen
   - A found match becomes a stored game
 - Kids Category
 - Crash Reporting
