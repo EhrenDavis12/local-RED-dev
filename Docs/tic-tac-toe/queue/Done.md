@@ -334,3 +334,11 @@
     closed, finishing move unretryable after a lost reply. Also: Play Game with no games now opens
     the New Game choice. TestFlight build 9, 1503 tests. Branch queue/game-over-online.
   - NOT yet tried on phones: game over on both phones, the other player leaving, rematch.
+- 2026-09-18 · Leaving an online game and coming back must keep it playable (device report on TestFlight build 9) [look] [M] · 3h · 4604af6 · http://localhost:3000/d/claude-agents?from=1789776000000&to=1789788600000
+  - Root cause: an online move is stored only after Apple's ok, so leaving or losing the reply in
+    that gap left the phone one move behind by its OWN move, and the receive rule refused every
+    payload after that. Fixed with a healing rule (Apple's board is accepted when it is the local
+    player's own single move, or that plus the opponent's reply), idempotent end-turn, 30s
+    timeouts so a send can't wedge, a load token so a send resuming across a reload can't write a
+    stale board, opening a different game from a notification reloads the board, a move made
+    during launch sign-in waits for it. TestFlight build 10. Branch queue/online-leave-return.
