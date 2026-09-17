@@ -7,3 +7,5 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
+- Play an anonymous game: our own button instead of Apple's Start Game, a searching screen, and the game starts when a player is found [look] [M] · started 2026-09-18T09:20 · branch queue/anonymous-game · session workTheQueue
+  - Asked for by the user after TestFlight build 10: rename Apple's "Start Game" to "Play an anonymous game", go to a searching screen, start once a pair is found.
