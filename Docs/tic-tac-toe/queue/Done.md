@@ -321,3 +321,16 @@
     launch plus a joined-invite message (build 7). The user confirmed multiplayer works, and
     said getting it to work was not smooth: review the flow and smooth it, and manage local
     and online games in one place since they share the 3-game limit.
+- 2026-09-17 · Smooth the online flow: one place to start and manage games, invited phone gets the game on accept, notifications open the game, catch-up with Game Center [look] [M] · 6h · 81c7db0 · http://localhost:3000/d/claude-agents?from=1789704600000&to=1789726200000
+  - Light path from the two-phone test. Play online left the main menu; New Game asks on this
+    phone or online; Apple's own match list hidden; starter saves the fresh board so the invited
+    phone gets the game on accept; tapped invites/notifications open the board; catch-up at
+    launch, resume and after a delete. TestFlight build 8. Branch queue/smooth-online-flow.
+- 2026-09-17 · Game over online: report the outcome, end the match, and make the rematch button start the next match in the same series [M] · 5h · 508b6a4 · http://localhost:3000/d/claude-agents?from=1789726200000&to=1789744200000
+  - Built on the light path (only stored change is one additive yes/no). Finishing move ends the
+    match; opponent-left state on row, banner and board; online rematch. One review found four
+    device-only defects, all fixed before shipping: deleted games resurrected by catch-up (now
+    remembered and dropped), both-tap-rematch deadlock, online-entry messages lost when the sheet
+    closed, finishing move unretryable after a lost reply. Also: Play Game with no games now opens
+    the New Game choice. TestFlight build 9, 1503 tests. Branch queue/game-over-online.
+  - NOT yet tried on phones: game over on both phones, the other player leaving, rematch.
