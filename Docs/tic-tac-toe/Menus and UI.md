@@ -14,9 +14,6 @@ The game needs a main menu.
 - **Play Game** — if there are no existing games, takes the player straight into a new
   two-player same-phone game. If there are existing games, takes the player to a screen
   listing all open games. Large.
-- **Play online** — second in the list, directly under Play Game. Starts a game against
-  someone on their own phone. Large, same weight as Play Game. See **Play online → Where
-  It Takes You** below.
 - **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
 - **Settings** — opens the settings menu. Smaller than the three above it.
@@ -24,11 +21,10 @@ The game needs a main menu.
 
 **Settings and About Us sit side by side in one row**, sharing its width — not two more
 full-width buttons stacked under the large ones. So the menu has two button tiers: the
-big three, and the small pair beneath them.
+big two, and the small pair beneath them.
 
-**Play Game, Play online and Theme are the same tier, not merely similar.** All three draw
-from one treatment, so a change to one is a change to all of them and no theme can drift
-them apart.
+**Play Game and Theme are the same tier, not merely similar.** Both draw from one
+treatment, so a change to one is a change to the other and no theme can drift them apart.
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
 same visual weight as Play Game.
@@ -58,10 +54,6 @@ the app version — `Theme: Neon · v0.1.0` under Neon.
 │   │                 │   │
 │   │    PLAY GAME    │   │
 │   │                 │   │
-│   └─────────────────┘   │
-│                         │
-│   ┌─────────────────┐   │
-│   │   PLAY ONLINE   │   │
 │   └─────────────────┘   │
 │                         │
 │   ┌─────────────────┐   │
@@ -98,8 +90,8 @@ words:
 > "We want the about us but it can be the last button in the list for now we might move it
 > in the future but lets add it here."
 
-So the main menu carries five buttons, in order: Play Game, Play online, Theme, Settings,
-About Us. The position is explicitly provisional — the user said "for now we might move it
+So the main menu carries four buttons, in order: Play Game, Theme, Settings, About Us. The
+position is explicitly provisional — the user said "for now we might move it
 in the future" — so a later reordering is expected rather than a reversal.
 
 Because Settings and About Us share a row, that pairing is the part a later reorder has to
@@ -116,8 +108,10 @@ Play Game branches on whether there are existing open games.
 - **Open games exist** — a new screen listing all open games, with **New Game** as an
   option at the **top of the list**.
 - **Each open game is titled with its opponent's name** — that's what a row shows.
-- **Selecting New Game prompts for the opponent's name**, with a default of
-  **ItSaMeMaRiO**. That prompt is for a game on this phone.
+- **Selecting New Game asks which kind of game first** — on this phone, or online. On this
+  phone then prompts for the opponent's name, with a default of **ItSaMeMaRiO**; online
+  goes to Game Center instead and nobody types a name. See **Starting a game — on this
+  phone or online** below.
 - **An online game is titled with the opponent's Game Center nickname**, taken when the
   match is created. Nobody types it. Nothing renames it either, with one exception: a
   random-opponent game comes back from Apple's sheet before the opponent exists, so it is
@@ -176,6 +170,54 @@ that nickname arrives.
 position has loaded, so a player never sees an empty board, or the game they were in
 before, standing in for it.
 
+### Starting a game — on this phone or online
+**New Game asks which kind of game first.** Two choices, weighted the same: **On this
+phone** and **Online**. On this phone goes to the opponent-name prompt above. Online runs
+the online entry — Game Center sign-in, the grown-up question if the account is a child's,
+then Apple's find-a-player sheet, where the player picks Play Now or invites a friend. See
+[Tech Design](./Tech%20Design.md) → Online Play.
+
+**The Online choice is hidden where there is no Game Center**, which today means anything
+that is not iOS. With one choice left the prompt skips the question and opens the name
+prompt straight away.
+
+**Local and online games share one limit and one list.** There is no separate online
+allowance and no second list of games — the open-games list is where every game lives, and
+New Game is the only place any of them is started from.
+
+**New Game refuses at the cap before it does anything else**, so Apple's sheet is never
+opened by a player with no slot to put the game in. A match started at the cap would be
+left orphaned in Game Center with nothing on this phone pointing at it.
+
+- **A match is found** — the game is stored and opens on the board, the same as picking it
+  out of the list.
+- **The match is waiting on the other player's first move** — a short message says so and
+  the player stays on the open-games list. The game turns up in the list once that first
+  turn lands.
+- **The account is not allowed to play online**, **the open-games box is full**, or
+  **Game Center fails** — each shows a short message and the player stays on the list.
+
+**On the other phone the game appears the moment the invite is accepted** — Player Two,
+waiting on the other player — because the starting phone puts the fresh board into the
+match as soon as the match is made. If that does not go through, the game turns up with
+the first move instead, and a short message says they joined until it does.
+
+**An invite that arrives while the box is full creates nothing** — a message says to delete
+a game to make room for it. Deleting one brings the game in: the app catches up with Game
+Center after every delete, and the invite it turned away arrives on that catch-up.
+
+**The list refreshes itself when a turn arrives** — a row that said it was waiting on the
+other player says it is your turn, without the player leaving the screen and coming back.
+
+**What any of those messages say is not settled** — see Open Questions.
+
+**These messages use the themed snackbar the New Game prompt already uses for its own
+full-box message** — one style for one kind of message, whichever door raised it. A new
+message replaces one still on screen rather than queueing behind it.
+
+**A second tap while one is already in flight does nothing.** One sign-in, one gate and one
+matchmaker at a time.
+
 ### What an open game holds
 **An open game holds a whole series — the board plus the running score.** A rematch
 continues in the same open game with the scoreboard intact, and resuming a game from the
@@ -197,9 +239,11 @@ freed only by the player deleting one — see **Deleting an open game** below, a
 evicts. What the New Game action offers a player who is already at the cap is not settled
 — see Open Questions.
 
-**Online games count against the same cap.** An online game holds a slot exactly as a game
-on this phone does, so a player at the cap can neither start one nor accept an invite to
-one until they delete a game. There is no separate online allowance.
+**Online games count against the same cap, and there is one list, not two.** An online game
+holds a slot exactly as a game on this phone does, so a player at the cap can neither start
+one nor accept an invite to one until they delete a game. There is no separate online
+allowance and no second list — an invite turned away at the cap comes back in once a game
+is deleted. See **Starting a game — on this phone or online** above.
 
 ### Deleting an open game
 **The open-games list carries a delete action, so a slot can be freed.** With a cap of 3
@@ -241,33 +285,6 @@ Consequence for theming: the trash button and the modal's **Yes** are the only
 no delete affordance at all on screen `1b` — this section is the source of the affordance,
 not the drawing.
 
-## Play online → Where It Takes You
-Play online starts a game against someone on their own phone, over Game Center. Tapping it
-signs the player in first — Apple's own sign-in sheet comes up if it needs to — then raises
-the parental gate if the account is a child's, then shows Apple's matchmaker, where the
-player picks Play Now or invites a friend. See [Tech Design](./Tech%20Design.md) →
-Online Play.
-
-- **A match is found** — the game is stored and opens on the board, the same as picking it
-  out of the open-games list.
-- **The match is waiting on the other player's first move** — a short message says so and
-  the player stays on the menu. The game turns up in the open-games list once that first
-  turn lands.
-- **The account is not allowed to play online**, **the open-games box is full**, or
-  **Game Center fails** — each shows a short message and the player stays on the menu.
-
-A player at the cap is told the box is full and offered nothing else for now. Whether that
-is where it lands is the same open question New Game has at the cap — see Open Questions.
-
-**What any of those messages say is not settled** — see Open Questions.
-
-**These messages use the themed snackbar the New Game prompt already uses for its own
-full-box message** — one style for one kind of message, whichever door raised it. A new
-message replaces one still on screen rather than queueing behind it.
-
-**A second tap while one is already in flight does nothing.** One sign-in, one gate and one
-matchmaker at a time.
-
 ## A New Game → What It Starts
 - A **two player game on the same exact phone**. One device, passed back and forth.
 - It starts **empty** — no marks anywhere on the nine boards, a score of **0–0–0**, and
@@ -275,7 +292,8 @@ matchmaker at a time.
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
 - No AI opponent. This section is the game on this phone; an online game is started from
-  **Play online** — see **Play online → Where It Takes You** above, and
+  the same New Game, by choosing Online — see **Play Game → Where It Takes You** →
+  **Starting a game — on this phone or online** above, and
   [Tech Design](./Tech%20Design.md) → Online Play.
 
 ## Pass-and-Play Turn Handoff
@@ -362,7 +380,7 @@ else. A forced quadrant needs no cue of its own, since *"The only board you can 
 right now."* already says it.
 
 ## Screens (so far)
-1. **Main Menu** — Play Game + Play online + Theme + Settings + About Us buttons.
+1. **Main Menu** — Play Game + Theme + Settings + About Us buttons.
 2. **Open Games List** — lists all open games, with New Game at the top of the list;
    reached from Play Game when open games exist.
 3. **New Game Name Prompt** — asks for the opponent's name when New Game is picked, with
@@ -394,8 +412,7 @@ The first seven each have an approved drawing in
 | Game over | `1g — Modal: winner`, `1h — Modal: draw` |
 | About Us | `1c — About Us` |
 
-`1a` draws the menu with four buttons, from before Play online existed — the fifth button
-is built and the drawing has not caught up.
+`1a` draws the menu's four buttons, and the menu carries exactly those four.
 
 Content for About Us is still unsettled — see Main Menu → About Us.
 
@@ -800,12 +817,15 @@ an open game** above.
   is built and it works, but nothing draws it and nothing settles its wording — the grown-up
   prompt, the problem line, the Submit and the out-of-attempts line are all the screen's own
   choice for now.
-- **What do the Play online messages say?** Four of them land on the menu — the account is
-  not allowed to play online, the match is waiting on the other player, the open-games box
-  is full, and Game Center couldn't do it — and none of the wording is settled. What a
-  player is told for a declined sign-in, a cancelled matchmaker or a payload that is turned
-  away is [Tech Design](./Tech%20Design.md) → Open Questions → *Online play — what the
-  player is told*.
+- **What do the online messages say?** Four land on the open-games list, where New Game
+  raised them — the account is not allowed to play online, the match is waiting on the
+  other player, the open-games box is full, and Game Center couldn't do it. Two more land
+  on whichever of the main menu or the open-games list the player is looking at, because an
+  invite arrives without being asked for — you joined someone's game, and an invite arrived
+  with no slot to put it in. None of the wording is settled. What a player is told for a
+  declined sign-in, a cancelled matchmaker or a payload that is turned away is
+  [Tech Design](./Tech%20Design.md) → Open Questions → *Online play — what the player is
+  told*.
 - **Does the back-swipe stay live on every other screen**, or is "you leave a surface by
   its own control" a rule of the whole app? It's off on the game screen only, because
   that's the one place a swipe would walk away from a pending move. Everywhere else it
@@ -867,10 +887,11 @@ an open game** above.
   reopened later**, or only on the result that has just happened?
 - **What does New Game do when the player is already at the cap** — refuse and say the list
   is full, route the player into the delete flow, offer the $4.99 unlock at the moment the
-  limit bites, or some combination of those? The same is unsettled for starting an online
-  game and for accepting an invite to one, which hit the same cap. The cap itself and the
-  rule that only a player-initiated delete frees a slot are settled; this is only what the
-  player is offered instead.
+  limit bites, or some combination of those? It refuses and says so today, for a game on
+  this phone and for an online one alike, and an invite arriving at the cap is turned away
+  with a message; whether a refusal is where this lands is what is open. The cap itself and
+  the rule that only a player-initiated delete frees a slot are settled; this is only what
+  the player is offered instead.
 - **What happens to games already stored above the cap if the unlock goes away?** A player
   with 60 open games whose ceiling drops back to 3 has 57 games nothing is willing to
   touch.

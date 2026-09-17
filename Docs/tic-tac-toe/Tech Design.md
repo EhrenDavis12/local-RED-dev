@@ -879,11 +879,16 @@ is constructed — no file under `lib/storage/` states 3 or 100.
 **An online game is an open game and counts against the same ceiling.** Creating one and
 accepting an invite to one are both creates, so both are refused at the ceiling exactly as
 a local New Game is, and a player at the cap frees a slot the only way there is — by
-deleting a game. There is no separate online allowance and no exemption for a match
-somebody else started. On the accepting device the create happens **when the starter's first
-payload lands, not when the invitation is accepted** — before that there is no board to
-store, and this layer stores no record without one — so the cap bites on the arriving
-payload's route rather than on the acceptance.
+deleting a game. There is no separate online allowance and no exemption for a match somebody
+else started. On the accepting device the create happens on the arriving payload, which is
+the moment the invitation is accepted — the starting device has already put the fresh board
+into the match — so the cap bites on that payload's route. It is the payload and not the
+acceptance this layer acts on: with no payload there is no board, and it stores no record
+without one.
+
+**A create refused at the cap is not a lost invitation.** Nothing is stored and the player is
+told to delete a game; the match is still Apple's, so the catch-up that runs after any delete
+replays it and the create is tried again with a slot free.
 
 **Creating an online game for a match id a record already holds is not a second create.** The
 existing record is answered back unchanged — not re-titled, not re-stamped — and nothing is
@@ -1554,10 +1559,19 @@ against the engine alone, so the channel code cannot creep into them. `lib/gamec
 holds the channel-backed bridge, the fake that stands in for it, the session state and the
 handoff from a found match to a stored game.
 
+**Online play is started from New Game in the open-games list**, by choosing Online rather
+than On this phone — the same one door every game on this phone goes through. See
+[Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes You → Starting a game —
+on this phone or online.
+
 **Finding an opponent is Apple's matchmaker screen, not ours.** It offers Play Now, which
 pairs the player with a random opponent, and Invite Friends, which covers Game Center
 friends and contacts and can send the invite through Messages. There is no invite-link API,
 so nothing generates a shareable link and nothing has to.
+
+**Apple's screen only starts games.** Its own list of the player's existing matches is
+switched off, so the open-games list is the only list of games there is and a player never
+has two of them to reconcile.
 
 **The match carries the board as JSON, and Apple caps match data at 64 KB.** A whole
 position and its series is a few KB, so the cap is headroom rather than a constraint today —
@@ -1657,6 +1671,12 @@ unchecked. A refused create writes nothing. The created record plays Player Two,
 payload's series id and the event's match id, and is titled with the opponent's nickname,
 falling back to the same placeholder a game on this phone defaults to.
 
+**That record appears when the invitation is accepted**, playing Player Two with the starter
+still to move, because the starting device has already put the fresh board into the match —
+see **A found match becomes a stored game** below. When that save did not go through, the
+record appears with the starter's first move instead, and the player is told they joined the
+game meanwhile.
+
 **The opponent's name resolves through these same events.** The rename fires only when the
 event names a non-empty nickname, the stored title is still the placeholder, and the two
 differ; if any of the three fails, no store call is made at all rather than one the store then
@@ -1664,13 +1684,17 @@ refuses. It runs on every event that gets that far, whether or not a payload was
 whether the record was just created or already held. An opponent whose real nickname is the
 placeholder is renamed to itself, which is a no-op rather than a defect.
 
-**Every outcome of an arriving turn is published on a stream as well as answered** — applied,
-created, a re-delivery, each refusal, and the drops above. Nothing renders any of them; the
-stream is the seam the board screen and the open-games list read. `didBecomeActive` is carried
-through and nothing branches on it: Apple defines it as "this event launched or foregrounded
-the app", which is true of the ordinary case too, and a match created from the sheet while the
-app is already foreground arrives with it false — so it is a fact about the event rather than
-anything a game can act on.
+**Every outcome of an arriving turn is published on a stream as well as answered** —
+applied, created, a re-delivery, each refusal, and the drops above. Nothing renders any of
+them; the stream is the seam the board screen and the open-games list read.
+
+**A turn event that brought the app to the foreground opens that game's board.** Apple sets
+`didBecomeActive` on the event that launched or foregrounded the app — tapping an invite, or
+tapping a "your turn" notification — and that is the one event the app navigates on: it
+opens the record the event resolved to, whether that record was just created, just applied,
+or already held and unchanged. An event arriving while the app is already in front, and
+every event a catch-up replays, moves the player nowhere. Opening is skipped when that
+game's board is already what is on screen.
 
 **A local move is written to this device's store only after Game Center accepts the turn.**
 The confirming tap on an online game puts the move on the session board and marks the game as
@@ -1708,20 +1732,26 @@ and a tie leaves it where it was — see [Rules](./Rules.md) → Turn Order Acro
 is stored on the record once, at create, and read from there afterwards rather than
 re-derived from the match.
 
-**Game Center sign-in happens when the player first enters online play.** The app
-authenticates on the tap that enters online play, and once at launch when — and only when —
-the store already holds at least one online game. That launch-time sign-in is what makes a
-"your turn" notification work at all: GameKit delivers a turn event only to a registered
-listener, and the listener is registered on the first successful authentication. Holding an
-online game is the narrowest condition that reaches it, so a player who never touches online
-play still never sees Game Center's sign-in banner.
+**Game Center sign-in happens at every launch.** The app authenticates as it starts,
+whatever is stored and whether or not the player ever goes near online play, and it
+authenticates again on the way into online play — a second call while one is in flight
+joins the first. Signing in at launch is what makes an invite and a "your turn"
+notification work at all: GameKit delivers a turn event only to a registered listener, the
+listener is registered on the first successful authentication, and Apple delivers an
+accepted invitation only to an app that is already signed in. A two-phone test proved a
+narrower condition does not reach it — an invited phone holds no online game until the
+invite's first payload lands, so a launch sign-in gated on holding one never runs and the
+invite never arrives. The cost is Apple's small welcome banner at launch for every player,
+including one who never plays online, and that is the price of an invite that works.
 
 **When Apple reports multiplayer is not allowed for the account, online play is refused
 with a message rather than an error.** `GKLocalPlayer.isMultiplayerGamingRestricted`
 carries a parent's "don't allow" setting. The restriction is only known once the player is
-signed in, so the **Play online** button is neither hidden nor disabled — it sits on the
-menu like any other, and the tap comes back with a calm, kid-facing message. See
-[Menus and UI](./Menus%20and%20UI.md) → Play online → Where It Takes You.
+signed in, so the **Online** choice in New Game is neither hidden nor disabled on that
+account — it sits there like the other one, and the tap comes back with a calm, kid-facing
+message. Online is hidden only where there is no Game Center at all, which is anything that
+is not iOS. See [Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes You →
+Starting a game — on this phone or online.
 
 **Random opponents versus friends-only is the parent's Game Center setting, and the app
 adds nothing of its own.** Game Center enforces the friends-only choice itself. The app
@@ -1809,15 +1839,18 @@ holds for a turn event, which has no current value and must not be silently coal
 prefix is the bundle identifier. All three use Flutter's standard message codec, and all
 three are hand-written — no channel generator is a dependency this app takes.
 
-**The method channel exposes exactly five methods**: `authenticate`, `presentMatchmaker`,
-`loadMatches`, `endTurn` and `resignMatch`. The first three take no argument; `endTurn` takes
-a match id and the encoded payload bytes, and `resignMatch` takes a match id alone. Each of
-those two answers a `status` of `ok`, or `failed` with a non-empty message — a match id
-GameKit does not hold, a match the local player is not in, and a GameKit failure are all the
-same one failure, since no caller has a second behaviour to take on them. Called while the
-session is not authenticated, each answers failed and sends no platform call, the same
-refusal the matchmaker and the match load already make. Any other name answers
-not-implemented.
+**The method channel exposes exactly seven methods**: `authenticate`, `presentMatchmaker`,
+`loadMatches`, `syncMatches`, `endTurn`, `resignMatch` and `saveMatchData`. The first four
+take no argument; `endTurn` and `saveMatchData` each take a match id and the encoded payload
+bytes, and `resignMatch` takes a match id alone. `saveMatchData` writes the payload as the
+match's data without ending the turn, which is the whole difference between it and
+`endTurn`. `syncMatches` answers `ok` with how many matches it replayed, or `failed` with a
+message, and it replies only once every one of them has gone out. Each of the other three
+answers a `status` of `ok`, or `failed` with a non-empty message — a match id GameKit does
+not hold, a match the local player is not in, and a GameKit failure are all the same one
+failure, since no caller has a second behaviour to take on them. Called while the session is
+not authenticated, each answers failed and sends no platform call, the same refusal the
+matchmaker and the match load already make. Any other name answers not-implemented.
 
 **No outcome on this channel is an error.** A declined sign-in, a restricted account, a
 cancelled matchmaker and a GameKit failure are all reply values: the Swift side never answers
@@ -1877,8 +1910,8 @@ while it was running.
 
 **The Dart side subscribes to the turn channel lazily, on its first listener**, unlike the
 session channel, which subscribes at construction. Subscribing does no GameKit work and
-registers no listener, so a player who never enters online play still never sees Game Center;
-until something listens, the platform holds its events in the buffer above. The turn stream
+registers no listener of its own; until something listens, the platform holds its events in
+the buffer above. The turn stream
 replays nothing to a new subscriber — a turn event is an occurrence, not a value with a
 current state — so what a late subscriber missed is the platform buffer's to deliver. One
 receiver subscribes for the app's lifetime, constructed at app start by the root widget; it
@@ -1934,19 +1967,37 @@ down for the others.
 it is the double every other layer tests against. It matches the real bridge on the stream's
 replay behaviour and on every refusal, and holds no shortcut the real one could not honour.
 
+### Catching up with Game Center
+
+**A turn event GameKit originates while nothing is listening never arrives on its own**, so
+the app asks Apple for its matches instead and replays each open one through the same
+receiving path a live event takes. Nothing about the replay is special-cased: the same
+routing, the same validation, the same outcomes — and every replayed event is marked as not
+having brought the app to the foreground, so a catch-up never moves the player off whatever
+they are looking at.
+
+**It runs in three places and no others**: at launch, once the launch sign-in comes back
+authenticated; every time the app returns to the foreground while signed in; and after any
+game is deleted, local or online, because freeing a slot is what lets in an invite the cap
+turned away. A catch-up asked for while one is already running answers that same one rather
+than sending a second call, and it never throws — a failure is silent, and the next catch-up
+tries again.
+
 ### Presenting Apple's matchmaker
 
 **The match request is minimum two players, maximum two, and sets no matchmaking mode at
-all** — that is where "never forces automatch-only" is honoured concretely.
+all** — that is where "never forces automatch-only" is honoured concretely. **The sheet's
+own list of existing matches is switched off**, so it is reached only to start a game and
+the open-games list stays the only list of them.
 
 **A found match does not arrive through the matchmaker's delegate.** Its found callback has
 been deprecated since iOS 9 and is not delivered at all on this app's iOS floor, so a bridge
 waiting on it waits forever. The match arrives instead on the local player listener's turn
-event, which is why that listener is registered on the first successful sign-in — and not
-before, since a player who never enters online play must never see Game Center at all. The
-delegate still supplies the other two outcomes. Found, cancelled and failed stay three
-distinct values rather than one failure carrying a message, because a caller that cannot tell
-a cancel from an error cannot behave differently on them.
+event, and that listener is registered on the first successful sign-in, which is why signing
+in at launch is what makes an invite arrive at all. The delegate still supplies the other two
+outcomes. Found, cancelled and failed stay three distinct values rather than one failure
+carrying a message, because a caller that cannot tell a cancel from an error cannot behave
+differently on them.
 
 **One sheet at a time, and the guard that makes it testable is on the Dart side**: a second
 presentation while one is in flight fails without reaching the platform. The Swift side
@@ -1979,6 +2030,11 @@ record it cannot read; nothing is defaulted, because a defaulted index would nam
 and make this device look like the starter. That same match arriving as a *found* result fails
 instead, there being nothing left for the caller to act on.
 
+**Replaying those matches is a separate call, and it is not a read.** The catch-up asks
+GameKit for the same matches and pushes each open one onto the turn-event stream, so what it
+sets off is the ordinary receiving path and whatever that path decides to store — see
+**Catching up with Game Center** below. Nothing reads its answer beyond whether it worked.
+
 ### A found match becomes a stored game
 
 **The handoff takes a found match and the store, and answers one of four values**: the stored
@@ -1999,6 +2055,14 @@ ordinary Play Now case — the title falls back to the same **ItSaMeMaRiO** a ga
 defaults to, as a placeholder; the store applies no fallback of its own and would refuse an
 empty title. The placeholder is replaced once, when the opponent resolves — see **Persistence
 and Serialization** → *What an online game adds to the record*.
+
+**The starting device puts the fresh board into the match as soon as the match is made.** It
+is a save that does not end the turn — the starter is still to move — and it exists so the
+invited device has a payload waiting the moment the invitation is accepted, rather than
+nothing until the starter's first move. It is fired and never waited on, and a failure is
+swallowed: the game is already stored here either way, and the invited device falls back to
+creating its record when the first move arrives. It runs only where this device actually
+minted the record, never for a match id the store already held.
 
 **The series id is 32 lowercase hex characters minted from 128 bits of a secure random
 source**, on the starting device, on that one call. It has to be unique across devices rather
@@ -2027,8 +2091,8 @@ online play raises it **only when Apple reports the signed-in account is a child
 flag rides on the session state the bridge publishes, for a restricted account as well as an
 authenticated one, so whatever raises the gate reads it from app state rather than asking
 GameKit again.
-Entering means the deliberate step: tapping **Play online** to find or invite an opponent,
-or accepting an invitation. Opening an online game that already exists — from the
+Entering means the deliberate step: choosing **Online** in New Game to find or invite an
+opponent, or accepting an invitation. Opening an online game that already exists — from the
 open-games list or from a "your turn" notification — is playing, not entering, and raises
 nothing. The game has no outbound links today — no in-app support URL, no social links, no
 advertising — so purchases and online play are the only triggers that currently exist. If

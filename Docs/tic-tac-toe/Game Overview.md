@@ -95,8 +95,8 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
   Player One → Player Two. Started from the **Play Game** button on the main menu.
 - **Two player, online.** Remote play against someone on their own phone, over Apple Game
   Center turn-based matches. A match waits as long as it takes for the other player to
-  move, so a game can run over days. Started from **Play online**. iOS only, and there is
-  no same-room play.
+  move, so a game can run over days. Started from **New Game** in the open-games list, by
+  choosing Online. iOS only, and there is no same-room play.
 
 **No single-player mode and no AI opponent** — every mode is two real players.
 

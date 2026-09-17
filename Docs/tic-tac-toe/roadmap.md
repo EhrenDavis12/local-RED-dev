@@ -48,10 +48,10 @@ game-over rematch flow.
 - Main Menu
   - About Us
 - Play Game → Where It Takes You
+  - Starting a game — on this phone or online
   - What an open game holds
   - How many open games we keep
   - Deleting an open game
-- Play online → Where It Takes You
 - A New Game → What It Starts
 - Pass-and-Play Turn Handoff
 - How to Play — the On-Board Legend and Hint
@@ -257,6 +257,7 @@ release/distribution.
   - The board screen drives a turn
   - The channel contract
   - Signing in, and the session anything can read
+  - Catching up with Game Center
   - Presenting Apple's matchmaker
   - A found match becomes a stored game
 - Kids Category
