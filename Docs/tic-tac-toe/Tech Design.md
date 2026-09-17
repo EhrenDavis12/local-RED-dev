@@ -767,14 +767,17 @@ already, so the guarantee is structural rather than something each caller has to
 **An online game is an open game in the same box** — the same store-minted id, the same
 repository-owned timestamps, the same version stamp, the same position in the open-games
 order, and the same cap. There is no second store, no second box and no second record type.
-It adds exactly three stored values and no others: the Game Center match it is currently
-played through, the series that match belongs to, and which side this device plays.
+It adds four stored values and no others: the Game Center match it is currently played
+through, the series that match belongs to, which side this device plays, and whether the
+opponent has left.
 
-**The three are written under a single `online` key on the record's JSON**, holding
-`matchId`, `seriesId` and `localPlayer`. The first two are strings; `localPlayer` is the
-player's name string — `playerOne` or `playerTwo` — exactly as the board already encodes a
-player. Those key names and encodings are on-disk identity the moment a record ships, so
-they are schema rather than a naming choice made at implementation time.
+**The four are written under a single `online` key on the record's JSON**, holding `matchId`,
+`seriesId`, `localPlayer` and — only once it is true — `opponentLeft`. The first two are
+strings; `localPlayer` is the player's name string — `playerOne` or `playerTwo` — exactly as
+the board already encodes a player; `opponentLeft` is a yes/no that is absent until it is yes,
+and an absent one reads as no, which is what every record written before it existed decodes
+as. Those key names and encodings are on-disk identity the moment a record ships, so they are
+schema rather than a naming choice made at implementation time.
 
 **The presence of that key is the only thing that tells an online game from a local one.** A
 record whose `online` key is absent, or present and null, is a local game and loads exactly
@@ -782,12 +785,12 @@ as a record written before online play existed. Nothing infers online-ness from 
 the board, or anything else.
 
 **An `online` key that is present but unreadable makes the whole record unreadable** — a
-missing `matchId` or `seriesId`, a `localPlayer` naming no player, any of the three
-wrong-typed — and it gets the answer every other unreadable record gets: "nothing stored"
-for a read by id, skipped by the list read while every other game still comes back, and left
-on disk exactly as it is. **An unrecognised extra key inside the map is ignored** rather than
-treated as unreadable, so a record written by a later version that added a fourth value still
-loads here.
+missing `matchId` or `seriesId`, a `localPlayer` naming no player, an `opponentLeft` that is
+not a yes/no, any of them wrong-typed — and it gets the answer every other unreadable record
+gets: "nothing stored" for a read by id, skipped by the list read while every other game still
+comes back, and left on disk exactly as it is. **An unrecognised extra key inside the map is
+ignored** rather than treated as unreadable, so a record written by a later version that added
+a fifth value still loads here.
 
 **The record stores no Game Center identity** — not the opponent's player id, not the local
 player's, not a team or an alias beyond the nickname the game is titled with. The players'
@@ -818,9 +821,13 @@ the title alone — the board, the three `online` values, the created timestamp 
 unchanged — and otherwise behaves exactly as a save does: it stamps the updated timestamp,
 moves the record to the top of the list, and emits on the change stream.
 
-**A save never touches the three.** Only the board is honoured, exactly as the title and the
+**A save never touches those four.** Only the board is honoured, exactly as the title and the
 created timestamp already are. **The match id changes on exactly two paths and no others** —
-the initiating device's own next-game write, and an accepted rematch payload.
+the initiating device's own next-game write, and an accepted rematch payload. **Marking the
+opponent as having left is its own operation, and the only thing that sets that value**: it
+touches nothing else on the record, does nothing at all for an id the store does not hold or
+for a local record with no online values to carry it, is safe to run twice, and announces a
+change only when something actually changed.
 
 **Advancing to the next game and pointing the record at the new match is one write.** Taking
 the next game on this phone stores the next board and the new match id together, so a record
@@ -927,9 +934,12 @@ value the caller can act on, in the same spirit as a refused create, because a s
 silently discards a player's move is the other failure.
 
 **Deleting removes one open game and its whole series** — board, scoreboard and all —
-permanently, leaves every other stored game untouched, and touches no preference. Nothing
-else in this layer discards a record: a game left mid-play is still there, with its
-scoreboard, on the next read.
+permanently, leaves every other stored game untouched, and touches no preference. **Deleting
+an online game also remembers its match id**, in a short list of the newest hundred kept
+alongside the games, so anything that arrives for that match afterwards is thrown away rather
+than taken for a new invite — and every delete path does it, not only the one that also
+resigns. Nothing else in this layer discards a record: a game left mid-play is still there,
+with its scoreboard, on the next read.
 
 ### Reads return "nothing stored", and defaults resolve above this layer
 **Every persistence operation is asynchronous**, because both stores are async on first
@@ -1602,11 +1612,17 @@ any other open game, and **deleting resigns the match**, so the other player is 
 waiting on a turn that will never come. The resign goes out first and the record is removed
 after, but it is best-effort: a resign Apple refuses, or one attempted with no network, never
 blocks or undoes the delete — a game that cannot be deleted while the phone is offline is
-worse than an opponent left waiting. Resigning is also what makes a delete stick, since a
-resigned match sends this phone no more turns. Nothing is written to mark a resigned match:
-the record is gone, so there is nowhere to write it, and an event that later arrives for that
-match is dropped. Deleting a game on this phone calls nothing. See
+worse than an opponent left waiting. Deleting a game on this phone calls nothing. See
 [Menus and UI](./Menus%20and%20UI.md) → Deleting an open game.
+
+**The phone remembers which matches it deleted, and an event for one is dropped before
+anything else is looked at.** The newest hundred match ids are kept, oldest dropped first, and
+the check comes first in the routing below — nothing is created, applied, renamed or opened
+for a match this phone has already thrown away. The resign on its own is not enough to make a
+delete stick: it is best-effort and nothing waits on it, so a catch-up can ask Apple for its
+matches and get that still-open match back before the resign lands, and without this memory
+the arriving payload would look like a brand-new invite and put the deleted game straight
+back.
 
 **A rematch online is a new match with a new id.** Apple's rematch mints a fresh match
 rather than reopening the finished one, so nothing may treat a match id as stable across a
@@ -1663,13 +1679,34 @@ for is dropped: this device has left that match and there is nothing to apply it
 that will not decode with no record to route it to is refused on its own, there being no
 stored series to measure it against.
 
+**When the other player leaves, the game is marked and it stops.** Apple carries every
+participant's own outcome on the match, and an event whose opponent shows as having quit
+marks the stored game as one the opponent left. A payload arriving in that same event is
+still applied first, by the ordinary rules; the mark goes on either way, and it is reported
+as its own outcome.
+
+**A game the opponent left says so and offers nothing but the way out.** Its row in the
+open-games list says the opponent left in place of whose turn it is, the board's banner says
+the same and keeps its slot even on a board that has finished, and every tap on the board is
+refused — on either side's turn, finished or not. No rematch is offered, because there is
+nobody left to play one with. Deleting it is the way out, and **deleting a game the opponent
+left resigns nothing**: they are already gone, so there is nothing left to tell them.
+
+**If the match is still open and it is this device's turn, the app ends it.** Apple would
+otherwise go on showing a match as active that neither player can play. It is best-effort and
+fired without waiting — a failure changes nothing, the mark on the record has already landed,
+and nothing queued behind it waits on the platform call.
+
 **The accepting device's create is refused unless the arriving board is reachable from a fresh
 series** — the fresh board itself, or one legal move from it — judged by the same rules every
 arriving board is judged by. A create is the one arrival path with no stored board to measure
 against, so without this it is the one path where an arbitrary board would be stored
-unchecked. A refused create writes nothing. The created record plays Player Two, takes the
-payload's series id and the event's match id, and is titled with the opponent's nickname,
-falling back to the same placeholder a game on this phone defaults to.
+unchecked. **It is refused outright for a match that is already over** — one Apple has ended,
+or one whose opponent has already quit — since a create is also the one path with no stored
+record to have caught either fact already. A refused create writes nothing. The created record
+plays Player Two, takes the payload's series id and the event's match id, and is titled with
+the opponent's nickname, falling back to the same placeholder a game on this phone defaults
+to.
 
 **That record appears when the invitation is accepted**, playing Player Two with the starter
 still to move, because the starting device has already put the fresh board into the match —
@@ -1708,6 +1745,16 @@ write the store then refuses is its own answered value: the board stays on the s
 sent and the turn is never re-sent, because the opponent already holds it. See
 [Menus and UI](./Menus%20and%20UI.md) → When a game is written to storage.
 
+**The move that finishes a game ends the match rather than handing off the turn.** Game
+Center is told the match is over and what each side got — won, lost or tied for this device,
+and the opposite for the other — except that a participant already recorded as having quit
+keeps that outcome rather than having one written over it. Everything else about the send is
+unchanged: the same awaiting-handoff mark while it is in flight, the same retry on a failure,
+the same write only on Apple's ok. Ending is safe to repeat — a retry against a match Apple
+has already ended with this device's outcome on it answers ok instead of failing, because a
+reply that never reached the app looks exactly like a send that never happened, and a retry
+is the ordinary response to silence.
+
 **While a move is awaiting handoff, that game refuses another one.** A second move on a turn
 the first has not handed off would put this device two moves ahead of the opponent, which
 their device refuses as unreachable and nothing can repair. A failed send writes nothing and
@@ -1716,13 +1763,24 @@ not a second move, which the refusal is exactly what makes safe. A relaunch lose
 move and shows the board as it stood before it, which is what the opponent sees too. One send
 is in flight at a time, and a second while one is unanswered never reaches the platform.
 
-**A rematch's handoff follows the same rule and stores no marker to do it.** The initiator
-holds Apple's new match id in the session only, hands off the next game's board under that id
-— the fresh board, plus its own first move when the engine says it goes first — and only on ok
-writes the next game's board and the new match id together, in the single write that operation
-already is. A relaunch loses the held id: the player taps rematch again, Apple mints another
-match, and the first is abandoned with nothing stored pointing at it. That is acceptable,
-because a match neither player ever played is invisible to both devices and costs no slot.
+**A rematch online is asked of Apple, and the handoff follows the same rule and stores no
+marker to do it.** The result card's rematch button asks Game Center for the rematch; Apple
+mints the fresh match, the initiator holds its new id in the session only, hands off the next
+game's board under that id — the fresh board, plus its own first move when the engine says it
+goes first — and only on ok writes the next game's board and the new match id together, in
+the single write that operation already is. When the engine says the other side goes first,
+that zero-move board is handed off there and then, since no move of this device's is coming
+to carry it. A second tap while the call is in flight does nothing, and a rematch Apple
+refuses leaves the game exactly as it was. A relaunch loses the held id: the player taps
+rematch again, Apple mints another match, and the first is abandoned with nothing stored
+pointing at it. That is acceptable, because a match neither player ever played is invisible to
+both devices and costs no slot.
+
+**Both players tapping rematch at once is safe.** The held id is dropped whenever a re-read of
+the record shows the match id has already moved on — which is what the opponent's own rematch
+reaching this device first looks like — so nothing is ever handed off under a match the record
+has already left behind, which would strand both phones waiting. The first handoff to land is
+the one the series continues in.
 
 **The device that starts the match plays Player One in the first game of the series; the
 device that accepts plays Player Two.** Game Center makes the match's creator the current
@@ -1767,19 +1825,23 @@ The parental gate that online play raises for a child's account is **Kids Catego
 ### The board screen drives a turn
 
 **An online game plays on the same board screen as a game on this phone**, and that screen
-derives one state to say what it may do: waiting on the opponent, your turn, a move being
-sent, a send that failed, or game over. It is derived from the session alone and never
-stored — whose turn it is is the board's current player compared against the side this
-device plays. The order they are tested in is what makes them right: a failed send, then a
-send in flight, then a finished board, and only then whose turn it is. **A send in flight
-and a failed send outrank a finished board**, because the move that ends the game still has
-to be handed off and a failed send of it has to stay retryable — a winning move whose send
-fails shows the retry, not only the result card. A finished board outranks whose turn it
-is, since its current player is the winner rather than someone to move.
+derives one state to say what it may do: the opponent has left, waiting on the opponent, your
+turn, a move being sent, a send that failed, or game over. It is derived from the session
+alone and never stored — whose turn it is is the board's current player compared against the
+side this device plays. The order they are tested in is what makes them right: the opponent
+having left, then a failed send, then a send in flight, then a finished board, and only then
+whose turn it is. **The opponent having left outranks everything**, because that game is over
+however the board looks. **A send in flight and a failed send outrank a finished board**,
+because the move that ends the game still has to be handed off and a failed send of it has to
+stay retryable — a winning move whose send fails shows the retry, not only the result card. A
+finished board outranks whose turn it is, since its current player is the winner rather than
+someone to move.
 
 **Only your own turn takes a move.** A tap on the opponent's turn is refused by the state
 layer's tap gate, as its own distinct refusal, checked before legality so it answers the
-same whatever cell it lands on. A refused tap does nothing at all — no mark, no pending
+same whatever cell it lands on. **A game the opponent has left refuses every tap**, ahead of
+that and ahead of everything else — on this device's own turn too, and on a board that has
+already finished. A refused tap does nothing at all — no mark, no pending
 selection, no shake, no message and no buzz.
 
 **The lock is taps and nothing else.** While waiting on the opponent the board renders
@@ -1800,9 +1862,10 @@ waiting on the opponent.
 **The screen listens to arriving-turn outcomes for as long as it is mounted, and subscribes
 before it loads its own game.** That stream replays nothing, so an outcome landing between
 mount and the load returning would otherwise be lost. It constructs no receiver of its own —
-one receiver subscribes for the app's lifetime. It acts on exactly two outcomes, a turn
-applied and a record created, and only when the record they name is the one on screen;
-every other outcome changes nothing there, including a re-delivery and every refusal.
+one receiver subscribes for the app's lifetime. It acts on exactly three outcomes, a turn
+applied, a record created, and the opponent having left, and only when the record they name
+is the one on screen; every other outcome changes nothing there, including a re-delivery and
+every refusal.
 
 **On one of those two it re-reads the record and replaces the board and the online values
 from it.** The re-read draws no loading state: withholding the board until a read lands
@@ -1810,8 +1873,9 @@ belongs to a screen's first read, and blanking the board to a spinner on every o
 move would be a defect of its own rather than that rule being honoured. What it applies is
 guarded — it is dropped whole if the player has left for another game by the time the read
 lands, judged by the record id the same way a send is; a read that answers nothing, the
-record being gone, leaves the session exactly as it was; and a rematch's held match id is
-left untouched, belonging to a handoff in flight rather than to the record just re-read.
+record being gone, leaves the session exactly as it was; and a rematch's held match id is left
+untouched when the record still names the match it was held against, and dropped when the
+record has moved on to another;
 The re-read clears the pending, unconfirmed selection and its preview, since one computed
 against the board that was just replaced is no longer a legal move on the board in front of
 the player; it clears any running win celebration, which would otherwise lock input on a
@@ -1839,18 +1903,23 @@ holds for a turn event, which has no current value and must not be silently coal
 prefix is the bundle identifier. All three use Flutter's standard message codec, and all
 three are hand-written — no channel generator is a dependency this app takes.
 
-**The method channel exposes exactly seven methods**: `authenticate`, `presentMatchmaker`,
-`loadMatches`, `syncMatches`, `endTurn`, `resignMatch` and `saveMatchData`. The first four
-take no argument; `endTurn` and `saveMatchData` each take a match id and the encoded payload
-bytes, and `resignMatch` takes a match id alone. `saveMatchData` writes the payload as the
-match's data without ending the turn, which is the whole difference between it and
-`endTurn`. `syncMatches` answers `ok` with how many matches it replayed, or `failed` with a
-message, and it replies only once every one of them has gone out. Each of the other three
-answers a `status` of `ok`, or `failed` with a non-empty message — a match id GameKit does
-not hold, a match the local player is not in, and a GameKit failure are all the same one
-failure, since no caller has a second behaviour to take on them. Called while the session is
-not authenticated, each answers failed and sends no platform call, the same refusal the
-matchmaker and the match load already make. Any other name answers not-implemented.
+**The method channel exposes exactly nine methods**: `authenticate`, `presentMatchmaker`,
+`loadMatches`, `syncMatches`, `endTurn`, `endMatch`, `rematch`, `resignMatch` and
+`saveMatchData`. The first four take no argument; `endTurn` and `saveMatchData` each take a
+match id and the encoded payload bytes; `endMatch` takes those two plus this device's own
+outcome — `won`, `lost` or `tied`; and `resignMatch` and `rematch` each take a match id alone.
+`saveMatchData` writes the payload as the match's data without ending the turn, which is the
+whole difference between it and `endTurn`. `endMatch` ends the match outright: it sets this
+device's participant to the outcome it was handed and every other participant to the
+opposite, never overwriting one already recorded as quit, and it answers ok rather than
+failing when the match is already ended with this device's outcome on it. `rematch` answers
+`ok` with the new match's own map, or `failed` with a message. `syncMatches` answers `ok` with
+how many matches it replayed, or `failed` with a message. Each of the other four answers a
+`status` of `ok`, or `failed` with a non-empty message — a match id GameKit does not hold, a
+match the local player is not in, and a GameKit failure are all the same one failure, since no
+caller has a second behaviour to take on them. Called while the session is not authenticated,
+each answers failed and sends no platform call, the same refusal the matchmaker and the match
+load already make. Any other name answers not-implemented.
 
 **No outcome on this channel is an error.** A declined sign-in, a restricted account, a
 cancelled matchmaker and a GameKit failure are all reply values: the Swift side never answers
@@ -1871,13 +1940,15 @@ or `failed` with a message.**
 
 **A match map is exactly six keys**: `matchId`, `status` (`matching`, `open`, `ended` or
 `unknown`), `participants`, `localParticipantIndex`, `currentParticipantIndex` — null when the
-match has no current participant — and `hasData`. A participant is a nickname and whether it
-is the local player, and the list is in GameKit's own order, which is the order turns rotate
-in; a participant Apple has not resolved carries the empty string, the ordinary case for a
-Play Now match whose opponent does not exist yet. `hasData` is read from *loaded* match data —
-GameKit leaves a match's data nil until it is loaded, so the Swift side loads it before
-describing a match, or every match of a series would look like a fresh one. Whose turn it is
-on the board is still engine state and is never read off `currentParticipantIndex`.
+match has no current participant — and `hasData`. A participant is a nickname, whether it is
+the local player, and that participant's own outcome on the match — none, quit, won, lost,
+tied, or something this build does not name — with a missing outcome read as none, which is
+also the ordinary still-playing value. The list is in GameKit's own order, which is the order
+turns rotate in; a participant Apple has not resolved carries the empty string, the ordinary
+case for a Play Now match whose opponent does not exist yet. `hasData` is read from *loaded*
+match data — GameKit leaves a match's data nil until it is loaded, so the Swift side loads it
+before describing a match, or every match of a series would look like a fresh one. Whose turn
+it is on the board is still engine state and is never read off `currentParticipantIndex`.
 
 **`endTurn` hands the payload to GameKit verbatim**, with the next participants being every
 participant of the match that is not the local player, in GameKit's own order.
@@ -1970,11 +2041,14 @@ replay behaviour and on every refusal, and holds no shortcut the real one could 
 ### Catching up with Game Center
 
 **A turn event GameKit originates while nothing is listening never arrives on its own**, so
-the app asks Apple for its matches instead and replays each open one through the same
-receiving path a live event takes. Nothing about the replay is special-cased: the same
-routing, the same validation, the same outcomes — and every replayed event is marked as not
-having brought the app to the foreground, so a catch-up never moves the player off whatever
-they are looking at.
+the app asks Apple for its matches instead and replays them through the same receiving path a
+live event takes. Every match still open is replayed, and so is every match that ended within
+the last fourteen days — a final move that was missed, or a "they left" that was missed, is
+caught up exactly the way an open match's missed turn is, and a match older than that has
+nothing left to tell anyone. Nothing about the replay is special-cased: the same routing, the
+same validation, the same outcomes — and every replayed event is marked as not having brought
+the app to the foreground, so a catch-up never moves the player off whatever they are looking
+at.
 
 **It runs in three places and no others**: at launch, once the launch sign-in comes back
 authenticated; every time the app returns to the foreground while signed in; and after any
@@ -1982,6 +2056,12 @@ game is deleted, local or online, because freeing a slot is what lets in an invi
 turned away. A catch-up asked for while one is already running answers that same one rather
 than sending a second call, and it never throws — a failure is silent, and the next catch-up
 tries again.
+
+**A catch-up cannot hang.** GameKit promises nothing about ever calling a completion handler
+back, so both halves are bounded: the iOS side answers after twenty seconds with however many
+matches it managed to replay, and the app gives up on the call after thirty. Either way the
+call completes, and completing is what lets the next catch-up run at all — one that never
+answered would wedge every later one behind it forever.
 
 ### Presenting Apple's matchmaker
 
