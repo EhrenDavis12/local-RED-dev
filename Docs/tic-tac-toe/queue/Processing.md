@@ -7,3 +7,5 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
+- Smooth the online flow: one place to start and manage games, invited phone gets the game on accept, notifications open the game, catch-up with Game Center [look] [M] · started 2026-09-17T04:10 · branch queue/smooth-online-flow · session workTheQueue
+  - Asked for by the user after the two-phone test: "the experience on getting it to work is not smooth"; local and online games share the 3-game limit so they are managed in the same place.

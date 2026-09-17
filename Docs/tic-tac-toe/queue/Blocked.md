@@ -41,15 +41,3 @@
     game. Cheap now; after merge it's a storage-contract change to undo.
   - Q: OK with the one rename for random-opponent games?
     A:
-- decide: a first-ever invite on a phone that has never played online [prd] · branch queue/game-center-bridge-2
-  - The app signs in to Game Center at launch only when the phone already holds an online
-    game (so one-phone players never see the banner). Apple delivers an invitation only to
-    an app that is signed in. So: a friend invites someone who has never played online;
-    the invitation notification opens the app; nothing signs in; the invite isn't picked
-    up until that player taps Play online (then it appears in Apple's sheet). Cheap to
-    change.
-  - Q: Leave it — the invite waits until they tap Play online — or sign in at every cold
-    launch (one Game Center banner for every player, including one-phone players), or
-    sign in at launch once the player has ever tapped Play online (remembering one
-    yes/no on the phone)?
-    A:
