@@ -312,3 +312,12 @@
     Menus and UI (banner states, online result card) and Game Board Design; PRD deleted.
     Branch queue/board-remote-turn, stacked on queue/game-center-bridge-2. Not yet looked
     at on a device — the online flow needs two devices with sandbox accounts (last row).
+- 2026-09-17 · Online games in the Open Games list: your turn, waiting on them, and which games are online [look] [M] · 3h · f77a50b · http://localhost:3000/d/claude-agents?from=1789610400000&to=1789621200000
+  - Look path: a pure row-state function and an online marker plus whose-turn line on each
+    online row; 1352 tests green. Branch queue/open-games-online.
+- 2026-09-17 · Play a full online game between two real devices on a child account [look] [S] · 1d · 4328764 · http://localhost:3000/d/claude-agents?from=1789621200000&to=1789689600000
+  - Played over TestFlight on two iPhones (cable installs weren't possible). First try found
+    the invited phone never signed in, so invites were dropped; fixed by signing in at every
+    launch plus a joined-invite message (build 7). The user confirmed multiplayer works, and
+    said getting it to work was not smooth: review the flow and smooth it, and manage local
+    and online games in one place since they share the 3-game limit.
