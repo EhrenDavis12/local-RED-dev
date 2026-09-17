@@ -1651,22 +1651,39 @@ the engine's throw on an illegal move is a contract violation no caller is meant
 **A payload is applied only when it is the opponent's turn to have sent it**, tested on the
 board the arriving one is measured against — never on a finished board, whose current player
 the engine leaves on the last mover, the winner of the game that just ended, who is not who
-goes first in the next one. The turn test and the reachability test both hold and neither
-replaces the other: reachability alone would accept a board this device itself produced and
-had echoed back to it.
+goes first in the next one.
+
+**There is one exception, and it heals a store left one move behind by its own move.** When
+the stored board says it is the local player's turn, an arriving board is still applied if the
+local player could have produced it: exactly one legal move of this device's own from the
+measured board, or that move followed by one legal opponent move. Both are enumerated through
+the engine and applied, never taken on the payload's word, and a board the local player could
+not have produced is still refused as out of turn.
+
+**That shape is exactly what a lost local write looks like.** An online move is stored only
+after Apple's ok, so an app left, killed, or a reply lost in that gap leaves this phone's copy
+missing a move it actually made. Apple's match data is the one copy both phones agreed on, so
+it is authoritative for that missing move. Without the healing case the game strands for good:
+every later payload is refused as out of turn, and every send this phone makes is refused by
+Apple, because the two devices disagree about whose turn it is and neither can say so.
+
+The turn test and the reachability test both hold and neither replaces the other. A board this
+device produced and had echoed straight back to it is caught before either of them, as a
+re-delivery of the stored board — which is what lets the healing case be as narrow as it is:
+one own move, or one own move and the opponent's reply to it, and nothing else.
 
 **A board equal to the stored one is a re-delivery, not a violation** — nothing is written,
 and it is reported as its own outcome. Game Center re-delivers, and treating that as a
 corrupt payload would raise an error on an ordinary event.
 
 **Everything else is refused, and nothing is written on any refusal**: a board two moves ahead
-or otherwise unreachable, a payload that arrived when it was this device's own turn, an
-arriving match id that differs from the stored one while the stored board is still in
-progress, a payload naming a series the record does not hold, a payload that will not decode,
-and one on a version this build does not recognise. Each is a distinct value the caller can
-branch on rather than one failure carrying a message — a caller that cannot tell a
-re-delivery from a corrupt payload cannot behave differently on them. What the player is
-shown for any of them is not settled — see **Open Questions**.
+or otherwise unreachable, a payload that arrived when it was this device's own turn and that
+the local player could not have produced, an arriving match id that differs from the stored one
+while the stored board is still in progress, a payload naming a series the record does not
+hold, a payload that will not decode, and one on a version this build does not recognise. Each
+is a distinct value the caller can branch on rather than one failure carrying a message — a
+caller that cannot tell a re-delivery from a corrupt payload cannot behave differently on them.
+What the player is shown for any of them is not settled — see **Open Questions**.
 
 **An arriving turn is routed to its own stored record by the match id it was delivered
 under.** A record held for that match id takes it; failing that, the payload's series id finds
@@ -1745,15 +1762,34 @@ write the store then refuses is its own answered value: the board stays on the s
 sent and the turn is never re-sent, because the opponent already holds it. See
 [Menus and UI](./Menus%20and%20UI.md) → When a game is written to storage.
 
+**A move confirmed while the launch sign-in is still in flight waits for it.** The app signs
+in at every launch, and a player who goes straight into a game and moves can beat that call
+back. The send waits on the sign-in already going out instead of failing as though the player
+were never signed in — it starts no second one, since a sign-in asked for while one is in
+flight joins the first.
+
+**A send that comes back after the player left and returned never puts its stale board on
+screen.** Leaving a game and opening it again is a fresh load of the same record, which the
+record id alone cannot tell from nothing having happened at all — so every load is counted,
+and a send whose count no longer matches the one it began under reads the store again rather
+than dropping the board it captured before the trip onto the session. The write to storage
+still happens; it is only what is on screen that is re-read instead of overwritten.
+
 **The move that finishes a game ends the match rather than handing off the turn.** Game
 Center is told the match is over and what each side got — won, lost or tied for this device,
 and the opposite for the other — except that a participant already recorded as having quit
 keeps that outcome rather than having one written over it. Everything else about the send is
 unchanged: the same awaiting-handoff mark while it is in flight, the same retry on a failure,
-the same write only on Apple's ok. Ending is safe to repeat — a retry against a match Apple
-has already ended with this device's outcome on it answers ok instead of failing, because a
-reply that never reached the app looks exactly like a send that never happened, and a retry
-is the ordinary response to silence.
+the same write only on Apple's ok.
+
+**A retried send never double-plays, whichever kind it is.** Handing off a turn and ending a
+match both answer ok to a retry Apple has already carried out — a hand-off that landed even
+though its reply did not, judged by this device no longer being the one to move and the match
+already holding exactly the board being sent; and a match already ended with this device's
+outcome on it. A reply that never arrived looks identical to a send that never happened, so a
+retry is the ordinary response to silence, and without this the retry meant to recover the
+first attempt is the thing that makes the failure permanent: Apple refuses a second hand-off
+from the same turn, and refuses to end a match twice.
 
 **While a move is awaiting handoff, that game refuses another one.** A second move on a turn
 the first has not handed off would put this device two moves ahead of the opponent, which
@@ -1762,6 +1798,17 @@ keeps the confirmed move on the board, and sending again re-sends that same boar
 not a second move, which the refusal is exactly what makes safe. A relaunch loses an unsent
 move and shows the board as it stood before it, which is what the opponent sees too. One send
 is in flight at a time, and a second while one is unanswered never reaches the platform.
+
+**No send can leave the board stuck saying it is sending.** Every platform call that hands a
+board over — ending a turn, ending a match, asking for a rematch, saving a board into the
+match — gives up after thirty seconds and reports the ordinary "could not be reached" failure,
+because a call that never answers is indistinguishable from one that failed and only one of
+the two can be retried. A send refused before it ever reached Apple — one already in flight,
+nothing pending to send, a game that is not online — is shown as a failed send too, with the
+retry and the way out, rather than leaving the banner on "sending" with nothing on screen able
+to change it. And a store write that throws after Apple has already taken the turn is answered
+as sent-but-not-stored rather than thrown: the opponent holds that board either way, and the
+next turn to arrive heals what was not written.
 
 **A rematch online is asked of Apple, and the handoff follows the same rule and stores no
 marker to do it.** The result card's rematch button asks Game Center for the rematch; Apple
@@ -1867,28 +1914,33 @@ applied, a record created, and the opponent having left, and only when the recor
 is the one on screen; every other outcome changes nothing there, including a re-delivery and
 every refusal.
 
-**On one of those two it re-reads the record and replaces the board and the online values
+**On any of those three it re-reads the record and replaces the board and the online values
 from it.** The re-read draws no loading state: withholding the board until a read lands
 belongs to a screen's first read, and blanking the board to a spinner on every opponent
 move would be a defect of its own rather than that rule being honoured. What it applies is
 guarded — it is dropped whole if the player has left for another game by the time the read
 lands, judged by the record id the same way a send is; a read that answers nothing, the
-record being gone, leaves the session exactly as it was; and a rematch's held match id is left
-untouched when the record still names the match it was held against, and dropped when the
-record has moved on to another;
-The re-read clears the pending, unconfirmed selection and its preview, since one computed
-against the board that was just replaced is no longer a legal move on the board in front of
-the player; it clears any running win celebration, which would otherwise lock input on a
-board that is now this side's to play; and it clears the awaiting-handoff and failed-send
-marks, the stored board being authoritative once a turn has arrived for it. Nothing else
-runs — input unlocks because the board's current player is now the local side, and a
-re-read is safe to run repeatedly, including one landing while the screen's own first load
-is still in flight.
+record being gone, leaves the session exactly as it was; and a rematch's held match id is
+left untouched when the record still names the match it was held against, and dropped when
+the record has moved on to another. The re-read clears the pending, unconfirmed selection and
+its preview, since one computed against the board that was just replaced is no longer a legal
+move on the board in front of the player; it clears any running win celebration, which would
+otherwise lock input on a board that is now this side's to play; and it clears the
+awaiting-handoff and failed-send marks, the stored board being authoritative once a turn has
+arrived for it. Nothing else runs — input unlocks because the board's current player is now
+the local side, and a re-read is safe to run repeatedly, including one landing while the
+screen's own first load is still in flight.
 
 **Opening an online game is playing, not entering.** From the open-games list or from a
 "your turn" notification, the screen shows the current stored board and nothing more: it
 makes no Game Center call, raises no sign-in and raises no parental gate. See **Kids
 Category** below.
+
+**Opening a different game while a board is already on screen loads that game.** A
+notification for another match, or a tap on another row, reaches the same board screen rather
+than a new one, so the screen loads whatever game id it is handed every time that id changes
+rather than only the first time. Without that the player is left looking at the game they
+were already in, with the notification apparently having done nothing.
 
 ### The channel contract
 
@@ -1912,20 +1964,29 @@ outcome — `won`, `lost` or `tied`; and `resignMatch` and `rematch` each take a
 whole difference between it and `endTurn`. `endMatch` ends the match outright: it sets this
 device's participant to the outcome it was handed and every other participant to the
 opposite, never overwriting one already recorded as quit, and it answers ok rather than
-failing when the match is already ended with this device's outcome on it. `rematch` answers
-`ok` with the new match's own map, or `failed` with a message. `syncMatches` answers `ok` with
-how many matches it replayed, or `failed` with a message. Each of the other four answers a
-`status` of `ok`, or `failed` with a non-empty message — a match id GameKit does not hold, a
-match the local player is not in, and a GameKit failure are all the same one failure, since no
-caller has a second behaviour to take on them. Called while the session is not authenticated,
-each answers failed and sends no platform call, the same refusal the matchmaker and the match
-load already make. Any other name answers not-implemented.
+failing when the match is already ended with this device's outcome on it. `endTurn` answers ok
+the same way, with no second platform call, when this device is no longer the one to move and
+the match already holds exactly the payload being sent. `rematch` answers `ok` with the new
+match's own map, or `failed` with a message. `syncMatches` answers `ok` with how many matches
+it replayed, or `failed` with a message. Each of the other four answers a `status` of `ok`, or
+`failed` with a non-empty message — a match id GameKit does not hold, a match the local player
+is not in, and a GameKit failure are all the same one failure, since no caller has a second
+behaviour to take on them. Called while the session is not authenticated, each answers failed
+and sends no platform call, the same refusal the matchmaker and the match load already make.
+Any other name answers not-implemented.
 
 **No outcome on this channel is an error.** A declined sign-in, a restricted account, a
 cancelled matchmaker and a GameKit failure are all reply values: the Swift side never answers
 a `FlutterError`, and nothing on the Dart interface throws — including on a build with no
 Swift side at all, which is every `flutter test` run. Every failure value carries a non-empty
 message, and nothing branches on that text.
+
+**Every call that sends is bounded at thirty seconds.** Ending a turn, ending a match, asking
+for a rematch and saving a board into the match each give up after that and answer their own
+"could not be reached" failure. GameKit promises nothing about ever calling a completion
+handler back, and a send that never answers wedges the one move the player is trying to make;
+a bounded wait plus an ordinary failure is what makes a retry possible at all. It is one value
+stated once, shared by all four and by the catch-up's own wait.
 
 **`authenticate` answers a session map** keyed `state` — `unauthenticated`, `authenticated`
 or `restricted` — carrying `nickname` and `isUnderage` when authenticated, `isUnderage` alone

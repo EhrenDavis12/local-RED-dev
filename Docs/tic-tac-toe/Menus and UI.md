@@ -370,9 +370,10 @@ the opponent's turn it names the side being waited on — Player One or Player T
 the board and never the opponent's Game Center nickname — in place of *"Player One, you're
 up!"*, with that side's own mark beside it as always, and nothing else on the screen moves.
 While a confirmed move is being handed to Game Center the banner says so, and it reads the
-same whether that send was begun by the confirming tap or by a retry. A send Game Center
-refused says so and carries two controls with it: send it again, and leave for the main
-menu. Those two are the only controls the online states add — each plays the button-tap
+same whether that send was begun by the confirming tap or by a retry. A send that did not go
+through says so and carries two controls with it: send it again, and leave for the main
+menu — whether Game Center refused it or it never got that far. Those two are the only
+controls the online states add — each plays the button-tap
 sound and fires no haptic, like the result card's own way out — and the confirmed move
 stays on the board behind them, to be sent again. When the other player has left, the banner
 says so and says nothing else: it takes the slot ahead of every other state and keeps it even
@@ -803,9 +804,11 @@ a new one.
 appears on the board as it is confirmed, but nothing is stored until Apple has taken it — so a
 stored board never shows the opponent to move on a turn this phone never handed off — and
 taking the next game of an online series is written with its new match id on the same accept.
-Until a move goes through, that game accepts no further move; a send that fails keeps the move
-on screen to be sent again, and quitting the app before it lands loses it. See
-[Tech Design](./Tech%20Design.md) → Online Play.
+Until a move goes through, that game accepts no further move, and a send that fails keeps the
+move on screen to be sent again. Quitting the app in the gap between Apple taking the move and
+this phone writing it does not lose it: Apple's copy is the one both phones agreed on, and the
+next turn to arrive puts the missing move back. A move Apple never took is lost, which is what
+the other player sees too. See [Tech Design](./Tech%20Design.md) → Online Play.
 
 **A brand-new game is written the moment it starts**, before a single mark is placed — the
 record has to exist for anything later to be saved against it. So a player who starts a
