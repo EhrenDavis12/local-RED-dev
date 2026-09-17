@@ -342,3 +342,10 @@
     timeouts so a send can't wedge, a load token so a send resuming across a reload can't write a
     stale board, opening a different game from a notification reloads the board, a move made
     during launch sign-in waits for it. TestFlight build 10. Branch queue/online-leave-return.
+- 2026-09-18 · Play an anonymous game: our own button instead of Apple's Start Game, a searching screen, and the game starts when a player is found [look] [M] · 4h · 25cfbae · http://localhost:3000/d/claude-agents?from=1789806000000&to=1789820400000
+  - Apple's sheet can't hide or rename Start Game, and Apple pairs a random player only after the
+    turn has passed, so the starter passes the turn at once and the joiner moves first (roles are
+    derived from whose turn Apple says it is). New Game: On this phone / Invite a friend / Play an
+    anonymous game; searching screen with background search, retry of the handoff, 15s catch-up;
+    row says looking for a player. TestFlight build 11, 1600+ tests. Branch queue/anonymous-game.
+  - NOT yet tried on phones.
