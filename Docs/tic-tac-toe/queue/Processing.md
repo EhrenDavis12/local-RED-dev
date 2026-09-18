@@ -7,3 +7,5 @@
 > that session. A line whose branch has gone quiet for a day is flagged at session start.
 
 ---
+- Online play looks themed and every label fits its button: apply the theme to all multiplayer screens and controls, make text fit buttons and rows, tighten row spacing where needed [look] [M] · started 2026-09-18T11:10 · branch queue/online-theme-fit · session workTheQueue
+  - Asked for by the user on TestFlight build 13: "the multiplayer feature set is not holding up to the theme"; "some text tends to run off the button".
