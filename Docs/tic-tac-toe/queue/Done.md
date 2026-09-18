@@ -351,3 +351,11 @@
     renamed to the joiner's nickname and the mark never cleared on rename; fixed. TestFlight build
     12, 1607 tests. Branch queue/anonymous-game (7acfaaf).
   - NOT yet tried on phones.
+- 2026-09-18 · Online play looks themed and every label fits its button [look] [M] · 2h · 375ccdb · http://localhost:3000/d/claude-agents?from=1789816200000&to=1789823400000
+  - Audit found two broad causes: the shared buttons never shrank text to the art's opaque body,
+    and the app followed Dynamic Type against the design. Fixed both at the root (18pt inset +
+    scale-down fit on every button; text scaling clamped at 1.15), themed button art on every
+    button incl. New Game choices, searching, rematch, exit, gate Submit, delete Yes/No; turn
+    banner online states on the theme's patch; searching lines on a backdrop; Dino Jungle's
+    invisible Submit label; margins on the centred cards; snackbar shape; row spacing. On main,
+    TestFlight build 14. NOT yet checked on phones.
