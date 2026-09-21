@@ -1808,6 +1808,9 @@ keeps that outcome rather than having one written over it. Everything else about
 unchanged: the same awaiting-handoff mark while it is in flight, the same retry on a failure,
 the same write only on Apple's ok.
 
+**The player on the other side of a finishing move is told with a banner even when their app
+is closed.** They are not left to discover the result the next time they open the app.
+
 **A retried send never double-plays, whichever kind it is.** Handing off a turn and ending a
 match both answer ok to a retry Apple has already carried out — a hand-off that landed even
 though its reply did not, judged by this device no longer being the one to move and the match
