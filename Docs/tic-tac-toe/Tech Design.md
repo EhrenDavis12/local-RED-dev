@@ -570,6 +570,14 @@ the mark art; board code places it and draws nothing itself. Which kinds of art 
 may supply — and why an image is the real answer for a theme — is
 [Theming](./Theming.md) → What a Theme Controls.
 
+**On an online game, which of the two player slots is drawn as the local player's is that
+device's own choice.** The player picks it at the start of the game, and it is a render-time
+swap of the two slots on this device and nothing else: it is not in the match payload —
+which carries exactly a payload version, a series id and a board, see **Online Play**
+below — it does not change which side the device plays, and the two devices may have picked
+the same slot. The engine is untouched by it and still knows only Player One and Player Two.
+See [Game Board Design](./Game%20Board%20Design.md) → Pieces & Marks.
+
 ### The screen loads its game before it draws one
 
 **The game screen reads the stored game it was opened for, and draws no board until that

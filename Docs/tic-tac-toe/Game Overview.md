@@ -36,7 +36,9 @@ Variants we've considered but aren't building live in
 The app isn't built around a single one-off game. It's built around **playing several in
 a row on the same phone**:
 
-- A **scoreboard** at the top of the game screen tracks **Player One / Cat / Player Two**.
+- A **scoreboard** at the top of the game screen tracks **Player One / Cat / Player Two** —
+  or, on an online game, each player's Game Center account name in place of Player One and
+  Player Two.
 - When a game is won or tied, the player is offered an option to **continue playing**.
 - Continuing **resets the board**. The score increments at game end, not when continuing
   is taken — see [Menus and UI](./Menus%20and%20UI.md) → Game Over → Rematch.
@@ -52,14 +54,19 @@ open-games list, and its running series is still there.
 The scoreboard is saved along with the game. See
 [Menus and UI](./Menus%20and%20UI.md) → Persistence.
 
-**Always "Player One" and "Player Two"** — no custom names for the players themselves.
+**A game on this phone is always "Player One" and "Player Two"** — no custom names for the
+players themselves.
 
 The opponent name entered at New Game does **not** replace "Player Two" on the in-game
 scoreboard. It titles the game in the open-games list, and nothing else. See
 [Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes You.
 
-With the option to change that later. Don't hardcode the strings in a way that fights
-adding real names down the road.
+**An online game's scoreboard shows the two players' Game Center account names instead**,
+one on each side, in place of Player One and Player Two. Player One and Player Two are what
+two people sharing one phone are called, where there is no account to name either of them;
+online there are two accounts already sitting there. *"i understand Player One and Two when
+on local phone But when online we should have the names of the accounts. Lets use those
+those to our advantage."*
 
 ## How a Move Is Made
 Moves are **two taps — select, then confirm:**

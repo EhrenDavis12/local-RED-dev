@@ -49,6 +49,7 @@ game-over rematch flow.
   - About Us
 - Play Game → Where It Takes You
   - Starting a game — on this phone or online
+  - Pick your Icon
   - What an open game holds
   - How many open games we keep
   - Deleting an open game

@@ -156,10 +156,13 @@ see Open Questions.
 does not ship.** Nothing ever removes a game the player did not choose to delete, so the
 drawing is stale on that point, and what the footer says instead is unwritten.
 
-**The opponent name does not replace "Player Two" in game.** It titles the game in the
-open-games list and nothing else. In game, the players are still **Player One** and
-**Player Two**. That might change in the future, so don't build it in a way that makes the
-swap hard to make later. See [Game Overview](./Game%20Overview.md) →
+**The opponent name typed at New Game does not replace "Player Two" in game.** It titles
+the game in the open-games list and nothing else. In a game on this phone the players are
+still **Player One** and **Player Two**.
+
+**An online game's scoreboard reads the two players' Game Center account names** in place
+of Player One and Player Two — this player's own account on one side and the opponent's on
+the other. See [Game Overview](./Game%20Overview.md) →
 Session Structure — Games and Continuing.
 
 **The name field comes up pre-filled with ItSaMeMaRiO and the text selected**, so typing
@@ -259,6 +262,22 @@ is long gone by the time Game Center answers.
 
 **A second tap while one is already in flight does nothing.** One sign-in, one gate and one
 matchmaker at a time.
+
+### Pick your Icon
+**An online game starts by asking each player to pick their own icon.** One screen, divided
+in half, titled **Pick your Icon**: the theme's two player marks, one on each side, and the
+player taps the one they want to be. *"It would be One screen devided in half with Pick your
+Icon."*
+
+**The pick is that phone's alone.** The mark the player picked is drawn for them and the
+other mark for the other player, on this phone only. The other player picks on their own
+phone, out of their own theme, and may pick the same one — neither pick crosses to the other
+phone and neither player is forced into a mark or a theme by the other. *"Themes should be
+what they want on their phone and not forced into a theme by the other player. this is gonig
+to be impotant as a player might have a theme and really wants to be a specific icon."*
+
+What the pick does and does not reach is [Game Board Design](./Game%20Board%20Design.md) →
+Pieces & Marks.
 
 ### What an open game holds
 **An open game holds a whole series — the board plus the running score.** A rematch
@@ -451,10 +470,13 @@ right now."* already says it.
 9. **Searching** — the waiting room for an anonymous game that has not found a player yet.
    Reached by starting one, and by opening a still-searching game from the open-games list.
    See Play Game → Where It Takes You → Starting a game — on this phone or online.
+10. **Pick your Icon** — one screen split in half, shown at the start of an online game,
+    where each player picks which of the theme's two marks is theirs. See Play Game → Where
+    It Takes You → Pick your Icon.
 
 The first seven each have an approved drawing in
-[Design Handoff](./design_handoff_game_ui/README.md); the parental gate and the searching
-screen have none:
+[Design Handoff](./design_handoff_game_ui/README.md); the parental gate, the searching
+screen and Pick your Icon have none:
 
 | Screen above | Handoff screen |
 |---|---|

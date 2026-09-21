@@ -97,12 +97,17 @@ A **scoreboard sits at the top of the game screen**, above the board. Three coun
 ```
 PLAYER 1 highlighted above — their turn to play.
 
-**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `CAT` between them), not
-`PLAYER ONE` / `PLAYER TWO`.
+**On a game on this phone the scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `CAT`
+between them), not `PLAYER ONE` / `PLAYER TWO`.
 
 This does **not** change the settled term for the player — the players are still called
 "Player One" and "Player Two." The chip uses the numeral because that is what every drawn
 screen shows and because the spelled-out form is materially wider in a fixed-width column.
+
+**On an online game the two outer chips carry the players' Game Center account names
+instead** — this player's own account on one side, the opponent's on the other, with `CAT`
+still between them. See [Game Overview](./Game%20Overview.md) →
+Session Structure — Games and Continuing.
 
 **The middle chip reads `CAT`, not `TIES`.** The engine, the theme files and the rest of
 these docs all call a tied board a cat game (see [Game Overview](./Game%20Overview.md) →
@@ -422,6 +427,29 @@ for provisional, solid lavender for the last move, solid purple for the active q
   emoji, animals, shapes. See [Theming](./Theming.md).
 - There are **three marks, not two** — Player One's, Player Two's, and one for a cat-game
   quadrant. All three are theme art.
+
+**On an online game each player picks which of the two player marks is theirs**, at the
+start of the game, and that pick only changes what their own phone draws: the cells that
+player has taken are drawn with the mark they picked, and the other player's with the other
+one. *"So if a player always wants to be X on their phone they can see it that way whil on
+the other phone they can see it the way they want. No player is forced into X or O it will
+always be there choice."*
+
+**Both players may pick the same mark**, and nothing reconciles it — each phone has its own
+theme and its own screen, so both can see themselves as the X and their opponent as the O at
+the same time and neither is wrong. On any one phone the two players are still drawn with the
+two different marks; the pick only decides which is which.
+
+That works because the pick is drawing and nothing else. It does not change which side a
+player plays: **Player One and Player Two stay the names of the two mark slots a theme
+fills**, and a theme's own mark art is still authored against those two slots — see
+[Theming](./Theming.md) → What a Theme Controls. The pick decides which of the two slots is
+drawn as *yours*.
+
+The cat-game mark is not picked — it belongs to neither player.
+
+Where the pick is made is [Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes
+You → Pick your Icon.
 
 ## Everything Here Is Theme-Driven
 Nothing in this document should be read as a hardcoded visual decision. Grid line colors,
