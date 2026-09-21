@@ -780,18 +780,22 @@ already, so the guarantee is structural rather than something each caller has to
 **An online game is an open game in the same box** — the same store-minted id, the same
 repository-owned timestamps, the same version stamp, the same position in the open-games
 order, and the same cap. There is no second store, no second box and no second record type.
-It adds five stored values and no others: the Game Center match it is currently played
+It adds six stored values and no others: the Game Center match it is currently played
 through, the series that match belongs to, which side this device plays, whether the opponent
-has left, and whether it is still waiting for one.
+has left, whether it is still waiting for one, and which of the two marks this device draws as
+its own.
 
-**The five are written under a single `online` key on the record's JSON**, holding `matchId`,
+**The six are written under a single `online` key on the record's JSON**, holding `matchId`,
 `seriesId`, `localPlayer` and — each only once it is true — `opponentLeft` and
 `awaitingOpponent`. The first two are strings; `localPlayer` is the player's name string —
 `playerOne` or `playerTwo` — exactly as the board already encodes a player; the other two are
 yes/nos that are absent until they are yes, and an absent one reads as no, which is what every
-record written before either existed decodes as. Those key names and encodings are on-disk
-identity the moment a record ships, so they are schema rather than a naming choice made at
-implementation time.
+record written before either existed decodes as. The sixth, `marksSwapped`, is a yes/no that is
+absent until the player has picked at all — absent means no pick has been made yet, which is
+what tells the app to ask — and once picked it is written whether yes or no, since "picked the
+first mark" and "not picked yet" have to read differently. Those key names and encodings are
+on-disk identity the moment a record ships, so they are schema rather than a naming choice made
+at implementation time.
 
 **The presence of that key is the only thing that tells an online game from a local one.** A
 record whose `online` key is absent, or present and null, is a local game and loads exactly
@@ -805,7 +809,9 @@ every other unreadable record gets: "nothing stored" for a read by id, skipped b
 read while every other game still comes back, and left on disk exactly as it is. **An
 unrecognised extra key inside the map is
 ignored** rather than treated as unreadable, so a record written by a later version that added
-a fifth value still loads here.
+a further value still loads here. The one exception to strictness is `marksSwapped`: a value
+under that key that is not a yes/no reads as absent rather than making the record unreadable,
+because a drawing preference must never cost a player their game.
 
 **The record stores no Game Center identity** — not the opponent's player id, not the local
 player's, not a team or an alias beyond the nickname the game is titled with. The players'
