@@ -149,9 +149,11 @@ rendering of the current player's own mark beside it. Its top is anchored to the
 of the grid, not to whatever sits under it, so neither the banner nor the mark moves as
 the how-to-play strip below them changes length.
 
-On an online game the banner carries that game's own state instead of naming the active
-player — see [Menus and UI](./Menus%20and%20UI.md) → How to Play — the On-Board Legend and
-Hint. The scoreboard's highlight is unchanged in every one of those states.
+On an online game the banner carries that game's own state instead — your own turn, the
+opponent named by their Game Center account name while it is theirs, a move being sent, a
+send that failed, or the other player having left — see
+[Menus and UI](./Menus%20and%20UI.md) → How to Play — the On-Board Legend and Hint. The
+scoreboard's highlight is unchanged in every one of those states.
 
 Like everything else, what the highlight looks like is theme-driven — see
 [Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
@@ -428,12 +430,12 @@ for provisional, solid lavender for the last move, solid purple for the active q
 - There are **three marks, not two** — Player One's, Player Two's, and one for a cat-game
   quadrant. All three are theme art.
 
-**On an online game each player picks which of the two player marks is theirs**, at the
-start of the game, and that pick only changes what their own phone draws: the cells that
-player has taken are drawn with the mark they picked, and the other player's with the other
-one. *"So if a player always wants to be X on their phone they can see it that way whil on
-the other phone they can see it the way they want. No player is forced into X or O it will
-always be there choice."*
+**On an online game each player picks which of the two player marks is theirs**, the first
+time that game's board is opened on their phone, and that pick only changes what their own
+phone draws: the cells that player has taken are drawn with the mark they picked, and the
+other player's with the other one. *"So if a player always wants to be X on their phone they
+can see it that way whil on the other phone they can see it the way they want. No player is
+forced into X or O it will always be there choice."*
 
 **Both players may pick the same mark**, and nothing reconciles it — each phone has its own
 theme and its own screen, so both can see themselves as the X and their opponent as the O at

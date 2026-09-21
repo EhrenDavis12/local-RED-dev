@@ -68,6 +68,13 @@ online there are two accounts already sitting there. *"i understand Player One a
 on local phone But when online we should have the names of the accounts. Lets use those
 those to our advantage."*
 
+**That holds for every in-game message that names a player, not just the scoreboard.** On an
+online game the turn banner waiting on the opponent, the win display at the end of a game,
+and the result card's win line and its who-goes-first-next line all use that player's Game
+Center account name. Your own turn names nobody — the banner reads *"You're up!"*, there
+being only one player on this phone to address. A game on this phone is Player One and
+Player Two everywhere, with no exception.
+
 ## How a Move Is Made
 Moves are **two taps — select, then confirm:**
 

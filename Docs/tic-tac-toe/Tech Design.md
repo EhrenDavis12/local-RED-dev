@@ -571,12 +571,17 @@ may supply — and why an image is the real answer for a theme — is
 [Theming](./Theming.md) → What a Theme Controls.
 
 **On an online game, which of the two player slots is drawn as the local player's is that
-device's own choice.** The player picks it at the start of the game, and it is a render-time
-swap of the two slots on this device and nothing else: it is not in the match payload —
-which carries exactly a payload version, a series id and a board, see **Online Play**
-below — it does not change which side the device plays, and the two devices may have picked
-the same slot. The engine is untouched by it and still knows only Player One and Player Two.
-See [Game Board Design](./Game%20Board%20Design.md) → Pieces & Marks.
+device's own choice.** The player picks it the first time that game's board is opened here,
+and it is a render-time swap of the two slots on this device and nothing else: it is not in
+the match payload — which carries exactly a payload version, a series id and a board, see
+**Online Play** below — it does not change which side the device plays, and the two devices
+may have picked the same slot. The engine is untouched by it and still knows only Player One
+and Player Two. See [Game Board Design](./Game%20Board%20Design.md) → Pieces & Marks.
+
+**The pick is saved with that open game on this device and kept for the life of the
+series.** It is asked once and survives a rematch, which continues in the same open game. It
+never crosses to the other phone, and it is not a global preference — a second online game
+asks again.
 
 ### The screen loads its game before it draws one
 
@@ -1638,7 +1643,9 @@ what was built rather than something that arrived from outside.
 
 **Turns never time out.** Every turn is ended with `GKTurnTimeoutNone` — GameKit takes the
 timeout on each `endTurn` rather than at creation, so that is where the app states it — and a
-match waits as long as it takes for the other player to move, days or forever.
+match waits as long as it takes for the other player to move, days or forever. A finished game
+leans on that: the winning move is handed off as a turn, so the match sits on the loser's turn
+until they open the app and close it, however long that takes.
 
 **A player who wants out of an online game deletes it from the open-games list**, the same as
 any other open game, and **deleting resigns the match**, so the other player is not left
@@ -1809,12 +1816,21 @@ and a send whose count no longer matches the one it began under reads the store 
 than dropping the board it captured before the trip onto the session. The write to storage
 still happens; it is only what is on screen that is re-read instead of overwritten.
 
-**The move that finishes a game ends the match rather than handing off the turn.** Game
-Center is told the match is over and what each side got — won, lost or tied for this device,
-and the opposite for the other — except that a participant already recorded as having quit
-keeps that outcome rather than having one written over it. Everything else about the send is
-unchanged: the same awaiting-handoff mark while it is in flight, the same retry on a failure,
-the same write only on Apple's ok.
+**The move that finishes a game is handed off as an ordinary turn, carrying a message that
+tells the other player they lost it.** Apple pushes a banner for "it's your turn" and for
+nothing else — there is no notification for a match ending — so a finishing move that ended
+the match outright would reach a closed app in silence. Handing the turn over instead puts
+Apple's own "your turn" banner on the other phone, and the message the hand-off carries is
+what that banner says. Everything else about the send is unchanged: the same
+awaiting-handoff mark while it is in flight, the same retry on a failure, and the same write
+only on Apple's ok.
+
+**The losing device is what ends the match, the next time it opens that game.** Apple lets
+only the player whose turn it is end a match, and the finishing hand-off is exactly what
+makes that the loser. Until they open it the match stays open on Apple's side with the
+result already drawn on both boards, which costs nothing — turns never time out, so nothing
+expires while it waits. Ending it sets this device's outcome to lost and the other's to won,
+the same call the opponent-left path already makes.
 
 **The player on the other side of a finishing move is told with a banner even when their app
 is closed.** They are not left to discover the result the next time they open the app.
@@ -1859,6 +1875,13 @@ refuses leaves the game exactly as it was. A relaunch loses the held id: the pla
 rematch again, Apple mints another match, and the first is abandoned with nothing stored
 pointing at it. That is acceptable, because a match neither player ever played is invisible to
 both devices and costs no slot.
+
+**Apple refuses a rematch while the finished match is still open, so the winner's rematch is
+held rather than failed.** The loser's phone is what ends that match, so a winner who taps
+rematch before the other player has opened the app gets a result card whose button says it
+is waiting on them, and which comes back to life by itself once the match shows as ended
+here. Nothing is queued: the rematch is asked of Apple on the tap that follows the unlock,
+never on the unlock itself. See [Menus and UI](./Menus%20and%20UI.md) → Game Over → Rematch.
 
 **Both players tapping rematch at once is safe.** The held id is dropped whenever a re-read of
 the record shows the match id has already moved on — which is what the opponent's own rematch
@@ -2004,10 +2027,12 @@ three are hand-written — no channel generator is a dependency this app takes.
 
 **The method channel exposes exactly ten methods**: `authenticate`, `presentMatchmaker`,
 `findRandomMatch`, `loadMatches`, `syncMatches`, `endTurn`, `endMatch`, `rematch`,
-`resignMatch` and `saveMatchData`. The first five take no argument; `endTurn` and
-`saveMatchData` each take a match id and the encoded payload bytes; `endMatch` takes those
-two plus this device's own outcome — `won`, `lost` or `tied`; and `resignMatch` and `rematch`
-each take a match id alone.
+`resignMatch` and `saveMatchData`. The first five take no argument; `saveMatchData`
+takes a match id and the encoded payload bytes; `endTurn` takes those two plus the message
+GameKit shows in its "your turn" notification — empty on an ordinary move, and carrying the
+result on the move that finishes a game; `endMatch` takes the match id, the payload and this
+device's own outcome — `won`, `lost` or `tied`; and `resignMatch` and `rematch` each take a
+match id alone.
 `saveMatchData` writes the payload as the match's data without ending the turn, which is the
 whole difference between it and `endTurn`. `endMatch` ends the match outright: it sets this
 device's participant to the outcome it was handed and every other participant to the
@@ -2064,7 +2089,9 @@ before describing a match, or every match of a series would look like a fresh on
 it is on the board is still engine state and is never read off `currentParticipantIndex`.
 
 **`endTurn` hands the payload to GameKit verbatim**, with the next participants being every
-participant of the match that is not the local player, in GameKit's own order.
+participant of the match that is not the local player, in GameKit's own order. The message
+it was handed becomes the match's own message, which is what Apple's "your turn" banner
+reads on the other phone.
 
 **Resigning quits the local participant and changes nothing else.** GameKit offers no single
 call covering both cases and the in-turn form fails when called out of turn, so the bridge

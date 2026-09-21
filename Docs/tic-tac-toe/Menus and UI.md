@@ -264,10 +264,16 @@ is long gone by the time Game Center answers.
 matchmaker at a time.
 
 ### Pick your Icon
-**An online game starts by asking each player to pick their own icon.** One screen, divided
-in half, titled **Pick your Icon**: the theme's two player marks, one on each side, and the
-player taps the one they want to be. *"It would be One screen devided in half with Pick your
-Icon."*
+**An online game asks each player to pick their own icon the first time that game's board is
+opened on this phone**, before a move is made or seen. One screen split into a top half and
+a bottom half, titled **Pick your Icon**: the theme's two player marks, one in each half, and
+the player taps the one they want to be. *"It would be One screen devided in half with Pick
+your Icon."* *"I like top and bottom"*
+
+**The pick is asked once per open game and kept through rematches.** A rematch continues in
+the same open game, so the mark a player chose stays theirs for the whole series and the
+screen never comes up again for that game. It is saved with that game on this phone, so
+starting a second online game asks again.
 
 **The pick is that phone's alone.** The mark the player picked is drawn for them and the
 other mark for the other player, on this phone only. The other player picks on their own
@@ -428,9 +434,11 @@ Because the banner is visible whenever there is a turn to announce, it takes ver
 space on every board screen with a turn to announce, not only while a move is pending.
 
 **On an online game the banner's slot carries that game's own state instead.** While it is
-the opponent's turn it names the side being waited on — Player One or Player Two, read off
-the board and never the opponent's Game Center nickname — in place of *"Player One, you're
-up!"*, with that side's own mark beside it as always, and nothing else on the screen moves.
+the opponent's turn it names them by their Game Center account name — *"Waiting on Sam…"* —
+with that side's own mark beside it as always, and nothing else on the screen moves. On your
+own turn it reads *"You're up!"* and names nobody, there being only one player on this phone
+to address. Player One and Player Two stay the banner's names on a game on this phone, where
+there is no account to name either player with.
 While a confirmed move is being handed to Game Center the banner says so, and it reads the
 same whether that send was begun by the confirming tap or by a retry. A send that did not go
 through says so and carries two controls with it: send it again, and leave for the main
@@ -440,7 +448,8 @@ sound and fires no haptic, like the result card's own way out — and the confir
 stays on the board behind them, to be sent again. When the other player has left, the banner
 says so and says nothing else: it takes the slot ahead of every other state and keeps it even
 once the board has finished, since there is no result card there to hand off to, and it
-carries no control of its own. What any of these say is not settled — see Open Questions.
+carries no control of its own. What the sending, failed-send and opponent-left states say is
+not settled — see Open Questions.
 
 The free-choice cue is a separate matter and lives in the how-to-play strip below the
 board — see [Game Board Design](./Game%20Board%20Design.md) → The free-choice state. On a
@@ -470,9 +479,9 @@ right now."* already says it.
 9. **Searching** — the waiting room for an anonymous game that has not found a player yet.
    Reached by starting one, and by opening a still-searching game from the open-games list.
    See Play Game → Where It Takes You → Starting a game — on this phone or online.
-10. **Pick your Icon** — one screen split in half, shown at the start of an online game,
-    where each player picks which of the theme's two marks is theirs. See Play Game → Where
-    It Takes You → Pick your Icon.
+10. **Pick your Icon** — one screen split top and bottom, shown the first time an online
+    game's board is opened on this phone, where each player picks which of the theme's two
+    marks is theirs. See Play Game → Where It Takes You → Pick your Icon.
 
 The first seven each have an approved drawing in
 [Design Handoff](./design_handoff_game_ui/README.md); the parental gate, the searching
@@ -779,7 +788,7 @@ its win line drawn and the result card below it, exactly as it was left.
 ### The result card
 **On a win, the result card is preceded by the game-win sequence** — the deciding
 quadrant's small-board celebration, then the big-board win line drawing across the three
-winning quadrants, then an "X wins" display — and the result card appears once that
+winning quadrants, then the win display — and the result card appears once that
 finishes. See [Animations](./Animations.md) → Where Animations Fire. With animations off,
 none of that plays and the result card appears instantly, same as today. Once the card is
 showing, its own behavior is unchanged.
@@ -795,11 +804,13 @@ and padding are not, since those are fixed in code app-wide (see
 [Theming](./Theming.md) → What a Theme Does NOT Control).
 
 **The card says what happened, in words, and a win and a tie read differently.** A win
-names the winning player. A tie names nobody — most quadrants claimed does not win it (see
-[Rules](./Rules.md) → Edge Cases).
+names the winning player — Player One or Player Two on a game on this phone, and on an
+online game that player's Game Center account name, *"Sam takes it!"*. A tie names nobody —
+most quadrants claimed does not win it (see [Rules](./Rules.md) → Edge Cases).
 
 **It shows the running score, already counting the game that just ended**, with the column
-that moved identifiable, and **it says who goes first in the next game**.
+that moved identifiable, and **it says who goes first in the next game** — naming that
+player the same way the win line does, by account name on an online game.
 
 **The result card carries two buttons — one to start the next game, and one to go back to
 the main menu.** *"On game over result card we should have a button for next game as well
@@ -813,6 +824,14 @@ says so and a second tap does nothing; a rematch Apple refuses leaves the card u
 Both players tapping it at once is safe — whichever rematch lands first is the one the series
 continues in.
 
+**The winner's rematch waits until the loser has seen the result.** Apple will not mint a
+rematch while the old match is still open, and it is the losing player's phone that closes
+it, the next time they open that game — see [Tech Design](./Tech%20Design.md) → Online Play.
+So a winner who taps rematch first gets a button saying it is waiting on the other player,
+*"Waiting for Sam to see the result"*, which comes back to life by itself once their phone
+has closed the match. The rematch is never queued to start on its own; the player taps it
+again when it does.
+
 **A game the other player left offers no rematch.** They left mid-game, so the board never
 finished and there is no result card either — the banner says they left, the board takes no
 taps, and deleting the game is the way out. The rematch is hidden rather than shown disabled,
@@ -821,7 +840,7 @@ of its own.
 
 **A game the opponent ended shows the card with no celebration.** An arriving turn plays no
 animation at all — no claim pop, no small-board line, no big-board line drawing across and
-no "X wins" display — so the finished board is drawn at rest with its win line and the card
+no win display — so the finished board is drawn at rest with its win line and the card
 is up, which is the same thing a reopened finished game shows (see
 [Animations](./Animations.md) → Where Animations Fire). The celebration belongs to the
 confirming tap that ends the game, and on an online game that tap was made on the other

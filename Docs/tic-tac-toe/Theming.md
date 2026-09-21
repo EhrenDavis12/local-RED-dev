@@ -806,10 +806,12 @@ user's own hedge — this is reversible if the enforcement story changes.
 
 **A theme styles text; it does not write it.** The words themselves are fixed in code — the
 scoreboard's chip labels, the settings toggles' names and their sub-labels — with one
-exception, an online game's two player chips, which carry Game Center account names instead
-(see [Game Board Design](./Game%20Board%20Design.md) → Scoreboard). A theme sets their size,
-weight, tracking and colour either way; the strings are content, not style, whichever of the
-two they come from.
+exception: on an online game every piece of text that names a player carries that player's
+Game Center account name instead. That is the two player chips (see
+[Game Board Design](./Game%20Board%20Design.md) → Scoreboard), the turn banner while it
+waits on the opponent, the win display, and the result card's win line and its
+who-goes-first-next line. A theme sets their size, weight, tracking and colour either way;
+the strings are content, not style, whichever of the two they come from.
 
 **Stated in its own terms:** a theme controls **everything visual about the game except the
 placement of objects** — the art, the icons, the images, the music and the sound effects
