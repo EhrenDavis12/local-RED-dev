@@ -55,9 +55,9 @@ legal implementation at all — the feature doesn't ship, and scheduling doesn't
 because no amount of later authoring changes what a developer can write today. This can't
 wait.
 
-A missing colour is the ugly case — a delete button renders unstyled, which is legal and
+A missing colour is the ugly case — a control renders unstyled, which is legal and
 shippable. A missing icon, where there's no slot to read and no permitted literal, is the
-impossible case — the button can't be drawn at all. One is debt, the other a deadlock, and
+impossible case — the control can't be drawn at all. One is debt, the other a deadlock, and
 treating them the same schedules the wrong one.
 
 **Ask that about a slot's *shape*, not only about whether it exists.** A slot that exists
@@ -236,10 +236,11 @@ Two consequences:
   authoritative where they differ.
 - Where the handoff draws no value at all, transcription cannot help and those values need
   authoring from scratch. The trash button and the delete confirmation's treatments were
-  decided after the handoff was drawn, so nothing draws them. The settings purchases
-  section has no approved screen showing it. And how far the mark grows in its pop is
-  nowhere: the handoff gives the pop a duration and an easing but never a magnitude.
-  Those gaps stay open.
+  decided after the handoff was drawn, so nothing draws them; the trash button's is
+  authored anyway, because it is never left unstyled — see **What a Theme Controls**. The
+  settings purchases section has no approved screen showing it. And how far the mark grows
+  in its pop is nowhere: the handoff gives the pop a duration and an easing but never a
+  magnitude. Those remaining gaps stay open.
 
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
@@ -550,7 +551,9 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Chrome icons** — the settings icon, close X, chevrons, plus, and the trash button on
   an open-game row. A theme may either name a glyph from a bundled icon set or ship its
   own image. The gear is Neon's art for the settings icon, not the name of the slot —
-  Sewing draws a thimble there.
+  Sewing draws a thimble there. **Every theme styles the trash button** — its colour, and
+  its own art where the theme ships art — and it is never drawn in an unstyled default:
+  *"The game delete button needs to follow the theme in some way otherwise it look bad."*
 
 > **Every theme must keep these legible.** The last-move highlight and active-quadrant
 > highlight are *gameplay-critical*, not decoration — a theme that makes them hard to spot

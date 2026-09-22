@@ -1674,21 +1674,25 @@ leans on that: the winning move is handed off as a turn, so the match sits on th
 until they open the app and close it, however long that takes.
 
 **A player who wants out of an online game deletes it from the open-games list**, the same as
-any other open game, and **deleting resigns the match**, so the other player is not left
-waiting on a turn that will never come. The resign goes out first and the record is removed
-after, but it is best-effort: a resign Apple refuses, or one attempted with no network, never
-blocks or undoes the delete — a game that cannot be deleted while the phone is offline is
-worse than an opponent left waiting. Deleting a game on this phone calls nothing. See
+any other open game, and **deleting resigns the match and then removes it from Game
+Center's list**, so the other player is not left waiting on a turn that will never come and
+the match does not linger on Apple's side after the player has thrown it away. The resign
+goes out first, the removal after it, and the record is removed last; both platform calls
+are best-effort: a call Apple refuses, or one attempted with no network, never blocks or
+undoes the delete — a game that cannot be deleted while the phone is offline is worse than
+an opponent left waiting or a match left in Apple's list. **Every delete of an online game
+asks for the removal**, including one the opponent has already left, where there is no
+resign to make. Deleting a game on this phone calls nothing. See
 [Menus and UI](./Menus%20and%20UI.md) → Deleting an open game.
 
 **The phone remembers which matches it deleted, and an event for one is dropped before
 anything else is looked at.** The newest hundred match ids are kept, oldest dropped first, and
 the check comes first in the routing below — nothing is created, applied, renamed or opened
-for a match this phone has already thrown away. The resign on its own is not enough to make a
-delete stick: it is best-effort and nothing waits on it, so a catch-up can ask Apple for its
-matches and get that still-open match back before the resign lands, and without this memory
-the arriving payload would look like a brand-new invite and put the deleted game straight
-back.
+for a match this phone has already thrown away. Neither the resign nor the removal is
+enough on its own to make a delete stick: both are best-effort and nothing waits on either,
+so a catch-up can ask Apple for its matches and get that match back before they land, and
+without this memory the arriving payload would look like a brand-new invite and put the
+deleted game straight back.
 
 **A rematch online is a new match with a new id.** Apple's rematch mints a fresh match
 rather than reopening the finished one, so nothing may treat a match id as stable across a
@@ -2109,14 +2113,14 @@ holds for a turn event, which has no current value and must not be silently coal
 prefix is the bundle identifier. All three use Flutter's standard message codec, and all
 three are hand-written — no channel generator is a dependency this app takes.
 
-**The method channel exposes exactly ten methods**: `authenticate`, `presentMatchmaker`,
+**The method channel exposes exactly eleven methods**: `authenticate`, `presentMatchmaker`,
 `findRandomMatch`, `loadMatches`, `syncMatches`, `endTurn`, `endMatch`, `rematch`,
-`resignMatch` and `saveMatchData`. The first five take no argument; `saveMatchData`
+`resignMatch`, `removeMatch` and `saveMatchData`. The first five take no argument; `saveMatchData`
 takes a match id and the encoded payload bytes; `endTurn` takes those two plus the message
 GameKit shows in its "your turn" notification — empty on an ordinary move, and carrying the
 result on the move that finishes a game; `endMatch` takes the match id, the payload and this
-device's own outcome — `won`, `lost` or `tied`; and `resignMatch` and `rematch` each take a
-match id alone.
+device's own outcome — `won`, `lost` or `tied`; and `resignMatch`, `rematch` and `removeMatch`
+each take a match id alone.
 `saveMatchData` writes the payload as the match's data without ending the turn, which is the
 whole difference between it and `endTurn`. `endMatch` ends the match outright: it sets this
 device's participant to the outcome it was handed and every other participant to the
@@ -2125,7 +2129,7 @@ failing when the match is already ended with this device's outcome on it. `endTu
 the same way, with no second platform call, when this device is no longer the one to move and
 the match already holds exactly the payload being sent. `rematch` answers `ok` with the new
 match's own map, or `failed` with a message. `syncMatches` answers `ok` with how many matches
-it replayed, or `failed` with a message. Each of the other four answers a `status` of `ok`, or
+it replayed, or `failed` with a message. Each of the other five answers a `status` of `ok`, or
 `failed` with a non-empty message — a match id GameKit does not hold, a match the local player
 is not in, and a GameKit failure are all the same one failure, since no caller has a second
 behaviour to take on them. Called while the session is not authenticated, each answers failed
@@ -2139,10 +2143,10 @@ Swift side at all, which is every `flutter test` run. Every failure value carrie
 message, and nothing branches on that text.
 
 **Every call that sends is bounded at thirty seconds.** Ending a turn, ending a match, asking
-for a rematch, saving a board into the match and asking for a random match each give up after
-that and answer their own "could not be reached" failure. GameKit promises nothing about ever
-calling a completion handler back, and a send that never answers wedges the one move the
-player is trying to make;
+for a rematch, saving a board into the match, removing a match and asking for a random match
+each give up after that and answer their own "could not be reached" failure. GameKit promises
+nothing about ever calling a completion handler back, and a send that never answers wedges the
+one move the player is trying to make;
 a bounded wait plus an ordinary failure is what makes a retry possible at all. It is one value
 stated once, shared by all four and by the catch-up's own wait.
 
@@ -2183,6 +2187,9 @@ picks by whether the local player is the match's current participant. The in-tur
 handed the match's own loaded data unchanged — resigning is not a move, so the board the
 other device sees must not change, and GameKit requires match data there, so passing empty
 data would wipe the opponent's board. Only the local participant's outcome is set.
+
+**Removing takes the match off this device's Game Center list and changes nothing else.** It
+is called after the resign, on the delete path alone — see **Online Play** above.
 
 **A turn event is exactly five keys**: `matchId`, the six-key `match` map built from the
 match it arrived for, `matchData` — the match's loaded data as bytes, or null when it holds

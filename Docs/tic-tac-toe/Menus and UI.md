@@ -325,7 +325,11 @@ the user's own words:
 > modal"
 
 The revealed control is a **trash button** — an icon, not a worded "Delete" label. The
-modal's buttons are **Yes and No**, not Cancel/Delete.
+modal's buttons are **Yes and No**, not Cancel/Delete. **The trash button is themed like
+anything else on screen** — every theme styles it, in its own colour and in its own art
+where the theme ships art, and it is never drawn in an unstyled default: *"The game delete
+button needs to follow the theme in some way otherwise it look bad."* See
+[Theming](./Theming.md) → What a Theme Controls.
 
 **The revealed trash button stays put when the finger lifts** — it has to, since the player
 has to tap it — and the reveal closes again on swiping the row back, on tapping the trash
@@ -333,17 +337,27 @@ button, or on tapping the row body. **Tapping the row body closes the reveal and
 open the game**: it is the standard iOS behaviour and the safer one to sit next to a
 destructive control, at the cost of a tap that would have resumed a game doing nothing.
 
+**The row itself has to show that it slides left to delete.** A player who does not already
+know the gesture has nothing to find: *"I know to slide left to delete but the user does
+not. We need a way to tell the user to swipe left on the game button to delete."* The answer
+is a design cue on the row — *"The best would be some kind of design aspect signals to the
+user how to delete and that the button is slidable to be deleted."* — with help text as the
+floor rather than the answer: *"Help Text is bear minumum."* What that cue is is not settled
+— see Open Questions.
+
 The confirmation is there because deleting a game is the only irreversible action in the
 app — it destroys the game and its whole running scoreboard — and kids are a stated target
 audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform).
 
-**Deleting an online game resigns the Game Center match**, so the other player's copy ends
-instead of waiting on a turn that never comes. The resign is best-effort and never blocks the
-delete: a player who asked for a game to be gone gets it gone whether or not Apple could be
-reached. **Deleting a game the other player already left resigns nothing** — they are gone, so
-there is nothing to tell them. Either way the game is gone for good: the phone remembers that
-match well enough to throw away anything that turns up for it afterwards, so a deleted game
-never reappears. See [Tech Design](./Tech%20Design.md) → Online Play.
+**Deleting an online game resigns the Game Center match and takes it off Game Center's own
+list**, so the other player's copy ends instead of waiting on a turn that never comes and
+the match does not sit in Apple's list after the player has thrown the game away. Both are
+best-effort and neither blocks the delete: a player who asked for a game to be gone gets it
+gone whether or not Apple could be reached. **Deleting a game the other player already left
+resigns nothing** — they are gone, so there is nothing to tell them — but it is still taken
+off Apple's list. Either way the game is gone for good: the phone remembers that match well
+enough to throw away anything that turns up for it afterwards, so a deleted game never
+reappears. See [Tech Design](./Tech%20Design.md) → Online Play.
 
 **Deleting an anonymous game that is still looking for a player cancels the search.** There is
 no separate cancel: the search is the game, so the ordinary delete — the same confirmation, the
@@ -1020,6 +1034,9 @@ an open game** above.
   nothing to go on.
 - **Should swiping one row open close another row that is already revealed**, or can two
   sit open at once?
+- **What is the design cue that tells a player the row slides left to delete?** The row has
+  to signal it visually rather than leaving the gesture to be guessed, and help text is the
+  bare minimum rather than the answer. Nothing settles what the cue actually is.
 - **What should happen when a player opens a game that is no longer there**, or that can't
   be read back? Going quietly back to the main menu tells them nothing about why, and an
   error surface would need copy and a control that nothing specifies.
