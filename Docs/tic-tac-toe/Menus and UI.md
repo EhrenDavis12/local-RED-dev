@@ -826,11 +826,21 @@ continues in.
 
 **The winner's rematch waits until the loser has seen the result.** Apple will not mint a
 rematch while the old match is still open, and it is the losing player's phone that closes
-it, the next time they open that game — see [Tech Design](./Tech%20Design.md) → Online Play.
-So a winner who taps rematch first gets a button saying it is waiting on the other player,
-*"Waiting for Sam to see the result"*, which comes back to life by itself once their phone
-has closed the match. The rematch is never queued to start on its own; the player taps it
-again when it does.
+it, as soon as that finished board is on their screen — see
+[Tech Design](./Tech%20Design.md) → Online Play. So the winner's card comes up with its
+button already saying it is waiting on the other player, *"Waiting for Sam to see the
+result"* — no tap is needed to find that out, the button takes no tap, and the wait survives
+a relaunch — and it comes back to life by itself once their phone has closed the match. The
+rematch is never queued to start on its own; the player taps it again when it does. The name
+is the opponent's Game Center account name, with the same fallback every other line naming
+them already uses.
+
+**A send in flight and a failed send both outrank the waiting button.** Until the finishing
+move has actually left this phone the screen shows what it shows for those two states — the
+sending notice, and the failed send with its retry and its way out — rather than telling the
+player they are waiting on an opponent who has not been handed the move yet. The losing
+player's own card never waits either: it draws the ordinary rematch button throughout, and a
+rematch Apple refuses there leaves the card up and says so.
 
 **A game the other player left offers no rematch.** They left mid-game, so the board never
 finished and there is no result card either — the banner says they left, the board takes no

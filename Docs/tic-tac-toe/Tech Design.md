@@ -780,22 +780,22 @@ already, so the guarantee is structural rather than something each caller has to
 **An online game is an open game in the same box** — the same store-minted id, the same
 repository-owned timestamps, the same version stamp, the same position in the open-games
 order, and the same cap. There is no second store, no second box and no second record type.
-It adds six stored values and no others: the Game Center match it is currently played
+It adds seven stored values and no others: the Game Center match it is currently played
 through, the series that match belongs to, which side this device plays, whether the opponent
-has left, whether it is still waiting for one, and which of the two marks this device draws as
-its own.
+has left, whether it is still waiting for one, whether Apple has closed the match it
+currently points at, and which of the two marks this device draws as its own.
 
-**The six are written under a single `online` key on the record's JSON**, holding `matchId`,
-`seriesId`, `localPlayer` and — each only once it is true — `opponentLeft` and
-`awaitingOpponent`. The first two are strings; `localPlayer` is the player's name string —
-`playerOne` or `playerTwo` — exactly as the board already encodes a player; the other two are
-yes/nos that are absent until they are yes, and an absent one reads as no, which is what every
-record written before either existed decodes as. The sixth, `marksSwapped`, is a yes/no that is
-absent until the player has picked at all — absent means no pick has been made yet, which is
-what tells the app to ask — and once picked it is written whether yes or no, since "picked the
-first mark" and "not picked yet" have to read differently. Those key names and encodings are
-on-disk identity the moment a record ships, so they are schema rather than a naming choice made
-at implementation time.
+**The seven are written under a single `online` key on the record's JSON**, holding
+`matchId`, `seriesId`, `localPlayer` and — each only once it is true — `opponentLeft`,
+`awaitingOpponent` and `matchEnded`. The first two are strings; `localPlayer` is the player's
+name string — `playerOne` or `playerTwo` — exactly as the board already encodes a player; the
+other three are yes/nos that are absent until they are yes, and an absent one reads as no,
+which is what every record written before any of them existed decodes as. The seventh,
+`marksSwapped`, is a yes/no that is absent until the player has picked at all — absent means
+no pick has been made yet, which is what tells the app to ask — and once picked it is written
+whether yes or no, since "picked the first mark" and "not picked yet" have to read
+differently. Those key names and encodings are on-disk identity the moment a record ships, so
+they are schema rather than a naming choice made at implementation time.
 
 **The presence of that key is the only thing that tells an online game from a local one.** A
 record whose `online` key is absent, or present and null, is a local game and loads exactly
@@ -803,8 +803,9 @@ as a record written before online play existed. Nothing infers online-ness from 
 the board, or anything else.
 
 **An `online` key that is present but unreadable makes the whole record unreadable** — a
-missing `matchId` or `seriesId`, a `localPlayer` naming no player, an `opponentLeft` or
-`awaitingOpponent` that is not a yes/no, any of them wrong-typed — and it gets the answer
+missing `matchId` or `seriesId`, a `localPlayer` naming no player, an `opponentLeft`,
+`awaitingOpponent` or `matchEnded` that is not a yes/no, any of them wrong-typed — and it
+gets the answer
 every other unreadable record gets: "nothing stored" for a read by id, skipped by the list
 read while every other game still comes back, and left on disk exactly as it is. **An
 unrecognised extra key inside the map is
@@ -844,7 +845,7 @@ the title alone — the board, the three `online` values, the created timestamp 
 unchanged — and otherwise behaves exactly as a save does: it stamps the updated timestamp,
 moves the record to the top of the list, and emits on the change stream.
 
-**A save never touches those five.** Only the board is honoured, exactly as the title and the
+**A save never touches any of them.** Only the board is honoured, exactly as the title and the
 created timestamp already are. **The awaiting-an-opponent mark is cleared when a turn is
 applied** — a turn genuinely applying means somebody is definitely on the other end, which is
 the same fact a resolved nickname carries and the more certain one, since it comes with an
@@ -852,11 +853,30 @@ actual move rather than only an identity. It is otherwise preserved, by a save a
 alike, and it has its own operation for clearing it directly.
 
 **The match id changes on exactly two paths and no others** —
-the initiating device's own next-game write, and an accepted rematch payload. **Marking the
-opponent as having left is its own operation, and the only thing that sets that value**: it
-touches nothing else on the record, does nothing at all for an id the store does not hold or
-for a local record with no online values to carry it, is safe to run twice, and announces a
-change only when something actually changed.
+the initiating device's own next-game write, and an accepted rematch payload. **Those same
+two writes are what clears the match-ended value**, which is this device's own knowledge that
+Apple has closed the match the record *currently* points at: it is knowledge about one match,
+and those are exactly the paths that move the record onto another. Without that, a series
+would hold a true value against a freshly opened match from its second game on — the device
+that owes the ending call would never make it, and the other would draw an ordinary rematch
+button whose tap Apple refuses. Everything else preserves it: a save, a rename, an applied
+turn that stays on the same match, marking the opponent as having left, the icon pick.
+
+**Setting the match-ended value is its own operation**, shaped exactly like marking the
+opponent as having left: it touches nothing else, never moves the record to the top of the
+list and never restamps it, is safe to run twice, does nothing for an id the store does not
+hold or for a local record with no online values to carry it, and announces a change only
+when something actually changed — which is what lets a result card already on screen see it
+without a reload. Two things call it, the turn-event receiver on an arriving event whose
+match status is `ended`, and the device that ends the match itself once its own call answers
+ok. Each re-reads the record first and writes only while it still points at the match in
+question, so a late replay of a match already superseded by a rematch never marks the new one
+ended.
+
+**Marking the opponent as having left is its own operation, and the only thing that sets that
+value**: it touches nothing else on the record, does nothing at all for an id the store does
+not hold or for a local record with no online values to carry it, is safe to run twice, and
+announces a change only when something actually changed.
 
 **Advancing to the next game and pointing the record at the new match is one write.** Taking
 the next game on this phone stores the next board and the new match id together, so a record
@@ -1831,15 +1851,64 @@ what that banner says. Everything else about the send is unchanged: the same
 awaiting-handoff mark while it is in flight, the same retry on a failure, and the same write
 only on Apple's ok.
 
-**The losing device is what ends the match, the next time it opens that game.** Apple lets
-only the player whose turn it is end a match, and the finishing hand-off is exactly what
-makes that the loser. Until they open it the match stays open on Apple's side with the
-result already drawn on both boards, which costs nothing — turns never time out, so nothing
-expires while it waits. Ending it sets this device's outcome to lost and the other's to won,
-the same call the opponent-left path already makes.
+**There are four of those messages, and they name the sender by Game Center account name**,
+read from this device's own signed-in session: *"`<name>` won your game."* when the sender
+won it, and *"Your game with `<name>` ended in a tie."* on a tie. With no nickname to use
+they fall back to *"Your game ended."* and *"Your game ended in a tie."* — which only happens
+when the session is not authenticated, since a sending device otherwise always knows its own
+name. An ordinary move carries no message at all, the anonymous starter's zero-move hand-off
+and the searching screen's re-sends of it included.
+
+**Which device ends the match is derived from the finished board, never read from Apple.**
+The engine leaves the winner — or, on a draw, whoever made the final move — as the current
+player of a finished board, and the finishing hand-off passes the turn to the other phone.
+So the device whose own side is the board's current player is the one that made the
+finishing move, and the other is Apple's current participant and therefore the one that ends
+the match. Nothing asks Game Center which participant is current, and nothing reads a
+match's status to decide what to draw. The comparison is between engine players — the
+board's current player against the side stored on the record — so the per-device icon pick
+never enters it; which mark this device draws changes nothing about which side it plays.
+
+**The losing device is what ends the match, as soon as that finished board is on its
+screen.** Apple lets only the player whose turn it is end a match, and the finishing
+hand-off is exactly what makes that the loser. It fires on the screen's own load of the
+record, on a re-read landing the finishing turn on the game already on screen, and on the
+arriving-turn path putting that game on screen; an event a catch-up replays while the player
+is looking at something else ends no match, and that one closes the next time the game is
+opened. Until it happens the match stays open on Apple's side with the result already drawn
+on both boards, which costs nothing — turns never time out, so nothing expires while it
+waits. Ending it sets this device's outcome to lost and the other's to won — tied on a draw
+— handing Apple the board already stored, under that record's series id, the same call the
+opponent-left path already makes. The device that made the finishing move never makes it, on
+a won game and on a tie alike, because Apple would refuse it.
+
+**That call is best-effort, silent, and one at a time per record.** It is fired without
+waiting, never shown to the player as an error or anything else, and never made twice
+concurrently for the same record. On Apple's ok the record is marked as knowing the match
+has ended — see **Persistence and Serialization** → *What an online game adds to the record*
+— and on a failure nothing is written, so the next time that board reaches the screen tries
+again. A record that has not caught up therefore costs one harmless extra call rather than a
+stuck match, because ending a match is idempotent. Like a finishing send, it waits on the
+launch sign-in while that call is still in flight rather than failing as though the player
+were never signed in.
+
+**A device learns a match has ended three ways, and all three arrive as ordinary turn
+events.** GameKit delivers the end to the other participant through its own match-ended
+callback rather than the turn-event one, and the bridge routes that callback down the same
+path; the catch-up at launch and on every resume replays an ended match the way it replays
+an open one; and the winner's waiting result card re-checks on its own timer. The
+match-ended value is written for any of them, whatever else the event did or did not apply —
+that status is the whole point of the event Apple sends when a match closes, and the board
+it carries has usually been applied already.
 
 **The player on the other side of a finishing move is told with a banner even when their app
 is closed.** They are not left to discover the result the next time they open the app.
+
+**A phone on a build that ends a match from the sending side leaves that match open until it
+updates.** Such a build has nothing that closes a match on receipt, so a finishing move
+handed to it sits there: the sender's rematch button waits indefinitely, and deleting the
+game is the way out, since deleting resigns the match. Nothing works around it — turns never
+time out, so nothing expires while it waits.
 
 **A retried send never double-plays, whichever kind it is.** Handing off a turn and ending a
 match both answer ok to a retry Apple has already carried out — a hand-off that landed even
@@ -1883,11 +1952,18 @@ pointing at it. That is acceptable, because a match neither player ever played i
 both devices and costs no slot.
 
 **Apple refuses a rematch while the finished match is still open, so the winner's rematch is
-held rather than failed.** The loser's phone is what ends that match, so a winner who taps
-rematch before the other player has opened the app gets a result card whose button says it
-is waiting on them, and which comes back to life by itself once the match shows as ended
-here. Nothing is queued: the rematch is asked of Apple on the tap that follows the unlock,
-never on the unlock itself. See [Menus and UI](./Menus%20and%20UI.md) → Game Over → Rematch.
+held rather than failed.** The loser's phone is what ends that match, and the device that
+made the finishing move draws the waiting button from the moment the result card appears
+rather than discovering it on a refused tap — what it reads is the record's own stored
+match-ended value, so the wait survives a relaunch. It comes back to life by itself once
+that value turns true, and while the waiting card is up it re-checks with Game Center every
+fifteen seconds, the same interval the searching screen already polls on, started when the
+card appears and stopped when it goes away. Nothing is queued: the rematch is asked of Apple
+on the tap that follows the unlock, never on the unlock itself. A rematch Apple refuses
+anyway — the value having turned true a moment before the match actually closed — is
+reported the way any other refusal is. The device that owes the match-ending call never
+waits, because it is not waiting on anybody. See [Menus and UI](./Menus%20and%20UI.md) →
+Game Over → Rematch.
 
 **Both players tapping rematch at once is safe.** The held id is dropped whenever a re-read of
 the record shows the match id has already moved on — which is what the opponent's own rematch
@@ -2009,8 +2085,10 @@ screen's own first load is still in flight.
 
 **Opening an online game is playing, not entering.** From the open-games list or from a
 "your turn" notification, the screen shows the current stored board and nothing more: it
-makes no Game Center call, raises no sign-in and raises no parental gate. See **Kids
-Category** below.
+raises no sign-in, raises no parental gate, and makes no Game Center call. A finished board
+is the one exception — the losing device makes the match-ending call above, and the winner's
+waiting result card re-checks every fifteen seconds — and neither of those draws anything.
+See **Kids Category** below.
 
 **Opening a different game while a board is already on screen loads that game.** A
 notification for another match, or a tap on another row, reaches the same board screen rather
@@ -2116,6 +2194,11 @@ before describing a match, or every event would carry no payload; a match whose 
 load, or whose local participant cannot be resolved, emits nothing. An event is emitted even
 while a matchmaker presentation is pending — it still reaches the receiver and is routed by
 match id — and which event completes that presentation is unaffected.
+
+**Three things emit a turn event.** GameKit's turn-event callback is one; its separate
+match-ended callback is the second, and it is how the end of a match reaches the other
+participant, since that never arrives on the turn-event one; and the catch-up's replay is
+the third. Both of the last two are marked as not having brought the app to the foreground.
 
 **Turn events that arrive with no Dart subscriber are buffered and replayed**, in arrival
 order, on the next subscribe and again after a cancel, and the buffer is cleared as it is
