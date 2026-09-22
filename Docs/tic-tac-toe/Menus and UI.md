@@ -342,8 +342,14 @@ know the gesture has nothing to find: *"I know to slide left to delete but the u
 not. We need a way to tell the user to swipe left on the game button to delete."* The answer
 is a design cue on the row — *"The best would be some kind of design aspect signals to the
 user how to delete and that the button is slidable to be deleted."* — with help text as the
-floor rather than the answer: *"Help Text is bear minumum."* What that cue is is not settled
-— see Open Questions.
+floor rather than the answer: *"Help Text is bear minumum."* Three things say it, in this
+order of weight: a double-chevron **grip** drawn at the trailing end of every game row —
+never on the New Game row — which slides the row when dragged and opens the trash when
+tapped; a one-time **peek**, the first time the list is shown in an app session, where the
+first game row slides a little to show its delete edge and settles back — after the list has
+finished arriving, never when animations are off, and a drag or a tap on it takes over
+cleanly; and a **caption** under the list, *"Slide a game left to delete it"*, the help-text
+floor. The trash is inert during the peek, since the row moved on its own.
 
 The confirmation is there because deleting a game is the only irreversible action in the
 app — it destroys the game and its whole running scoreboard — and kids are a stated target
@@ -1034,9 +1040,6 @@ an open game** above.
   nothing to go on.
 - **Should swiping one row open close another row that is already revealed**, or can two
   sit open at once?
-- **What is the design cue that tells a player the row slides left to delete?** The row has
-  to signal it visually rather than leaving the gesture to be guessed, and help text is the
-  bare minimum rather than the answer. Nothing settles what the cue actually is.
 - **What should happen when a player opens a game that is no longer there**, or that can't
   be read back? Going quietly back to the main menu tells them nothing about why, and an
   error surface would need copy and a control that nothing specifies.

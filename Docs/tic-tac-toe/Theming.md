@@ -554,6 +554,9 @@ Everything visual and audible. Rough list, not exhaustive:
   Sewing draws a thimble there. **Every theme styles the trash button** — its colour, and
   its own art where the theme ships art — and it is never drawn in an unstyled default:
   *"The game delete button needs to follow the theme in some way otherwise it look bad."*
+  The grip is a chrome icon too (`slideGrip`), and the trash button's plate is an image slot
+  (`deleteButton`) with a fill colour behind it when a theme ships no art; the peek is an
+  animation slot (`deletePeek`) a theme may clear.
 
 > **Every theme must keep these legible.** The last-move highlight and active-quadrant
 > highlight are *gameplay-critical*, not decoration — a theme that makes them hard to spot
