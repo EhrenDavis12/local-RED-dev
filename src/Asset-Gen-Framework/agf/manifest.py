@@ -27,6 +27,7 @@ RECOGNIZED_FORMATS = {
     "wav": (".wav",),
     "mp3": (".mp3",),
     "mp4": (".mp4",),
+    "mov": (".mov",),
 }
 
 # R38 — version one's two settled defaults.
@@ -38,7 +39,7 @@ DEFAULT_MODELS = {
 ALL_FIELDS = {
     "name", "type", "operation", "model", "prompt", "prompt_key", "output",
     "format", "inputs", "input_files", "frame_count", "frame_size", "layout",
-    "frames", "source",
+    "frames", "source", "resize",
 }
 REQUIRED_FIELDS = {"name", "type", "output", "format"}
 CALL_FIELDS = {"model", "prompt", "prompt_key", "inputs", "input_files"}
@@ -78,6 +79,7 @@ class Entry:
     layout: dict | None
     frames: list | None
     source: str | None
+    resize: list | None  # extract_frames only: every frame is fitted into [w, h]
 
 
 def load_manifest_raw(manifest_path: Path):
@@ -262,6 +264,7 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
         layout=layout,
         frames=frames_list,
         source=source,
+        resize=raw.get("resize"),
     )
 
 
@@ -344,6 +347,21 @@ def _is_int(value) -> bool:
 
 def _validate_geometry(name, type_, operation, raw, frame_count, frame_size, layout) -> None:
     is_sheet = type_ == "sprite_sheet"
+    if "resize" in raw:
+        if operation != "extract_frames":
+            raise ManifestError(
+                f"entry {name!r}: 'resize' is legal only for extract_frames"
+            )
+        resize = raw["resize"]
+        if not (
+            isinstance(resize, list)
+            and len(resize) == 2
+            and all(_is_int(v) and v > 0 for v in resize)
+        ):
+            raise ManifestError(
+                f"entry {name!r}: 'resize' must be a [width, height] list of two "
+                f"positive integers, got {resize!r}"
+            )
     if is_sheet:
         missing = [k for k in ("frame_count", "frame_size", "layout") if k not in raw]
         if missing:

@@ -15,6 +15,7 @@ import io
 from pathlib import Path
 
 import av
+from PIL import Image
 
 _PIL_FORMAT_BY_DECLARED = {"png": "PNG", "jpeg": "JPEG", "webp": "WEBP"}
 
@@ -47,9 +48,14 @@ def extract(source_path: Path, format: str) -> list[bytes]:
                 raise ExtractionError(f"{source_path} has no video stream to extract frames from")
             stream = container.streams.video[0]
             for frame in container.decode(stream):
-                image = frame.to_image()
-                if pil_format == "PNG":
-                    image = image.convert("RGBA")
+                if pil_format == "PNG" and "a" in frame.format.name:
+                    # An alpha-carrying source (ProRes 4444, VP9 with
+                    # alpha) keeps its matte: to_image() would flatten it.
+                    image = Image.fromarray(frame.to_ndarray(format="rgba"), "RGBA")
+                else:
+                    image = frame.to_image()
+                    if pil_format == "PNG":
+                        image = image.convert("RGBA")
                 buffer = io.BytesIO()
                 image.save(buffer, format=pil_format)
                 encoded_frames.append(buffer.getvalue())

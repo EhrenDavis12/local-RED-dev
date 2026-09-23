@@ -29,7 +29,9 @@ def detect_format(data: bytes) -> str | None:
     if len(data) >= 2 and data[0] == 0xFF and (data[1] & 0xE0) == 0xE0:
         return "mp3"
     if len(data) >= 12 and data[4:8] == b"ftyp":
-        return "mp4"
+        # QuickTime and MP4 share the ftyp box; the major brand tells them
+        # apart. `qt  ` is what a ProRes 4444 (alpha-carrying) .mov declares.
+        return "mov" if data[8:12] == b"qt  " else "mp4"
     return None
 
 

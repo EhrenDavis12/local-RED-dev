@@ -1,0 +1,24 @@
+{
+  "name": "asset-animation-demo",
+  "aliases": ["aad"],
+  "title": "Asset Animation Demo",
+  "summary": "A one-screen Flutter demo that plays generated character animations — proving assets can be generated in one consistent style, repeatably, with transparency, and played smoothly in a game.",
+  "docsRoot": "Docs/asset-animation-demo",
+  "prds": "Docs/asset-animation-demo/PRDs",
+  "roadmap": "Docs/asset-animation-demo/roadmap.md",
+  "srcRoots": [
+    "src/asset-animation-demo",
+    "src/Asset-Gen-Framework"
+  ],
+  "stack": "Flutter / Dart (the demo app) + Python (Asset-Gen-Framework, which the pipeline extends where a step is missing)",
+  "testing": {
+    "command": "cd src/asset-animation-demo && flutter test; cd src/Asset-Gen-Framework && .venv/bin/python -m pytest -q",
+    "prefer": [
+      "This is a demo. One widget test that the screen builds and a button starts its animation, plus a parsing test for the catalog. Framework changes get one pytest each.",
+      "Everything about smoothness, size, and look is checked by running the app on the simulator, never asserted."
+    ],
+    "avoid": [
+      "Golden tests, integration tests, and anything that asserts against a generated asset's pixels."
+    ]
+  }
+}

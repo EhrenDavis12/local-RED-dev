@@ -271,7 +271,7 @@ RECORD_ENTRY_KEYS = frozenset(
         "frame_size",
         "layout",
         "frames",
-        "source",
+        "source", "resize",
     }
 )
 

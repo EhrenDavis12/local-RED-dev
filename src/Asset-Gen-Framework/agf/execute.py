@@ -272,8 +272,35 @@ def _run_assemble_sheet(config: Config, entry: Entry):
 def _run_extract_frames(config: Config, entry: Entry):
     source_path = resolve_reference(config, entry.source, context=f"entry {entry.name!r} source")
     extracted = frames.extract(source_path, entry.format)
+    if entry.resize is not None:
+        extracted = [_fit_frame(data, entry.resize, entry.format) for data in extracted]
     basename_template = PurePosixPath(entry.output).name
     return [(basename_template.format(n=i), data) for i, data in enumerate(extracted, start=1)]
+
+
+def _fit_frame(data: bytes, size: list, format: str) -> bytes:
+    """Scale one extracted frame to fit inside `size`, keeping its aspect
+    ratio, centred on a canvas of exactly `size`. PNG canvases are
+    transparent; other formats are black. This is the one place the
+    framework scales, and only because a video model cannot be asked for
+    game-sized frames while a sheet has to be."""
+    width, height = size
+    with Image.open(io.BytesIO(data)) as source:
+        source.load()
+        if format == "png":
+            image = source.convert("RGBA")
+            canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        else:
+            image = source.convert("RGB")
+            canvas = Image.new("RGB", (width, height), (0, 0, 0))
+    scale = min(width / image.width, height / image.height)
+    fitted_size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
+    fitted = image.resize(fitted_size, Image.LANCZOS)
+    offset = ((width - fitted_size[0]) // 2, (height - fitted_size[1]) // 2)
+    canvas.paste(fitted, offset)
+    buffer = io.BytesIO()
+    canvas.save(buffer, format={"png": "PNG", "jpeg": "JPEG", "webp": "WEBP"}[format])
+    return buffer.getvalue()
 
 
 def _run_checks(
