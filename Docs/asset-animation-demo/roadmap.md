@@ -11,6 +11,7 @@ Covers the demo app, the generation pipeline, and what the framework gained for 
 - The Screen
 - The Pipeline
   - What the framework gained for this
+- What Six Characters Cost
 - Open Questions
 
 See the design docs under `Docs/asset-animation-demo/` for actual content — this file is

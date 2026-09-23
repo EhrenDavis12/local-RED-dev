@@ -93,7 +93,18 @@ Four small additions, each a gap this pipeline hit:
 Community models on Replicate are named with a pinned version (`owner/name:hash`), which
 the framework already routes to the generic predictions endpoint; the matte model is one.
 
+## What Six Characters Cost
+
+Six characters, three actions each, came to 78 framework entries and about 33 MB of PNG
+in the app — roughly 1.8 MB per sheet. Every animation came back usable on the first
+try; nothing was regenerated. The one visible artifact is the mage's defend, where a
+translucent magic barrier matted as an opaque white disc for a few frames: a matte cannot
+carry a half-transparent effect, so effects that should be see-through belong in code or in
+a separate layer, not in the character's video.
+
 ## Open Questions
 
 - Is 256px per cell enough on a 3x phone, or should the sheets be 384px and larger?
+- Should sheets be quantized (pngquant) to bring 1.8 MB per action down, and does the
+  banding show?
 - Should the idle loop be generated shorter than the actions, since it repeats?
