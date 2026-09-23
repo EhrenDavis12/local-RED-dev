@@ -355,7 +355,7 @@ def _is_int(value) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
-MATTE_KEYS = {"mask", "background", "grow", "threshold", "feather"}
+MATTE_KEYS = {"mask", "background", "grow", "threshold", "feather", "effect"}
 
 
 def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
@@ -390,6 +390,10 @@ def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
                 raise ManifestError(
                     f"entry {name!r}: matte.{key} must be a number from {low} to {high}, got {value!r}"
                 )
+    if "effect" in matte and not isinstance(matte["effect"], bool):
+        raise ManifestError(
+            f"entry {name!r}: matte.effect must be a bool, got {matte['effect']!r}"
+        )
 
 
 def _validate_geometry(name, type_, operation, raw, frame_count, frame_size, layout) -> None:

@@ -11,6 +11,7 @@ import shutil
 import uuid
 from pathlib import Path, PurePosixPath
 
+import numpy as np
 from PIL import Image
 
 import agf.frames as frames
@@ -291,8 +292,19 @@ def _run_extract_frames(config: Config, entry: Entry):
                 remedy="the mask video must be made from this exact source video",
                 checks=[],
             )
+        matte = entry.matte
+        if matte.get("background", "auto") == "auto":
+            # Resolved once, from the first frame: a burst's later frames
+            # can have foreground in the corners, and re-resolving per
+            # frame would make the key drift with them.
+            first_rgb = np.array(Image.open(io.BytesIO(extracted[0])).convert("RGB")).astype(float)
+            background = matting.background_of(first_rgb, "auto")
+            matte = {
+                **matte,
+                "background": "#{:02x}{:02x}{:02x}".format(*(int(round(c)) for c in background)),
+            }
         extracted = [
-            matting.apply(frame, mask, entry.matte) for frame, mask in zip(extracted, masks)
+            matting.apply(frame, mask, matte) for frame, mask in zip(extracted, masks)
         ]
     if entry.resize is not None:
         extracted = [_fit_frame(data, entry.resize, entry.format) for data in extracted]

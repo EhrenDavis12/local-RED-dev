@@ -17,6 +17,16 @@ share, `(1 - alpha) * background`, is subtracted out. The body keeps the
 model's mask at full alpha. Transparent pixels get black colour so nothing
 downstream can bleed the background back in.
 
+`matte.effect` is for material the mask model tracks badly: effects are
+colourful and sparse, and the model routinely loses whole small shards, so
+a grown band a few pixels wide never reaches back far enough to recover
+them. Outside the body the key is by colour alone, over the whole frame,
+with a narrow ramp around the threshold rather than the band's measured
+"fully foreground" distance -- there is no reliable body left to measure
+that from. Inside the body only the exact background colour is dropped;
+everything else, including a shard the model missed, keeps full alpha and
+its original colour untouched.
+
 `apply` is pure image work -- no model, no network.
 """
 from __future__ import annotations
@@ -33,7 +43,13 @@ def _decode(data: bytes) -> Image.Image:
         return img.copy()
 
 
-def _background(rgb: np.ndarray, spec: str) -> np.ndarray:
+def background_of(rgb: np.ndarray, spec: str) -> np.ndarray:
+    """The background colour `apply` keys against: `spec` verbatim if it is
+    a `#rrggbb` colour, otherwise `auto`, read from this frame's corners.
+    For a clip, `auto` is read from the corners of the clip's first frame
+    and held for the whole clip, because later frames may have foreground
+    in the corners -- that holding is the caller's job (`execute.py`), not
+    this function's; `background_of` only ever measures one frame."""
     if spec != "auto":
         return np.array([int(spec[i : i + 2], 16) for i in (1, 3, 5)], dtype=float)
     h, w = rgb.shape[:2]
@@ -53,6 +69,7 @@ def apply(frame_data: bytes, mask_data: bytes, options: dict) -> bytes:
     grow = int(options.get("grow", 3))
     threshold = float(options.get("threshold", 60))
     feather = float(options.get("feather", 0))
+    effect = bool(options.get("effect", False))
 
     rgb = np.array(_decode(frame_data).convert("RGB")).astype(float)
     mask = np.array(_decode(mask_data).convert("L"))
@@ -62,9 +79,28 @@ def apply(frame_data: bytes, mask_data: bytes, options: dict) -> bytes:
     core = mask >= 128
     alpha = core.astype(float)
     colour = rgb.copy()
-    if grow > 0 and core.any():
+    if effect:
+        # No band, no grow: the model loses whole shards, so the key runs
+        # over the whole frame by colour alone.
+        background = background_of(rgb, options.get("background", "auto"))
+        distance = np.sqrt(((rgb - background) ** 2).sum(axis=-1))
+        outside = ~core
+
+        half = max(threshold * 0.5, 1e-6)
+        ramp = np.clip((distance - half) / half, 0.0, 1.0)
+        alpha = np.where(outside, ramp, alpha)
+        # Inside the body, only the exact background colour drops out.
+        alpha = np.where(core & (distance <= threshold * 0.25), 0.0, alpha)
+
+        # Un-blend: the pixel was alpha * fg + (1 - alpha) * background.
+        # Only partially-keyed pixels outside the body need it -- alpha 1
+        # is untouched colour, and the body never un-blends.
+        sel = outside & (alpha > 0) & (alpha < 1)
+        a = alpha[sel][:, None]
+        colour[sel] = np.clip((rgb[sel] - (1.0 - a) * background) / np.maximum(a, 1e-3), 0, 255)
+    elif grow > 0 and core.any():
         band = _binary_filter(core, 2 * grow + 1, ImageFilter.MaxFilter) & ~core
-        background = _background(rgb, options.get("background", "auto"))
+        background = background_of(rgb, options.get("background", "auto"))
         distance = np.sqrt(((rgb - background) ** 2).sum(axis=-1))
         # What a fully-foreground pixel measures: the outermost ring of the
         # body, which for outlined art is the outline itself.
