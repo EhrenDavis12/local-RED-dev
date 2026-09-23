@@ -317,12 +317,33 @@ def _fit_frame(data: bytes, size: list, format: str) -> bytes:
             canvas = Image.new("RGB", (width, height), (0, 0, 0))
     scale = min(width / image.width, height / image.height)
     fitted_size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
-    fitted = image.resize(fitted_size, Image.LANCZOS)
+    if format == "png":
+        fitted = _resize_premultiplied(image, fitted_size)
+    else:
+        fitted = image.resize(fitted_size, Image.LANCZOS)
     offset = ((width - fitted_size[0]) // 2, (height - fitted_size[1]) // 2)
     canvas.paste(fitted, offset)
     buffer = io.BytesIO()
     canvas.save(buffer, format={"png": "PNG", "jpeg": "JPEG", "webp": "WEBP"}[format])
     return buffer.getvalue()
+
+
+def _resize_premultiplied(image: Image.Image, size: tuple) -> Image.Image:
+    """Resize RGBA with the colour premultiplied by alpha, so transparent
+    pixels' colour cannot bleed into the edge: a straight RGBA resize mixes
+    whatever colour sits under alpha 0 into its neighbours and paints a
+    fringe around every outline."""
+    import numpy as np
+
+    arr = np.asarray(image, dtype=np.float32)
+    alpha = arr[..., 3:4] / 255.0
+    channels = [arr[..., i] * alpha[..., 0] for i in range(3)] + [arr[..., 3]]
+    resized = [np.asarray(Image.fromarray(c).resize(size, Image.LANCZOS)) for c in channels]
+    out_alpha = np.clip(resized[3], 0, 255)
+    denominator = np.maximum(out_alpha / 255.0, 1e-3)[..., None]
+    rgb = np.clip(np.dstack(resized[:3]) / denominator, 0, 255)
+    rgb[out_alpha < 1] = 0
+    return Image.fromarray(np.dstack([rgb, out_alpha]).round().astype(np.uint8), "RGBA")
 
 
 def _run_checks(

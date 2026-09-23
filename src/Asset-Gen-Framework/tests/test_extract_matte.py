@@ -44,6 +44,30 @@ def test_apply_restores_the_outline_and_keeps_the_background_out():
     assert tuple(out[20, 20, :3]) == (40, 80, 200)
 
 
+def test_apply_unblends_a_half_covered_edge_pixel():
+    """An edge pixel that is half outline, half background gets half alpha and
+    the outline's colour -- not the blend, which would read as a light rim."""
+    rgb, mask = _scene()
+    rgb[10, :, :] = ((np.array((20, 20, 25)) + np.array((230, 225, 229))) / 2).astype(np.uint8)
+    out = np.array(Image.open(io.BytesIO(matting.apply(_png(rgb, "RGB"), _png(mask, "L"), {"grow": 3, "feather": 0}))))
+    alpha = out[10, 20, 3]
+    assert 90 < alpha < 170, alpha
+    assert out[10, 20, :3].max() < 70, out[10, 20, :3]   # dark, like the outline
+    assert tuple(out[5, 5, :3]) == (0, 0, 0) and out[5, 5, 3] == 0   # transparent pixels are black
+
+
+def test_fit_frame_does_not_bleed_transparent_colour_into_the_edge():
+    from agf.execute import _fit_frame
+
+    arr = np.zeros((64, 64, 4), dtype=np.uint8)
+    arr[..., :3] = 255                       # white everywhere ...
+    arr[16:48, 16:48] = (20, 20, 25, 255)    # ... but only a dark square is visible
+    arr[..., 3][arr[..., 3] == 0] = 0
+    out = np.array(Image.open(io.BytesIO(_fit_frame(_png(arr, "RGBA"), [32, 32], "png"))))
+    edge = out[out[..., 3] > 0]
+    assert edge[:, :3].max() < 60, edge[:, :3].max()     # no white crept in
+
+
 def test_apply_with_no_grow_is_just_the_mask():
     rgb, mask = _scene()
     out = np.array(Image.open(io.BytesIO(matting.apply(_png(rgb, "RGB"), _png(mask, "L"), {"grow": 0, "feather": 0}))))

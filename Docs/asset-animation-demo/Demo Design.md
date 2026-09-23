@@ -73,9 +73,12 @@ Per character:
    edge does not flicker between frames.
 5. **Frames** — the framework's own `extract_frames` with `matte:` and `resize: [256, 256]`.
    The alpha comes from the mask, and the outline the matte shaved off is restored by
-   colour: the mask is grown three pixels and, in that band, only pixels clearly unlike the
-   flat background are kept. The body is the model's; the edge is decided by colour, the
-   same on every frame. Every frame comes out as a 256px transparent PNG, centered.
+   colour: the mask is grown three pixels and, in that band, each pixel is keyed by its
+   colour distance from the flat background — that distance becomes its alpha and the
+   background's share is subtracted from its colour, so the edge carries no background and
+   no pale rim. The body is the model's; the edge is decided by colour, the same on every
+   frame. The fit to 256px is premultiplied so transparent pixels cannot bleed into the
+   edge. Every frame comes out as a 256px transparent PNG, centered.
 6. **Sheet** — the framework's own `assemble_sheet`: the 38 kept frames into a 7x6 grid of
    256px cells, one PNG.
 
@@ -94,8 +97,9 @@ Five small additions, each a gap this pipeline hit:
   model cannot be asked for game-sized frames, and `assemble_sheet` refuses a frame that
   is not exactly the declared cell size, so something had to fit one to the other.
 - `extract_frames` accepts `matte:` — a mask video, a background colour (or `auto`, read
-  from the corners), a grow radius, a colour threshold and a feather — and does the
-  outline restoration described above locally, with no model call.
+  from the corners), a grow radius, a colour threshold and an optional feather — and does
+  the difference key and outline restoration described above locally, with no model call.
+  Its resize is premultiplied.
 - `mov` is a declared video format, told apart from `mp4` by the ftyp brand, for the case
   where a matte comes back as ProRes 4444 with alpha.
 - An `input_files` value may be a list of references, uploaded in order and passed as a
