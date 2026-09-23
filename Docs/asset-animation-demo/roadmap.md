@@ -8,7 +8,7 @@ content.
 Covers the demo app, the generation pipeline, and what the framework gained for it.
 
 - What This Is
-- The Screen
+- The Screens
 - The Pipeline
   - What the framework gained for this
 - What Six Characters Cost
