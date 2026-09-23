@@ -239,7 +239,14 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
 
     # R42/R43 — every file reference must resolve to a real file, now.
     for key, ref in (raw.get("input_files") or {}).items():
-        resolve_reference(config, ref, context=f"entry {name!r} input_files[{key!r}]")
+        context = f"entry {name!r} input_files[{key!r}]"
+        if isinstance(ref, list):
+            if not ref:
+                raise ManifestError(f"{context}: a list of file references must not be empty")
+            for one in ref:
+                resolve_reference(config, one, context=context)
+        else:
+            resolve_reference(config, ref, context=context)
     if operation == "assemble_sheet":
         for ref in frames_list:
             resolve_reference(config, ref, context=f"entry {name!r} frames")

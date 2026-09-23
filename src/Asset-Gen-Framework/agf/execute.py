@@ -197,8 +197,17 @@ def _run_model_op(config: Config, entry: Entry, credential: str, destination_rel
         key = entry.prompt_key if entry.prompt_key is not None else "prompt"
         inputs[key] = entry.prompt
     for key, ref in (entry.input_files or {}).items():
-        local_path = resolve_reference(config, ref, context=f"entry {entry.name!r} input_files[{key!r}]")
-        inputs[key] = provider.upload(local_path, credential)
+        context = f"entry {entry.name!r} input_files[{key!r}]"
+        if isinstance(ref, list):
+            # A model input that takes several files (reference images,
+            # say) is declared as a list of references and arrives as a
+            # list of URLs, in the order written.
+            inputs[key] = [
+                provider.upload(resolve_reference(config, one, context=context), credential)
+                for one in ref
+            ]
+        else:
+            inputs[key] = provider.upload(resolve_reference(config, ref, context=context), credential)
 
     result = provider.run(entry.resolved_model, inputs, credential)
     version = result["version"]

@@ -77,7 +77,7 @@ write there itself.
 
 ### What the framework gained for this
 
-Three small additions, each a gap the video path hit:
+Four small additions, each a gap this pipeline hit:
 
 - `extract_frames` keeps the alpha of a source that has one. Before, every frame was
   flattened to RGB on the way out, which made a matted video pointless.
@@ -86,6 +86,12 @@ Three small additions, each a gap the video path hit:
   is not exactly the declared cell size, so something had to fit one to the other.
 - `mov` is a declared video format, told apart from `mp4` by the ftyp brand, because
   ProRes 4444 in a QuickTime container is how alpha comes back from the matte.
+- An `input_files` value may be a list of references, uploaded in order and passed as a
+  list. The image model takes its style references as a list, and one reference is how
+  every character after the first stays in the first one's style.
+
+Community models on Replicate are named with a pinned version (`owner/name:hash`), which
+the framework already routes to the generic predictions endpoint; the matte model is one.
 
 ## Open Questions
 
