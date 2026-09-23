@@ -32,17 +32,26 @@ with the new one. Picking a character shows its idle at once. A tile shows the f
 of that character's idle.
 
 A segmented control in the app bar switches between Showcase and Battle, and both keep their
-state. The battle arena is the top half: five circles per side in a staggered formation, the
-right side mirrored so its characters face left. Characters are placed by long-pressing a
-carousel tile and dragging it onto a circle; dropping on a filled circle replaces, tapping a
-filled circle empties it. Under the carousel there is one button per placed character,
-"Knight · Sword Wave", enabled once the other side has someone; with one enemy it fires at
-once, with several the enemy circles light up and a tap picks the target. A cast plays the
-attacker's attack, spawns the projectile at its front halfway through, flies it in a straight
-line to the target's centre (rotated to the flight angle, mirrored when flying left, and spun
-by code for the thrown weapons), then plays the burst on the target while the target plays
-hurt; several casts can be in the air at once. A Fight button makes every placed character
-with a skill attack a random enemy in turn.
+state. The battle arena is the top half: a side-on battlefield on a perspective floor — a
+horizon about a third of the way down, a grid converging toward it — and both squads stand
+near the middle facing each other, five a side: a back row of three standing higher and drawn
+smaller, a front row of two lower and larger, the right squad mirrored so it faces left. Each
+position is an elliptical pad on the floor; a placed fighter stands on its pad with its name
+above it, and the pad lights up for the attacker choosing a target and for the enemies it may
+pick. The pad and the fighter's feet are the drop and tap area, so a front-row fighter never
+takes a tap meant for the one behind. The button band under the carousel has a fixed height,
+so the arena never moves when buttons appear; in landscape the carousel tiles shrink so the
+arena keeps at least half the screen. Characters are placed by long-pressing a carousel tile
+and dragging it onto a pad; dropping on a filled pad replaces, tapping a filled pad empties
+it. Under the carousel there is one button per placed character, "Knight · Sword Wave",
+enabled once the other side has someone; with one enemy it fires at once, with several the
+enemy pads light up and a tap picks the target. A cast plays the attacker's attack, spawns the
+projectile at its front halfway through, flies it in a straight line to the target's centre
+(rotated to the flight angle, mirrored when flying left, and spun by code for the thrown
+weapons), then plays the burst on the target while the target plays hurt — the burst is drawn
+larger than the fighter and fades out radially at its edge, so a sheet cell's square edge can
+never show; several casts can be in the air at once. A Fight button makes every placed
+character with a skill attack a random enemy in turn.
 
 The app reads `assets/characters/characters.json`: a list of characters, each with named
 animations, each animation a sheet path plus its geometry (cell width and height, columns,
@@ -107,9 +116,14 @@ Per skill:
    no character.
 2. **Animation video** — a looping video of the effect animating in place. The app supplies
    the travel, so the review fails a clip that drifts.
-3. **Impact video** — a burst video from the same reference whose last-frame image is a flat
-   background frame the skill writes locally, so the model is pulled to an empty frame, and
-   whose review checks that it ends empty.
+3. **Impact video** — a burst video from `skill_small.png`, the effect reference shrunk to
+   42% on its own background (written locally like the blank frame), because a burst that
+   starts from an effect filling two thirds of the frame has nowhere to expand and gets cut
+   off by the cell; the prompt keeps the burst within the middle two thirds. Its last-frame
+   image is a flat background frame the skill writes locally, so the model is pulled to an
+   empty frame, and the review's `--contained` gate fails any frame whose border is more than
+   2% solid foreground after a two-pixel erosion — a cut shard, not the spray of dots every
+   burst throws.
 4. **Mask, frames and sheet** — as for an action, but the frames step runs the framework's
    effect matte: outside the mask body every pixel is keyed by colour with a narrow ramp
    around the threshold, because the mask model loses small shards, and inside it only exact
@@ -160,8 +174,9 @@ few frames: a matte cannot carry a half-transparent effect, so effects that shou
 see-through belong in code or in a separate layer, not in the character's video.
 
 The second batch — adding a skill, a burst and a hurt to all six — was 6 images, 18 videos
-and 18 masks; three videos were regenerated (a hurt that read as a lunge, and two spinning
-weapons that wandered before the spin moved into code); the app's sheets roughly doubled to
+and 18 masks; three videos regenerated for motion (a hurt that read as a lunge, and two
+spinning weapons that wandered before the spin moved into code), and all six bursts
+regenerated once more so they stay inside their cells; the app's sheets roughly doubled to
 about 62 MB.
 
 ## Open Questions
