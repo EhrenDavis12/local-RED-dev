@@ -39,7 +39,7 @@ DEFAULT_MODELS = {
 ALL_FIELDS = {
     "name", "type", "operation", "model", "prompt", "prompt_key", "output",
     "format", "inputs", "input_files", "frame_count", "frame_size", "layout",
-    "frames", "source", "resize",
+    "frames", "source", "resize", "matte",
 }
 REQUIRED_FIELDS = {"name", "type", "output", "format"}
 CALL_FIELDS = {"model", "prompt", "prompt_key", "inputs", "input_files"}
@@ -80,6 +80,7 @@ class Entry:
     frames: list | None
     source: str | None
     resize: list | None  # extract_frames only: every frame is fitted into [w, h]
+    matte: dict | None  # extract_frames only: alpha from a mask video, outline restored
 
 
 def load_manifest_raw(manifest_path: Path):
@@ -252,6 +253,7 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
             resolve_reference(config, ref, context=f"entry {name!r} frames")
     if operation == "extract_frames":
         resolve_reference(config, source, context=f"entry {name!r} source")
+    _validate_matte(name, operation, raw, config)
 
     return Entry(
         name=name,
@@ -272,6 +274,7 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
         frames=frames_list,
         source=source,
         resize=raw.get("resize"),
+        matte=raw.get("matte"),
     )
 
 
@@ -350,6 +353,43 @@ def _is_int(value) -> bool:
     # bool is a subclass of int; a manifest author writing `true` for a
     # count or a dimension is not writing a number.
     return isinstance(value, int) and not isinstance(value, bool)
+
+
+MATTE_KEYS = {"mask", "background", "grow", "threshold", "feather"}
+
+
+def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
+    if "matte" not in raw:
+        return
+    if operation != "extract_frames":
+        raise ManifestError(f"entry {name!r}: 'matte' is legal only for extract_frames")
+    matte = raw["matte"]
+    if not isinstance(matte, dict) or "mask" not in matte:
+        raise ManifestError(f"entry {name!r}: 'matte' must be a mapping with at least 'mask'")
+    unknown = set(matte) - MATTE_KEYS
+    if unknown:
+        raise ManifestError(
+            f"entry {name!r}: matte has unknown key(s) {', '.join(sorted(unknown))}; "
+            f"legal keys are {', '.join(sorted(MATTE_KEYS))}"
+        )
+    resolve_reference(config, matte["mask"], context=f"entry {name!r} matte.mask")
+    background = matte.get("background", "auto")
+    if background != "auto" and not (
+        isinstance(background, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", background)
+    ):
+        raise ManifestError(
+            f"entry {name!r}: matte.background must be 'auto' or a '#rrggbb' colour, "
+            f"got {background!r}"
+        )
+    for key, low, high in (("grow", 0, 16), ("threshold", 0, 441), ("feather", 0, 8)):
+        if key in matte:
+            value = matte[key]
+            if not (isinstance(value, (int, float)) and not isinstance(value, bool)) or not (
+                low <= value <= high
+            ):
+                raise ManifestError(
+                    f"entry {name!r}: matte.{key} must be a number from {low} to {high}, got {value!r}"
+                )
 
 
 def _validate_geometry(name, type_, operation, raw, frame_count, frame_size, layout) -> None:

@@ -14,6 +14,7 @@ from pathlib import Path, PurePosixPath
 from PIL import Image
 
 import agf.frames as frames
+import agf.matting as matting
 import agf.provider as provider
 from agf.checks import check_format, check_frame_sizes, check_layout
 from agf.config import Config
@@ -281,6 +282,18 @@ def _run_assemble_sheet(config: Config, entry: Entry):
 def _run_extract_frames(config: Config, entry: Entry):
     source_path = resolve_reference(config, entry.source, context=f"entry {entry.name!r} source")
     extracted = frames.extract(source_path, entry.format)
+    if entry.matte is not None:
+        mask_path = resolve_reference(config, entry.matte["mask"], context=f"entry {entry.name!r} matte.mask")
+        masks = frames.extract(mask_path, entry.format)
+        if len(masks) != len(extracted):
+            raise ChecksFailedError(
+                f"matte mask has {len(masks)} frame(s) but the source has {len(extracted)}",
+                remedy="the mask video must be made from this exact source video",
+                checks=[],
+            )
+        extracted = [
+            matting.apply(frame, mask, entry.matte) for frame, mask in zip(extracted, masks)
+        ]
     if entry.resize is not None:
         extracted = [_fit_frame(data, entry.resize, entry.format) for data in extracted]
     basename_template = PurePosixPath(entry.output).name

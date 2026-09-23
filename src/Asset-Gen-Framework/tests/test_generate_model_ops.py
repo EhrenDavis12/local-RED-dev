@@ -216,7 +216,7 @@ def test_r54_correct_bytes_pass_format_check(project, run_cli, fake_provider, mo
 
 def test_r47_generate_writes_the_closed_sixteen_key_record_shape(project, run_cli, fake_provider, monkeypatch):
     """
-    R47: a record entry's keys are exactly the seventeen it names, every
+    R47: a record entry's keys are exactly the eighteen it names, every
     time — asserted here on what `generate` itself writes, not on a
     hand-crafted fixture, so an implementation that stashes extra fields
     (say, the raw provider response) alongside the correct ones is caught.
