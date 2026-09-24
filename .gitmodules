@@ -10,3 +10,6 @@
 [submodule "src/asset-animation-demo"]
 	path = src/asset-animation-demo
 	url = git@github.com:EhrenDavis12/asset-animation-demo.git
+[submodule "src/unity-side-scroler"]
+	path = src/unity-side-scroler
+	url = git@github.com:EhrenDavis12/unity-side-scroler.git
