@@ -9,6 +9,7 @@ Covers the demo app, the generation pipeline, and what the framework gained for 
 
 - What This Is
 - The Screens
+- The Idle
 - The Pipeline
   - What the framework gained for this
 - What Six Characters Cost

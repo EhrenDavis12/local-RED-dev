@@ -55,12 +55,42 @@ character with a skill attack a random enemy in turn.
 
 The app reads `assets/characters/characters.json`: a list of characters, each with named
 animations, each animation a sheet path plus its geometry (cell width and height, columns,
-rows, frame count, fps, loop). `idle` is required; every other key becomes a button, in
-the order written. Each character may also carry `skill`: a name, a `spin` flag, and two more
-animations with the same geometry — `animation`, the looping projectile, and `impact`, the
-one-shot burst, which the catalog plays at 32 fps so it reads as a hit. Frames are laid out
-row-major and cells past the frame count are empty. Each character's folder is listed in
-`pubspec.yaml` by hand, because Flutter does not bundle asset directories recursively.
+rows, frame count, fps, loop). `idle` is required; every other key except a `fidget_` key
+becomes a button, in the order written. Each character may also carry `skill`: a name, a
+`spin` flag, and two more animations with the same geometry — `animation`, the looping
+projectile, and `impact`, the one-shot burst, which the catalog plays at 32 fps so it reads
+as a hit. Frames are laid out row-major and cells past the frame count are empty. Each
+character's folder is listed in `pubspec.yaml` by hand, because Flutter does not bundle
+asset directories recursively.
+
+## The Idle
+
+The idle is mostly stillness. A character at rest breathes and does little else, and an idle
+that moves more than that reads as a puppet on a string rather than someone standing there.
+It is two pieces:
+
+- **A base loop**, played forever: breathing and nothing else. The chest and shoulders rise
+  and fall by a few percent of the character's height, the feet stay planted and the hips
+  nearly still, and the parts follow one another instead of moving as one block — the chest
+  leads, the shoulders follow a beat later, the head after that, and loose things like a
+  plume, a cape or hair trail last. Rigid armour barely moves. The breath is uneven: in is
+  quicker than out, with a short pause at the top and bottom. Nothing in the loop is big
+  enough to notice it repeating.
+- **Fidgets** — short one-shots that start and end on the rest pose: a glance back over the
+  shoulder, a re-grip of the weapon, a blink. The player picks one at random every 5 to 15
+  seconds, never the same one twice running, plays it, and returns to the base loop. Playing
+  an action resets that timer. The blink is a fidget rather than part of the base loop,
+  because a blink on a fixed five-second cycle is exactly what gives a loop away.
+
+The base loop's prompt asks for a character standing nearly motionless with only the breath
+visible, and never asks the knees to bend with the breath: nobody breathes with their knees,
+and it turns the whole body into a bob. Fidgets keep the end frame pinned like every
+one-shot, which is what brings them back to the rest pose. The player also carries an idle
+playback speed, so how slow the loop should run is tuned by looking at it rather than by
+re-rolling it.
+
+An action whose key starts with `fidget_` is an idle variation, in `animate.yaml` and in the
+catalog alike: it never becomes a button, and only the idle player plays it.
 
 ## The Pipeline
 
