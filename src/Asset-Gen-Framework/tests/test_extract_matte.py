@@ -44,15 +44,30 @@ def test_apply_restores_the_outline_and_keeps_the_background_out():
     assert tuple(out[20, 20, :3]) == (40, 80, 200)
 
 
-def test_apply_unblends_a_half_covered_edge_pixel():
-    """An edge pixel that is half outline, half background gets half alpha and
-    the outline's colour -- not the blend, which would read as a light rim."""
+def test_apply_saturates_the_band_ramp_at_twice_the_threshold():
+    """The band's alpha ramp measures colour distance from the background
+    against a reference distance capped at `2 * threshold`. A pixel far
+    enough past that cap -- a 50/50 outline/background blend, ~179 from the
+    background against a threshold of 60 (cap 120) -- reads as fully solid
+    and keeps the outline's own dark colour; only the antialiasing that
+    comes from downscaling should ever soften an edge, not the ramp itself.
+    A pixel still inside the cap -- a 20/80 blend, ~72 from the background,
+    between the ramp's zero point (threshold * 0.5 = 30) and the 120 cap --
+    still ramps proportionally (72 / 120 ~= 0.6) and keeps the outline's
+    dark colour too, not a blend that would read as a light rim."""
     rgb, mask = _scene()
-    rgb[10, :, :] = ((np.array((20, 20, 25)) + np.array((230, 225, 229))) / 2).astype(np.uint8)
+    rgb[10, :, :] = ((np.array((20, 20, 25)) + np.array((230, 225, 229))) / 2).astype(np.uint8)            # 50/50
+    rgb[11, :, :] = (0.2 * np.array((20, 20, 25)) + 0.8 * np.array((230, 225, 229))).astype(np.uint8)      # 20/80
     out = np.array(Image.open(io.BytesIO(matting.apply(_png(rgb, "RGB"), _png(mask, "L"), {"grow": 3, "feather": 0}))))
-    alpha = out[10, 20, 3]
-    assert 90 < alpha < 170, alpha
-    assert out[10, 20, :3].max() < 70, out[10, 20, :3]   # dark, like the outline
+
+    far_alpha = out[10, 20, 3]
+    assert far_alpha == 255, far_alpha
+    assert out[10, 20, :3].max() < 70, out[10, 20, :3]          # dark, like the outline -- not the pale blend
+
+    mid_alpha = out[11, 20, 3]
+    assert 120 < mid_alpha < 185, mid_alpha
+    assert out[11, 20, :3].max() < 70, out[11, 20, :3]          # dark, like the outline
+
     assert tuple(out[5, 5, :3]) == (0, 0, 0) and out[5, 5, 3] == 0   # transparent pixels are black
 
 

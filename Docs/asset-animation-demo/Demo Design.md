@@ -17,9 +17,9 @@ Five requirements, and how each is met:
 | Requirement | How |
 |---|---|
 | Plays in our Flutter game | Sprite sheets drawn with `drawImageRect` from a ticker, plain Flutter, no packages |
-| Smooth | 16 frames per second, every second video frame kept, the flashing tail dropped, drawn once per frame change |
+| Smooth | 16 frames per second, every video frame kept so motion plays at the speed it was made, the flashing tail dropped, drawn once per frame change |
 | Same style repeatedly | One style bible prompt, and every character after the first is generated with the first as a reference image |
-| Reasonable size and playability | 256px cells, a 7x6 sheet of 38 frames per action, roughly 1–2 MB per action as PNG |
+| Reasonable size and playability | 512px cells, a per-action grid — 75 frames for a loop, fewer for a one-shot that is cut a beat after it settles — roughly 6–10 MB per action as PNG (characters built before the upscale stage are still 256px, 1–2 MB, until regenerated) |
 | Transparent backgrounds | The video is matted by a model built for stylized art, the outline is restored against the known flat background, and the alpha survives into the sheet |
 
 ## The Screens
@@ -80,34 +80,55 @@ Per character:
    text alone; every later one also gets the first character's image as an init image and
    is told to match its style and draw a different character. The background is a flat
    light gray, deliberately not transparent: it is only an input to the video model, and a
-   flat known background is what the matte and the outline restoration depend on.
+   flat known background is what the matte and the outline restoration depend on. The image
+   model still draws a soft ground shadow under the feet often enough to matter, so before
+   anything is built from a reference its background is flattened locally: every pixel
+   reachable from the corners within a colour tolerance becomes the exact corner colour. A
+   shadow is contiguous with the background and goes; the character is sealed off by its own
+   outline and stays. The same is done to the effect reference.
 2. **Action video** — `wan-video/wan-2.2-i2v-fast`, per action. Image-to-video from the
-   reference, 81 frames at 16 fps, 480p. Wan will not make fewer than 81 frames, which is
-   five seconds — about twice what a one-shot action wants — so the sheet keeps every
-   second frame and the app plays those at 16 fps: the motion runs at twice the model's
-   pace, which reads as snappy rather than as dropped frames. The same reference is
-   passed as the last frame too, which is what makes an action return to its starting
-   pose and an idle loop close. The prompt asks for a brisk action, a static camera, a
-   centered character of unchanging size, and an unchanged flat background.
+   reference, 81 frames at 16 fps, 720p (a square clip comes back 960px). Wan will not
+   make fewer than 81 frames, which is five seconds. Every frame is kept and played at
+   16 fps, so an idle loop runs the full five seconds at real speed, and a one-shot
+   action is cut four frames after the last frame that still moves (the review measures
+   where the character has settled), so its return-to-pose hold does not pad the sheet.
+   The same reference is passed as the last frame too, which is what makes an action
+   return to its starting pose and an idle loop close. The prompt asks for a brisk
+   action, a static camera, a centered character of unchanging size, an unchanged
+   flat background, and a calm, steady face with the mouth closed, because the video
+   model otherwise animates the mouth on its own and at speed that reads as talking.
 3. **Review** — the skill measures the raw video before anything else is spent on it: a
    brightness step at the end of the kept range or a background that stops being flat
    fails the video and blocks its chain; mid-clip spikes, loop gap and drift are warnings
    with a contact sheet to look at. The last six frames of every video are dropped before
    anything uses them, because the model blends toward its last-frame image there and the
    character brightens — that was the flash seen at the end of every action.
-4. **Mask** — `sprited/birefnet-video` with the `toonout` variant (the stylized-art model),
+4. **Upscale** — `lucataco/real-esrgan-video` with the `RealESRGAN_x4plus_anime_6B` model
+   at its `2k` setting, which returns a square clip at 2560px with the same 81 frames and
+   16 fps. The video model's 720p output through a lossy codec has a soft outline, and a
+   256px cell cut from it is soft again once a game scales the sprite up; the anime-tuned
+   super-resolution redraws the clip as hard line art, so the fit to the cell below is a
+   downscale and the edge comes out as antialiased line art. It runs after the review so a
+   failed roll is never upscaled, and its input is sent inline as a data URI because this
+   model fails on Replicate's file-endpoint URLs. Everything after this step reads the
+   upscaled clip.
+5. **Mask** — `sprited/birefnet-video` with the `toonout` variant (the stylized-art model),
    as a grayscale alpha video. A video matte rather than per-frame image matting, so the
    edge does not flicker between frames.
-5. **Frames** — the framework's own `extract_frames` with `matte:` and `resize: [256, 256]`.
+6. **Frames** — the framework's own `extract_frames` with `matte:` and `resize: [512, 512]`.
    The alpha comes from the mask, and the outline the matte shaved off is restored by
-   colour: the mask is grown three pixels and, in that band, each pixel is keyed by its
-   colour distance from the flat background — that distance becomes its alpha and the
-   background's share is subtracted from its colour, so the edge carries no background and
-   no pale rim. The body is the model's; the edge is decided by colour, the same on every
-   frame. The fit to 256px is premultiplied so transparent pixels cannot bleed into the
-   edge. Every frame comes out as a 256px transparent PNG, centered.
-6. **Sheet** — the framework's own `assemble_sheet`: the 38 kept frames into a 7x6 grid of
-   256px cells, one PNG.
+   colour: the mask is shrunk three pixels (the model's body edge lands in the background
+   blend just outside the outline) and then grown twelve (three, at the 624px the number
+   was first tuned at), and in that band each pixel is keyed by its colour distance from
+   the flat background — that distance becomes its alpha, and a partially covered pixel
+   takes the colour of the nearest body pixel rather than an un-blend of its own, because
+   un-blending a low-alpha pixel amplifies codec noise into a pale rim. The body is the
+   model's; the edge is decided by colour, the same on every frame. The fit to 512px, a
+   downscale from 2560px, is premultiplied so transparent pixels cannot bleed into the
+   edge. Every frame comes out as a 512px transparent PNG, centered.
+7. **Sheet** — the framework's own `assemble_sheet`: the kept frames into a grid as square
+   as the count allows — 9x9 for a 75-frame loop (4608px, so a game engine must allow an
+   8192 source texture or it downsamples the sheet on import), one PNG.
 
 Per skill:
 
@@ -154,6 +175,9 @@ Six small additions, each a gap this pipeline hit:
   call. Its resize is premultiplied.
 - `mov` is a declared video format, told apart from `mp4` by the ftyp brand, for the case
   where a matte comes back as ProRes 4444 with alpha.
+- A manifest entry may set `inline_inputs: true` to send its input files as data URIs
+  instead of uploading them to Replicate's file endpoint, for models that fail on those
+  URLs.
 - An `input_files` value may be a list of references, uploaded in order and passed as a
   list. The image model takes its style references as a list, and one reference is how
   every character after the first stays in the first one's style.

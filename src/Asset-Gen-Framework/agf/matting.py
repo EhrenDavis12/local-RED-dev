@@ -12,10 +12,39 @@ around the outline once the background is gone.
 When the background is a flat known colour both are mechanical. The mask is
 grown a few pixels; in that band each pixel is keyed by its colour distance
 from the background: alpha is that distance relative to what a fully
-foreground pixel measures, and the colour is un-blended -- the background's
-share, `(1 - alpha) * background`, is subtracted out. The body keeps the
-model's mask at full alpha. Transparent pixels get black colour so nothing
+foreground pixel measures, capped (below) so a band pixel of a different
+material than the mask's own edge still reaches solid. Colour, though,
+needs a measure of how much of the pixel really is foreground that the cap
+can't distort, so it is judged by a separate, uncapped confidence -- the
+same distance against the reference before the cap. Below confidence 1.0
+the pixel takes the nearest body pixel's colour, spread outward by
+iterative nearest-neighbour dilation, and only where that fill actually
+reaches it: a partial-coverage pixel's own colour still carries a share of
+the background and, recovered by un-blending, amplifies that share into
+noise as coverage drops, where the body's colour right next to it is
+already the right colour for what is, at any partial coverage, an
+antialiasing pixel -- and a dark outline painted that colour is invisible
+against any background, chroma key or otherwise. Only at confidence 1.0 --
+as far from the background as the outline ring itself, no longer a blend
+at all -- does the pixel keep its own colour. The body keeps the model's
+mask at full alpha. Transparent pixels get black colour so nothing
 downstream can bleed the background back in.
+
+The model's own body edge routinely lands a pixel or two outside the painted
+outline, in the background blend, and at full alpha those pixels average
+into a pale rim once the frame is downscaled. `matte.erode` shrinks the body
+by that many pixels before the band is built, so the colour key and the
+nearest-body fill decide that ring instead of the model's mask. The band
+itself still grows from the un-eroded body, not the shrunk one, so a
+feature narrower than the erosion -- a thin limb, a whisker -- stays
+reachable instead of falling outside `grow` pixels of the shrunk body and
+vanishing.
+
+`erode` assumes every feature narrower than `2*erode+1` pixels carries the
+outline colour, which is true of outlined art at the matte's working size.
+A light, outline-less detail thinner than that is keyed by colour after
+erosion like any other band pixel, and where the fill reaches it, it takes
+the nearest body colour instead of its own.
 
 `matte.effect` is for material the mask model tracks badly: effects are
 colourful and sparse, and the model routinely loses whole small shards, so
@@ -61,12 +90,55 @@ def background_of(rgb: np.ndarray, spec: str) -> np.ndarray:
     return np.median(corners, axis=0)
 
 
-def _binary_filter(mask: np.ndarray, size: int, op) -> np.ndarray:
-    return np.array(Image.fromarray(mask.astype(np.uint8) * 255).filter(op(size))) > 0
+def _step_binary(mask: np.ndarray, combine) -> np.ndarray:
+    """One 3x3-neighbourhood step of `mask`, edge pixels replicated outward
+    -- matching how PIL's `MaxFilter`/`MinFilter` treat the border -- and
+    `combine` reducing each pixel with its 8 neighbours (`logical_or` for a
+    dilation step, `logical_and` for an erosion step)."""
+    padded = np.pad(mask, 1, mode="edge")
+    result = mask.copy()
+    for dy in (0, 1, 2):
+        for dx in (0, 1, 2):
+            combine(result, padded[dy : dy + mask.shape[0], dx : dx + mask.shape[1]], out=result)
+    return result
+
+
+def _dilate(mask: np.ndarray, steps: int) -> np.ndarray:
+    """`mask` grown by `steps` pixels (Chebyshev distance). `steps`
+    iterations of a 3x3 step give the same result as one pass of a
+    `(2*steps+1)`-wide filter -- a single wide pass is quadratic in
+    `steps` -- and plain numpy shifts (`_step_binary`) do each 3x3 step
+    far cheaper than a PIL rank filter call over a full frame."""
+    result = mask
+    for _ in range(steps):
+        result = _step_binary(result, np.logical_or)
+    return result
+
+
+def _erode(mask: np.ndarray, steps: int) -> np.ndarray:
+    """`mask` shrunk by `steps` pixels (Chebyshev distance); see `_dilate`."""
+    result = mask
+    for _ in range(steps):
+        result = _step_binary(result, np.logical_and)
+    return result
+
+
+def _neighbour_sum(arr: np.ndarray) -> np.ndarray:
+    """Sum of `arr` over each pixel's 3x3 neighbourhood (itself included),
+    zero-padded at the edges. `arr` is 2D or 2D-plus-channels, and the
+    result keeps `arr`'s own dtype -- callers on the hot path pass float32
+    to halve the cost of `apply`'s per-frame fill loop."""
+    padded = np.pad(arr, [(1, 1), (1, 1)] + [(0, 0)] * (arr.ndim - 2))
+    total = np.zeros_like(arr)
+    for dy in (0, 1, 2):
+        for dx in (0, 1, 2):
+            total += padded[dy : dy + arr.shape[0], dx : dx + arr.shape[1]]
+    return total
 
 
 def apply(frame_data: bytes, mask_data: bytes, options: dict) -> bytes:
     grow = int(options.get("grow", 3))
+    erode = int(options.get("erode", 0))
     threshold = float(options.get("threshold", 60))
     feather = float(options.get("feather", 0))
     effect = bool(options.get("effect", False))
@@ -99,21 +171,83 @@ def apply(frame_data: bytes, mask_data: bytes, options: dict) -> bytes:
         a = alpha[sel][:, None]
         colour[sel] = np.clip((rgb[sel] - (1.0 - a) * background) / np.maximum(a, 1e-3), 0, 255)
     elif grow > 0 and core.any():
-        band = _binary_filter(core, 2 * grow + 1, ImageFilter.MaxFilter) & ~core
+        eroded_core = _erode(core, erode) if erode > 0 else core
+        if not eroded_core.any():
+            # Erosion swallowed the whole body -- key against the
+            # un-eroded core instead of measuring `full` or filling colour
+            # from nothing.
+            eroded_core = core
+        alpha = eroded_core.astype(float)
+        # Grown from the *original* core, not the eroded one: a feature
+        # narrower than the erosion (a thin limb, a whisker) can sit more
+        # than `grow` pixels from the eroded body, and growing from the
+        # eroded body would leave it outside the band -- and so at alpha 0
+        # -- entirely.
+        band = _dilate(core, grow) & ~eroded_core
         background = background_of(rgb, options.get("background", "auto"))
         distance = np.sqrt(((rgb - background) ** 2).sum(axis=-1))
         # What a fully-foreground pixel measures: the outermost ring of the
-        # body, which for outlined art is the outline itself.
-        ring = core & ~_binary_filter(core, 5, ImageFilter.MinFilter)
-        full = float(np.median(distance[ring])) if ring.any() else float(np.median(distance[core]))
-        full = max(full, threshold, 1.0)
+        # (possibly eroded) body, which for outlined art is the outline
+        # itself.
+        ring = eroded_core & ~_erode(eroded_core, 2)
+        full_ring = float(np.median(distance[ring])) if ring.any() else float(np.median(distance[eroded_core]))
+        full_ring = max(full_ring, threshold, 1.0)
+        # Capped at twice the threshold: on a chroma-green background the
+        # outline itself can sit ~430 from the background while a silver
+        # body sits ~300, so scaling by the outline's `full_ring` left a
+        # silver pixel the mask missed at alpha ~0.7 and a thin blade read
+        # as translucent. A pixel at least twice the threshold from the
+        # background is unmistakably foreground and must be solid;
+        # antialiasing still comes from the downscale, not this ramp.
+        full = min(full_ring, 2 * threshold)
         band_alpha = np.clip(distance / full, 0.0, 1.0)
         band_alpha[distance <= threshold * 0.5] = 0.0
         alpha = np.where(band, band_alpha, alpha)
-        # Un-blend: the pixel was alpha * fg + (1 - alpha) * background.
-        sel = band & (alpha > 0)
-        a = alpha[sel][:, None]
-        colour[sel] = np.clip((rgb[sel] - (1.0 - a) * background) / np.maximum(a, 1e-3), 0, 255)
+        # How much of this pixel is really foreground, independent of the
+        # cap above -- against `full_ring`, not `full`, so a pixel the cap
+        # pushed to solid can still read as a partial blend here.
+        confidence = np.clip(distance / full_ring, 0.0, 1.0)
+
+        if band.any():
+            # Below confidence 1.0, colour comes from the nearest body
+            # pixel, spread outward by `grow + erode` steps of
+            # nearest-neighbour dilation -- the extra `erode` steps because
+            # the fill starts from the eroded body, but (per the band
+            # above) now has to reach `grow` pixels past the un-eroded
+            # core -- rather than this pixel's own colour; see the module
+            # docstring. Restricted to the band's bounding box, padded by
+            # one pixel, and to float32: the frame-size cost of this loop
+            # is otherwise paid over pixels the band never touches.
+            rows = np.where(band.any(axis=1))[0]
+            cols = np.where(band.any(axis=0))[0]
+            crop = np.s_[
+                max(int(rows[0]) - 1, 0) : min(int(rows[-1]) + 2, band.shape[0]),
+                max(int(cols[0]) - 1, 0) : min(int(cols[-1]) + 2, band.shape[1]),
+            ]
+
+            sub_core = eroded_core[crop]
+            colour_fill = colour[crop].astype(np.float32) * sub_core[..., None]
+            filled = sub_core.copy()
+            for _ in range(grow + erode):
+                neighbour_count = _neighbour_sum(filled.astype(np.float32))
+                neighbour_colour = _neighbour_sum(colour_fill)
+                newly_filled = (~filled) & (neighbour_count > 0)
+                colour_fill[newly_filled] = (
+                    neighbour_colour[newly_filled] / neighbour_count[newly_filled, None]
+                )
+                filled |= newly_filled
+
+            # Only a band pixel the fill actually reached takes the fill
+            # colour -- a band pixel `filled` never reached has no nearest
+            # body colour to take -- `colour_fill` there is still zero --
+            # and must keep its own colour too, or it comes out black. A
+            # pixel at confidence 1.0 -- as far from the background as the
+            # outline ring itself -- was never a blend to begin with and
+            # keeps its own colour regardless of what the fill reached.
+            sub_alpha = alpha[crop]
+            sub_confidence = confidence[crop]
+            sel = band[crop] & (sub_alpha > 0) & (sub_confidence < 1.0) & filled
+            colour[crop][sel] = colour_fill[sel]
 
     alpha_img = Image.fromarray((alpha * 255).round().astype(np.uint8))
     if feather > 0:

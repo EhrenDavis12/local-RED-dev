@@ -249,7 +249,7 @@ def real_provider_fake_http(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# The record's closed key set — R47 names exactly these sixteen keys, every
+# The record's closed key set — R47 names exactly these nineteen keys, every
 # one present on every entry the framework writes, whatever its type and
 # operation.
 # ---------------------------------------------------------------------------
@@ -265,6 +265,7 @@ RECORD_ENTRY_KEYS = frozenset(
         "seed",
         "inputs",
         "input_files",
+        "inline_inputs",
         "output",
         "format",
         "frame_count",
@@ -277,7 +278,7 @@ RECORD_ENTRY_KEYS = frozenset(
 
 
 def full_record_entry(**overrides):
-    """A record entry with all sixteen R47 keys, defaulting to null, so a
+    """A record entry with all nineteen R47 keys, defaulting to null, so a
     hand-written fixture never silently falls out of shape when the schema
     changes."""
     entry = {key: None for key in RECORD_ENTRY_KEYS}
