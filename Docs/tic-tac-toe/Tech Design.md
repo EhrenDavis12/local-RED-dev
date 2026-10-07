@@ -18,7 +18,7 @@ here so they don't get re-litigated:
 
 | Requirement | Comes from |
 |---|---|
-| **Fully offline, except for in-app purchases.** No backend, no network, no accounts — StoreKit is the one exception, needing network access and a restore-purchases path tied to the Apple ID. The exception is a StoreKit query against Apple, not a service we run — see In-App Purchases and Entitlements below. | Two players, one phone; qualified by In-App Purchases and Entitlements |
+| **Fully offline, except for Apple's own services.** No backend of ours and no accounts of ours — StoreKit and Game Center are the two exceptions, and both are Apple's rather than ours. StoreKit needs network access and a restore-purchases path tied to the Apple ID; Game Center holds the turn-based match, its data and the player identity. Neither is a service we run — see In-App Purchases and Entitlements and Online Play below. | Two players, one phone or two; qualified by In-App Purchases and Entitlements, and Online Play |
 | **Local persistence** for 5 values: theme, music, sound, vibrate, animations | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Game-state persistence.** Every open game is saved and resumable, each with its own scoreboard. | [Menus and UI](./Menus%20and%20UI.md) → Persistence |
 | **Audio playback** for one-shot sound effects, and for looping music the app fades in and out itself | [Theming](./Theming.md) |
@@ -89,6 +89,8 @@ lib/
     board.dart
     rules.dart
   storage/         ← repository interfaces + their store implementations
+  online/          ← pure Dart: the turn payload codec and the receive validator
+  gamecenter/      ← the Game Center bridge: the platform channel and session
   theme/
     theme.dart     ← merged theme object
     loader.dart    ← YAML → theme
@@ -99,6 +101,7 @@ lib/
   entitlements/    ← StoreKit entitlement state
   diagnostics/     ← crash catching/reporting
   purchase/        ← store integration
+  parentalgate/    ← the gate, its fake, and its pure Dart problem generator
   ui/
     board/
     menus/
@@ -117,20 +120,51 @@ rewrite.
 `storage/` is local persistence only — the repository interfaces and the implementations
 that back them. Which repositories exist, which store each is backed by, and what each
 holds is **Persistence and Serialization** below. There is **no backend data layer**:
-nothing in the app talks to a server. Online multiplayer is an intended future direction,
-so tech choices must not foreclose syncing board state over a network — a backend layer
-gets added if multiplayer arrives.
+nothing in the app talks to a server of ours, and none gets added. Online play is remote
+play over **Apple Game Center turn-based matches** — Apple holds the match data, the
+matchmaking, the invites, the player identity and the "your turn" push, so the app still
+runs no service of its own and still collects no identity of its own. The board position
+crosses the wire to Apple's match and comes back; `storage/` still holds only what is on
+this device. Online play is iOS only, and same-room play — Bluetooth, peer-to-peer, two
+phones in one room — is not wanted. It is being built: what it is, and how the bridge to
+GameKit works, is **Online Play** below.
 
 That rule is checked rather than trusted: a scan over `lib/` finds no HTTP client and no
-network target other than the store SDK. It covers `lib/` only, so build-time tooling
-outside that tree is out of its reach by construction. What is fixed is that property, not
-a list of banned symbols — widening it when a new transport appears is ordinary
-maintenance, narrowing it to let a real network call through is not. It must **not** be
-written as "no networking API is reachable from `lib/`": in-app purchases are the one
-sanctioned network path, so the stricter form fails the day the store layer lands.
+network target other than the store SDK and GameKit. It covers `lib/` only, so build-time
+tooling outside that tree is out of its reach by construction. What is fixed is that
+property, not a list of banned symbols — widening it when a new transport appears is
+ordinary maintenance, narrowing it to let a real network call through is not. It must
+**not** be written as "no networking API is reachable from `lib/`": in-app purchases and
+Game Center are the two sanctioned network paths, so the stricter form fails the day the
+store layer lands.
 
 `engine/`'s purity is held by a test that scans the layer's imports rather than by
 discipline — see **The Rules Engine** below for what that check matches.
+
+`online/` holds the pure Dart side of online play and its purity is held the same way, by a
+scan over the layer's imports — no Flutter, no `dart:ui`, no Hive and no platform channel.
+It imports the engine and nothing else of the app's, which is what keeps the two decisions
+a turn turns on testable with no GameKit in sight. The series id's minter lives there too,
+with the payload that carries a series id across the wire. See **Online Play** below.
+
+`gamecenter/` holds the other half of online play — everything that faces the platform
+channel: the channel-backed bridge, the fake that stands in for it, the session providers,
+the handoff from a found match to a stored game, and the receiver that routes an arriving
+turn to its stored record. Keeping it out of `online/` is what lets that layer's purity scan
+stay true. The three channel-name strings are written in exactly one file on each side — one
+under `lib/gamecenter/`, one under `ios/Runner/` — and a scan test holds that, so the string
+contract between the two languages has one place to be checked against. The scan matches by
+substring, so a second file naming a channel anywhere would fail it regardless of which
+layer wanted it. The Swift half is registered from `AppDelegate` alongside the generated
+plugin registrant.
+
+`parentalgate/` is the gate's own layer rather than a file inside `purchase/`, since
+purchases and online entry both call it and neither owns it. The service, the fake that
+stands in for it, and the problem generator all live there. The generator is pure Dart and
+takes its source of randomness as a parameter, so a seeded source pins the exact problem and
+its answer in a test; its purity is held by an import scan the same way `engine/`'s and
+`online/`'s are — over that one file rather than the whole folder, since the service beside
+it carries no such guarantee.
 
 `theme/` holds more than the merged theme object and its loader. Resolving a theme's icon
 slot to a concrete `IconData`, and a stored integer weight to a `FontWeight`, both live in
@@ -340,6 +374,12 @@ It also covers the requirement that settings and the theme be readable from
 `Notifier`/`NotifierProvider` — fey-tactics is a reference for the sync shape, not for
 the API surface.
 
+**A layer with one real implementation and a fake is reached through a plain `Provider` of
+its abstract interface, and a test substitutes the fake by overriding that provider** — no
+singleton, no global instance. The Game Center bridge and the parental gate are both shaped
+that way, and both fakes ship as app code rather than test code, because they are the double
+every other layer tests against.
+
 ## Navigation
 
 **The app has an explicit navigation layer, and the routing package is `go_router`.** The
@@ -442,6 +482,30 @@ under the main menu and not under the game, so it cannot be reached from inside 
 without leaving it — you can't change the theme mid-game (see
 [Theming](./Theming.md) → Choosing a Theme).
 
+### The parental gate is pushed, and that is the one exception
+
+**The parental gate's surface is a top-level route pushed over whatever is on screen.** It is
+the one exception to this layer's shape, where a route change is a replacement by
+construction rather than a `push` — see [Menus and UI](./Menus%20and%20UI.md) → Navigation
+and the Back Stack. The gate is raised from the main menu, from Settings and from wherever
+the purchase flow lands, so it has no single parent to be nested under, and it has to return
+the player to a caller it does not know, which is exactly what a replacement cannot do.
+Pushing leaves what raised it mounted and visible beneath, and popping lands the player back
+where they were.
+
+**It is reached through a second small interface beside the game-launch one** — show the
+gate, dismiss the gate, and nothing else, with its own provider. `AppNavigator`'s fixed
+operations are left alone, for the same reason the game-launch operations were kept off them:
+every screen and every recording fake already depends on that shape. Both of the gate's
+operations go through the layer's single choke point, so raising the gate over the board
+clears a pending, unconfirmed move like every other navigation does.
+
+**The gate's surface reports its outcome to the gate service, never through the navigator**,
+since no navigation operation reports an outcome back. The service holds the pending action,
+runs it on a pass, and takes the surface off screen itself. The surface's disposal reports an
+abandon too, so a gate the platform took away rather than a control closing cannot leave a
+stale action pending behind it.
+
 **Nothing unmounts when a surface opens over the board, so nothing clears a pending move
 by accident** — which is why clearing it belongs to this layer. Every operation clears the
 pending, unconfirmed selection before it navigates; clearing when there is none is a
@@ -453,9 +517,11 @@ itself is [Game Board Design](./Game%20Board%20Design.md) → Changing your mind
 ### Deep links are possible, not wired
 
 The route structure is link-shaped, because that is part of what `go_router` was chosen
-for. But nothing asks for an external entry point and the app is otherwise fully offline,
-so no URL scheme, universal link or associated-domain configuration is specified. The
-capability is retained; nothing is wired to it.
+for. The app does have an external entry point — it can be launched from a Game Center
+invite or a "your turn" notification — but that arrives through GameKit rather than as a
+URL, and there is no invite-link API to wire up, so no URL scheme, universal link or
+associated-domain configuration is specified. The capability is retained; nothing is wired
+to it.
 
 The route table and route paths are not designed here — that is a PRD's job.
 
@@ -486,6 +552,11 @@ move they had lined up. For the same reason a cell's tap target is its whole box
 the pixels it paints: an empty cell paints nothing, so a board that only took taps where
 it had drawn something would be inert.
 
+**The same holds for a board the player may not play on at all.** While an online game is
+waiting on the opponent, nothing wraps the board in a pointer blocker and no cell loses its
+handler — the refusal is the state layer's, exactly as an illegal tap's is. See **Online
+Play** below.
+
 **The boundary is a widget, not a rectangle:** a tap a cell takes never clears the
 pending selection; every other tap on the game screen does — the gaps between cells and
 quadrants, the board's margins, the scoreboard, the how-to-play strip. The surface that
@@ -498,6 +569,19 @@ the other half of the rule lives in the navigation layer — see **Navigation** 
 the mark art; board code places it and draws nothing itself. Which kinds of art a theme
 may supply — and why an image is the real answer for a theme — is
 [Theming](./Theming.md) → What a Theme Controls.
+
+**On an online game, which of the two player slots is drawn as the local player's is that
+device's own choice.** The player picks it the first time that game's board is opened here,
+and it is a render-time swap of the two slots on this device and nothing else: it is not in
+the match payload — which carries exactly a payload version, a series id and a board, see
+**Online Play** below — it does not change which side the device plays, and the two devices
+may have picked the same slot. The engine is untouched by it and still knows only Player One
+and Player Two. See [Game Board Design](./Game%20Board%20Design.md) → Pieces & Marks.
+
+**The pick is saved with that open game on this device and kept for the life of the
+series.** It is asked once and survives a rematch, which continues in the same open game. It
+never crosses to the other phone, and it is not a global preference — a second online game
+asks again.
 
 ### The screen loads its game before it draws one
 
@@ -612,7 +696,8 @@ Two consequences worth naming, because they cut across other sections:
   `engine/` — pure Dart, Flutter-free — while the Hive box, adapters-free, lives in
   `storage/`. The storage layer writes no encoding of the game state of its own; what it
   does encode by hand is the record envelope around it — the opponent name, the two
-  timestamps and the version stamp. The engine's models are kept as they are and gain
+  timestamps, the version stamp and, on an online game, the three values under **What an
+  online game adds to the record** below. The engine's models are kept as they are and gain
   conversion rather than being rewritten through `freezed`: regenerating working, tested
   code buys no behaviour change, and it would put the engine's purity guarantee through a
   generator. Generated serialization stays permitted where it is simpler, and is required
@@ -639,10 +724,11 @@ version that last wrote this record*: a record created under one version and sav
 later one carries the later one.
 
 ### What a stored open game holds
-**A stored open game is the engine's whole game-plus-series state, plus three things that
-are storage's own: the record id, the opponent name the game is titled with, and two
-timestamps.** No design doc puts any of those three in game state, so they sit alongside
-the board rather than inside it.
+**A stored open game is the engine's whole game-plus-series state, plus what belongs to
+storage rather than to the game: the record id, the opponent name the game is titled with,
+two timestamps, the app version stamp, and — on an online game — the three values that say
+which match it is being played through.** No design doc puts any of those in game state, so
+they sit alongside the board rather than inside it.
 
 **The most recent completed move is persisted as the move itself, not as a derived
 value.** It has two consumers and only the move serves both: the forced quadrant is
@@ -664,6 +750,13 @@ stored name and discards whatever the caller passed, the same way it preserves t
 timestamp — otherwise every save is a rename, and no doc specifies a rename or a control
 that would perform one.
 
+**An online game's name is the opponent's Game Center nickname, captured when the match is
+created.** The rule above holds unchanged for it: set at create, and a save never changes
+it. So the field has two sources — typed by the player for a game on this phone, taken from
+Game Center for an online one — and one lifecycle, with a single narrow exception for an
+online game whose opponent has not resolved yet, in **What an online game adds to the
+record** below. See **Online Play** below.
+
 **The record carries both a created and an updated timestamp, not one or the other.** That
 leaves the sort key a *display* choice rather than a *schema* one — a list that wanted
 creation order, or a row that wanted "started on", can be served later without migrating
@@ -682,6 +775,133 @@ been written at a different instant — and the open-games list is ordered on ex
 comparison, so the list would reorder itself after a flight or a DST change. The
 repository forces UTC on whatever its clock answers rather than trusting it to be UTC
 already, so the guarantee is structural rather than something each caller has to honour.
+
+### What an online game adds to the record
+**An online game is an open game in the same box** — the same store-minted id, the same
+repository-owned timestamps, the same version stamp, the same position in the open-games
+order, and the same cap. There is no second store, no second box and no second record type.
+It adds seven stored values and no others: the Game Center match it is currently played
+through, the series that match belongs to, which side this device plays, whether the opponent
+has left, whether it is still waiting for one, whether Apple has closed the match it
+currently points at, and which of the two marks this device draws as its own.
+
+**The seven are written under a single `online` key on the record's JSON**, holding
+`matchId`, `seriesId`, `localPlayer` and — each only once it is true — `opponentLeft`,
+`awaitingOpponent` and `matchEnded`. The first two are strings; `localPlayer` is the player's
+name string — `playerOne` or `playerTwo` — exactly as the board already encodes a player; the
+other three are yes/nos that are absent until they are yes, and an absent one reads as no,
+which is what every record written before any of them existed decodes as. The seventh,
+`marksSwapped`, is a yes/no that is absent until the player has picked at all — absent means
+no pick has been made yet, which is what tells the app to ask — and once picked it is written
+whether yes or no, since "picked the first mark" and "not picked yet" have to read
+differently. Those key names and encodings are on-disk identity the moment a record ships, so
+they are schema rather than a naming choice made at implementation time.
+
+**The presence of that key is the only thing that tells an online game from a local one.** A
+record whose `online` key is absent, or present and null, is a local game and loads exactly
+as a record written before online play existed. Nothing infers online-ness from the title,
+the board, or anything else.
+
+**An `online` key that is present but unreadable makes the whole record unreadable** — a
+missing `matchId` or `seriesId`, a `localPlayer` naming no player, an `opponentLeft`,
+`awaitingOpponent` or `matchEnded` that is not a yes/no, any of them wrong-typed — and it
+gets the answer
+every other unreadable record gets: "nothing stored" for a read by id, skipped by the list
+read while every other game still comes back, and left on disk exactly as it is. **An
+unrecognised extra key inside the map is
+ignored** rather than treated as unreadable, so a record written by a later version that added
+a further value still loads here. The one exception to strictness is `marksSwapped`: a value
+under that key that is not a yes/no reads as absent rather than making the record unreadable,
+because a drawing preference must never cost a player their game.
+
+**The record stores no Game Center identity** — not the opponent's player id, not the local
+player's, not a team or an alias beyond the nickname the game is titled with. The players'
+identities live in the match, with Apple. Knowing which side this device plays is what is
+stored instead of an identifier, and it is the reason that is the shape.
+
+**Whose turn it is is not a stored field.** It is the board's current player compared against
+the side this device plays. Whose turn it is is engine state and is never derived a second
+way.
+
+**The side this device plays is set at create and never changes for the life of the record**,
+including across a rematch: the side on the record wins over any assignment the new match
+could suggest.
+
+**Creating an online game takes the opponent's nickname, the starting board, the match id,
+the series id and this device's side — all five from the caller**, and optionally the
+awaiting-an-opponent mark, which defaults to no and is set only on an anonymous game's starter.
+The store mints the record id and nothing else; it mints no series id, and it substitutes no
+title.
+
+**One operation renames a stored game, and it exists for one case.** An anonymous game is
+started before there is an opponent at all, so the record has to be created — and therefore
+titled — with a name Game Center cannot yet supply; it takes a placeholder title and is renamed
+exactly once, when the opponent resolves. Setting the online opponent
+name is the only way a stored title ever changes after create, and a save still never renames.
+It is allowed on an online record only: a local record answers the same "nothing stored" an id
+the store never held gets. An empty or whitespace-only nickname is refused, distinctly from
+"nothing stored", and neither refusal writes or emits anything. A successful rename touches
+the title alone — the board, the three `online` values, the created timestamp and the id are
+unchanged — and otherwise behaves exactly as a save does: it stamps the updated timestamp,
+moves the record to the top of the list, and emits on the change stream.
+
+**A save never touches any of them.** Only the board is honoured, exactly as the title and the
+created timestamp already are. **The awaiting-an-opponent mark is cleared when a turn is
+applied** — a turn genuinely applying means somebody is definitely on the other end, which is
+the same fact a resolved nickname carries and the more certain one, since it comes with an
+actual move rather than only an identity. It is otherwise preserved, by a save and by a rename
+alike, and it has its own operation for clearing it directly.
+
+**The match id changes on exactly two paths and no others** —
+the initiating device's own next-game write, and an accepted rematch payload. **Those same
+two writes are what clears the match-ended value**, which is this device's own knowledge that
+Apple has closed the match the record *currently* points at: it is knowledge about one match,
+and those are exactly the paths that move the record onto another. Without that, a series
+would hold a true value against a freshly opened match from its second game on — the device
+that owes the ending call would never make it, and the other would draw an ordinary rematch
+button whose tap Apple refuses. Everything else preserves it: a save, a rename, an applied
+turn that stays on the same match, marking the opponent as having left, the icon pick.
+
+**Setting the match-ended value is its own operation**, shaped exactly like marking the
+opponent as having left: it touches nothing else, never moves the record to the top of the
+list and never restamps it, is safe to run twice, does nothing for an id the store does not
+hold or for a local record with no online values to carry it, and announces a change only
+when something actually changed — which is what lets a result card already on screen see it
+without a reload. Two things call it, the turn-event receiver on an arriving event whose
+match status is `ended`, and the device that ends the match itself once its own call answers
+ok. Each re-reads the record first and writes only while it still points at the match in
+question, so a late replay of a match already superseded by a rematch never marks the new one
+ended.
+
+**Marking the opponent as having left is its own operation, and the only thing that sets that
+value**: it touches nothing else on the record, does nothing at all for an id the store does
+not hold or for a local record with no online values to carry it, is safe to run twice, and
+announces a change only when something actually changed.
+
+**Advancing to the next game and pointing the record at the new match is one write.** Taking
+the next game on this phone stores the next board and the new match id together, so a record
+can never sit with the next game's board under the finished game's match id, or the reverse.
+It requires a finished stored board, and answers a value rather than throwing when the board
+is still in progress or the id names no record.
+
+**That write optionally takes the board to store**, so a device that has already handed a
+board off to Game Center writes that board and the new match id together rather than needing
+a second write to add the move it just sent. A given board is validated first, by one rule:
+it must equal the next game of the stored series, or be exactly one legal move from it. Legal
+moves are enumerated and applied, the way the receive rules do it; no turn test runs and no
+side is consulted, because this board is the device's own rather than one that arrived, and
+those branches would refuse the ordinary case. A board that fails — two moves ahead, from
+another series, anything unreachable — is refused with its own distinct value, and nothing is
+written on any refusal.
+
+**Applying a turn that arrived takes a record id, not a record** — the store reads the current
+one itself rather than trusting a copy the caller may be holding stale. Every outcome is a
+returned value the caller can branch on, never a throw, and nothing is written on any outcome
+but acceptance. An accepted turn stamps the updated timestamp, moves the record to the top of
+the list exactly as any save does, and emits on the change stream; a re-delivery or a refusal
+emits nothing, because neither changed what the list would show. An apply against a record
+with no online values held answers the same "nothing stored" as an id the store never held.
+Which outcome a payload gets is **Online Play** below.
 
 ### The open-games list has a defined order
 **Reading the open-games list returns most-recent-first on the updated timestamp,
@@ -712,6 +932,39 @@ than defining either number itself. Entitlement state does not exist yet, so the
 of 3 is resolved at startup, above the storage layer, and handed to the repository when it
 is constructed — no file under `lib/storage/` states 3 or 100.
 
+**An online game is an open game and counts against the same ceiling.** Creating one, accepting
+an invite to one and joining an anonymous one are all creates, so all three are refused at the
+ceiling exactly as a local New Game is, and a player at the cap frees a slot the only way there
+is — by deleting a game. There is no separate online allowance and no exemption for a match
+somebody else started. On an invited device the create happens on the arriving payload, which is
+the moment the invitation is accepted — the inviting device has already put the fresh board into
+the match — so the cap bites on that payload's route. It is the payload and not the acceptance
+this layer acts on: with no payload there is no board, and it stores no record without one. On
+an anonymous joiner the payload arrives with the found match itself rather than as an event, and
+the cap bites there in the same way. The New Game prompt refuses at the cap before either online
+door is opened, so this layer's refusal is the backstop rather than the first line.
+
+**A create refused at the cap is not a lost invitation.** Nothing is stored and the player is
+told to delete a game; the match is still Apple's, so the catch-up that runs after any delete
+replays it and the create is tried again with a slot free.
+
+**Creating an online game for a match id a record already holds is not a second create.** The
+existing record is answered back unchanged — not re-titled, not re-stamped — and nothing is
+emitted on the change stream, because nothing changed. A duplicate delivery would otherwise
+consume a second slot and split one match across two records. That answer comes before both
+the title check and the cap.
+
+**The storage layer applies no name fallback.** An online create whose title is empty or
+whitespace-only is refused, and that refusal is distinct from the cap refusal so the caller
+can tell the two apart; nothing is stored. Supplying a title is the caller's, because a layer
+that substitutes a title is a layer that can rename a game. This reaches the online create
+alone — a local create still stores what it is handed, since the New Game prompt has already
+applied its own default by then. See [Menus and UI](./Menus%20and%20UI.md) → Play Game.
+
+**A rematch is not a create.** No cap check runs on either device when a series moves to its
+next game, no second record appears, and a rematch is accepted while the player is at the
+ceiling — it continues in the same open game.
+
 **The cap counts only the records that can be read back.** A record that cannot be read is
 not in the list the player sees, so counting it would refuse a create against games the
 player has no way to find or delete.
@@ -732,9 +985,12 @@ value the caller can act on, in the same spirit as a refused create, because a s
 silently discards a player's move is the other failure.
 
 **Deleting removes one open game and its whole series** — board, scoreboard and all —
-permanently, leaves every other stored game untouched, and touches no preference. Nothing
-else in this layer discards a record: a game left mid-play is still there, with its
-scoreboard, on the next read.
+permanently, leaves every other stored game untouched, and touches no preference. **Deleting
+an online game also remembers its match id**, in a short list of the newest hundred kept
+alongside the games, so anything that arrives for that match afterwards is thrown away rather
+than taken for a new invite — and every delete path does it, not only the one that also
+resigns. Nothing else in this layer discards a record: a game left mid-play is still there,
+with its scoreboard, on the next read.
 
 ### Reads return "nothing stored", and defaults resolve above this layer
 **Every persistence operation is asynchronous**, because both stores are async on first
@@ -968,10 +1224,10 @@ to it; and the app builds, tests and archives on a machine that has never held a
 credential. The credential is read from the environment, never from a committed file, a
 flag or a prompt, and never lands in anything the tool writes.
 
-This is what keeps **Fully offline, except for in-app purchases.** under **What the Design
-Docs Already Imply** above true — the app makes no Replicate call, because generation
-happened on a developer's machine long before the build. It also has to be true because
-**CI — local builds only** below leaves nowhere to hold a build-time secret.
+This is what keeps **Fully offline, except for Apple's own services.** under **What the
+Design Docs Already Imply** above true — the app makes no Replicate call, because
+generation happened on a developer's machine long before the build. It also has to be true
+because **CI — local builds only** below leaves nowhere to hold a build-time secret.
 
 ### What gets generated, and where it lands
 **`assets/images/` and `assets/audio/` are where art and audio ship from, and the
@@ -1109,8 +1365,29 @@ Blue and Sewing), and a **$4.99 unlock that raises the open-game cap from 3 to 1
 → Play Game → Where It Takes You → How many open games we keep.
 
 **Consequence for offline status:** in-app purchases require StoreKit, which needs network
-access and a restore-purchases path tied to the Apple ID. StoreKit is the one exception to
-**Fully offline** under **What the Design Docs Already Imply** above.
+access and a restore-purchases path tied to the Apple ID. StoreKit is one of the two
+exceptions to **Fully offline** under **What the Design Docs Already Imply** above; Game
+Center is the other.
+
+### The store plugin — Flutter's official `in_app_purchase`
+**The purchase layer is the official Flutter `in_app_purchase` plugin**, with
+`in_app_purchase_storekit` under it on iOS. That package's StoreKit 2 path is the default
+on iOS 15 and up, which is the floor **Platform and Targets** → *Minimum iOS version*
+sets — so the `Transaction.currentEntitlements` semantics this section is built on are
+what the app actually gets, rather than something it has to opt into.
+
+**Stripe and third-party purchase services — RevenueCat and the like — are out.** Apple
+requires digital goods to be sold through in-app purchase, and a purchase service of our
+own would mean a server and player accounts. There is no server and there are no accounts.
+
+**`restorePurchases()` is silent, and `AppStore.sync()` is the one the player sees.** The
+plugin's `restorePurchases()` reads `Transaction.currentEntitlements` without showing the
+player anything, and delivers what it finds as a batch of `restored` events on the
+purchase stream. A player who owns nothing produces no events at all, so the events are
+not what says the read finished — only the returned Future completing says that.
+`AppStore.sync()` is a separate call, reached through
+`InAppPurchaseStoreKitPlatformAddition`, and it does prompt for an Apple ID. **Restore
+purchases runs the sync first, then the silent read.**
 
 ### Entitlements — Apple stores them, no backend needed
 **No receipt-validation server, and no backend of ours.** StoreKit provides
@@ -1121,15 +1398,25 @@ full purchase history if it is ever needed.
 
 Restore for non-consumables is largely automatic: signing in on a new device repopulates
 entitlements without the player doing anything. The visible **Restore purchases** control
-is still required by Apple's review guidelines, and `AppStore.sync()` is the explicit call
-behind it — so the control is a compliance requirement more than a functional one.
+is still required by Apple's review guidelines, and what it runs is `AppStore.sync()`
+followed by the silent `currentEntitlements` read — see *The store plugin — Flutter's
+official `in_app_purchase`* above. The sync is the half the player sees, because it
+prompts for an Apple ID; the read is the half that produces the answer. So the control is
+a compliance requirement more than a functional one.
 
 On-device verification is sufficient for an app this size.
 
+**Purchases are per platform.** An entitlement lives with the Apple ID that bought it, so
+if the game ever ships on Android a theme bought on an iPhone is bought again there.
+Nothing links a purchase across platforms, because linking them needs accounts and a
+server of ours, and there are neither.
+
 **Consequence for the architecture: Apple is the record of truth and it is queryable at
 runtime.** Any locally stored entitlement state is an offline convenience, not the record.
-A refunded or lapsed purchase simply stops appearing in `currentEntitlements` — that is what
-answers "what happens when an entitlement goes away."
+A refunded or lapsed purchase stops appearing in `currentEntitlements` — that is what
+answers "what happens when an entitlement goes away." What the purchase stream says about
+it is a different matter: see *Committing an answer — all of it, in order, to memory and
+disk* below.
 
 **The entitlement provider's shape — last-known plus refresh.** Entitlement state is exposed
 as a plain value, seeded from the locally cached copy and refreshed when the store answers —
@@ -1193,6 +1480,13 @@ set assembled from a single transaction that happened to arrive. Partial answers
 semantics cannot coexist: a fragment applied as a replacement silently drops everything it
 does not mention.
 
+**No event on the purchase stream is trusted for what it claims to be.** The plugin
+forwards a refund or a revocation tagged `purchased`, so an app that read an entitlement
+off the event's status would hand back the thing Apple just took away. Every event is a
+signal to re-read the whole owned set and commit that, and `currentEntitlements` already
+leaves revoked products out — so the re-read is the answer and the event is only the
+prompt.
+
 **An older answer never overwrites a newer one, and "older" means asked earlier, not arrived
 earlier.** Two questions can be in flight at once — the one every launch asks, and the one a
 transaction resolving out of band provokes — and the slow one can land last while carrying
@@ -1247,11 +1541,34 @@ changed on the record reaches the app without a build.
 **The gate challenges with an arithmetic problem stated in words, answered with a number** —
 *"Enter the answer: seven times eight."* **The operands are spelled out as words rather than
 digits**, and that is the load-bearing part: digits are solvable by a child who can count,
-while the word form defeats pre-readers and early readers alike. The problem is randomised
-each time the gate is raised, and **three wrong attempts dismiss it** without ever reaching
-the store.
+while the word form defeats pre-readers and early readers alike. The problem is a
+multiplication of two whole numbers from 2 to 9, so the smallest answer is 4 and the largest
+81, and it is answered by typing digits into a field that takes no more than two of them.
 
-**A pass is good for one purchase and nothing else.** There is no remembered pass — the next
+**One problem per raise, fixed for all three attempts** — a wrong answer does not swap the
+question out from under the person answering it. The next raise generates a fresh one, and
+two raises in a row never show the same problem; the operands are interchangeable for that
+test, so *"seven times eight"* and *"eight times seven"* are one problem. The gate remembers
+only the previous raise's problem, in memory and never written down, so the first raise after
+a launch has nothing to avoid.
+
+**Three wrong attempts end the raise**, and the third wrong answer is what ends it: the gate
+stops asking, says the tries are used up, and the guarded action never runs — for a purchase,
+without ever reaching the store. Every way out from there reports the same out-of-attempts
+result, never an abandon. Nothing imposes a cooldown, so the gate can be raised again
+straight away, and that raise gets its own three attempts.
+
+**Leaving the gate without answering, while attempts remain, abandons the raise** — the
+pending action is dropped, nothing runs, and no attempt is spent.
+
+**A raise resolves exactly once, and the gate is what decides it.** The first of a pass, a
+third wrong answer or an abandon wins, and no later signal about that raise changes the
+outcome or answers a second time. The pending action is consumed in the same step that
+resolves the raise, so it runs exactly once however many signals arrive. If it throws, the
+gate still closes and the error reaches the guard's caller rather than being swallowed.
+
+**A pass is good for one purchase and nothing else** — or for one entry into online play,
+which is worth exactly one pass the same way. There is no remembered pass — the next
 purchase raises the gate again, immediately after a passed one included. This also avoids
 having to define "session" at all: cold launch, foreground return and dismissing a surface
 are three different answers and none of them is obviously right.
@@ -1265,15 +1582,873 @@ Purchases means by keeping one parental gate in one place. Moving the challenge 
 caller and passing an assurance inward would weaken the guarantee from enforced to
 conventionally observed, which is the whole thing the gate exists for.
 
+**The only way past the gate is to hand it the action.** It publishes no pass value a caller
+can hold, store or present back to it, and nothing accepts an assurance that the gate was
+passed somewhere else. A caller hands over the action and learns what happened to it, which
+is a report rather than an authorisation — holding one gets a caller nothing.
+
+**Two guards, and one of six answers.** One guards a purchase; the other guards entry into
+online play and takes a resolved Game Center session alongside the action (**Kids Category**
+below). Each answers exactly one of: the action ran, either after a pass or because no gate
+was owed; refused without asking; no resolved session to decide from; busy; abandoned; or out
+of attempts. Six distinct values a caller branches on rather than one flag or a failure
+carrying a message, for the same reason the Game Center bridge gives for its own. The answer
+arrives when the gate closes, and on a pass that is after the action's own work has finished;
+refused, busy and no-session come back immediately, having put nothing on screen.
+
+**Busy means a raise was already up.** A second raise while one is pending does nothing at
+all — no second surface, no second problem — and never replaces the pending action.
+
 Why the gate exists at all is **Kids Category** below.
+
+## Online Play
+
+**Online play is remote play over Apple Game Center turn-based matches**, and it is being
+built as part of this game's work. Apple holds the match data, the matchmaking, the invites,
+the player identity and the "your turn" push, so the app runs no service of its own and
+collects no identity of its own. It is iOS only. Same-room play — Bluetooth, peer-to-peer,
+two phones in one room — is not wanted and is not built.
+
+**The bridge is a Swift platform channel.** No Flutter package wraps Game Center's
+turn-based matches, so the GameKit calls are written in Swift on the iOS side and reached
+from Dart over a channel. **The Dart side is split in two: the pure decisions live in
+`lib/online/`, and everything that faces the channel lives in `lib/gamecenter/`.** A scan
+over `lib/online/`'s imports finds no Flutter, no `dart:ui`, no Hive and no platform
+channel, held the way `engine/`'s purity is. Both decisions a turn turns on — what the bytes
+a match carries look like, and whether bytes that arrived may be applied — are made there,
+against the engine alone, so the channel code cannot creep into them. `lib/gamecenter/`
+holds the channel-backed bridge, the fake that stands in for it, the session state and the
+handoff from a found match to a stored game.
+
+**Online play is started from New Game in the open-games list**, by choosing **Invite a
+friend** or **Play an anonymous game** rather than On this phone — the same one door every game
+on this phone goes through. See [Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It
+Takes You → Starting a game — on this phone or online.
+
+**There are two doors to an opponent, and only one of them is Apple's screen.** Invite a friend
+presents Apple's matchmaker, which covers Game Center friends and contacts and can send the
+invite through Messages; there is no invite-link API, so nothing generates a shareable link and
+nothing has to. Play an anonymous game asks GameKit for a random opponent directly and presents
+nothing.
+
+**Apple's sheet is not used for the random opponent, because it cannot be made to describe
+one.** Its **Start Game** button cannot be hidden or renamed, it says nothing about playing a
+random person, and it starts a game before anybody has been found — and the match request's
+matchmaking-mode setting, which would otherwise narrow what the sheet offers, has no effect on
+the turn-based sheet at all. Our own door is what makes a searching screen possible and lets
+the game start once a pair actually exists.
+
+**Apple pairs a random player into a turn-based match only once the turn has passed to the
+empty seat.** That is why the anonymous starter ends its turn at once with the untouched fresh
+board rather than holding it: until the turn is passed, there is nothing for a random player to
+be paired into. Whoever joins therefore makes the first move of the game.
+
+**Apple's screen only starts games.** Its own list of the player's existing matches is
+switched off, so the open-games list is the only list of games there is and a player never
+has two of them to reconcile.
+
+**The match carries the board as JSON, and Apple caps match data at 64 KB.** A whole
+position and its series is a few KB, so the cap is headroom rather than a constraint today —
+but it is a hard ceiling, and anything later added to the record spends against it.
+
+**What crosses the wire is the board as JSON in an envelope of exactly three keys** — the
+payload format version, the series id, and the board — encoded as UTF-8 bytes, because Game
+Center's match data is bytes. Nothing else crosses: no nickname, no player id, no turn
+marker, no timestamps, and **no match id**. The match id is not in the payload; it is what
+the match was delivered under, and it travels alongside the bytes to whatever handles them.
+The version key is on the wire for the same reason every persisted record carries a version
+stamp, only more so — two devices on different app versions is the ordinary case here rather
+than the rare one.
+
+**The encoder refuses to produce a payload over 48 KB**, throwing rather than making a silent
+oversized send. That keeps headroom under Apple's hard ceiling, and a worst-case board — 81
+cells marked, nine quadrant states with their winning lines, a long-running score — is
+nowhere near it. Throwing is right here and nowhere else in online play: the encoder runs
+before anything is sent, on this device's own data, so an oversized payload is a defect in
+what was built rather than something that arrived from outside.
+
+**Turns never time out.** Every turn is ended with `GKTurnTimeoutNone` — GameKit takes the
+timeout on each `endTurn` rather than at creation, so that is where the app states it — and a
+match waits as long as it takes for the other player to move, days or forever. A finished game
+leans on that: the winning move is handed off as a turn, so the match sits on the loser's turn
+until they open the app and close it, however long that takes.
+
+**A player who wants out of an online game deletes it from the open-games list**, the same as
+any other open game, and **deleting resigns the match and then removes it from Game
+Center's list**, so the other player is not left waiting on a turn that will never come and
+the match does not linger on Apple's side after the player has thrown it away. The resign
+goes out first, the removal after it, and the record is removed last; both platform calls
+are best-effort: a call Apple refuses, or one attempted with no network, never blocks or
+undoes the delete — a game that cannot be deleted while the phone is offline is worse than
+an opponent left waiting or a match left in Apple's list. **Every delete of an online game
+asks for the removal**, including one the opponent has already left, where there is no
+resign to make. Deleting a game on this phone calls nothing. See
+[Menus and UI](./Menus%20and%20UI.md) → Deleting an open game.
+
+**The phone remembers which matches it deleted, and an event for one is dropped before
+anything else is looked at.** The newest hundred match ids are kept, oldest dropped first, and
+the check comes first in the routing below — nothing is created, applied, renamed or opened
+for a match this phone has already thrown away. Neither the resign nor the removal is
+enough on its own to make a delete stick: both are best-effort and nothing waits on either,
+so a catch-up can ask Apple for its matches and get that match back before they land, and
+without this memory the arriving payload would look like a brand-new invite and put the
+deleted game straight back.
+
+**A rematch online is a new match with a new id.** Apple's rematch mints a fresh match
+rather than reopening the finished one, so nothing may treat a match id as stable across a
+series.
+
+**The series id is what stays constant while the match id changes.** It is opaque, unique
+across devices, never parsed and never displayed, and it exists because the match id cannot
+serve: a rematch continues in the same open game with the scoreboard intact, so something
+stable has to cross the wire, and the record id cannot — it is minted per device. It has
+exactly two sources and no third: the device that **starts** the match mints it, and a device
+receiving the first payload of a series it does not hold **copies it out of that payload**.
+Both devices hold the same series id from the first turn onward, which is what lets a
+rematch's fresh match id find the record it belongs to.
+
+**A board that arrives is replayed against the rules engine before it is believed, and which
+board it is measured against is decided by the stored board — never by the match id.** A
+stored board still in progress is measured against itself: the arriving board is applied only
+if some single legal move from the stored board produces it. A stored board that is finished
+is measured against the next game of the series instead, and there the arriving board is
+accepted if it equals that next board or is one legal move from it — **zero or one move, and
+both are ordinary**, because a rematch's initiator ends its turn with the fresh board
+untouched when the engine says the other side goes first. Validation enumerates the legal
+moves and applies them; it never feeds the engine a board and catches what it throws, since
+the engine's throw on an illegal move is a contract violation no caller is meant to catch.
+
+**A payload is applied only when it is the opponent's turn to have sent it**, tested on the
+board the arriving one is measured against — never on a finished board, whose current player
+the engine leaves on the last mover, the winner of the game that just ended, who is not who
+goes first in the next one.
+
+**There is one exception, and it heals a store left one move behind by its own move.** When
+the stored board says it is the local player's turn, an arriving board is still applied if the
+local player could have produced it: exactly one legal move of this device's own from the
+measured board, or that move followed by one legal opponent move. Both are enumerated through
+the engine and applied, never taken on the payload's word, and a board the local player could
+not have produced is still refused as out of turn.
+
+**That shape is exactly what a lost local write looks like.** An online move is stored only
+after Apple's ok, so an app left, killed, or a reply lost in that gap leaves this phone's copy
+missing a move it actually made. Apple's match data is the one copy both phones agreed on, so
+it is authoritative for that missing move. Without the healing case the game strands for good:
+every later payload is refused as out of turn, and every send this phone makes is refused by
+Apple, because the two devices disagree about whose turn it is and neither can say so.
+
+The turn test and the reachability test both hold and neither replaces the other. A board this
+device produced and had echoed straight back to it is caught before either of them, as a
+re-delivery of the stored board — which is what lets the healing case be as narrow as it is:
+one own move, or one own move and the opponent's reply to it, and nothing else.
+
+**A board equal to the stored one is a re-delivery, not a violation** — nothing is written,
+and it is reported as its own outcome. Game Center re-delivers, and treating that as a
+corrupt payload would raise an error on an ordinary event.
+
+**Everything else is refused, and nothing is written on any refusal**: a board two moves ahead
+or otherwise unreachable, a payload that arrived when it was this device's own turn and that
+the local player could not have produced, an arriving match id that differs from the stored one
+while the stored board is still in progress, a payload naming a series the record does not
+hold, a payload that will not decode, and one on a version this build does not recognise. Each
+is a distinct value the caller can branch on rather than one failure carrying a message — a
+caller that cannot tell a re-delivery from a corrupt payload cannot behave differently on them.
+What the player is shown for any of them is not settled — see **Open Questions**.
+
+**An arriving turn is routed to its own stored record by the match id it was delivered
+under.** A record held for that match id takes it; failing that, the payload's series id finds
+the record, which is how a rematch's fresh match id reaches the game it belongs to; and
+failing both, the payload is the first of a series this device does not hold, and the record
+is created here. An event that carries no payload applies nothing — that is the ordinary
+starter's-own-match event, which GameKit reports before either side has put data in the match.
+An event whose local participant has already quit and whose match this device holds no record
+for is dropped: this device has left that match and there is nothing to apply it to. A payload
+that will not decode with no record to route it to is refused on its own, there being no
+stored series to measure it against.
+
+**When the other player leaves, the game is marked and it stops.** Apple carries every
+participant's own outcome on the match, and an event whose opponent shows as having quit
+marks the stored game as one the opponent left. A payload arriving in that same event is
+still applied first, by the ordinary rules; the mark goes on either way, and it is reported
+as its own outcome.
+
+**A game the opponent left says so and offers nothing but the way out.** Its row in the
+open-games list says the opponent left in place of whose turn it is, the board's banner says
+the same and keeps its slot even on a board that has finished, and every tap on the board is
+refused — on either side's turn, finished or not. No rematch is offered, because there is
+nobody left to play one with. Deleting it is the way out, and **deleting a game the opponent
+left resigns nothing**: they are already gone, so there is nothing left to tell them.
+
+**If the match is still open and it is this device's turn, the app ends it.** Apple would
+otherwise go on showing a match as active that neither player can play. It is best-effort and
+fired without waiting — a failure changes nothing, the mark on the record has already landed,
+and nothing queued behind it waits on the platform call.
+
+**The accepting device's create is refused unless the arriving board is reachable from a fresh
+series** — the fresh board itself, or one legal move from it — judged by the same rules every
+arriving board is judged by. A create is the one arrival path with no stored board to measure
+against, so without this it is the one path where an arbitrary board would be stored
+unchecked. **It is refused outright for a match that is already over** — one Apple has ended,
+or one whose opponent has already quit — since a create is also the one path with no stored
+record to have caught either fact already. A refused create writes nothing. The created record
+plays the side the rule above derives, takes the payload's series id and the event's match id,
+and is titled with the opponent's nickname, falling back to the same placeholder a game on this
+phone defaults to.
+
+**On an invited game that record appears when the invitation is accepted**, playing Player Two
+with the starter still to move, because the starting device has already put the fresh board
+into the match — see **A found match becomes a stored game** below. When that save did not go
+through, the record appears with the starter's first move instead, and the player is told they
+joined the game meanwhile. An anonymous game's joiner does not wait for an event at all: it
+builds its record straight from the match data the search handed back.
+
+**The opponent's name resolves through these same events.** The rename fires only when the
+event names a non-empty nickname, the stored title is still the placeholder, and the two
+differ; if any of the three fails, no store call is made at all rather than one the store then
+refuses. It runs on every event that gets that far, whether or not a payload was applied and
+whether the record was just created or already held. An opponent whose real nickname is the
+placeholder is renamed to itself, which is a no-op rather than a defect.
+
+**Every outcome of an arriving turn is published on a stream as well as answered** —
+applied, created, a re-delivery, each refusal, and the drops above. Nothing renders any of
+them; the stream is the seam the board screen and the open-games list read.
+
+**A turn event that brought the app to the foreground opens that game's board.** Apple sets
+`didBecomeActive` on the event that launched or foregrounded the app — tapping an invite, or
+tapping a "your turn" notification — and that is the one event the app navigates on: it
+opens the record the event resolved to, whether that record was just created, just applied,
+or already held and unchanged. An event arriving while the app is already in front, and
+every event a catch-up replays, moves the player nowhere. Opening is skipped when that
+game's board is already what is on screen.
+
+**A local move is written to this device's store only after Game Center accepts the turn.**
+The confirming tap on an online game puts the move on the session board and marks the game as
+awaiting handoff, saves nothing, and hands the encoded board to Game Center; only on Apple's
+ok is that board written, under the same match id it was sent under. A stored board showing
+the opponent to move on a turn this device never handed off would be a game neither device can
+continue, and it would survive a relaunch. The match id is chosen once, before the send, and
+the write reuses it rather than re-reading the record — re-reading is what would let the send
+and the write disagree about which match the board belongs to. A send Apple accepted whose
+write the store then refuses is its own answered value: the board stays on the session as
+sent and the turn is never re-sent, because the opponent already holds it. See
+[Menus and UI](./Menus%20and%20UI.md) → When a game is written to storage.
+
+**A move confirmed while the launch sign-in is still in flight waits for it.** The app signs
+in at every launch, and a player who goes straight into a game and moves can beat that call
+back. The send waits on the sign-in already going out instead of failing as though the player
+were never signed in — it starts no second one, since a sign-in asked for while one is in
+flight joins the first.
+
+**A send that comes back after the player left and returned never puts its stale board on
+screen.** Leaving a game and opening it again is a fresh load of the same record, which the
+record id alone cannot tell from nothing having happened at all — so every load is counted,
+and a send whose count no longer matches the one it began under reads the store again rather
+than dropping the board it captured before the trip onto the session. The write to storage
+still happens; it is only what is on screen that is re-read instead of overwritten.
+
+**The move that finishes a game is handed off as an ordinary turn, carrying a message that
+tells the other player they lost it.** Apple pushes a banner for "it's your turn" and for
+nothing else — there is no notification for a match ending — so a finishing move that ended
+the match outright would reach a closed app in silence. Handing the turn over instead puts
+Apple's own "your turn" banner on the other phone, and the message the hand-off carries is
+what that banner says. Everything else about the send is unchanged: the same
+awaiting-handoff mark while it is in flight, the same retry on a failure, and the same write
+only on Apple's ok.
+
+**There are four of those messages, and they name the sender by Game Center account name**,
+read from this device's own signed-in session: *"`<name>` won your game."* when the sender
+won it, and *"Your game with `<name>` ended in a tie."* on a tie. With no nickname to use
+they fall back to *"Your game ended."* and *"Your game ended in a tie."* — which only happens
+when the session is not authenticated, since a sending device otherwise always knows its own
+name. An ordinary move carries no message at all, the anonymous starter's zero-move hand-off
+and the searching screen's re-sends of it included.
+
+**Which device ends the match is derived from the finished board, never read from Apple.**
+The engine leaves the winner — or, on a draw, whoever made the final move — as the current
+player of a finished board, and the finishing hand-off passes the turn to the other phone.
+So the device whose own side is the board's current player is the one that made the
+finishing move, and the other is Apple's current participant and therefore the one that ends
+the match. Nothing asks Game Center which participant is current, and nothing reads a
+match's status to decide what to draw. The comparison is between engine players — the
+board's current player against the side stored on the record — so the per-device icon pick
+never enters it; which mark this device draws changes nothing about which side it plays.
+
+**The losing device is what ends the match, as soon as that finished board is on its
+screen.** Apple lets only the player whose turn it is end a match, and the finishing
+hand-off is exactly what makes that the loser. It fires on the screen's own load of the
+record, on a re-read landing the finishing turn on the game already on screen, and on the
+arriving-turn path putting that game on screen; an event a catch-up replays while the player
+is looking at something else ends no match, and that one closes the next time the game is
+opened. Until it happens the match stays open on Apple's side with the result already drawn
+on both boards, which costs nothing — turns never time out, so nothing expires while it
+waits. Ending it sets this device's outcome to lost and the other's to won — tied on a draw
+— handing Apple the board already stored, under that record's series id, the same call the
+opponent-left path already makes. The device that made the finishing move never makes it, on
+a won game and on a tie alike, because Apple would refuse it.
+
+**That call is best-effort, silent, and one at a time per record.** It is fired without
+waiting, never shown to the player as an error or anything else, and never made twice
+concurrently for the same record. On Apple's ok the record is marked as knowing the match
+has ended — see **Persistence and Serialization** → *What an online game adds to the record*
+— and on a failure nothing is written, so the next time that board reaches the screen tries
+again. A record that has not caught up therefore costs one harmless extra call rather than a
+stuck match, because ending a match is idempotent. Like a finishing send, it waits on the
+launch sign-in while that call is still in flight rather than failing as though the player
+were never signed in.
+
+**A device learns a match has ended three ways, and all three arrive as ordinary turn
+events.** GameKit delivers the end to the other participant through its own match-ended
+callback rather than the turn-event one, and the bridge routes that callback down the same
+path; the catch-up at launch and on every resume replays an ended match the way it replays
+an open one; and the winner's waiting result card re-checks on its own timer. The
+match-ended value is written for any of them, whatever else the event did or did not apply —
+that status is the whole point of the event Apple sends when a match closes, and the board
+it carries has usually been applied already.
+
+**The player on the other side of a finishing move is told with a banner even when their app
+is closed.** They are not left to discover the result the next time they open the app.
+
+**A phone on a build that ends a match from the sending side leaves that match open until it
+updates.** Such a build has nothing that closes a match on receipt, so a finishing move
+handed to it sits there: the sender's rematch button waits indefinitely, and deleting the
+game is the way out, since deleting resigns the match. Nothing works around it — turns never
+time out, so nothing expires while it waits.
+
+**A retried send never double-plays, whichever kind it is.** Handing off a turn and ending a
+match both answer ok to a retry Apple has already carried out — a hand-off that landed even
+though its reply did not, judged by this device no longer being the one to move and the match
+already holding exactly the board being sent; and a match already ended with this device's
+outcome on it. A reply that never arrived looks identical to a send that never happened, so a
+retry is the ordinary response to silence, and without this the retry meant to recover the
+first attempt is the thing that makes the failure permanent: Apple refuses a second hand-off
+from the same turn, and refuses to end a match twice.
+
+**While a move is awaiting handoff, that game refuses another one.** A second move on a turn
+the first has not handed off would put this device two moves ahead of the opponent, which
+their device refuses as unreachable and nothing can repair. A failed send writes nothing and
+keeps the confirmed move on the board, and sending again re-sends that same board — a retry,
+not a second move, which the refusal is exactly what makes safe. A relaunch loses an unsent
+move and shows the board as it stood before it, which is what the opponent sees too. One send
+is in flight at a time, and a second while one is unanswered never reaches the platform.
+
+**No send can leave the board stuck saying it is sending.** Every platform call that hands a
+board over — ending a turn, ending a match, asking for a rematch, saving a board into the
+match — gives up after thirty seconds and reports the ordinary "could not be reached" failure,
+because a call that never answers is indistinguishable from one that failed and only one of
+the two can be retried. A send refused before it ever reached Apple — one already in flight,
+nothing pending to send, a game that is not online — is shown as a failed send too, with the
+retry and the way out, rather than leaving the banner on "sending" with nothing on screen able
+to change it. And a store write that throws after Apple has already taken the turn is answered
+as sent-but-not-stored rather than thrown: the opponent holds that board either way, and the
+next turn to arrive heals what was not written.
+
+**A rematch online is asked of Apple, and the handoff follows the same rule and stores no
+marker to do it.** The result card's rematch button asks Game Center for the rematch; Apple
+mints the fresh match, the initiator holds its new id in the session only, hands off the next
+game's board under that id — the fresh board, plus its own first move when the engine says it
+goes first — and only on ok writes the next game's board and the new match id together, in
+the single write that operation already is. When the engine says the other side goes first,
+that zero-move board is handed off there and then, since no move of this device's is coming
+to carry it. A second tap while the call is in flight does nothing, and a rematch Apple
+refuses leaves the game exactly as it was. A relaunch loses the held id: the player taps
+rematch again, Apple mints another match, and the first is abandoned with nothing stored
+pointing at it. That is acceptable, because a match neither player ever played is invisible to
+both devices and costs no slot.
+
+**Apple refuses a rematch while the finished match is still open, so the winner's rematch is
+held rather than failed.** The loser's phone is what ends that match, and the device that
+made the finishing move draws the waiting button from the moment the result card appears
+rather than discovering it on a refused tap — what it reads is the record's own stored
+match-ended value, so the wait survives a relaunch. It comes back to life by itself once
+that value turns true, and while the waiting card is up it re-checks with Game Center every
+fifteen seconds, the same interval the searching screen already polls on, started when the
+card appears and stopped when it goes away. Nothing is queued: the rematch is asked of Apple
+on the tap that follows the unlock, never on the unlock itself. A rematch Apple refuses
+anyway — the value having turned true a moment before the match actually closed — is
+reported the way any other refusal is. The device that owes the match-ending call never
+waits, because it is not waiting on anybody. See [Menus and UI](./Menus%20and%20UI.md) →
+Game Over → Rematch.
+
+**Both players tapping rematch at once is safe.** The held id is dropped whenever a re-read of
+the record shows the match id has already moved on — which is what the opponent's own rematch
+reaching this device first looks like — so nothing is ever handed off under a match the record
+has already left behind, which would strand both phones waiting. The first handoff to land is
+the one the series continues in.
+
+**Which side a device plays is derived when the record is created, never fixed by who
+started.** A record created from an arriving payload reads Apple's own current participant: if
+that is this device, it plays whichever side the board says is to move, since it is genuinely
+this device's turn on that board; otherwise it plays the other side; and a match with no
+current participant at all falls back to Player Two. One rule, applied at every create, rather
+than a different assumption per entry path.
+
+**What that rule produces in each case:** a game started from Apple's sheet is unchanged — its
+starter plays Player One and moves first, and an invited friend plays Player Two. The starter
+of an anonymous game plays **Player Two**, because it passes the turn on with the fresh board
+untouched; the player who joins an anonymous game plays **Player One** and makes the first
+move.
+
+The advantage does not accumulate: from the second game the winner of the last game goes first,
+and a tie leaves it where it was — see [Rules](./Rules.md) → Turn Order Across Games. The side
+is stored on the record once, at create, and read from there afterwards rather than re-derived
+from the match.
+
+**Game Center sign-in happens at every launch.** The app authenticates as it starts,
+whatever is stored and whether or not the player ever goes near online play, and it
+authenticates again on the way into online play — a second call while one is in flight
+joins the first. Signing in at launch is what makes an invite and a "your turn"
+notification work at all: GameKit delivers a turn event only to a registered listener, the
+listener is registered on the first successful authentication, and Apple delivers an
+accepted invitation only to an app that is already signed in. A two-phone test proved a
+narrower condition does not reach it — an invited phone holds no online game until the
+invite's first payload lands, so a launch sign-in gated on holding one never runs and the
+invite never arrives. The cost is Apple's small welcome banner at launch for every player,
+including one who never plays online, and that is the price of an invite that works.
+
+**When Apple reports multiplayer is not allowed for the account, online play is refused
+with a message rather than an error.** `GKLocalPlayer.isMultiplayerGamingRestricted`
+carries a parent's "don't allow" setting. The restriction is only known once the player is
+signed in, so neither online choice in New Game is hidden or disabled on that account — they
+sit there like the other one, and the tap comes back with a calm, kid-facing message. They are
+hidden only where there is no Game Center at all, which is anything that is not iOS. See
+[Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes You →
+Starting a game — on this phone or online.
+
+**Random opponents versus friends-only is the parent's Game Center setting, and the app
+adds nothing of its own.** Game Center enforces the friends-only choice itself. The app
+never forces automatch-only mode — that throws for a friends-only child — and it never
+imposes a restriction Apple has not.
+
+**Online games count against the open-game cap**, the same 3-by-default, 100-with-the-unlock
+ceiling as games on this phone — see **Persistence and Serialization** → *The cap is
+enforced on create, and the store never evicts*.
+
+The parental gate that online play raises for a child's account is **Kids Category** below.
+
+### The board screen drives a turn
+
+**An online game plays on the same board screen as a game on this phone**, and that screen
+derives one state to say what it may do: the opponent has left, waiting on the opponent, your
+turn, a move being sent, a send that failed, or game over. It is derived from the session
+alone and never stored — whose turn it is is the board's current player compared against the
+side this device plays. The order they are tested in is what makes them right: the opponent
+having left, then a failed send, then a send in flight, then a finished board, and only then
+whose turn it is. **The opponent having left outranks everything**, because that game is over
+however the board looks. **A send in flight and a failed send outrank a finished board**,
+because the move that ends the game still has to be handed off and a failed send of it has to
+stay retryable — a winning move whose send fails shows the retry, not only the result card. A
+finished board outranks whose turn it is, since its current player is the winner rather than
+someone to move.
+
+**Only your own turn takes a move.** A tap on the opponent's turn is refused by the state
+layer's tap gate, as its own distinct refusal, checked before legality so it answers the
+same whatever cell it lands on. **A game the opponent has left refuses every tap**, ahead of
+that and ahead of everything else — on this device's own turn too, and on a board that has
+already finished. A refused tap does nothing at all — no mark, no pending
+selection, no shake, no message and no buzz.
+
+**The lock is taps and nothing else.** While waiting on the opponent the board renders
+exactly as it does on your own turn: the forced-quadrant highlight and the last-move
+highlight both stay drawn, nothing dims and nothing is added. Which quadrant the opponent
+must play in is information the player wants, and the two highlights are the board's core
+readability — so there is no dimming, no veil and no online-only treatment to design. How
+the lock is *not* built is **Rendering the Board** above.
+
+**The confirming tap makes one call, and the screen never sends of its own accord.** The
+state layer is what applies the move, marks the game awaiting handoff and hands the encoded
+board to Game Center; the retry on a failed send is the only send the screen itself asks
+for. A retry reads as a send in flight rather than as still failed — the record of the last
+failure clears the moment a send is actually attempted, past every refusal and before the
+platform call. A send Apple accepts says nothing of its own: the board simply goes back to
+waiting on the opponent.
+
+**The screen listens to arriving-turn outcomes for as long as it is mounted, and subscribes
+before it loads its own game.** That stream replays nothing, so an outcome landing between
+mount and the load returning would otherwise be lost. It constructs no receiver of its own —
+one receiver subscribes for the app's lifetime. It acts on exactly three outcomes, a turn
+applied, a record created, and the opponent having left, and only when the record they name
+is the one on screen; every other outcome changes nothing there, including a re-delivery and
+every refusal.
+
+**On any of those three it re-reads the record and replaces the board and the online values
+from it.** The re-read draws no loading state: withholding the board until a read lands
+belongs to a screen's first read, and blanking the board to a spinner on every opponent
+move would be a defect of its own rather than that rule being honoured. What it applies is
+guarded — it is dropped whole if the player has left for another game by the time the read
+lands, judged by the record id the same way a send is; a read that answers nothing, the
+record being gone, leaves the session exactly as it was; and a rematch's held match id is
+left untouched when the record still names the match it was held against, and dropped when
+the record has moved on to another. The re-read clears the pending, unconfirmed selection and
+its preview, since one computed against the board that was just replaced is no longer a legal
+move on the board in front of the player; it clears any running win celebration, which would
+otherwise lock input on a board that is now this side's to play; and it clears the
+awaiting-handoff and failed-send marks, the stored board being authoritative once a turn has
+arrived for it. Nothing else runs — input unlocks because the board's current player is now
+the local side, and a re-read is safe to run repeatedly, including one landing while the
+screen's own first load is still in flight.
+
+**Opening an online game is playing, not entering.** From the open-games list or from a
+"your turn" notification, the screen shows the current stored board and nothing more: it
+raises no sign-in, raises no parental gate, and makes no Game Center call. A finished board
+is the one exception — the losing device makes the match-ending call above, and the winner's
+waiting result card re-checks every fifteen seconds — and neither of those draws anything.
+See **Kids Category** below.
+
+**Opening a different game while a board is already on screen loads that game.** A
+notification for another match, or a tap on another row, reaches the same board screen rather
+than a new one, so the screen loads whatever game id it is handed every time that id changes
+rather than only the first time. Without that the player is left looking at the game they
+were already in, with the notification apparently having done nothing.
+
+### The channel contract
+
+**Three channels carry everything, and each side names them in exactly one file.** A method
+channel, `com.ehrendavis.tictactoeextreme/gamecenter`, carries calls and their replies; an
+event channel, `com.ehrendavis.tictactoeextreme/gamecenter/session`, carries session changes
+GameKit originates; and a second event channel,
+`com.ehrendavis.tictactoeextreme/gamecenter/turns`, carries the turn events it originates.
+Turn events are not folded into the session channel: that channel replays its current value
+on subscribe and lets a malformed event leave the last known session standing, and neither
+holds for a turn event, which has no current value and must not be silently coalesced. The
+prefix is the bundle identifier. All three use Flutter's standard message codec, and all
+three are hand-written — no channel generator is a dependency this app takes.
+
+**The method channel exposes exactly eleven methods**: `authenticate`, `presentMatchmaker`,
+`findRandomMatch`, `loadMatches`, `syncMatches`, `endTurn`, `endMatch`, `rematch`,
+`resignMatch`, `removeMatch` and `saveMatchData`. The first five take no argument; `saveMatchData`
+takes a match id and the encoded payload bytes; `endTurn` takes those two plus the message
+GameKit shows in its "your turn" notification — empty on an ordinary move, and carrying the
+result on the move that finishes a game; `endMatch` takes the match id, the payload and this
+device's own outcome — `won`, `lost` or `tied`; and `resignMatch`, `rematch` and `removeMatch`
+each take a match id alone.
+`saveMatchData` writes the payload as the match's data without ending the turn, which is the
+whole difference between it and `endTurn`. `endMatch` ends the match outright: it sets this
+device's participant to the outcome it was handed and every other participant to the
+opposite, never overwriting one already recorded as quit, and it answers ok rather than
+failing when the match is already ended with this device's outcome on it. `endTurn` answers ok
+the same way, with no second platform call, when this device is no longer the one to move and
+the match already holds exactly the payload being sent. `rematch` answers `ok` with the new
+match's own map, or `failed` with a message. `syncMatches` answers `ok` with how many matches
+it replayed, or `failed` with a message. Each of the other five answers a `status` of `ok`, or
+`failed` with a non-empty message — a match id GameKit does not hold, a match the local player
+is not in, and a GameKit failure are all the same one failure, since no caller has a second
+behaviour to take on them. Called while the session is not authenticated, each answers failed
+and sends no platform call, the same refusal the matchmaker and the match load already make.
+Any other name answers not-implemented.
+
+**No outcome on this channel is an error.** A declined sign-in, a restricted account, a
+cancelled matchmaker and a GameKit failure are all reply values: the Swift side never answers
+a `FlutterError`, and nothing on the Dart interface throws — including on a build with no
+Swift side at all, which is every `flutter test` run. Every failure value carries a non-empty
+message, and nothing branches on that text.
+
+**Every call that sends is bounded at thirty seconds.** Ending a turn, ending a match, asking
+for a rematch, saving a board into the match, removing a match and asking for a random match
+each give up after that and answer their own "could not be reached" failure. GameKit promises
+nothing about ever calling a completion handler back, and a send that never answers wedges the
+one move the player is trying to make;
+a bounded wait plus an ordinary failure is what makes a retry possible at all. It is one value
+stated once, shared by all four and by the catch-up's own wait.
+
+**`authenticate` answers a session map** keyed `state` — `unauthenticated`, `authenticated`
+or `restricted` — carrying `nickname` and `isUnderage` when authenticated, `isUnderage` alone
+when restricted, and an optional `message` saying why an unauthenticated result came back.
+The event channel emits the same map: the current value on subscribe, and every later change.
+The in-flight `authenticating` state never crosses the channel in either direction — the Dart
+side publishes that one itself.
+
+**`presentMatchmaker` answers `found`, `cancelled` or `failed`** — a match map on `found`, a
+message on `failed`. **`findRandomMatch` answers `found` or `failed` and never `cancelled`**,
+since it presents nothing a player could dismiss; its `found` carries the match map and, when
+the match already holds data, that data's bytes alongside it, so the joining device can build
+its record without a second round trip. **`loadMatches` answers `ok` with a list of match maps,
+possibly empty, or `failed` with a message.**
+
+**A match map is exactly six keys**: `matchId`, `status` (`matching`, `open`, `ended` or
+`unknown`), `participants`, `localParticipantIndex`, `currentParticipantIndex` — null when the
+match has no current participant — and `hasData`. A participant is a nickname, whether it is
+the local player, and that participant's own outcome on the match — none, quit, won, lost,
+tied, or something this build does not name — with a missing outcome read as none, which is
+also the ordinary still-playing value. The list is in GameKit's own order, which is the order
+turns rotate in; a participant Apple has not resolved carries the empty string, the ordinary
+case for a Play Now match whose opponent does not exist yet. `hasData` is read from *loaded*
+match data — GameKit leaves a match's data nil until it is loaded, so the Swift side loads it
+before describing a match, or every match of a series would look like a fresh one. Whose turn
+it is on the board is still engine state and is never read off `currentParticipantIndex`.
+
+**`endTurn` hands the payload to GameKit verbatim**, with the next participants being every
+participant of the match that is not the local player, in GameKit's own order. The message
+it was handed becomes the match's own message, which is what Apple's "your turn" banner
+reads on the other phone.
+
+**Resigning quits the local participant and changes nothing else.** GameKit offers no single
+call covering both cases and the in-turn form fails when called out of turn, so the bridge
+picks by whether the local player is the match's current participant. The in-turn form is
+handed the match's own loaded data unchanged — resigning is not a move, so the board the
+other device sees must not change, and GameKit requires match data there, so passing empty
+data would wipe the opponent's board. Only the local participant's outcome is set.
+
+**Removing takes the match off this device's Game Center list and changes nothing else.** It
+is called after the resign, on the delete path alone — see **Online Play** above.
+
+**A turn event is exactly five keys**: `matchId`, the six-key `match` map built from the
+match it arrived for, `matchData` — the match's loaded data as bytes, or null when it holds
+none — `didBecomeActive` verbatim, and `localParticipantQuit`, true when the local
+participant is done with a quit outcome. The match id is a top-level key as well as a field
+of `match` because it is what routes the event, and it travels alongside the bytes rather
+than inside them. The Swift side loads the match's data before emitting, exactly as it does
+before describing a match, or every event would carry no payload; a match whose data fails to
+load, or whose local participant cannot be resolved, emits nothing. An event is emitted even
+while a matchmaker presentation is pending — it still reaches the receiver and is routed by
+match id — and which event completes that presentation is unaffected.
+
+**Three things emit a turn event.** GameKit's turn-event callback is one; its separate
+match-ended callback is the second, and it is how the end of a match reaches the other
+participant, since that never arrives on the turn-event one; and the catch-up's replay is
+the third. Both of the last two are marked as not having brought the app to the foreground.
+
+**Turn events that arrive with no Dart subscriber are buffered and replayed**, in arrival
+order, on the next subscribe and again after a cancel, and the buffer is cleared as it is
+replayed. It holds at most one event per match id: a second event for a match already
+buffered replaces that entry in place and keeps its position, so the buffer cannot grow
+without bound and a superseded board is never replayed. Nothing about this depends on how the
+app was launched — an event that launched the app is handled exactly as one that arrived
+while it was running.
+
+**The Dart side subscribes to the turn channel lazily, on its first listener**, unlike the
+session channel, which subscribes at construction. Subscribing does no GameKit work and
+registers no listener of its own; until something listens, the platform holds its events in
+the buffer above. The turn stream
+replays nothing to a new subscriber — a turn event is an occurrence, not a value with a
+current state — so what a late subscriber missed is the platform buffer's to deliver. One
+receiver subscribes for the app's lifetime, constructed at app start by the root widget; it
+is the only subscriber that writes to the store, and a second live one would double-apply
+every arriving turn.
+
+**Decoding what arrives is strict, per key, and all-or-nothing.** Nothing is coerced, no
+missing key is defaulted, and no value is half-filled: a reply that is not a map, an
+unrecognised `state` or `status`, a wrong-typed field, a participant list that is not exactly
+two entries with exactly one local player, or an index that does not index that list — each
+makes the whole call answer its own failure value. One bad match fails a whole `loadMatches`
+reply rather than yielding a list with a hole in it. A malformed event on the session channel
+is ignored and the last known session stands, as it does on an error or a close. A turn event
+is decoded the same way and dropped whole on any failure, with one exception: a `match` map
+that fails to decode is carried through as absent rather than dropping the event, since the
+event routes by match id and applying a turn reads no field of that map. Dropping it would
+lose a legal move to a field the move never reads; the only thing an absent match map costs
+is the rename.
+
+**`flutter test` reaches the Dart half only.** The channel is exercised against a mock handler
+and every other layer tests against the fake bridge; the Swift half carries no test target and
+is checked by running the app on a device signed into Game Center.
+
+### Signing in, and the session anything can read
+
+**Registering the channel does no GameKit work, and neither does subscribing.** The sign-in
+handler is installed on the first `authenticate` call and never on a listen, so something
+subscribing at launch presents no sign-in view controller and shows no banner. Before that
+first call the session channel reports unauthenticated on subscribe and nothing else; after
+it, a change GameKit originates with no call behind it — the player signing out in iOS
+Settings — arrives through that same handler. A later call re-installs the handler **only
+while the player is not authenticated**, which is what makes a declined sign-in retryable;
+re-installing it over a signed-in player would re-present Apple's sheet for nothing. Once the
+player is signed in, the call answers from the cached local player and presents nothing.
+
+**`authenticate` is safe to call any number of times.** A second call while one is in flight
+joins the first rather than starting a second sign-in, so at most one sheet is ever on screen.
+Events on the session channel are not published while a call is in flight — the reply is what
+publishes the outcome, and without that the channel's on-subscribe replay would overwrite the
+in-flight state the moment the first call was made.
+
+**The session is one plain value anything can read**, through a provider holding it directly
+rather than an async wrapper, since the in-flight state is already one of the four values it
+can hold: unauthenticated, optionally with a reason; authenticating; authenticated, with the
+nickname and whether the account is a child's; and restricted, with whether the account is a
+child's. **Restricted is a state of its own and not a flag on authenticated**, so a caller
+deciding whether to offer online play branches on the state rather than on a boolean it can
+forget to read — the same shape the engine's placement state uses. The stream is broadcast and
+replays the current value to each new subscriber, and one subscriber cancelling tears nothing
+down for the others.
+
+**A fake bridge ships as app code rather than test code**, behind the same interface, because
+it is the double every other layer tests against. It matches the real bridge on the stream's
+replay behaviour and on every refusal, and holds no shortcut the real one could not honour.
+
+### Catching up with Game Center
+
+**A turn event GameKit originates while nothing is listening never arrives on its own**, so
+the app asks Apple for its matches instead and replays them through the same receiving path a
+live event takes. Every match still open is replayed, and so is every match that ended within
+the last fourteen days — a final move that was missed, or a "they left" that was missed, is
+caught up exactly the way an open match's missed turn is, and a match older than that has
+nothing left to tell anyone. Nothing about the replay is special-cased: the same routing, the
+same validation, the same outcomes — and every replayed event is marked as not having brought
+the app to the foreground, so a catch-up never moves the player off whatever they are looking
+at.
+
+**It runs in three places and no others**: at launch, once the launch sign-in comes back
+authenticated; every time the app returns to the foreground while signed in; and after any
+game is deleted, local or online, because freeing a slot is what lets in an invite the cap
+turned away. A catch-up asked for while one is already running answers that same one rather
+than sending a second call, and it never throws — a failure is silent, and the next catch-up
+tries again.
+
+**A catch-up cannot hang.** GameKit promises nothing about ever calling a completion handler
+back, so both halves are bounded: the iOS side answers after twenty seconds with however many
+matches it managed to replay, and the app gives up on the call after thirty. Either way the
+call completes, and completing is what lets the next catch-up run at all — one that never
+answered would wedge every later one behind it forever.
+
+### Presenting Apple's matchmaker
+
+**The match request is minimum two players, maximum two, and sets no matchmaking mode at
+all** — that is where "never forces automatch-only" is honoured concretely. **The sheet's
+own list of existing matches is switched off**, so it is reached only to start a game and
+the open-games list stays the only list of them.
+
+**A found match does not arrive through the matchmaker's delegate.** Its found callback has
+been deprecated since iOS 9 and is not delivered at all on this app's iOS floor, so a bridge
+waiting on it waits forever. The match arrives instead on the local player listener's turn
+event, and that listener is registered on the first successful sign-in, which is why signing
+in at launch is what makes an invite arrive at all. The delegate still supplies the other two
+outcomes. Found, cancelled and failed stay three distinct values rather than one failure
+carrying a message, because a caller that cannot tell a cancel from an error cannot behave
+differently on them.
+
+**One sheet at a time, and the guard that makes it testable is on the Dart side**: a second
+presentation while one is in flight fails without reaching the platform. The Swift side
+refuses a second sheet as a backstop and clears its own guard only once the dismissal has
+completed, so the next presentation cannot race the dismissal animation.
+
+**Everything is presented on the topmost presented controller of the foreground-active scene's
+key window, never the window's root** — the root is Flutter's own view controller, and
+presenting on it while a Flutter surface is already up throws. When nothing can present, the
+call answers rather than waiting: `authenticate` comes back unauthenticated with a reason,
+`presentMatchmaker` comes back failed. A call that cannot present is never left pending. Every
+reply and every event is delivered on the main thread, since GameKit's completion handlers
+promise nothing about which thread they call on.
+
+**Neither the matchmaker nor a match load signs the player in on the caller's behalf.** Called
+while the session is not authenticated, the matchmaker answers "unavailable" carrying the
+current session and the match load answers failed, and neither sends a platform call.
+
+**Entering online play signs in first and then calls the parental gate with the session that
+produced.** The gate decides from the session it is handed and never authenticates, so what
+it guards is the second half of entering — presenting the matchmaker, or accepting the
+invitation — and never the sign-in itself. What it does with each session state is **Kids
+Category** below.
+
+**Asking Apple which matches it holds reads only.** It creates, stores, reconciles and deletes
+nothing, and imposes no order of its own on what GameKit answers — nothing may depend on the
+order matches come back in. A match whose local participant GameKit cannot identify is left
+out of the answer and the rest still come back, the same doctrine the store applies to a
+record it cannot read; nothing is defaulted, because a defaulted index would name the opponent
+and make this device look like the starter. That same match arriving as a *found* result fails
+instead, there being nothing left for the caller to act on.
+
+**Replaying those matches is a separate call, and it is not a read.** The catch-up asks
+GameKit for the same matches and pushes each open one onto the turn-event stream, so what it
+sets off is the ordinary receiving path and whatever that path decides to store — see
+**Catching up with Game Center** below. Nothing reads its answer beyond whether it worked.
+
+### Finding a random opponent without a sheet
+
+**`findRandomMatch` asks GameKit for a turn-based match on the same minimum-two, maximum-two
+request the sheet uses, and sets no matchmaking mode either.** Nothing crosses the channel for
+the call: the request is built on the Swift side. It presents no view controller, so there is
+no one-sheet-at-a-time guard to take and no cancel to answer — found or failed, and
+"unavailable" with no platform call when the session is not authenticated, the same refusal the
+matchmaker and the match load already make.
+
+**What comes back may be a brand-new match or somebody else's.** A match GameKit has just
+minted carries no data and leaves the local participant current; a match somebody else started
+carries their board and has already resolved this device into the current participant. That one
+test decides which of the two branches in **A found match becomes a stored game** runs, and it
+is the same test the matchmaker's own found match is judged by.
+
+**A found match that is already over is abandoned and the search tried again, three times at
+most.** A match whose other player has quit, or that GameKit has ended, still occupies an
+automatch seat the search would otherwise keep being handed; it is resigned best-effort — the
+retry that follows is what matters, not the resign — and `findRandomMatch` is asked again. After
+three attempts the search fails and the player is told.
+
+### The searching screen
+
+**A record still looking for a player opens the searching screen, never the board.** The
+open-games list, and the entry itself, both route on the record rather than on where the player
+came from, so there is one answer to "what does opening this game show".
+
+**While it is up it makes sure the starter's handoff actually went out.** It re-sends the same
+untouched fresh board on arrival and on every poll, which is safe because ending a turn is
+idempotent — GameKit is told nothing new when this device is no longer the one to move and the
+match already holds exactly that board. Only when a send does not go through does the screen
+offer a **Retry**, and one check is in flight at a time: a poll landing on top of one still
+running is dropped rather than queued.
+
+**It catches up with Game Center every fifteen seconds.** A live turn event is what ordinarily
+ends the wait, and the poll is what notices an opponent when no event arrives — the app
+backgrounded, or a push simply missed.
+
+**When the first move arrives or the opponent resolves, it says who was found for a beat and
+then opens the board.** Leaving it with "keep looking in the background" goes back to the
+open-games list and changes nothing about the search: the game is stored, it is still looking,
+and deleting it is the only thing that calls the search off.
+
+### A found match becomes a stored game
+
+**The handoff takes a found match and the store, and answers one of four values**: the stored
+record, awaiting-the-first-turn, refused at the cap — carrying the ceiling and the current
+count, so a caller can say "3 of 3" without a second round trip — or refused for an empty
+title. It never throws, and it writes at most once: only the starter path writes at all.
+
+**A match whose id the store already holds answers that existing record** — nothing created,
+nothing re-titled, no series id minted. **This device is the starter exactly when the match
+carries no data yet and the local participant is the current participant.** Everything else is
+awaiting the first turn and stores nothing, which is the accepting device's ordinary state
+until the starter's first payload lands.
+
+**An invited game's starter create hands the store a freshly minted series id, a new series
+board, the match id, Player One as this device's side, and the other participant's nickname as
+the title.** When that nickname is blank the title falls back to the same **ItSaMeMaRiO** a game
+on this phone defaults to, as a placeholder; the store applies no fallback of its own and would
+refuse an empty title. The placeholder is replaced once, when the opponent resolves — see
+**Persistence and Serialization** → *What an online game adds to the record*.
+
+**The inviting device puts the fresh board into the match as soon as the match is made.** It is
+a save that does not end the turn — the starter is still to move — and it exists so the invited
+device has a payload waiting the moment the invitation is accepted, rather than nothing until
+the starter's first move. It is fired and never waited on, and a failure is swallowed: the game
+is already stored here either way, and the invited device falls back to creating its record when
+the first move arrives. It runs only where this device actually minted the record, never for a
+match id the store already held.
+
+**An anonymous game's starter create is the same create with three differences**: the side is
+**Player Two**, the record is marked as awaiting an opponent, and the title is a placeholder
+because there is no participant to name it after yet. Instead of a save that keeps the turn, it
+**ends** the turn at once with the untouched fresh board — that pass is what makes the empty
+seat available for GameKit to pair a random player into, and it is what the searching screen
+keeps re-sending until it goes through.
+
+**An anonymous game's joiner create is built straight from the match data the search handed
+back**, not from an arriving event: the payload's series id, the board as it stands, the match
+id, the side the derivation rule gives it — Player One, with the first move to make — and the
+other participant's nickname as the title, falling back to the same placeholder. Nothing about
+the create is special-cased; it is the accepting device's ordinary create reached by a different
+route.
+
+**The series id is 32 lowercase hex characters minted from 128 bits of a secure random
+source**, on the starting device, on that one call. It has to be unique across devices rather
+than merely within this process, since the accepting device copies it out of the first payload
+and both then hold it — the store's own record-id minter does not satisfy that and is not
+reused here.
 
 ## Kids Category
 
 **The app will be listed in Apple's Kids Category.** This is not only a listing choice — it
 changes what gets built in features that ship long before release work:
 
-- A **parental gate** is required before any purchase flow and before any link that leaves
-  the app.
+- A **parental gate** is required before any purchase flow, before any link that leaves the
+  app, and — for a child's account — before entering online play.
 - Third-party analytics and behavioural advertising are restricted.
 - A privacy policy is mandatory.
 
@@ -1282,11 +2457,31 @@ exist before those are built rather than being added at submission.
 
 A separate, consequent fact: the age rating is **4+.**
 
-**The parental gate's scope is purchases only.** The game has no outbound links today — no
-in-app support URL, no social links, no advertising — so purchases are the only trigger that
-currently exists. If an outbound link is ever added, it needs the gate too — that is a thing
-to remember rather than a thing already handled. What the gate asks, and how long a pass
-lasts, is **In-App Purchases and Entitlements** above.
+**The parental gate guards purchases and online play.** Every purchase raises it. Entering
+online play raises it **only when Apple reports the signed-in account is a child's** —
+`GKLocalPlayer.isUnderage` — so an adult account is never gated on the way into a match. That
+flag rides on the session state the bridge publishes, for a restricted account as well as an
+authenticated one, so whatever raises the gate reads it from app state rather than asking
+GameKit again.
+Entering means the deliberate step: choosing either online option in New Game — inviting a
+friend or starting an anonymous game — or accepting an invitation. Opening an online game
+that already exists — from the open-games list or from a "your turn" notification — is
+playing, not entering, and raises nothing. The game has no outbound links today — no in-app
+support URL, no social links, no
+advertising — so purchases and online play are the only triggers that currently exist. If
+an outbound link is ever added, it needs the gate too — that is a thing to remember rather
+than a thing already handled. What the gate asks, and how long a pass lasts, is **In-App
+Purchases and Entitlements** above. What online play is, is **Online Play** above.
+
+**The gate exists as one service with two guards** — one for a purchase, one for entry into
+online play — and the online guard is handed a session that has already been resolved. It
+authenticates nothing itself and sends no platform call. A restricted account is refused
+without asking: Apple has said multiplayer is not allowed for it, so there is nothing to
+enter, and `isUnderage` is never read on that path because the refusal comes first. A session
+that is unauthenticated or still in flight is not gated either — the guard answers that there
+is nothing to decide from and runs nothing, because the entry point signs in before it calls
+and the matchmaker refuses an unsigned player anyway. An adult account runs straight through
+with nothing on screen, and a child's account is asked.
 
 ## Crash Reporting
 
@@ -1302,10 +2497,10 @@ So the error handling and the report object are day-one work; the transport is n
 destination is deliberately left for later rather than being an open question — today's
 answer is "nowhere."
 
-This keeps **Fully offline, except for in-app purchases.** under **What the Design Docs
-Already Imply** above true for now. StoreKit being permitted does not make a report
-destination permitted — those are two separate exceptions, and this one stops being true
-the day a destination is chosen.
+This keeps **Fully offline, except for Apple's own services.** under **What the Design
+Docs Already Imply** above true for now. StoreKit and Game Center being permitted does not
+make a report destination permitted — those are separate exceptions, and this one stops
+being true the day a destination is chosen.
 
 **No off-the-shelf crash SDK is used.** Crashlytics, Sentry and the rest all assume a
 destination and a network, and there is neither — so none is added, and no HTTP or socket
@@ -1372,9 +2567,9 @@ redirected later — to wherever reports are eventually sent — without touchin
 caller.
 
 The console is a developer-facing log, not a transmission. It does not make a report
-destination chosen, and **Fully offline, except for in-app purchases.** stays true. What
-reaches the console is the report rendered as text, so the contract above governs what it
-can say.
+destination chosen, and **Fully offline, except for Apple's own services.** stays true.
+What reaches the console is the report rendered as text, so the contract above governs what
+it can say.
 
 ### Reports are held in memory
 **A report is kept in memory and goes no further.** It is written to no file and to
@@ -1675,11 +2870,13 @@ answered by hand on every upload — a step to forget rather than a decision to 
 the app ever ships its own cryptography, the answer changes and so does the filing.
 
 ### What the record declares about data collection
-**Nothing is transmitted, so the privacy nutrition label's answer for the build being
-submitted is "no data collected."** The app operates no server of its own: entitlements
-live with Apple and are verified on device, crash reports are built and never sent, and
-there is no analytics or advertising SDK to declare — see **Crash Reporting** and
-**In-App Purchases and Entitlements** above.
+**Nothing of the player's is transmitted to anyone but Apple, so the privacy nutrition
+label's answer for the build being submitted is "no data collected."** The app operates no
+server of its own: entitlements live with Apple and are verified on device, an online
+game's board and the player's identity live in an Apple Game Center match, crash reports
+are built and never sent, and there is no analytics or advertising SDK to declare — see
+**Crash Reporting**, **In-App Purchases and Entitlements** and **Online Play** above. Game
+Center is Apple, not a third party, which is what keeps the answer "no data collected".
 
 **It is not settled beyond that build.** Whatever a crash report ends up carrying is
 what a future destination would send, and that is what the label would then have to
@@ -1840,12 +3037,6 @@ block other work.
 - What is the player shown for each of the four purchase endings? Pending is the one that
   needs real copy — the player is being told to wait for someone else, and under the Kids
   Category that is the common case rather than the rare one.
-- Which store plugin sits behind the purchase layer. Nothing is chosen, and it is the
-  largest single thing standing between this section and a build. Whichever it is has to
-  expose the StoreKit 2 semantics this section depends on — the current-entitlements query,
-  the ability to re-issue it on demand, the explicit restore call, and the stream of
-  transactions that resolve out of band. Not every Flutter plugin surfaces all four. See
-  Platform and Targets → Minimum iOS version.
 - Can a paid theme ever be a product whose theme file is not on the device? If every paid
   theme ships in the build and a purchase merely unlocks it, the model only ever gates
   content the device already has. If a paid theme can arrive any other way, it has to handle
@@ -1856,3 +3047,17 @@ block other work.
   and Release states that the first release carries a theme product, and a theme product
   cannot be configured before the theme it sells exists. The theme itself is deferred as not
   needed right now. Whether those are the same point in time is not stated.
+
+### 12. Online play — what the player is told
+- Should a re-delivered identical board be visible to the player at all, or silently
+  ignored? The data side is settled — nothing is written, and it is reported as its own
+  outcome — but nothing says whether the player sees anything.
+- What happens when a payload arrives carrying a version this build does not recognise,
+  beyond the rejection itself — whether the player is told the other device is on a newer
+  version, and whether that is distinguishable to them from a corrupt payload.
+- What does the player see for a sign-in that fails or is declined, for a cancelled
+  matchmaker, for a move Game Center would not take, and for a GameKit error the bridge
+  reports? Each comes back as its own value; a send the board screen made is the one that
+  now draws something — a message, a retry and a way out — and nothing renders the rest.
+  The calm, kid-facing message a restricted account gets is decided in **Online Play**
+  above, but its wording is not, and neither is the failed send's.

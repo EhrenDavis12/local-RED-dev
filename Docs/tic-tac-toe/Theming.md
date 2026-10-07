@@ -55,9 +55,9 @@ legal implementation at all — the feature doesn't ship, and scheduling doesn't
 because no amount of later authoring changes what a developer can write today. This can't
 wait.
 
-A missing colour is the ugly case — a delete button renders unstyled, which is legal and
+A missing colour is the ugly case — a control renders unstyled, which is legal and
 shippable. A missing icon, where there's no slot to read and no permitted literal, is the
-impossible case — the button can't be drawn at all. One is debt, the other a deadlock, and
+impossible case — the control can't be drawn at all. One is debt, the other a deadlock, and
 treating them the same schedules the wrong one.
 
 **Ask that about a slot's *shape*, not only about whether it exists.** A slot that exists
@@ -236,10 +236,11 @@ Two consequences:
   authoritative where they differ.
 - Where the handoff draws no value at all, transcription cannot help and those values need
   authoring from scratch. The trash button and the delete confirmation's treatments were
-  decided after the handoff was drawn, so nothing draws them. The settings purchases
-  section has no approved screen showing it. And how far the mark grows in its pop is
-  nowhere: the handoff gives the pop a duration and an easing but never a magnitude.
-  Those gaps stay open.
+  decided after the handoff was drawn, so nothing draws them; the trash button's is
+  authored anyway, because it is never left unstyled — see **What a Theme Controls**. The
+  settings purchases section has no approved screen showing it. And how far the mark grows
+  in its pop is nowhere: the handoff gives the pop a duration and an easing but never a
+  magnitude. Those remaining gaps stay open.
 
 ### Watch out for
 A partial theme inherits Neon's *personality*, not just its values. Classic Red vs Blue
@@ -264,7 +265,9 @@ because they now have to read against the background rather than against a card.
 
 ## Theme Catalog
 
-**Three themes ship at launch — Neon, Classic Red vs Blue and Sewing.**
+**Five themes ship — Neon, Classic Red vs Blue, Sewing, Robot Workshop and Dino Jungle.**
+Robot Workshop and Dino Jungle are built from the design handoff's
+`robot-workshop.theme.json` and `dino-jungle.theme.json`.
 
 ### Theme 1 — Neon (base)
 The first theme. The look:
@@ -351,15 +354,17 @@ to it, achieved with shadows.
   behind Player One, Cat and Player Two, so the three read as three rather than as one
   strip.
 - **Every button is a spool of thread**, at every tier — not only the large main-menu
-  pair: *"We allso need the spools of threads to be for all the buttens this include the
-  Settings and About Us on the main page. The saved games, and the Exit to Main Menu"*
+  buttons: *"We allso need the spools of threads to be for all the buttens this include
+  the Settings and About Us on the main page. The saved games, and the Exit to Main Menu"*
 - **The settings icon is a thimble.**
 - **The four lines inside each small board are sewing needles.**
 - **The four separator lines on the big board are a deep blue twisting ribbon**, with a
   V-cut at each end, drawn in the gap between the quadrants. It is deep so it stays
   clearly darker than the pale blue cloth it is drawn on.
 - **The win line is the same ribbon art** — Sewing binds its win-line slot to the same
-  ribbon used for the big-board grid lines.
+  ribbon used for the big-board grid lines, drawn thicker than the separator ribbon so it
+  reads: `winLineWidth` 5 and `bigBoardWinLineWidth` 14 as starting values, tuned by
+  playtesting, since the ribbon was too thin to see at grid-line thickness.
 
 *"What if the inner boards are sewing needles those would be thin as needed to prevent
 the crouded ness. And the large board is the ribbons. This should add a deabth of detail
@@ -375,14 +380,74 @@ merge; Sewing is designed to be looked at, so its art is authored rather than in
 **Sewing snips.** Its signature sound is a scissor snip — a short, crisp cut of fabric
 scissors, as distinct from Neon's electric buzz and Classic's wet splat.
 
+### Theme 4 — Robot Workshop
+Steel plates and hazard stripes; red gear against blue bolt. Built for ages 5–8, which
+drives the whole treatment.
+
+- **The construction rules are the theme's signature:** flat saturated fills; a 3–5px dark
+  (`#16202b`) outline on every element; solid offset drop shadows (a visible bottom edge),
+  never blurred ones; chunky radii; nothing soft-glowed except the forced-quadrant ring.
+- **Type is heavier and bigger than Neon everywhere** — 700 weight is the default for
+  anything a child reads, not an emphasis.
+- **Marks:** a red gear (Player One) and a blue hex bolt (Player Two) — different
+  silhouette as well as different color.
+- **The ground is riveted blue-grey steel.** Small-board lines are scored seams in the
+  plate. Big-board separators are yellow/black hazard girders laid across the gaps, never
+  touching a quadrant. The dead board is a rust patch labelled SCRAP.
+- **Buttons and panels are steel plates** with the outline and the solid shadow step; the
+  primary button is the accent yellow.
+- **Two contrast rules that must not be undone** (both were measured failures before they
+  were fixed): the wordmark/title plate is dark (`#2b3a4c`) because the `#ffc82c` wordmark
+  measured 2.14:1 on the light plate and 7.48:1 on the dark one; labels on the saturated
+  player chips use a near-black of their own hue, not white — white on `#2bc4f5` measured
+  2.04:1, white on `#ff4433` 3.44:1.
+- **Copy is not part of the theme:** the JSON names the players Red and Blue and relabels
+  the ties chip SCRAP, but the words on screen are fixed in code (see **What a Theme Does
+  NOT Control**), so only the art carries those names — the SCRAP label lives inside the
+  dead-board patch's own image.
+
+**Signature sound:** a **clank**. Its sound set and animation set are still to author;
+until then it inherits Neon's sounds by the fallback rule and Neon's animation timings.
+
+**Robot Workshop as drawn:**
+`Docs/tic-tac-toe/design_handoff_game_ui/robot-workshop.theme.json`; screens 4a in the
+design file (menu, board, winner).
+
+### Theme 5 — Dino Jungle
+A candidate kept as a second theme option: colors and geometry are final, the direction
+is not approved. Built and shipped so it can be tested.
+
+- Same construction rules as Robot Workshop (flat fills, a 3–4px `#10382a` outline on
+  every element, solid offset shadows, chunky radii, 700-weight type) on a jungle-green
+  ground with leaf-blade stripes.
+- **Marks:** an orange T-Rex footprint (Player One) and a violet Stegosaurus plate
+  (Player Two).
+- Small-board lines are vines. Big-board separators are bamboo poles laid across the
+  gaps, carrying darker node bands. The dead board is a mud puddle labelled MUD.
+- Panels and secondary buttons are cream; the title plate is dark green because the
+  orange wordmark measured 2.22:1 on cream. Labels on the orange chip use a near-black of
+  the hue, not white (2.36:1). Mid-green text on cream must be `#18664a` or darker —
+  `#27865c` measured 4.25:1 and just missed.
+- Copy is not part of the theme, same as Robot Workshop: T-Rex/Stego and MUD are art
+  only.
+
+**Signature sound:** a **roar**. Sound and animation sets still to author; inherits
+Neon's by the fallback rule for now.
+
+**Dino Jungle as drawn:**
+`Docs/tic-tac-toe/design_handoff_game_ui/dino-jungle.theme.json`; screens 4b in the
+design file.
+
 ---
 
 ## Free and Paid Themes
 **Which themes are free is answered outside the theme file, and today every theme that
-ships is free.** Neon, Classic Red vs Blue and Sewing all ship free. Sewing is intended
-to become a paid theme once purchasing is in place, and that flow is not built yet. The
-theme selection list **labels** which themes are free and which are paid, so a paid theme
-drops in without redrawing the screen.
+ships is free.** Neon, Classic Red vs Blue, Sewing, Robot Workshop and Dino Jungle all
+ship free. Sewing is intended to become a paid theme once purchasing is in place, and
+that flow is not built yet. Robot Workshop and Dino Jungle ship free for now too, so they
+can be tested — *"For now make them free so we can test them."* The theme selection list
+**labels** which themes are free and which are paid, so a paid theme drops in without
+redrawing the screen.
 
 *"Ship it now for free but this will morelikly become a paid theme after we get payments
 inplace."*
@@ -427,6 +492,13 @@ Everything visual and audible. Rough list, not exhaustive:
   triple, on a small-board or a big-board win — a theme image slot of its own, the same
   pattern as the game's other image slots. See [Animations](./Animations.md) → Where
   Animations Fire.
+- **Win-line thickness is themed**, under `board:`, following the existing small/big
+  naming convention — `winLineWidth` for the small-board win line and
+  `bigBoardWinLineWidth` for the big-board win line. Neon's values reproduce today's
+  rendering exactly: `winLineWidth` 1.5, `bigBoardWinLineWidth` 8. These widths are the win
+  line's own, not the grid lines'; they are NOT bounded by the small-board line's gutter
+  ceiling or the big-board separator's gap-width ceiling, because the win line draws over
+  cells and quadrants, not inside a fixed gap.
 - **Last-move highlight** — the exaggerated treatment on the opponent's most recent mark
 - **Active-quadrant highlight** — where you're allowed to play
 - **Locked/inactive quadrant styling** — the dimmed state on the eight you can't play in
@@ -479,7 +551,12 @@ Everything visual and audible. Rough list, not exhaustive:
 - **Chrome icons** — the settings icon, close X, chevrons, plus, and the trash button on
   an open-game row. A theme may either name a glyph from a bundled icon set or ship its
   own image. The gear is Neon's art for the settings icon, not the name of the slot —
-  Sewing draws a thimble there.
+  Sewing draws a thimble there. **Every theme styles the trash button** — its colour, and
+  its own art where the theme ships art — and it is never drawn in an unstyled default:
+  *"The game delete button needs to follow the theme in some way otherwise it look bad."*
+  The grip is a chrome icon too (`slideGrip`), and the trash button's plate is an image slot
+  (`deleteButton`) with a fill colour behind it when a theme ships no art; the peek is an
+  animation slot (`deletePeek`) a theme may clear.
 
 > **Every theme must keep these legible.** The last-move highlight and active-quadrant
 > highlight are *gameplay-critical*, not decoration — a theme that makes them hard to spot
@@ -733,9 +810,14 @@ Themes still control colour, marks, sounds, icons, animation, radii and the type
 Spacing and padding is the one slot pulled out of the inventory, and "for now" is the
 user's own hedge — this is reversible if the enforcement story changes.
 
-**A theme styles text; it does not write it.** The words themselves are fixed in code —
-the scoreboard's three chip labels, the settings toggles' names and their sub-labels. A
-theme sets their size, weight, tracking and colour; the strings are content, not style.
+**A theme styles text; it does not write it.** The words themselves are fixed in code — the
+scoreboard's chip labels, the settings toggles' names and their sub-labels — with one
+exception: on an online game every piece of text that names a player carries that player's
+Game Center account name instead. That is the two player chips (see
+[Game Board Design](./Game%20Board%20Design.md) → Scoreboard), the turn banner while it
+waits on the opponent, the win display, and the result card's win line and its
+who-goes-first-next line. A theme sets their size, weight, tracking and colour either way;
+the strings are content, not style, whichever of the two they come from.
 
 **Stated in its own terms:** a theme controls **everything visual about the game except the
 placement of objects** — the art, the icons, the images, the music and the sound effects

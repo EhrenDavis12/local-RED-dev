@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-8d34aa70-bd87-4199-9b49-90eb65f48fbb/styles.css">
+<script src="_ds/nocturne-8d34aa70-bd87-4199-9b49-90eb65f48fbb/_ds_bundle.js"></script>
+</helmet>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%">
+  <sc-for list="{{ quads }}" as="q" hint-placeholder-count="9">
+    <div style="position:relative;padding:5px;border-radius:9px;background:#12142099;box-shadow:0 0 0 1.5px rgba(79,195,255,0.5),0 0 14px rgba(79,195,255,0.16),inset 0 0 12px rgba(79,195,255,0.06)">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px">
+        <sc-for list="{{ q.cells }}" as="c" hint-placeholder-count="9">
+          <div style="position:relative;aspect-ratio:1;background:transparent;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:19px;line-height:1">
+            <sc-if value="{{ c.x }}" hint-placeholder-val="{{ false }}"><span style="color:#ff5c85;text-shadow:0 0 12px rgba(255,61,113,0.95),0 0 3px rgba(255,180,200,0.9)">✕</span></sc-if>
+            <sc-if value="{{ c.o }}" hint-placeholder-val="{{ false }}"><span style="color:#4dffb0;text-shadow:0 0 12px rgba(45,255,158,0.9),0 0 3px rgba(200,255,230,0.85)">○</span></sc-if>
+            <sc-if value="{{ c.ghostX }}" hint-placeholder-val="{{ false }}"><span style="color:#ff5c85;opacity:.4">✕</span></sc-if>
+            <sc-if value="{{ c.ghostO }}" hint-placeholder-val="{{ false }}"><span style="color:#4dffb0;opacity:.4">○</span></sc-if>
+            <sc-if value="{{ c.pending }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:-1px;border-radius:5px;border:2px dashed #e9e9ed;opacity:.85;z-index:4"></span></sc-if>
+            <sc-if value="{{ c.last }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:-1px;border-radius:5px;border:2px solid #d2cefd;box-shadow:0 0 14px 3px rgba(181,171,252,0.9),inset 0 0 8px rgba(181,171,252,0.4);z-index:4"></span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <span style="position:absolute;inset:5px;pointer-events:none">
+        <span style="position:absolute;top:9%;bottom:9%;left:33.33%;width:1.5px;margin-left:-0.75px;border-radius:2px;background:#4fc3ff;opacity:.75;box-shadow:0 0 7px rgba(79,195,255,0.9)"></span>
+        <span style="position:absolute;top:9%;bottom:9%;left:66.67%;width:1.5px;margin-left:-0.75px;border-radius:2px;background:#4fc3ff;opacity:.75;box-shadow:0 0 7px rgba(79,195,255,0.9)"></span>
+        <span style="position:absolute;left:9%;right:9%;top:33.33%;height:1.5px;margin-top:-0.75px;border-radius:2px;background:#4fc3ff;opacity:.75;box-shadow:0 0 7px rgba(79,195,255,0.9)"></span>
+        <span style="position:absolute;left:9%;right:9%;top:66.67%;height:1.5px;margin-top:-0.75px;border-radius:2px;background:#4fc3ff;opacity:.75;box-shadow:0 0 7px rgba(79,195,255,0.9)"></span>
+      </span>
+      <sc-if value="{{ q.dest }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:-3px;border-radius:12px;border:2px dashed #e9e9ed;opacity:.8;background:rgba(233,233,237,0.05);z-index:3;pointer-events:none"></span>
+      </sc-if>
+      <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:0;border-radius:9px;box-shadow:0 0 0 1.5px rgba(79,195,255,0.85),0 0 20px rgba(79,195,255,0.35);pointer-events:none"></span>
+      </sc-if>
+      <sc-if value="{{ q.locked }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:0;border-radius:9px;background:rgba(15,16,26,0.5);z-index:2;pointer-events:none"></span>
+      </sc-if>
+      <sc-if value="{{ q.forced }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:-3px;border-radius:12px;border:2px solid #b57cff;box-shadow:0 0 20px 5px rgba(181,124,255,0.6),inset 0 0 16px rgba(181,124,255,0.3);z-index:3;pointer-events:none"></span>
+      </sc-if>
+      <sc-if value="{{ q.cx }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:0;border-radius:9px;background:rgba(15,16,26,0.76);z-index:2;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:56px;line-height:1;color:#ff5c85;text-shadow:0 0 26px rgba(255,61,113,0.95)">✕</span>
+      </sc-if>
+      <sc-if value="{{ q.co }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:0;border-radius:9px;background:rgba(15,16,26,0.76);z-index:2;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:52px;line-height:1;color:#4dffb0;text-shadow:0 0 26px rgba(45,255,158,0.9)">○</span>
+      </sc-if>
+      <sc-if value="{{ q.cat }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;inset:0;border-radius:9px;background:rgba(15,16,26,0.76);z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:Inter,system-ui,sans-serif;line-height:1;color:#9aa2c2;text-shadow:0 0 22px rgba(154,162,194,0.75)"><span style="font-weight:500;font-size:44px">Ø</span><span style="font-weight:500;font-size:8px;letter-spacing:0.16em;opacity:.8">CAT</span></span>
+      </sc-if>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:370,&quot;height&quot;:370},&quot;quads&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Array&lt;{cells:Array&lt;{x?:boolean,o?:boolean,last?:boolean}&gt;,open?:boolean,locked?:boolean,forced?:boolean,cx?:boolean,co?:boolean,cat?:boolean}&gt;&quot;}}"></script>
+</body>
+</html>

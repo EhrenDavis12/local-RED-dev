@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-8d34aa70-bd87-4199-9b49-90eb65f48fbb/styles.css">
+<script src="_ds/nocturne-8d34aa70-bd87-4199-9b49-90eb65f48fbb/_ds_bundle.js"></script>
+</helmet>
+<div style="position:relative;width:100%">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%">
+    <sc-for list="{{ quads }}" as="q" hint-placeholder-count="9">
+      <div style="position:relative;padding:6px;border-radius:7px;background:rgba(105,74,38,0.18);box-shadow:inset 0 2px 5px rgba(58,38,14,0.35),inset 0 -1px 0 rgba(255,234,190,0.25)">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
+          <sc-for list="{{ q.cells }}" as="c" hint-placeholder-count="9">
+            <div style="position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center">
+              <sc-if value="{{ c.x }}" hint-placeholder-val="{{ false }}">
+                <span style="position:relative;width:21px;height:21px;display:block">
+                  <span style="position:absolute;left:2px;top:1px;width:3px;height:19px;border-radius:2px;background:linear-gradient(180deg,#e2552f,#9c2a12);transform:rotate(13deg);box-shadow:0 1px 0 rgba(255,220,190,.35)"></span>
+                  <span style="position:absolute;left:9px;top:0;width:3px;height:21px;border-radius:2px;background:linear-gradient(180deg,#e2552f,#9c2a12);box-shadow:0 1px 0 rgba(255,220,190,.35)"></span>
+                  <span style="position:absolute;left:16px;top:1px;width:3px;height:19px;border-radius:2px;background:linear-gradient(180deg,#e2552f,#9c2a12);transform:rotate(-13deg);box-shadow:0 1px 0 rgba(255,220,190,.35)"></span>
+                </span>
+              </sc-if>
+              <sc-if value="{{ c.o }}" hint-placeholder-val="{{ false }}">
+                <span style="width:22px;height:19px;display:block;background:linear-gradient(180deg,#5da362,#2f6b3c);clip-path:polygon(50% 0,100% 100%,0 100%);filter:drop-shadow(0 1px 0 rgba(230,255,220,.35))"></span>
+              </sc-if>
+              <sc-if value="{{ c.ghostX }}" hint-placeholder-val="{{ false }}">
+                <span style="position:relative;width:21px;height:21px;display:block;opacity:.38">
+                  <span style="position:absolute;left:2px;top:1px;width:3px;height:19px;border-radius:2px;background:#9c2a12;transform:rotate(13deg)"></span>
+                  <span style="position:absolute;left:9px;top:0;width:3px;height:21px;border-radius:2px;background:#9c2a12"></span>
+                  <span style="position:absolute;left:16px;top:1px;width:3px;height:19px;border-radius:2px;background:#9c2a12;transform:rotate(-13deg)"></span>
+                </span>
+              </sc-if>
+              <sc-if value="{{ c.ghostO }}" hint-placeholder-val="{{ false }}">
+                <span style="width:22px;height:19px;display:block;opacity:.38;background:#2f6b3c;clip-path:polygon(50% 0,100% 100%,0 100%)"></span>
+              </sc-if>
+              <sc-if value="{{ c.pending }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:-2px;border-radius:4px;border:2px dashed #fff6e2;z-index:4"></span></sc-if>
+              <sc-if value="{{ c.last }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:-2px;border-radius:4px;border:2px solid #fff6e2;box-shadow:0 0 0 1px rgba(90,60,24,.5),0 0 10px rgba(255,246,226,.7);z-index:4"></span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <span style="position:absolute;inset:6px;pointer-events:none">
+          <span style="position:absolute;top:8%;bottom:8%;left:33.33%;width:2px;margin-left:-1px;border-radius:2px;background:linear-gradient(180deg,rgba(247,238,214,.25),#f2e6c8 18%,#f2e6c8 82%,rgba(247,238,214,.25));box-shadow:0 0 0 .5px rgba(84,56,22,.35)"></span>
+          <span style="position:absolute;top:8%;bottom:8%;left:66.67%;width:2px;margin-left:-1px;border-radius:2px;background:linear-gradient(180deg,rgba(247,238,214,.25),#f2e6c8 18%,#f2e6c8 82%,rgba(247,238,214,.25));box-shadow:0 0 0 .5px rgba(84,56,22,.35)"></span>
+          <span style="position:absolute;left:8%;right:8%;top:33.33%;height:2px;margin-top:-1px;border-radius:2px;background:linear-gradient(90deg,rgba(247,238,214,.25),#f2e6c8 18%,#f2e6c8 82%,rgba(247,238,214,.25));box-shadow:0 0 0 .5px rgba(84,56,22,.35)"></span>
+          <span style="position:absolute;left:8%;right:8%;top:66.67%;height:2px;margin-top:-1px;border-radius:2px;background:linear-gradient(90deg,rgba(247,238,214,.25),#f2e6c8 18%,#f2e6c8 82%,rgba(247,238,214,.25));box-shadow:0 0 0 .5px rgba(84,56,22,.35)"></span>
+        </span>
+        <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:0;border-radius:7px;box-shadow:inset 0 0 0 1.5px rgba(255,176,32,0.5);pointer-events:none"></span>
+        </sc-if>
+        <sc-if value="{{ q.locked }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:0;border-radius:7px;background:rgba(178,136,82,0.58);z-index:2;pointer-events:none"></span>
+        </sc-if>
+        <sc-if value="{{ q.dest }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:-4px;border-radius:11px;border:2px dashed #fff6e2;background:rgba(255,246,226,0.08);z-index:3;pointer-events:none"></span>
+        </sc-if>
+        <sc-if value="{{ q.forced }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:-4px;border-radius:11px;border:3px solid #ffb020;box-shadow:0 0 18px 4px rgba(255,176,32,0.55),inset 0 0 14px rgba(255,176,32,0.25);z-index:3;pointer-events:none"></span>
+        </sc-if>
+        <sc-if value="{{ q.cx }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:0;border-radius:7px;background:rgba(156,42,18,0.2);z-index:2;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(156,42,18,.55)">
+            <span style="position:relative;width:62px;height:62px;display:block">
+              <span style="position:absolute;left:6px;top:3px;width:9px;height:56px;border-radius:6px;background:linear-gradient(180deg,#e2552f,#8d2410);transform:rotate(13deg)"></span>
+              <span style="position:absolute;left:26px;top:0;width:9px;height:62px;border-radius:6px;background:linear-gradient(180deg,#e2552f,#8d2410)"></span>
+              <span style="position:absolute;left:46px;top:3px;width:9px;height:56px;border-radius:6px;background:linear-gradient(180deg,#e2552f,#8d2410);transform:rotate(-13deg)"></span>
+            </span>
+          </span>
+        </sc-if>
+        <sc-if value="{{ q.co }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:0;border-radius:7px;background:rgba(47,107,60,0.22);z-index:2;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(47,107,60,.6)">
+            <span style="width:64px;height:55px;display:block;background:linear-gradient(180deg,#5da362,#265c33);clip-path:polygon(50% 0,100% 100%,0 100%)"></span>
+          </span>
+        </sc-if>
+        <sc-if value="{{ q.cat }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:0;border-radius:7px;background:rgba(28,20,12,0.62);z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+            <span style="width:46px;height:30px;border-radius:50% 50% 45% 55%/60% 55% 45% 40%;background:radial-gradient(60% 60% at 40% 30%,#4a3a2a,#120c07);box-shadow:inset 0 2px 3px rgba(255,220,170,.2)"></span>
+            <span style="font:500 8px Inter,system-ui,sans-serif;letter-spacing:.16em;color:#d8c49a">TAR PIT</span>
+          </span>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+  <span style="position:absolute;inset:0;pointer-events:none">
+    <span style="position:absolute;top:-3px;bottom:-3px;left:32.7%;width:9px;margin-left:-4.5px;border-radius:6px;background:linear-gradient(90deg,#a98a5e,#f6ecd2 35%,#efe1c0 65%,#9d7d52);box-shadow:0 2px 6px rgba(48,30,12,.55),inset 0 0 0 1px rgba(120,88,44,.35)"></span>
+    <span style="position:absolute;top:-3px;bottom:-3px;left:67.3%;width:9px;margin-left:-4.5px;border-radius:6px;background:linear-gradient(90deg,#a98a5e,#f6ecd2 35%,#efe1c0 65%,#9d7d52);box-shadow:0 2px 6px rgba(48,30,12,.55),inset 0 0 0 1px rgba(120,88,44,.35)"></span>
+    <span style="position:absolute;left:-3px;right:-3px;top:32.7%;height:9px;margin-top:-4.5px;border-radius:6px;background:linear-gradient(180deg,#a98a5e,#f6ecd2 35%,#efe1c0 65%,#9d7d52);box-shadow:0 2px 6px rgba(48,30,12,.55),inset 0 0 0 1px rgba(120,88,44,.35)"></span>
+    <span style="position:absolute;left:-3px;right:-3px;top:67.3%;height:9px;margin-top:-4.5px;border-radius:6px;background:linear-gradient(180deg,#a98a5e,#f6ecd2 35%,#efe1c0 65%,#9d7d52);box-shadow:0 2px 6px rgba(48,30,12,.55),inset 0 0 0 1px rgba(120,88,44,.35)"></span>
+  </span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:370,&quot;height&quot;:370},&quot;quads&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Array&lt;{cells:Array&lt;{x?:boolean,o?:boolean,last?:boolean,pending?:boolean,ghostX?:boolean,ghostO?:boolean}&gt;,open?:boolean,locked?:boolean,forced?:boolean,dest?:boolean,cx?:boolean,co?:boolean,cat?:boolean}&gt;&quot;}}"></script>
+</body>
+</html>

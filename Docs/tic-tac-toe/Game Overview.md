@@ -36,7 +36,9 @@ Variants we've considered but aren't building live in
 The app isn't built around a single one-off game. It's built around **playing several in
 a row on the same phone**:
 
-- A **scoreboard** at the top of the game screen tracks **Player One / Cat / Player Two**.
+- A **scoreboard** at the top of the game screen tracks **Player One / Cat / Player Two** —
+  or, on an online game, each player's Game Center account name in place of Player One and
+  Player Two.
 - When a game is won or tied, the player is offered an option to **continue playing**.
 - Continuing **resets the board**. The score increments at game end, not when continuing
   is taken — see [Menus and UI](./Menus%20and%20UI.md) → Game Over → Rematch.
@@ -52,14 +54,26 @@ open-games list, and its running series is still there.
 The scoreboard is saved along with the game. See
 [Menus and UI](./Menus%20and%20UI.md) → Persistence.
 
-**Always "Player One" and "Player Two"** — no custom names for the players themselves.
+**A game on this phone is always "Player One" and "Player Two"** — no custom names for the
+players themselves.
 
 The opponent name entered at New Game does **not** replace "Player Two" on the in-game
 scoreboard. It titles the game in the open-games list, and nothing else. See
 [Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes You.
 
-With the option to change that later. Don't hardcode the strings in a way that fights
-adding real names down the road.
+**An online game's scoreboard shows the two players' Game Center account names instead**,
+one on each side, in place of Player One and Player Two. Player One and Player Two are what
+two people sharing one phone are called, where there is no account to name either of them;
+online there are two accounts already sitting there. *"i understand Player One and Two when
+on local phone But when online we should have the names of the accounts. Lets use those
+those to our advantage."*
+
+**That holds for every in-game message that names a player, not just the scoreboard.** On an
+online game the turn banner waiting on the opponent, the win display at the end of a game,
+and the result card's win line and its who-goes-first-next line all use that player's Game
+Center account name. Your own turn names nobody — the banner reads *"You're up!"*, there
+being only one player on this phone to address. A game on this phone is Player One and
+Player Two everywhere, with no exception.
 
 ## How a Move Is Made
 Moves are **two taps — select, then confirm:**
@@ -81,7 +95,8 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
   it into "best of" bragging rights between two people sharing a phone.
 
 ## Target Audience & Platform
-- **Phone.** Two players sharing one device, or one player against the AI on their own.
+- **Phone.** Two players sharing one device, or two players each on their own phone over
+  Game Center — see Modes below, or one player against the AI on their own.
 - **Kids are a target audience** — swappable themes exist specifically to make it fun
   for kids. See [Theming](./Theming.md).
 
@@ -89,20 +104,25 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
 <!-- Ultimate Tic Tac Toe, other games, mechanics you liked elsewhere -->
 
 ## Modes
+<<<<<<< HEAD
 **Current scope — two modes:**
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
   Player One → Player Two.
 - **One player against the AI**, at one of three levels — Beginner, Medium or Advanced.
   **The AI is Player Two**, and everything else about a game is the same: the same board,
   the same scoreboard, the same series. See [AI](./AI.md).
+- **Two player, online.** Remote play against someone on their own phone, over Apple Game
+  Center turn-based matches. A match waits as long as it takes for the other player to
+  move, so a game can run over days. Started from **New Game** in the open-games list, by
+  choosing either **Invite a friend** or **Play an anonymous game**. iOS only, and there is
+  no same-room play.
+
 
 Both start from the **Play Game** button on the main menu, and starting a game asks which
 of them it is before it asks anything else.
 
-**No online play** — it is offered in that prompt as **Versus** and disabled, so it is
-visibly coming rather than absent.
-
-See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow.
+See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow, and
+[Tech Design](./Tech%20Design.md) → Online Play for how an online game works.
 
 ## Terminology (working vocabulary)
 - **Big board / bigger board** — the outer 3x3.

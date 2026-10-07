@@ -48,6 +48,8 @@ game-over rematch flow.
 - Main Menu
   - About Us
 - Play Game → Where It Takes You
+  - Starting a game — on this phone or online
+  - Pick your Icon
   - What an open game holds
   - How many open games we keep
   - Deleting an open game
@@ -62,6 +64,7 @@ game-over rematch flow.
   - Vibrate on Touch
   - Purchases
   - How you reach settings from gameplay
+- The Parental Gate
 - Dynamic Type
 - Game Over → Rematch
   - The result card
@@ -143,6 +146,8 @@ The theme system — what a theme is, how it inherits from Neon, and what it con
   - Theme 1 — Neon (base)
   - Theme 2 — Classic Red vs Blue
   - Theme 3 — Sewing
+  - Theme 4 — Robot Workshop
+  - Theme 5 — Dino Jungle
 - Free and Paid Themes
 - What a Theme Controls
 - How a Theme's Art Is Drawn
@@ -209,6 +214,7 @@ release/distribution.
   - Nothing outside the layer puts a surface on screen
   - The layer is reached through a provider
   - Surfaces that stay on top of something are nested
+  - The parental gate is pushed, and that is the one exception
   - Deep links are possible, not wired
 - Rendering the Board
   - Marks — supplied by the theme
@@ -221,6 +227,7 @@ release/distribution.
   - Serialization and the storage layer
   - Every persisted record carries a version stamp
   - What a stored open game holds
+  - What an online game adds to the record
   - The open-games list has a defined order
   - The cap is enforced on create, and the store never evicts
   - Reads return "nothing stored", and defaults resolve above this layer
@@ -239,6 +246,7 @@ release/distribution.
   - Declared in `pubspec.yaml`, or it does not ship
   - Regenerating, and leaving nothing behind
 - In-App Purchases and Entitlements
+  - The store plugin — Flutter's official `in_app_purchase`
   - Entitlements — Apple stores them, no backend needed
   - Ownership is keyed by product, and only the store may change it
   - Committing an answer — all of it, in order, to memory and disk
@@ -246,6 +254,15 @@ release/distribution.
   - Buying ends one of four ways, and one of them ends later
   - Prices come from the store at runtime
   - The parental gate — a word problem, every time
+- Online Play
+  - The board screen drives a turn
+  - The channel contract
+  - Signing in, and the session anything can read
+  - Catching up with Game Center
+  - Presenting Apple's matchmaker
+  - Finding a random opponent without a sheet
+  - The searching screen
+  - A found match becomes a stored game
 - Kids Category
 - Crash Reporting
   - What gets caught
@@ -285,6 +302,7 @@ release/distribution.
   - 9. The rules engine
   - 10. The bundled icon set
   - 11. In-app purchases and entitlements
+  - 12. Online play — what the player is told
 
 ---
 

@@ -7,3 +7,6 @@
 [submodule ".claude"]
 	path = .claude
 	url = git@github.com:EhrenDavis12/.claude.git
+[submodule "src/asset-animation-demo"]
+	path = src/asset-animation-demo
+	url = git@github.com:EhrenDavis12/asset-animation-demo.git

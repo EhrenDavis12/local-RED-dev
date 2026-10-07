@@ -11,9 +11,11 @@ import shutil
 import uuid
 from pathlib import Path, PurePosixPath
 
+import numpy as np
 from PIL import Image
 
 import agf.frames as frames
+import agf.matting as matting
 import agf.provider as provider
 from agf.checks import check_format, check_frame_sizes, check_layout
 from agf.config import Config
@@ -197,8 +199,17 @@ def _run_model_op(config: Config, entry: Entry, credential: str, destination_rel
         key = entry.prompt_key if entry.prompt_key is not None else "prompt"
         inputs[key] = entry.prompt
     for key, ref in (entry.input_files or {}).items():
-        local_path = resolve_reference(config, ref, context=f"entry {entry.name!r} input_files[{key!r}]")
-        inputs[key] = provider.upload(local_path, credential)
+        context = f"entry {entry.name!r} input_files[{key!r}]"
+        if isinstance(ref, list):
+            # A model input that takes several files (reference images,
+            # say) is declared as a list of references and arrives as a
+            # list of URLs, in the order written.
+            inputs[key] = [
+                provider.upload(resolve_reference(config, one, context=context), credential)
+                for one in ref
+            ]
+        else:
+            inputs[key] = provider.upload(resolve_reference(config, ref, context=context), credential)
 
     result = provider.run(entry.resolved_model, inputs, credential)
     version = result["version"]
@@ -272,8 +283,79 @@ def _run_assemble_sheet(config: Config, entry: Entry):
 def _run_extract_frames(config: Config, entry: Entry):
     source_path = resolve_reference(config, entry.source, context=f"entry {entry.name!r} source")
     extracted = frames.extract(source_path, entry.format)
+    if entry.matte is not None:
+        mask_path = resolve_reference(config, entry.matte["mask"], context=f"entry {entry.name!r} matte.mask")
+        masks = frames.extract(mask_path, entry.format)
+        if len(masks) != len(extracted):
+            raise ChecksFailedError(
+                f"matte mask has {len(masks)} frame(s) but the source has {len(extracted)}",
+                remedy="the mask video must be made from this exact source video",
+                checks=[],
+            )
+        matte = entry.matte
+        if matte.get("background", "auto") == "auto":
+            # Resolved once, from the first frame: a burst's later frames
+            # can have foreground in the corners, and re-resolving per
+            # frame would make the key drift with them.
+            first_rgb = np.array(Image.open(io.BytesIO(extracted[0])).convert("RGB")).astype(float)
+            background = matting.background_of(first_rgb, "auto")
+            matte = {
+                **matte,
+                "background": "#{:02x}{:02x}{:02x}".format(*(int(round(c)) for c in background)),
+            }
+        extracted = [
+            matting.apply(frame, mask, matte) for frame, mask in zip(extracted, masks)
+        ]
+    if entry.resize is not None:
+        extracted = [_fit_frame(data, entry.resize, entry.format) for data in extracted]
     basename_template = PurePosixPath(entry.output).name
     return [(basename_template.format(n=i), data) for i, data in enumerate(extracted, start=1)]
+
+
+def _fit_frame(data: bytes, size: list, format: str) -> bytes:
+    """Scale one extracted frame to fit inside `size`, keeping its aspect
+    ratio, centred on a canvas of exactly `size`. PNG canvases are
+    transparent; other formats are black. This is the one place the
+    framework scales, and only because a video model cannot be asked for
+    game-sized frames while a sheet has to be."""
+    width, height = size
+    with Image.open(io.BytesIO(data)) as source:
+        source.load()
+        if format == "png":
+            image = source.convert("RGBA")
+            canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        else:
+            image = source.convert("RGB")
+            canvas = Image.new("RGB", (width, height), (0, 0, 0))
+    scale = min(width / image.width, height / image.height)
+    fitted_size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
+    if format == "png":
+        fitted = _resize_premultiplied(image, fitted_size)
+    else:
+        fitted = image.resize(fitted_size, Image.LANCZOS)
+    offset = ((width - fitted_size[0]) // 2, (height - fitted_size[1]) // 2)
+    canvas.paste(fitted, offset)
+    buffer = io.BytesIO()
+    canvas.save(buffer, format={"png": "PNG", "jpeg": "JPEG", "webp": "WEBP"}[format])
+    return buffer.getvalue()
+
+
+def _resize_premultiplied(image: Image.Image, size: tuple) -> Image.Image:
+    """Resize RGBA with the colour premultiplied by alpha, so transparent
+    pixels' colour cannot bleed into the edge: a straight RGBA resize mixes
+    whatever colour sits under alpha 0 into its neighbours and paints a
+    fringe around every outline."""
+    import numpy as np
+
+    arr = np.asarray(image, dtype=np.float32)
+    alpha = arr[..., 3:4] / 255.0
+    channels = [arr[..., i] * alpha[..., 0] for i in range(3)] + [arr[..., 3]]
+    resized = [np.asarray(Image.fromarray(c).resize(size, Image.LANCZOS)) for c in channels]
+    out_alpha = np.clip(resized[3], 0, 255)
+    denominator = np.maximum(out_alpha / 255.0, 1e-3)[..., None]
+    rgb = np.clip(np.dstack(resized[:3]) / denominator, 0, 255)
+    rgb[out_alpha < 1] = 0
+    return Image.fromarray(np.dstack([rgb, out_alpha]).round().astype(np.uint8), "RGBA")
 
 
 def _run_checks(

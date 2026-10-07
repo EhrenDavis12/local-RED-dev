@@ -1,0 +1,154 @@
+{
+  "id": "5f2c9a41-8e63-4b07-9d15-6a4e3b81c2f7",
+  "name": "Robot Workshop",
+  "blurb": "Steel plates and hazard stripes. Red gear against blue bolt.",
+  "ownership": "free",
+  "status": "APPROVED direction. Colors and geometry final; sounds and animations still to author.",
+  "inheritsFrom": null,
+  "note": "A full override of Neon, not a tint. Screens 4a in the design file. Style rules: flat saturated fills, a 3-4px #16202b outline on EVERY element, solid offset drop shadows (0 Npx 0) instead of blurred shadows, chunky radii. Nothing is soft-glowed except the forced-quadrant ring.",
+
+  "color": {
+    "ground": "#55677d",
+    "groundGradient": "linear-gradient(180deg,#63768d,#3e4e61)",
+    "groundRivets": "radial-gradient(circle at 8px 8px,rgba(255,255,255,.09) 2px,transparent 2.5px), radial-gradient(circle at 28px 28px,rgba(22,32,43,.16) 2px,transparent 2.5px) — 40px tile",
+    "outline": "#16202b",
+    "outlineWidth": "3px on chips and quadrants, 4px on buttons and panels, 5px on modals",
+    "plate": "#7b8fa6",
+    "plateGradient": "linear-gradient(180deg,#7b8fa6,#5f7488)",
+    "plateDark": "#5c7089",
+    "titlePlate": "#2b3a4c",
+    "shadowStep": "#2b3a4c",
+    "seam": "#2b3a4c",
+    "rivet": "#c9d6e3",
+
+    "text": "#eef3f8",
+    "textOnPlate": "#16202b",
+    "textMuted": "#9fb4c9",
+
+    "playerOne": "#ff4433",
+    "playerOneLight": "#ff6a55",
+    "playerOneShadow": "#a8261a",
+    "playerOneInk": "#320601",
+    "playerTwo": "#2bc4f5",
+    "playerTwoShadow": "#146a90",
+    "playerTwoInk": "#08303f",
+
+    "accent": "#ffc82c",
+    "accentGradient": "linear-gradient(180deg,#ffd75a,#ffb700)",
+    "accentShadow": "#b37c00",
+
+    "highlightForced": "#ffc82c",
+    "highlightLastMove": "#ffffff",
+    "highlightPending": "#ffffff (dashed)",
+
+    "catGame": "#8a6a4a",
+    "catGameLabel": "#fff2df",
+    "veilLocked": "rgba(22,32,43,0.50)",
+    "scrim": "rgba(22,32,43,0.62)"
+  },
+
+  "marks": {
+    "playerOne": {
+      "kind": "shape",
+      "name": "gear",
+      "build": "two stacked rounded squares (0deg + 45deg) in #ff4433 over a #16202b silhouette 2.5px larger, a #ff6a55 inner circle with an inset top highlight, and a #16202b centre hole",
+      "sizes": { "cell": 23, "claimedQuadrant": 68, "resultModal": 78 }
+    },
+    "playerTwo": {
+      "kind": "shape",
+      "name": "hex bolt",
+      "build": "hexagon clip-path polygon(25% 2%,75% 2%,100% 50%,75% 98%,25% 98%,0 50%) in #2bc4f5 over a #16202b hexagon 2.5px larger, a white 45% trapezoid highlight across the top, and a #16202b centre hole",
+      "sizes": { "cell": 23, "claimedQuadrant": 68, "resultModal": 78 }
+    },
+    "catGame": {
+      "kind": "patch",
+      "name": "rust / SCRAP",
+      "build": "three overlapping rust radial-gradients (#d67a3c, #a05626, #784622) on #8a6a4a, with a 700-weight 11px SCRAP label in #fff2df",
+      "label": "SCRAP"
+    }
+  },
+
+  "board": {
+    "outerGap": 13,
+    "quadrantPadding": 6,
+    "quadrantRadius": 9,
+    "innerGap": 2,
+    "quadrant": "linear-gradient(180deg,#7b8fa6,#5f7488), 0 0 0 3px #16202b, inset 0 3px 0 rgba(255,255,255,.28), inset 0 -3px 0 rgba(22,32,43,.3)",
+    "quadrantRivets": "4px #c9d6e3 circles with a 1.5px #16202b ring, one per quadrant corner, inset 4px",
+    "smallGridLines": "3px #2b3a4c rounded bars, inset 7% from each end, with a 1px white-22% lit edge — scored seams in the plate",
+    "bigGridLines": "11px hazard girders laid ACROSS the gaps (never touching a quadrant): repeating-linear-gradient(135deg,#ffc82c 0 7px,#16202b 7px 14px), 0 0 0 2.5px #16202b, 0 3px 6px rgba(10,18,26,.5), radius 3, positioned at 32.8% and 67.2%, inset -4px on the cross axis",
+    "openRing": "inset 0 0 0 3px rgba(255,200,44,.75)",
+    "forcedRing": "4px solid #ffc82c, offset -5, radius 13, 0 0 0 2px #16202b + 0 0 20px 5px rgba(255,200,44,.7)",
+    "lastMoveRing": "3px solid #ffffff, offset -2, radius 5, 0 0 0 2px #16202b + 0 0 12px rgba(255,255,255,.8)",
+    "pendingRing": "3px dashed #ffffff, offset -2, radius 5",
+    "destinationRing": "3px dashed #ffffff, offset -5, radius 13, over rgba(255,255,255,0.10)"
+  },
+
+  "controls": {
+    "buttonPrimary": "linear-gradient(180deg,#ffd75a,#ffb700), text #16202b, 0 0 0 4px #16202b + 0 7px 0 #b37c00 + inset 0 4px 0 rgba(255,255,255,.5), radius 16, padding 22, 26px/700",
+    "buttonSecondary": "linear-gradient(180deg,#3bcdf9,#1f9fd4), text #eef3f8, 0 0 0 4px #16202b + 0 7px 0 #146a90, radius 16",
+    "buttonTertiary": "linear-gradient(180deg,#8399b1,#5c7089), text #eef3f8, 0 0 0 4px #16202b + 0 6px 0 #2b3a4c, radius 14, 17px/700",
+    "iconButton": "48x48, accent gradient, radius 13, 0 0 0 3px #16202b + 0 4px 0 #b37c00",
+    "scoreChip": "#7b8fa6 plate, radius 12, 0 0 0 3px #16202b + 0 4px 0 #2b3a4c; the active player's chip swaps to their color with their own shadow step",
+    "panel": "#7b8fa6, radius 22, 0 0 0 5px #16202b + 0 9px 0 #2b3a4c + inset 0 5px 0 rgba(255,255,255,.32)",
+    "titlePlate": "#2b3a4c, radius 16, 0 0 0 4px #16202b + 0 7px 0 #1b2735 — dark ON PURPOSE so the #ffc82c wordmark clears 4.5:1",
+    "versionPill": "#ffc82c, radius 999, 0 0 0 3px #16202b, 12px/600 #16202b"
+  },
+
+  "type": {
+    "family": "Inter",
+    "weights": { "body": 600, "bold": 700 },
+    "note": "Built for ages 5-8: heavier and larger than Neon throughout. 700 weight is the default for anything a child reads, not an emphasis.",
+    "scale": {
+      "wordmark": { "size": 50, "weight": 700 },
+      "resultTitle": { "size": 34, "weight": 700 },
+      "button": { "size": 26, "weight": 700 },
+      "buttonSmall": { "size": 17, "weight": 700 },
+      "turnBanner": { "size": 17, "weight": 700 },
+      "chipValue": { "size": 24, "weight": 700 },
+      "chipValueLarge": { "size": 30, "weight": 700 },
+      "chipLabel": { "size": 9.5, "weight": 700, "tracking": 0.08 },
+      "legend": { "size": 13, "weight": 600 }
+    }
+  },
+
+  "copy": {
+    "voice": "Short, loud, kid-facing. Players are named by color, not 'Player One'.",
+    "playerOneName": "Red",
+    "playerTwoName": "Blue",
+    "tiesLabel": "SCRAP",
+    "turnBanner": "Blue, your turn!",
+    "forcedCue": "Middle board",
+    "freeChoiceCue": "Any board you like!",
+    "win": "RED WINS!",
+    "winDetail": "Three boards in a row!",
+    "draw": "Nobody wins this one!",
+    "rematch": "PLAY AGAIN",
+    "legendLastMove": "They went here last.",
+    "legendForced": "Play in here!"
+  },
+
+  "sound": {
+    "signature": "clank",
+    "placeMark": "TODO: metal clank",
+    "claimQuadrant": "TODO: servo whirr + thunk",
+    "catGame": "TODO: rusty creak",
+    "winGame": "TODO: klaxon",
+    "buttonTap": "TODO: heavy switch",
+    "music": null
+  },
+
+  "animation": {
+    "note": "Same timings as Neon; only the character changes — mechanical, not bouncy.",
+    "placeMark": { "type": "stamp-down", "durationMs": 200 },
+    "claimQuadrant": { "type": "gear-spin-settle", "durationMs": 420 },
+    "catGame": { "type": "rust-spread", "durationMs": 320 },
+    "winGame": { "type": "girder-flash", "durationMs": 900 },
+    "activeQuadrant": { "type": "lamp-pulse", "durationMs": 1600, "loop": true }
+  },
+
+  "contrastNotes": [
+    "Labels on saturated chips (#ff4433, #2bc4f5) use a near-black of their own hue, NOT white — white measured 2.0-3.4:1 and failed.",
+    "The wordmark plate is dark for the same reason. Do not lighten it back."
+  ]
+}

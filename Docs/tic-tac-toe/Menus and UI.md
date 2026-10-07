@@ -16,15 +16,15 @@ The game needs a main menu.
   new-game questions are the same — see **Playing the AI**. Large.
 - **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
-- **Settings** — opens the settings menu. Smaller than the two above it.
+- **Settings** — opens the settings menu. Smaller than the three above it.
 - **About Us** — last in the list, same smaller treatment as Settings.
 
 **Settings and About Us sit side by side in one row**, sharing its width — not two more
-full-width buttons stacked under Play Game and Theme. So the menu has two button tiers:
-the big pair, and the small pair beneath them.
+full-width buttons stacked under the large ones. So the menu has two button tiers: the
+big two, and the small pair beneath them.
 
 **Play Game and Theme are the same tier, not merely similar.** Both draw from one
-treatment, so a change to one is a change to both and no theme can drift them apart.
+treatment, so a change to one is a change to the other and no theme can drift them apart.
 
 Themes are deliberately **up front**, not buried in settings. The theme button gets the
 same visual weight as Play Game.
@@ -68,6 +68,14 @@ the app version — `Theme: Neon · v0.1.0` under Neon.
 └─────────────────────────┘
 ```
 
+**The menu compacts itself rather than clipping on a short screen.** At the handoff's own
+390×844 the layout above is drawn exactly as it stands. When the height is too small for
+it — an iPhone SE at 375×667 is the screen that found this — the hero shrinks: a smaller
+icon box, tighter gaps, and the tagline dropped. If even that would not fit, the menu
+scrolls, so nothing is ever lost off the bottom. The height it switches at is worked out
+from the active theme's own type sizes rather than a fixed screen size, so a theme with
+larger text compacts sooner instead of inheriting Neon's threshold.
+
 The entire main menu is itself theme-driven — background, button styling, title. No
 hardcoded styling here either.
 
@@ -83,8 +91,8 @@ words:
 > in the future but lets add it here."
 
 So the main menu carries four buttons, in order: Play Game, Theme, Settings, About Us. The
-position is explicitly provisional — the user said "for now we might move it in the
-future" — so a later reordering is expected rather than a reversal.
+position is explicitly provisional — the user said "for now we might move it
+in the future" — so a later reordering is expected rather than a reversal.
 
 Because Settings and About Us share a row, that pairing is the part a later reorder has to
 revisit — nothing else in the menu depends on About Us being last.
@@ -96,14 +104,22 @@ One thing this doesn't settle:
 ## Play Game → Where It Takes You
 Play Game branches on whether there are existing open games.
 
-- **No open games** — straight into starting a new game, with no open-games list in
-  between. The new-game questions are still asked; see below.
+- **No open games** — the list opens with the New Game choice already up, so the choice
+  between a game on this phone and an online one is there on a fresh install too. Where
+  there is no Game Center to offer, it still goes straight into a new game on this phone,
+  no intermediate screen.
 - **Open games exist** — a new screen listing all open games, with **New Game** as an
   option at the **top of the list**.
 - **Each open game is titled with its opponent's name** — that's what a row shows.
-- **Selecting New Game asks who you are playing first**, then the AI's level if that is
-  the mode, then the opponent's name with a default of **ItSaMeMaRiO**. See **Playing the
-  AI** below.
+- **Selecting New Game asks which kind of game first** — on this phone, invite a friend, or
+  play an anonymous game. On this phone then prompts for the opponent's name, with a default
+  of **ItSaMeMaRiO**; the two online choices go to Game Center instead and nobody types a
+  name. See **Starting a game — on this phone or online** below.
+- **An online game is titled with the opponent's Game Center nickname**, taken when the match
+  is created. Nobody types it. Nothing renames it either, with one exception: an anonymous
+  game is started before there is an opponent to name it after, so it carries a placeholder
+  title while it looks for a player and takes the real nickname once one is found — see
+  [Tech Design](./Tech%20Design.md) → Online Play.
 
 ```
 ┌─────────────────────────┐
@@ -129,8 +145,12 @@ Each open game is titled with its opponent's name. ItSaMeMaRiO is the default.
 the top. It shows every open game — none is hidden, truncated or paginated away — so with
 the cap raised to 100 the list scrolls.
 
-**A row shows the opponent's name, and nothing else is settled.** The handoff draws a
-relative time and three score chips on every row; neither is decided — see Open Questions.
+**A row shows the opponent's name, and on an online game a line saying where that game
+stands.** An anonymous game that has not found anybody yet says it is looking for a player,
+and that line outranks every other one except the opponent having left; opening that row goes
+to the searching screen rather than the board. What else a row carries is not settled: the
+handoff draws a relative time and three score chips on every row, and neither is decided —
+see Open Questions.
 
 **The footer drawn on `1b` — "Three saved games. Starting a fourth replaces the oldest." —
 does not ship.** Nothing ever removes a game the player did not choose to delete, so the
@@ -142,19 +162,134 @@ then on AI which level, then for the name — pre-filled with **ItSaMeMaRiO** an
 selected, exactly as it comes up when the list was there. So there is one new-game flow
 rather than two, and what the empty state saves the player is the list, nothing else.
 
-**The opponent name does not replace "Player Two" in game.** It titles the game in the
-open-games list and nothing else. In game, the players are still **Player One** and
-**Player Two**. That might change in the future, so don't build it in a way that makes the
-swap hard to make later. See [Game Overview](./Game%20Overview.md) →
+**The opponent name typed at New Game does not replace "Player Two" in game.** It titles
+the game in the open-games list and nothing else. In a game on this phone the players are
+still **Player One** and **Player Two**.
+
+**An online game's scoreboard reads the two players' Game Center account names** in place
+of Player One and Player Two — this player's own account on one side and the opponent's on
+the other. See [Game Overview](./Game%20Overview.md) →
 Session Structure — Games and Continuing.
 
 **The name field comes up pre-filled with ItSaMeMaRiO and the text selected**, so typing
 replaces it. Leaving it empty falls back to ItSaMeMaRiO rather than blocking, and the
-field takes at most 16 characters. Cancelling the prompt creates nothing.
+field takes at most 16 characters. Cancelling the prompt creates nothing. The prompt never
+comes up for an online game, whose title is the opponent's Game Center nickname — though an
+online game whose opponent has not resolved yet carries a placeholder title until that
+nickname arrives.
 
 **Opening a game from the list shows that game.** The board is not drawn until the saved
 position has loaded, so a player never sees an empty board, or the game they were in
 before, standing in for it.
+
+### Starting a game — on this phone or online
+**New Game asks which kind of game first.** Three choices, weighted the same: **On this
+phone**, **Invite a friend** and **Play an anonymous game**. On this phone goes to the
+opponent-name prompt above. Both online choices run the same online entry first — Game Center
+sign-in, then the grown-up question if the account is a child's — and differ only in how the
+opponent is found: Invite a friend opens Apple's find-a-player sheet, and Play an anonymous
+game is our own door to a random opponent and shows no Apple sheet at all. See
+[Tech Design](./Tech%20Design.md) → Online Play.
+
+**Play an anonymous game exists because Apple's sheet cannot be made to say what it does.**
+Apple's own **Start Game** button says nothing about playing a random person, and it starts a
+game before anybody has been found, so a player who taps it is left on a board with no
+opponent and no explanation. Our own door can say what it is doing: a searching screen while
+it looks, and the game starting once a pair is actually found, so the game knows you found
+somebody.
+
+**Both online choices are hidden where there is no Game Center**, which today means anything
+that is not iOS. With one choice left the prompt skips the question and opens the name prompt
+straight away.
+
+**Local and online games share one limit and one list.** There is no separate online
+allowance and no second list of games — the open-games list is where every game lives, and
+New Game is the only place any of them is started from.
+
+**New Game refuses at the cap before anything is asked of Apple**, whichever online choice was
+tapped, so neither Apple's sheet nor a search for a random opponent is ever reached by a player
+with no slot to put the game in. A match started at the cap would be left orphaned in Game
+Center with nothing on this phone pointing at it.
+
+**Invite a friend ends one of these ways:**
+
+- **A match is found** — the game is stored and opens on the board, the same as picking it
+  out of the list.
+- **The match is waiting on the other player's first move** — a short message says so and
+  the player stays on the open-games list. The game turns up in the list once that first
+  turn lands.
+- **The account is not allowed to play online**, **the open-games box is full**, or
+  **Game Center fails** — each shows a short message and the player stays on the list.
+
+**On the other phone an invited game appears the moment the invite is accepted** — Player Two,
+waiting on the other player — because the starting phone puts the fresh board into the match as
+soon as the match is made. If that does not go through, the game turns up with the first move
+instead, and a short message says they joined until it does.
+
+**Play an anonymous game ends one of these ways:**
+
+- **Somebody was already waiting** — their game is picked up as it stands, stored here, and
+  opens on the board with the first move to make. The player who joins an anonymous game plays
+  **Player One** and moves first.
+- **Nobody was waiting** — a game is started and stored here straight away, marked as looking
+  for a player, and the searching screen comes up. The player who starts an anonymous game
+  plays **Player Two**, so whoever joins moves first.
+- **The account is not allowed to play online**, **the open-games box is full**, or
+  **Game Center fails** — each shows a short message and the player stays on the list.
+
+**A game that is still looking for a player is an ordinary open game.** It is in the list, it
+holds a slot against the limit like any other, and deleting it is how the search is called off
+— the ordinary delete, with its best-effort resign. Its row says it is looking for a player,
+and opening it goes back to the searching screen rather than to the board.
+
+**The searching screen** is calm: a looping indicator, a line saying it is looking for a
+player, and a button to keep looking in the background, which goes back to the open-games list
+and leaves the game searching. While it is up it keeps checking that the handoff to Game Center
+actually went out — on arrival and on every check after — and a **Retry** appears only when it
+has not. It catches up with Game Center every fifteen seconds, and when the first move arrives
+or the opponent's name resolves it says who was found for a beat and then opens the board.
+
+**An invite that arrives while the box is full creates nothing** — a message says to delete
+a game to make room for it. Deleting one brings the game in: the app catches up with Game
+Center after every delete, and the invite it turned away arrives on that catch-up.
+
+**The list refreshes itself when a turn arrives** — a row that said it was waiting on the
+other player says it is your turn, without the player leaving the screen and coming back. **A
+game the other player has left says so on its row**, in place of whose turn it is, until it is
+deleted.
+
+**What any of those messages say is not settled** — see Open Questions.
+
+**These messages use the themed snackbar the New Game prompt already uses for its own
+full-box message** — one style for one kind of message, whichever door raised it. A new
+message replaces one still on screen rather than queueing behind it. The New Game sheet
+closes the moment Online is chosen, so they land on the open-games list behind it: the sheet
+is long gone by the time Game Center answers.
+
+**A second tap while one is already in flight does nothing.** One sign-in, one gate and one
+matchmaker at a time.
+
+### Pick your Icon
+**An online game asks each player to pick their own icon the first time that game's board is
+opened on this phone**, before a move is made or seen. One screen split into a top half and
+a bottom half, titled **Pick your Icon**: the theme's two player marks, one in each half, and
+the player taps the one they want to be. *"It would be One screen devided in half with Pick
+your Icon."* *"I like top and bottom"*
+
+**The pick is asked once per open game and kept through rematches.** A rematch continues in
+the same open game, so the mark a player chose stays theirs for the whole series and the
+screen never comes up again for that game. It is saved with that game on this phone, so
+starting a second online game asks again.
+
+**The pick is that phone's alone.** The mark the player picked is drawn for them and the
+other mark for the other player, on this phone only. The other player picks on their own
+phone, out of their own theme, and may pick the same one — neither pick crosses to the other
+phone and neither player is forced into a mark or a theme by the other. *"Themes should be
+what they want on their phone and not forced into a theme by the other player. this is gonig
+to be impotant as a player might have a theme and really wants to be a specific icon."*
+
+What the pick does and does not reach is [Game Board Design](./Game%20Board%20Design.md) →
+Pieces & Marks.
 
 ### What an open game holds
 **An open game holds a whole series — the board plus the running score.** A rematch
@@ -177,6 +312,12 @@ freed only by the player deleting one — see **Deleting an open game** below, a
 evicts. What the New Game action offers a player who is already at the cap is not settled
 — see Open Questions.
 
+**Online games count against the same cap, and there is one list, not two.** An online game
+holds a slot exactly as a game on this phone does, so a player at the cap can neither start
+one nor accept an invite to one until they delete a game. There is no separate online
+allowance and no second list — an invite turned away at the cap comes back in once a game
+is deleted. See **Starting a game — on this phone or online** above.
+
 ### Deleting an open game
 **The open-games list carries a delete action, so a slot can be freed.** With a cap of 3
 and a rematch staying in the same open game, nothing else frees a slot.
@@ -190,7 +331,11 @@ the user's own words:
 > modal"
 
 The revealed control is a **trash button** — an icon, not a worded "Delete" label. The
-modal's buttons are **Yes and No**, not Cancel/Delete.
+modal's buttons are **Yes and No**, not Cancel/Delete. **The trash button is themed like
+anything else on screen** — every theme styles it, in its own colour and in its own art
+where the theme ships art, and it is never drawn in an unstyled default: *"The game delete
+button needs to follow the theme in some way otherwise it look bad."* See
+[Theming](./Theming.md) → What a Theme Controls.
 
 **The revealed trash button stays put when the finger lifts** — it has to, since the player
 has to tap it — and the reveal closes again on swiping the row back, on tapping the trash
@@ -198,13 +343,41 @@ button, or on tapping the row body. **Tapping the row body closes the reveal and
 open the game**: it is the standard iOS behaviour and the safer one to sit next to a
 destructive control, at the cost of a tap that would have resumed a game doing nothing.
 
+**The row itself has to show that it slides left to delete.** A player who does not already
+know the gesture has nothing to find: *"I know to slide left to delete but the user does
+not. We need a way to tell the user to swipe left on the game button to delete."* The answer
+is a design cue on the row — *"The best would be some kind of design aspect signals to the
+user how to delete and that the button is slidable to be deleted."* — with help text as the
+floor rather than the answer: *"Help Text is bear minumum."* Three things say it, in this
+order of weight: a double-chevron **grip** drawn at the trailing end of every game row —
+never on the New Game row — which slides the row when dragged and opens the trash when
+tapped; a one-time **peek**, the first time the list is shown in an app session, where the
+first game row slides a little to show its delete edge and settles back — after the list has
+finished arriving, never when animations are off, and a drag or a tap on it takes over
+cleanly; and a **caption** under the list, *"Slide a game left to delete it"*, the help-text
+floor. The trash is inert during the peek, since the row moved on its own.
+
 The confirmation is there because deleting a game is the only irreversible action in the
 app — it destroys the game and its whole running scoreboard — and kids are a stated target
 audience (see [Game Overview](./Game%20Overview.md) → Target Audience & Platform).
 
+**Deleting an online game resigns the Game Center match and takes it off Game Center's own
+list**, so the other player's copy ends instead of waiting on a turn that never comes and
+the match does not sit in Apple's list after the player has thrown the game away. Both are
+best-effort and neither blocks the delete: a player who asked for a game to be gone gets it
+gone whether or not Apple could be reached. **Deleting a game the other player already left
+resigns nothing** — they are gone, so there is nothing to tell them — but it is still taken
+off Apple's list. Either way the game is gone for good: the phone remembers that match well
+enough to throw away anything that turns up for it afterwards, so a deleted game never
+reappears. See [Tech Design](./Tech%20Design.md) → Online Play.
+
+**Deleting an anonymous game that is still looking for a player cancels the search.** There is
+no separate cancel: the search is the game, so the ordinary delete — the same confirmation, the
+same best-effort resign, the same memory of the match so nothing turns up for it afterwards —
+is what stops it.
+
 **Deleting the last open game leaves the player on the list**, with New Game alone on it,
-rather than dropping them into a new game. Going straight into a game is what Play Game
-does when there are none to begin with, not what deleting your way down to zero does.
+rather than dropping them into a new game.
 
 Consequence for theming: the trash button and the modal's **Yes** are the only
 **destructive** treatment in the app, and nothing else gets one. The approved handoff draws
@@ -218,7 +391,6 @@ not the drawing.
   **Player One** to move (see [Rules](./Rules.md) → Turn Order Across Games).
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
-- **No online play in this version.** Versus is drawn in the mode prompt and disabled.
 
 ## Playing the AI
 How the AI actually plays — the three levels and what each one looks at — is
@@ -362,6 +534,24 @@ confirming it. That is what the approved handoff draws on screen `2d`.
 Because the banner is visible whenever there is a turn to announce, it takes vertical
 space on every board screen with a turn to announce, not only while a move is pending.
 
+**On an online game the banner's slot carries that game's own state instead.** While it is
+the opponent's turn it names them by their Game Center account name — *"Waiting on Sam…"* —
+with that side's own mark beside it as always, and nothing else on the screen moves. On your
+own turn it reads *"You're up!"* and names nobody, there being only one player on this phone
+to address. Player One and Player Two stay the banner's names on a game on this phone, where
+there is no account to name either player with.
+While a confirmed move is being handed to Game Center the banner says so, and it reads the
+same whether that send was begun by the confirming tap or by a retry. A send that did not go
+through says so and carries two controls with it: send it again, and leave for the main
+menu — whether Game Center refused it or it never got that far. Those two are the only
+controls the online states add — each plays the button-tap
+sound and fires no haptic, like the result card's own way out — and the confirmed move
+stays on the board behind them, to be sent again. When the other player has left, the banner
+says so and says nothing else: it takes the slot ahead of every other state and keeps it even
+once the board has finished, since there is no result card there to hand off to, and it
+carries no control of its own. What the sending, failed-send and opponent-left states say is
+not settled — see Open Questions.
+
 The free-choice cue is a separate matter and lives in the how-to-play strip below the
 board — see [Game Board Design](./Game%20Board%20Design.md) → The free-choice state. On a
 free-choice turn it shows alongside the legend and the hint, not instead of them. It drops
@@ -374,7 +564,7 @@ right now."* already says it.
 2. **Open Games List** — lists all open games, with New Game at the top of the list;
    reached from Play Game when open games exist.
 3. **New Game Mode Prompt** — an **overlay**, not its own screen. Asks whether the game is
-   Two Player, AI or Versus, before anything else about the game. Versus is drawn and
+   Two Player, AI or invite to a friend, before anything else about the game. Versus is drawn and
    disabled. See **Playing the AI**.
 4. **AI Level Select** — an **overlay**, not its own screen. Asks which level, on picking
    AI, with Beginner highlighted. See **Playing the AI** → The level select.
@@ -389,11 +579,22 @@ right now."* already says it.
    button → quick actions).
 9. **About Us** — reached from the main menu (About Us button). A full screen of its own,
    not an overlay: nothing stays visible behind it. See Main Menu → About Us.
+8. **Parental Gate** — the grown-up check, over whatever raised it rather than in place of
+   it. See [The Parental Gate](#the-parental-gate) below.
+9. **Searching** — the waiting room for an anonymous game that has not found a player yet.
+   Reached by starting one, and by opening a still-searching game from the open-games list.
+   See Play Game → Where It Takes You → Starting a game — on this phone or online.
+10. **Pick your Icon** — one screen split top and bottom, shown the first time an online
+    game's board is opened on this phone, where each player picks which of the theme's two
+    marks is theirs. See Play Game → Where It Takes You → Pick your Icon.
 
 **The mode prompt and the AI level select are the two surfaces with no approved drawing.**
 Every other screen has one in
 [Design Handoff](./design_handoff_game_ui/README.md), which was drawn before the AI
 existed:
+The first seven each have an approved drawing in
+[Design Handoff](./design_handoff_game_ui/README.md); the parental gate, the searching
+screen and Pick your Icon have none:
 
 | Screen above | Handoff screen |
 |---|---|
@@ -402,12 +603,15 @@ existed:
 | New Game Mode Prompt | *not drawn* |
 | AI Level Select | *not drawn* |
 | New Game Name Prompt | `2c — New Game, opponent name prompt` |
+| New Game Prompt | `2c — New Game, opponent name prompt` |
 | Game Screen | `1d` (free choice), `1e` (forced quadrant), `2d` (pending move) |
 | Theme Selection | `2a — Theme Select (overlay, with paywall)` |
 | Settings (main menu) | `2b — Settings page (from the main menu)` |
 | Settings (in game) | `1f — Modal: in-game settings / quick actions` |
 | Game over | `1g — Modal: winner`, `1h — Modal: draw` |
 | About Us | `1c — About Us` |
+
+`1a` draws the menu's four buttons, and the menu carries exactly those four.
 
 Content for About Us is still unsettled — see Main Menu → About Us.
 
@@ -436,11 +640,11 @@ quadrants, reaching the surfaces that open on top of it — see
 
 **The back-swipe can't carry a player out of a live game either — the gesture is turned
 off on the game screen.** The only way off the board is the explicit exit: quick actions
-mid-play, or back to main menu on the result card. It's turned off there because a swipe
-off the board would slip past that clearing, which every other way off the board does. The
-block belongs to the screen rather than to the state of the game, so it holds over a
-finished board as well as a live one — the result card carries its own way out, so nobody
-is stranded on one.
+mid-play, back to main menu on the result card, or the way out offered beside a send Game
+Center refused. It's turned off there because a swipe off the board would slip past that
+clearing, which every other way off the board does. The block belongs to the screen rather
+than to the state of the game, so it holds over a finished board as well as a live one —
+the result card carries its own way out, so nobody is stranded on one.
 
 **The open-games list has a back control that leaves it without picking anything.** `1b`
 draws one; where it goes isn't decided — see Open Questions below.
@@ -648,6 +852,21 @@ trimmed-down in-game version with the exit option added. What that decides is wh
 four toggles the in-game surface carries — on the *same screen* reading, the Animations
 row, the Music row and the purchases section all arrive in game together.
 
+## The Parental Gate
+**The gate is its own surface, over whatever raised it** — the purchases section, and either
+online choice in New Game, for a child's account. It shows a line addressed to a
+grown-up, the problem in words, a field for the answer, a Submit, and a way out. After the
+third wrong answer it stops asking: the prompt, the problem, the field and Submit all go,
+and what is left is a line saying the tries are used up, with the way out. The way out and
+a tap on the scrim behind the card both leave the gate while attempts remain, and so does
+anything that takes the surface away without either — the platform back-swipe among them.
+
+**None of the wording is settled**, and none of it is drawn: the handoff has no gate screen,
+the same gap [Theming](./Theming.md) records for the settings purchases section. What the
+gate asks, what a pass is worth, and what raises it are
+[Tech Design](./Tech%20Design.md) → In-App Purchases and Entitlements → The parental gate — a
+word problem, every time.
+
 ## Dynamic Type
 **The app does not scale its text to the iOS Dynamic Type setting in this version.** Not
 for now — *"Lets not do this as of yet."*
@@ -676,38 +895,81 @@ time (see [Rules](./Rules.md) → Turn Order Across Games).
 
 **Nothing resets the board on its own.** A game the players finished and never rematched
 stays finished — reopen it from the open-games list and you get that finished board with
-the result card over it, both buttons live, exactly as it was left.
+its win line drawn and the result card below it, exactly as it was left.
 
 ### The result card
 **On a win, the result card is preceded by the game-win sequence** — the deciding
 quadrant's small-board celebration, then the big-board win line drawing across the three
-winning quadrants, then an "X wins" display — and the result card appears once that
+winning quadrants, then the win display — and the result card appears once that
 finishes. See [Animations](./Animations.md) → Where Animations Fire. With animations off,
 none of that plays and the result card appears instantly, same as today. Once the card is
 showing, its own behavior is unchanged.
 
-**A result card drawn over the board, with the board dimmed behind it** — not a separate
-screen and not a banner. The finished position stays visible behind the card.
+**The result card is a bottom-anchored panel** — it sits at the bottom of the screen, below
+the board, with no scrim and no dim. Not a separate screen and not a banner. The finished
+board and its big-board win line stay fully visible while the card is up, so there is
+nothing to put aside to look at the finished board — the board is never covered in the
+first place.
 
-This matches what the approved handoff draws. The board keeps being drawn behind the card
-rather than replaced by it — dimmed, but still legible enough to read the finished
-position. The scrim, the dim behind it, and the card's own fill, border and radius are
-theme values like everything else; its spacing and padding are not, since those are fixed
-in code app-wide (see [Theming](./Theming.md) → What a Theme Does NOT Control).
+The card's own fill, border and radius are theme values like everything else; its spacing
+and padding are not, since those are fixed in code app-wide (see
+[Theming](./Theming.md) → What a Theme Does NOT Control).
 
 **The card says what happened, in words, and a win and a tie read differently.** A win
-names the winning player. A tie names nobody — most quadrants claimed does not win it (see
-[Rules](./Rules.md) → Edge Cases).
+names the winning player — Player One or Player Two on a game on this phone, and on an
+online game that player's Game Center account name, *"Sam takes it!"*. A tie names nobody —
+most quadrants claimed does not win it (see [Rules](./Rules.md) → Edge Cases).
 
 **It shows the running score, already counting the game that just ended**, with the column
-that moved identifiable, and **it says who goes first in the next game**.
+that moved identifiable, and **it says who goes first in the next game** — naming that
+player the same way the win line does, by account name on an online game.
 
 **The result card carries two buttons — one to start the next game, and one to go back to
 the main menu.** *"On game over result card we should have a button for next game as well
 as back to main menu."*
 
+**The rematch button shows on an online game too**, and taking it asks Game Center for the
+rematch rather than only resetting the board here: Apple mints a fresh match, the series
+carries on in the same open game with the scoreboard intact, and the next game's board is
+handed off under that new match the same way any move is. While the app is asking, the button
+says so and a second tap does nothing; a rematch Apple refuses leaves the card up and says so.
+Both players tapping it at once is safe — whichever rematch lands first is the one the series
+continues in.
+
+**The winner's rematch waits until the loser has seen the result.** Apple will not mint a
+rematch while the old match is still open, and it is the losing player's phone that closes
+it, as soon as that finished board is on their screen — see
+[Tech Design](./Tech%20Design.md) → Online Play. So the winner's card comes up with its
+button already saying it is waiting on the other player, *"Waiting for Sam to see the
+result"* — no tap is needed to find that out, the button takes no tap, and the wait survives
+a relaunch — and it comes back to life by itself once their phone has closed the match. The
+rematch is never queued to start on its own; the player taps it again when it does. The name
+is the opponent's Game Center account name, with the same fallback every other line naming
+them already uses.
+
+**A send in flight and a failed send both outrank the waiting button.** Until the finishing
+move has actually left this phone the screen shows what it shows for those two states — the
+sending notice, and the failed send with its retry and its way out — rather than telling the
+player they are waiting on an opponent who has not been handed the move yet. The losing
+player's own card never waits either: it draws the ordinary rematch button throughout, and a
+rematch Apple refuses there leaves the card up and says so.
+
+**A game the other player left offers no rematch.** They left mid-game, so the board never
+finished and there is no result card either — the banner says they left, the board takes no
+taps, and deleting the game is the way out. The rematch is hidden rather than shown disabled,
+because nothing defines a disabled-control treatment and a hidden control needs no theme value
+of its own.
+
+**A game the opponent ended shows the card with no celebration.** An arriving turn plays no
+animation at all — no claim pop, no small-board line, no big-board line drawing across and
+no win display — so the finished board is drawn at rest with its win line and the card
+is up, which is the same thing a reopened finished game shows (see
+[Animations](./Animations.md) → Where Animations Fire). The celebration belongs to the
+confirming tap that ends the game, and on an online game that tap was made on the other
+phone.
+
 The card is self-sufficient, so the player is never dependent on the settings button to
-leave a finished game. The result stays up until one of the two is pressed, and leaving
+leave a finished game. The result stays up until one of its buttons is pressed, and leaving
 destroys nothing — the game and its score are already saved, and the series is picked back
 up from the open-games list exactly as it stands.
 
@@ -752,6 +1014,16 @@ that game to carry it. Otherwise a player who takes the next game and quits befo
 reopens the *finished* board with the result card still over it, having already asked for
 a new one.
 
+**On an online game both of those writes wait for Game Center to accept the turn.** The move
+appears on the board as it is confirmed, but nothing is stored until Apple has taken it — so a
+stored board never shows the opponent to move on a turn this phone never handed off — and
+taking the next game of an online series is written with its new match id on the same accept.
+Until a move goes through, that game accepts no further move, and a send that fails keeps the
+move on screen to be sent again. Quitting the app in the gap between Apple taking the move and
+this phone writing it does not lose it: Apple's copy is the one both phones agreed on, and the
+next turn to arrive puts the missing move back. A move Apple never took is lost, which is what
+the other player sees too. See [Tech Design](./Tech%20Design.md) → Online Play.
+
 **A brand-new game is written the moment it starts**, before a single mark is placed — the
 record has to exist for anything later to be saved against it. So a player who starts a
 game and walks away without playing still finds it in the open-games list, empty, holding
@@ -771,7 +1043,20 @@ Nothing but deleting a game from the open-games list ever removes one — see **
 an open game** above.
 
 ## Open Questions
-- Future menu items to consider later: Rules/How to Play, Settings, Online.
+- Future menu items to consider later: Rules/How to Play, Settings, vs. AI.
+- **Where does the parental gate belong among the app's screens, and what does it say?** It
+  is built and it works, but nothing draws it and nothing settles its wording — the grown-up
+  prompt, the problem line, the Submit and the out-of-attempts line are all the screen's own
+  choice for now.
+- **What do the online messages say?** Four land on the open-games list, where New Game
+  raised them — the account is not allowed to play online, the match is waiting on the
+  other player, the open-games box is full, and Game Center couldn't do it. Two more land
+  on whichever of the main menu or the open-games list the player is looking at, because an
+  invite arrives without being asked for — you joined someone's game, and an invite arrived
+  with no slot to put it in. None of the wording is settled. What a player is told for a
+  declined sign-in, a cancelled matchmaker or a payload that is turned away is
+  [Tech Design](./Tech%20Design.md) → Open Questions → *Online play — what the player is
+  told*.
 - **Does the back-swipe stay live on every other screen**, or is "you leave a surface by
   its own control" a rule of the whole app? It's off on the game screen only, because
   that's the one place a swipe would walk away from a pending move. Everywhere else it
@@ -795,8 +1080,9 @@ an open game** above.
   listed above as a future menu item to consider.)
 - **Which strip content belongs to which board state, and is the set of states exactly the
   three the handoff draws (`1d`, `1e`, `2d`)?** The board has more states than that — game
-  over, and free choice after being sent to a dead quadrant — and it's not decided what,
-  if anything, this strip shows for those.
+  over, free choice after being sent to a dead quadrant, and on an online game waiting on
+  the opponent, a move being sent, a send that failed, and the other player having left —
+  and it's not decided what, if anything, this strip shows for those.
 - **What does the strip say to explain the sending rule?** Nothing written or drawn says,
   in words, that the square you play inside a small board is what decides which board your
   opponent plays in next. Whatever it says has to work in the words a player reads —
@@ -828,16 +1114,15 @@ an open game** above.
 - **What does the result card call a drawn big board?** The drawn draw modal words it as a
   "cat game," which [Game Overview](./Game%20Overview.md) → Terminology defines as a small
   board filled with no winner and [Rules](./Rules.md) → Edge Cases calls a straight draw.
-- **Can the result card be put aside to look at the finished board?** The board is visible
-  behind it either way, but neither drawn result modal carries a close control the way the
-  in-game settings sheet does.
 - **Does the `+1` under the column that just moved show again when a finished game is
   reopened later**, or only on the result that has just happened?
 - **What does New Game do when the player is already at the cap** — refuse and say the list
   is full, route the player into the delete flow, offer the $4.99 unlock at the moment the
-  limit bites, or some combination of those? The cap itself and the rule that only a
-  player-initiated delete frees a slot are settled; this is only what the player is offered
-  instead.
+  limit bites, or some combination of those? It refuses and says so today, for a game on
+  this phone and for an online one alike, and an invite arriving at the cap is turned away
+  with a message; whether a refusal is where this lands is what is open. The cap itself and
+  the rule that only a player-initiated delete frees a slot are settled; this is only what
+  the player is offered instead.
 - **What happens to games already stored above the cap if the unlock goes away?** A player
   with 60 open games whose ceiling drops back to 3 has 57 games nothing is willing to
   touch.

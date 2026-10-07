@@ -117,10 +117,16 @@ existing claim overlay — grow/pop; the handoff's `claimQuadrant` values are th
 point) → play resumes.
 
 Game-win sequence: the final quadrant's small-board celebration plays as above → the
-big-board win line draws across the three winning quadrants, over roughly one second → an
-"X wins" display appears — the space below the board that the turn banner vacates is its
-natural home → the result card appears. The result card is now the end of this sequence,
-not an instantaneous appearance.
+big-board win line draws across the three winning quadrants, over roughly one second → a win
+display appears — the space below the board that the turn banner vacates is its natural
+home → the result card appears. **On an online game the win display names the winning player
+by their Game Center account name**, because each phone picks its own marks and both players
+may be drawn as the same one, so the mark alone would not say who won — see
+[Game Board Design](./Game%20Board%20Design.md) → Pieces & Marks. The result card is now the
+end of this sequence, not an instantaneous appearance. Once the result card appears, the
+big-board win line stays — it no longer clears when the celebration sequence ends. It is the
+resting state of a finished board, shown for as long as the finished board is, including a
+reopened finished game.
 
 The win line is drawn with the active theme's art, through a theme image slot of its own —
 the same pattern as the game's other image slots. See [Theming](./Theming.md).
@@ -176,8 +182,8 @@ own timing, so a theme controls its own pacing.
 keeps playing as normal — it isn't interrupted or skipped, and the game doesn't wait on it.
 
 **Win sequences do block input.** From the moment a win is detected until its celebration
-finishes — the win line, the claim pop, and on a game win the big-board line and the
-"X wins" display — taps do nothing.
+finishes — the win line, the claim pop, and on a game win the big-board line and the win
+display — taps do nothing.
 
 ## Turning Animations Off
 There is an **animations on/off toggle**, and it is **not theme-defined**. It's a global
@@ -192,9 +198,11 @@ player owns it. Reduce Motion being on does not change what the game does.
 
 With animations turned off, the game does the thing **instantly**. The mark simply
 appears, the quadrant is simply claimed — no animation, no substitute effect, no fade or
-transition standing in for one. A win is the same: no win line, no claim pop, no input
+transition standing in for one. A win is the same: no win-line draw, no claim pop, no input
 lock — the quadrant is simply claimed, the game is simply won, and the result card appears
-instantly.
+instantly. A finished board still *shows* its win line statically, the same as the claim
+mark — the line is state display, not animation; only the ~1s draw is the animation that's
+skipped.
 
 Don't worry about animations at all in this mode. The game state changes and the screen
 shows the new state. That's it.

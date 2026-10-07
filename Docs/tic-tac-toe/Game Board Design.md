@@ -97,12 +97,17 @@ A **scoreboard sits at the top of the game screen**, above the board. Three coun
 ```
 PLAYER 1 highlighted above — their turn to play.
 
-**The scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `CAT` between them), not
-`PLAYER ONE` / `PLAYER TWO`.
+**On a game on this phone the scoreboard chips read `PLAYER 1` and `PLAYER 2`** (with `CAT`
+between them), not `PLAYER ONE` / `PLAYER TWO`.
 
 This does **not** change the settled term for the player — the players are still called
 "Player One" and "Player Two." The chip uses the numeral because that is what every drawn
 screen shows and because the spelled-out form is materially wider in a fixed-width column.
+
+**On an online game the two outer chips carry the players' Game Center account names
+instead** — this player's own account on one side, the opponent's on the other, with `CAT`
+still between them. See [Game Overview](./Game%20Overview.md) →
+Session Structure — Games and Continuing.
 
 **The middle chip reads `CAT`, not `TIES`.** The engine, the theme files and the rest of
 these docs all call a tied board a cat game (see [Game Overview](./Game%20Overview.md) →
@@ -143,6 +148,12 @@ thing telling them who's up.
 rendering of the current player's own mark beside it. Its top is anchored to the bottom
 of the grid, not to whatever sits under it, so neither the banner nor the mark moves as
 the how-to-play strip below them changes length.
+
+On an online game the banner carries that game's own state instead — your own turn, the
+opponent named by their Game Center account name while it is theirs, a move being sent, a
+send that failed, or the other player having left — see
+[Menus and UI](./Menus%20and%20UI.md) → How to Play — the On-Board Legend and Hint. The
+scoreboard's highlight is unchanged in every one of those states.
 
 Like everything else, what the highlight looks like is theme-driven — see
 [Everything Here Is Theme-Driven](#everything-here-is-theme-driven).
@@ -371,6 +382,10 @@ button: pick something else, or tap away.
 includes the legend/how-to-play strip, the scoreboard, the settings button, and opening any
 menu or sheet. One rule, uniformly applied.
 
+**An opponent's turn arriving clears a pending selection too**, on an online game. The
+board it was chosen against has been replaced, and a pending selection is always a legal
+move on the board in front of the player, with the preview being that move applied.
+
 The gutters between cells (3pt) and the quadrant padding (5pt) are outside the cells, so a
 near-miss between two cells clears the selection rather than doing nothing. That is the
 accepted cost of the single uniform rule.
@@ -414,6 +429,29 @@ for provisional, solid lavender for the last move, solid purple for the active q
   emoji, animals, shapes. See [Theming](./Theming.md).
 - There are **three marks, not two** — Player One's, Player Two's, and one for a cat-game
   quadrant. All three are theme art.
+
+**On an online game each player picks which of the two player marks is theirs**, the first
+time that game's board is opened on their phone, and that pick only changes what their own
+phone draws: the cells that player has taken are drawn with the mark they picked, and the
+other player's with the other one. *"So if a player always wants to be X on their phone they
+can see it that way whil on the other phone they can see it the way they want. No player is
+forced into X or O it will always be there choice."*
+
+**Both players may pick the same mark**, and nothing reconciles it — each phone has its own
+theme and its own screen, so both can see themselves as the X and their opponent as the O at
+the same time and neither is wrong. On any one phone the two players are still drawn with the
+two different marks; the pick only decides which is which.
+
+That works because the pick is drawing and nothing else. It does not change which side a
+player plays: **Player One and Player Two stay the names of the two mark slots a theme
+fills**, and a theme's own mark art is still authored against those two slots — see
+[Theming](./Theming.md) → What a Theme Controls. The pick decides which of the two slots is
+drawn as *yours*.
+
+The cat-game mark is not picked — it belongs to neither player.
+
+Where the pick is made is [Menus and UI](./Menus%20and%20UI.md) → Play Game → Where It Takes
+You → Pick your Icon.
 
 ## Everything Here Is Theme-Driven
 Nothing in this document should be read as a hardcoded visual decision. Grid line colors,

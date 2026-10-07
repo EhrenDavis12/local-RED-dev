@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-8d34aa70-bd87-4199-9b49-90eb65f48fbb/styles.css">
+<script src="_ds/nocturne-8d34aa70-bd87-4199-9b49-90eb65f48fbb/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#0f1018;font-family:Inter,system-ui,sans-serif}
+.dv-turn{padding:44px 48px 36px;border-bottom:1px solid rgba(233,233,237,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 22px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#9184d9;color:#161826;border-radius:4px;text-decoration:none}
+.dv-tname{font:500 13px/1.2 Inter,system-ui,sans-serif;color:#e9e9ed}
+.dv-opts{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(233,233,237,.1);color:#e9e9ed;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Inter,system-ui,sans-serif;color:rgba(233,233,237,.55)}
+.dv-opt:target .dv-oid{background:#9184d9;color:#161826}
+.dv-next{margin:26px 0 0;font:12px/1.6 Inter,system-ui,sans-serif;color:rgba(233,233,237,.5)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">The missing pieces — theme overlay, settings, naming a game, and the pending-move preview</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a"><div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Theme select — overlay on the main menu</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="position:relative;min-height:874px;background:radial-gradient(120% 65% at 50% 0%,#20233a 0%,#161826 58%,#111320 100%);color:#e9e9ed;padding:96px 28px 52px;display:flex;flex-direction:column;align-items:center;isolation:isolate">
+    <div style="opacity:.35;display:flex;flex-direction:column;align-items:center;width:100%">
+      <div style="width:104px;height:104px;border-radius:20px;border:1px dashed #5d5294;background:#1b1e2c"></div>
+      <div style="margin-top:26px;text-align:center">
+        <div style="font-size:13px;letter-spacing:.34em;color:#b5abfc">TIC TAC TOE</div>
+        <div style="font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-top:4px">EXTREME</div>
+      </div>
+    </div>
+    <div style="position:absolute;inset:0;background:rgba(15,16,24,.72);z-index:10;display:flex;align-items:flex-end;padding:20px 16px 34px">
+      <div style="width:100%;background:#232532;border-radius:20px;padding:20px;box-shadow:0 0 0 1px #595d6c,0 16px 40px rgba(0,0,0,.65)">
+        <div style="display:flex;align-items:center;margin-bottom:4px">
+          <div>
+            <div style="font-size:20px;font-weight:600;letter-spacing:-.01em">Pick your look</div>
+            <div style="font-size:11.5px;color:#75798c">Two free, two extra. Switch any time.</div>
+          </div>
+          <button class="btn btn-secondary btn-icon" style="margin-left:auto;border-radius:10px" aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round"><path d="M200 56 56 200M56 56l144 144"></path></svg>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+          <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:#161826;box-shadow:0 0 0 2px #4fc3ff,0 0 22px rgba(79,195,255,.3)">
+            <div style="width:66px;height:66px;flex:none;border-radius:9px;background:#12142099;box-shadow:0 0 0 1.5px rgba(79,195,255,.6),0 0 12px rgba(79,195,255,.25);display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:5px;font:600 15px Inter,system-ui,sans-serif">
+              <span style="display:flex;align-items:center;justify-content:center;color:#ff5c85;text-shadow:0 0 8px rgba(255,61,113,.9)">✕</span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#4dffb0;text-shadow:0 0 8px rgba(45,255,158,.9)">○</span>
+              <span></span><span style="display:flex;align-items:center;justify-content:center;color:#ff5c85;text-shadow:0 0 8px rgba(255,61,113,.9)">✕</span><span></span>
+              <span></span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#b57cff;text-shadow:0 0 8px rgba(181,124,255,.9)">○</span>
+            </div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:17px;font-weight:600">Neon</div>
+                <span class="tag" style="background:rgba(79,195,255,.18);color:#a9e4ff;font-size:9.5px;letter-spacing:.1em">ACTIVE</span>
+                <span class="tag" style="background:#292b31;color:#9397ab;font-size:9.5px;letter-spacing:.1em">FREE</span>
+              </div>
+              <div style="font-size:12px;color:#9397ab;margin-top:2px;text-wrap:pretty">Black night, electric lines. Buzzes like a neon sign.</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:#161826;box-shadow:inset 0 0 0 1px #3f424d">
+            <div style="width:66px;height:66px;flex:none;border-radius:9px;background:#f3f5fe;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:5px;font:600 15px Inter,system-ui,sans-serif">
+              <span style="display:flex;align-items:center;justify-content:center;color:#d92d3f">✕</span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#2453c4">○</span>
+              <span></span><span style="display:flex;align-items:center;justify-content:center;color:#d92d3f">✕</span><span></span>
+              <span></span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#2453c4">○</span>
+            </div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:17px;font-weight:600">Classic Red vs Blue</div>
+                <span class="tag" style="background:#292b31;color:#9397ab;font-size:9.5px;letter-spacing:.1em">FREE</span>
+              </div>
+              <div style="font-size:12px;color:#9397ab;margin-top:2px;text-wrap:pretty">The plain old one. Red you, blue them.</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:#161826;box-shadow:inset 0 0 0 1px #2b2f42">
+            <div style="position:relative;width:66px;height:66px;flex:none;border-radius:9px;border:1px dashed #3f424d;background:#12142099;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:5px;font:600 15px Inter,system-ui,sans-serif;opacity:.45">
+              <span style="display:flex;align-items:center;justify-content:center;color:#ff5c85">●</span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#4dffb0">●</span>
+              <span></span><span style="display:flex;align-items:center;justify-content:center;color:#ff5c85">●</span><span></span>
+              <span></span><span></span><span></span>
+            </div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:17px;font-weight:600;color:#b2b6ca">Splat</div>
+              </div>
+              <div style="font-size:12px;color:#75798c;margin-top:2px;text-wrap:pretty">Paint-balloon marks. Gloriously messy.</div>
+            </div>
+            <button class="btn btn-primary" style="flex:none;gap:6px;font-size:14px;padding:9px 13px;border-radius:11px;border-width:2px">
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"><rect x="40" y="88" width="176" height="128" rx="12"></rect><path d="M92 88V56a36 36 0 0 1 72 0v32"></path></svg>
+              $1.99
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:#161826;box-shadow:inset 0 0 0 1px #3f424d">
+            <div style="width:66px;height:66px;flex:none;border-radius:9px;border:1px dashed #5d5294;background:#12142099;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:5px;font:600 13px Inter,system-ui,sans-serif">
+              <span style="display:flex;align-items:center;justify-content:center;color:#ff5c85">T</span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#4dffb0">S</span>
+              <span></span><span style="display:flex;align-items:center;justify-content:center;color:#ff5c85">T</span><span></span>
+              <span></span><span></span><span style="display:flex;align-items:center;justify-content:center;color:#4dffb0">S</span>
+            </div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:17px;font-weight:600">Dinosaurs</div>
+                <span class="tag" style="background:rgba(45,255,158,.16);color:#a5ffd8;font-size:9.5px;letter-spacing:.1em">OWNED</span>
+              </div>
+              <div style="font-size:12px;color:#9397ab;margin-top:2px;text-wrap:pretty">T-Rex versus Stegosaurus. Roars included.</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11.5px;color:#595d6c">
+          <svg width="12" height="12" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"><path d="M128 24a104 104 0 1 0 104 104A104 104 0 0 0 128 24Zm0 168a64 64 0 1 1 64-64 64 64 0 0 1-64 64Z"></path></svg>
+          Restore purchases
+        </div>
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="2b"><div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Settings — its own page, from the main menu</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:#161826;color:#e9e9ed;padding:64px 20px 52px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+      <a class="btn btn-secondary btn-icon" href="#1a" style="border-radius:11px" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"><path d="M160 208 80 128l80-80"></path></svg>
+      </a>
+      <div>
+        <div style="font-size:22px;font-weight:600;letter-spacing:-.01em">Settings</div>
+        <div style="font-size:12px;color:#75798c">These stick around between games.</div>
+      </div>
+    </div>
+    <div style="background:#1e2131;border-radius:16px;padding:6px 16px;box-shadow:0 0 0 1px #2b2f42">
+      <sc-for list="{{ toggles }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 0">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:500">{{ s.name }}</div>
+            <div style="font-size:11.5px;color:#75798c">{{ s.hint }}</div>
+          </div>
+          <sc-if value="{{ s.on }}" hint-placeholder-val="{{ true }}">
+            <span style="width:52px;height:31px;flex:none;border-radius:999px;background:rgba(145,132,217,.28);box-shadow:inset 0 0 0 1.5px #9184d9,0 0 14px rgba(145,132,217,.35);display:flex;align-items:center;justify-content:flex-end;padding:3px">
+              <span style="width:25px;height:25px;border-radius:50%;background:#d2cefd;box-shadow:0 0 10px rgba(181,171,252,.8)"></span>
+            </span>
+          </sc-if>
+          <sc-if value="{{ s.off }}" hint-placeholder-val="{{ false }}">
+            <span style="width:52px;height:31px;flex:none;border-radius:999px;background:#161826;box-shadow:inset 0 0 0 1.5px #3f424d;display:flex;align-items:center;justify-content:flex-start;padding:3px">
+              <span style="width:25px;height:25px;border-radius:50%;background:#595d6c"></span>
+            </span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:22px;display:flex;align-items:center;gap:12px;padding:15px 16px;border-radius:16px;background:#1e2131;box-shadow:0 0 0 1px #2b2f42">
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:500">Theme</div>
+        <div style="font-size:11.5px;color:#75798c">Picked from the main menu</div>
+      </div>
+      <span class="tag" style="background:rgba(79,195,255,.18);color:#a9e4ff">Neon</span>
+    </div>
+    <div style="margin-top:auto;padding-top:26px;text-align:center;font-size:11px;line-height:1.6;color:#595d6c;text-wrap:pretty">Sound and animations are part of the theme —<br>these switches turn them off for every theme.</div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="2c"><div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>New Game — naming your opponent</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" keyboard="{{ true }}" hint-size="402px,874px">
+  <div style="position:relative;min-height:540px;background:#161826;color:#e9e9ed;padding:64px 20px 20px;display:flex;flex-direction:column;isolation:isolate">
+    <div style="opacity:.3">
+      <div style="font-size:22px;font-weight:600;letter-spacing:-.01em">Pick up where you left off</div>
+      <div style="margin-top:18px;display:flex;flex-direction:column;gap:11px">
+        <div style="height:56px;border-radius:13px;background:#1e2131"></div>
+        <div style="height:86px;border-radius:13px;background:#1e2131"></div>
+        <div style="height:86px;border-radius:13px;background:#1e2131"></div>
+      </div>
+    </div>
+    <div style="position:absolute;inset:0;background:rgba(15,16,24,.74);z-index:10;display:flex;align-items:flex-end;padding:20px 16px 20px">
+      <div style="width:100%;background:#232532;border-radius:20px;padding:22px 20px 20px;box-shadow:0 0 0 1px #595d6c,0 16px 40px rgba(0,0,0,.65)">
+        <div style="font-size:20px;font-weight:600;letter-spacing:-.01em">Who are you playing?</div>
+        <div style="font-size:12.5px;color:#75798c;margin-top:4px;text-wrap:pretty">Just a name for the list — on the board you're still Player One and Player Two.</div>
+        <div style="margin-top:18px;position:relative">
+          <div style="font-size:11px;color:#9397ab;margin-bottom:6px">Opponent</div>
+          <div style="display:flex;align-items:center;min-height:52px;padding:0 14px;border-radius:13px;background:#161826;box-shadow:inset 0 0 0 2px #9184d9,0 0 18px rgba(145,132,217,.25)">
+            <span style="font-size:18px;font-weight:500">ItSaMeMaRiO</span>
+            <span style="width:2px;height:22px;margin-left:2px;background:#b5abfc"></span>
+            <span style="margin-left:auto;font-size:11px;color:#595d6c">11/16</span>
+          </div>
+          <div style="font-size:11.5px;color:#595d6c;margin-top:8px">Leave it as is if you can't be bothered.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button class="btn btn-secondary" style="flex:1;font-size:15px;padding:15px;border-radius:12px;color:#b2b6ca">Cancel</button>
+          <button class="btn btn-primary" style="flex:2;font-size:16px;padding:15px;border-radius:12px;border-width:2px;box-shadow:0 0 20px rgba(145,132,217,.26)">Start playing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="2d"><div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Board — pending move, all three highlights at once</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:#161826;color:#e9e9ed;padding:62px 16px 44px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42">
+          <div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER ONE</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">2</div>
+        </div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42">
+          <div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">1</div>
+        </div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:rgba(45,255,158,.12);box-shadow:inset 0 0 0 1px #2dff9e,0 0 16px rgba(45,255,158,.28)">
+          <div style="font-size:9px;letter-spacing:.1em;color:#a5ffd8">PLAYER TWO</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15">0</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-icon" style="border-radius:11px;width:44px;height:44px;flex:none" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"><path d="M40 96h176M40 160h176"></path><circle cx="100" cy="96" r="20" fill="#161826"></circle><circle cx="164" cy="160" r="20" fill="#161826"></circle></svg>
+      </button>
+    </div>
+    <div style="margin:16px 0 12px;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;background:rgba(233,233,237,.06);box-shadow:inset 0 0 0 1px rgba(233,233,237,.35)">
+      <span style="width:19px;height:19px;flex:none;border-radius:5px;border:2px dashed #e9e9ed"></span>
+      <span style="font-size:14px;font-weight:600">Play here?</span>
+      <span style="margin-left:auto;font-size:12px;color:#b2b6ca">Tap again to lock it in</span>
+    </div>
+    <dc-import name="Board" quads="{{ boardPending }}" hint-size="100%,370px"></dc-import>
+    <div style="margin-top:auto;padding-top:22px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#b2b6ca">
+        <span style="width:15px;height:15px;flex:none;border-radius:4px;border:2px dashed #e9e9ed"></span>
+        Your pick, not played yet — and where it sends them.
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#b2b6ca">
+        <span style="width:15px;height:15px;flex:none;border-radius:4px;border:2px solid #d2cefd;box-shadow:0 0 10px 2px rgba(181,171,252,.7)"></span>
+        Still showing what they did last — it stays until you commit.
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "add the theme-failed-to-load modal from the docs" · "show the Classic Red vs Blue board" · "regenerate the handoff bundle with turn 2 in it"</p>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Tic Tac Toe Extreme — four pages and two modals, Nocturne as the Neon theme</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Main Menu — logo is a placeholder mark</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:radial-gradient(120% 65% at 50% 0%,#20233a 0%,#161826 58%,#111320 100%);color:#e9e9ed;padding:96px 28px 52px;display:flex;flex-direction:column;align-items:center">
+    <div style="width:104px;height:104px;border-radius:20px;border:1px dashed #5d5294;background:#1b1e2c;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:11px;box-shadow:0 0 30px rgba(145,132,217,.22)">
+      <sc-for list="{{ nine }}" as="a" hint-placeholder-count="9">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
+          <sc-for list="{{ nine }}" as="b" hint-placeholder-count="9">
+            <div style="aspect-ratio:1;border-radius:1px;background:#9184d9;opacity:.75"></div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:26px;text-align:center">
+      <div style="font-size:13px;letter-spacing:.34em;color:#b5abfc;text-transform:uppercase">Tic Tac Toe</div>
+      <div style="font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-top:4px;text-shadow:0 0 34px rgba(145,132,217,.55)">EXTREME</div>
+      <div style="margin-top:10px;font-size:13px;color:#9397ab">Nine boards. One winner. Good luck.</div>
+    </div>
+    <div style="width:100%;display:flex;flex-direction:column;gap:12px;margin-top:auto;padding-top:44px">
+      <a class="btn btn-primary" href="#1b" style="font-size:20px;letter-spacing:.02em;padding:22px;border-radius:14px;border-width:2px;box-shadow:0 0 24px rgba(145,132,217,.28),inset 0 0 22px rgba(145,132,217,.1)">PLAY GAME</a>
+      <button class="btn btn-primary" style="font-size:20px;letter-spacing:.02em;padding:22px;border-radius:14px;border-width:2px;box-shadow:0 0 24px rgba(145,132,217,.28),inset 0 0 22px rgba(145,132,217,.1)">THEME</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <button class="btn btn-secondary" style="font-size:15px;padding:16px;border-radius:12px">Settings</button>
+        <a class="btn btn-secondary" href="#1c" style="font-size:15px;padding:16px;border-radius:12px">About Us</a>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#595d6c;margin-top:10px">Theme: Neon · v0.1.0</div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Select Game — name, score, last played</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:#161826;color:#e9e9ed;padding:64px 20px 52px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button class="btn btn-secondary btn-icon" style="border-radius:11px" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"><path d="M160 208 80 128l80-80"></path></svg>
+      </button>
+      <div>
+        <div style="font-size:22px;font-weight:600;letter-spacing:-.01em">Pick up where you left off</div>
+        <div style="font-size:12px;color:#75798c">3 games on the go · scores are saved</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin:0 0 18px;font-size:17px;padding:18px;border-radius:13px;border-width:2px;gap:9px;box-shadow:0 0 20px rgba(145,132,217,.24)">
+      <svg width="19" height="19" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round"><path d="M40 128h176M128 40v176"></path></svg>
+      NEW GAME
+    </button>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <sc-for list="{{ games }}" as="g" hint-placeholder-count="3">
+        <div class="card elev-sm" style="padding:15px 16px;border-radius:13px;gap:11px;background:#1e2131">
+          <div style="display:flex;align-items:baseline;gap:9px">
+            <div style="font-size:18px;font-weight:600;flex:1;letter-spacing:-.01em">{{ g.name }}</div>
+            <div style="font-size:11px;color:#75798c">{{ g.when }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+              <div style="background:#161826;border-radius:8px;padding:7px 4px;text-align:center;box-shadow:inset 0 0 0 1px rgba(145,132,217,.35)">
+                <div style="font-size:9px;letter-spacing:.09em;color:#b5abfc">YOU</div>
+                <div style="font-size:19px;font-weight:600;color:#e9e9ed">{{ g.p1 }}</div>
+              </div>
+              <div style="background:#161826;border-radius:8px;padding:7px 4px;text-align:center;box-shadow:inset 0 0 0 1px #2b2f42">
+                <div style="font-size:9px;letter-spacing:.09em;color:#75798c">TIES</div>
+                <div style="font-size:19px;font-weight:600;color:#b2b6ca">{{ g.tie }}</div>
+              </div>
+              <div style="background:#161826;border-radius:8px;padding:7px 4px;text-align:center;box-shadow:inset 0 0 0 1px #2b2f42">
+                <div style="font-size:9px;letter-spacing:.09em;color:#75798c">THEM</div>
+                <div style="font-size:19px;font-weight:600;color:#b2b6ca">{{ g.p2 }}</div>
+              </div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="#75798c" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"><path d="m96 48 80 80-80 80"></path></svg>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto;padding-top:24px;text-align:center;font-size:11px;color:#595d6c">Three saved games. Starting a fourth replaces the oldest.</div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>About Us — copy is placeholder</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:linear-gradient(180deg,#1a1d30 0%,#161826 42%);color:#e9e9ed;padding:64px 24px 52px;display:flex;flex-direction:column">
+    <button class="btn btn-secondary btn-icon" style="border-radius:11px;margin-bottom:22px" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"><path d="M160 208 80 128l80-80"></path></svg>
+    </button>
+    <div style="font-size:11px;letter-spacing:.24em;color:#b5abfc">ABOUT US</div>
+    <div style="font-size:34px;font-weight:600;line-height:1.08;letter-spacing:-.02em;margin-top:8px">We made a<br>tiny board game<br>nine times bigger.</div>
+    <div style="height:1px;margin:22px 0;background:linear-gradient(to right,transparent,rgba(233,233,237,.16) 40px,rgba(233,233,237,.16) calc(100% - 40px),transparent)"></div>
+    <p style="font-size:14px;line-height:1.65;color:#b2b6ca;text-wrap:pretty">Placeholder copy — final text to be written. Two or three sentences on what the game is: a recursive board-in-a-board where every move you make decides where your opponent has to play next.</p>
+    <p style="font-size:14px;line-height:1.65;color:#b2b6ca;text-wrap:pretty">A second paragraph about the people who built it, why they built it, and who it is for. Kept short enough that nobody scrolls past it.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:20px">
+      <sc-for list="{{ team }}" as="t" hint-placeholder-count="4">
+        <div style="background:#1e2131;border-radius:12px;padding:14px;box-shadow:0 0 0 1px #2b2f42">
+          <div style="width:34px;height:34px;border-radius:9px;border:1px dashed #5d5294;background:#161826"></div>
+          <div style="font-size:14px;font-weight:600;margin-top:10px">{{ t.name }}</div>
+          <div style="font-size:11px;color:#75798c">{{ t.role }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto;padding-top:26px;display:flex;align-items:center;gap:8px">
+      <span class="tag tag-accent">Neon</span>
+      <span class="tag tag-neutral">v0.1.0</span>
+      <span style="margin-left:auto;font-size:11px;color:#595d6c">Made on one phone, passed back and forth.</span>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Game Board — opening move, free choice</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:#161826;color:#e9e9ed;padding:62px 16px 44px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:rgba(255,61,113,.14);box-shadow:inset 0 0 0 1px #ff3d71,0 0 16px rgba(255,61,113,.3)">
+          <div style="font-size:9px;letter-spacing:.1em;color:#ff9fb6">PLAYER ONE</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15">0</div>
+        </div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42">
+          <div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div>
+        </div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42">
+          <div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER TWO</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-icon" style="border-radius:11px;width:44px;height:44px;flex:none" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"><path d="M40 96h176M40 160h176"></path><circle cx="100" cy="96" r="20" fill="#161826"></circle><circle cx="164" cy="160" r="20" fill="#161826"></circle></svg>
+      </button>
+    </div>
+    <div style="margin:16px 0 12px;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;background:rgba(255,61,113,.1);box-shadow:inset 0 0 0 1px rgba(255,61,113,.4)">
+      <span style="font-size:17px;font-weight:600;color:#ff5c85;text-shadow:0 0 10px rgba(255,61,113,.95)">✕</span>
+      <span style="font-size:14px;font-weight:600">Player One, you're up!</span>
+      <span style="margin-left:auto;font-size:12px;color:#4fc3ff">Free choice — pick any board</span>
+    </div>
+    <dc-import name="Board" quads="{{ boardFresh }}" hint-size="100%,370px"></dc-import>
+    <div style="margin-top:14px;text-align:center;font-size:12px;line-height:1.6;color:#75798c;text-wrap:pretty">Tap a square to see where it sends them.<br>Tap it again to play it.</div>
+    <div style="margin-top:auto;padding-top:18px;display:flex;justify-content:center;gap:16px;font-size:10.5px;color:#595d6c">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(79,195,255,.85)"></span>Open</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#1b1e2c"></span>Locked</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#9aa2c2">Ø</span>Cat game</span>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Game Board — forced quadrant + last move</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="min-height:874px;background:#161826;color:#e9e9ed;padding:62px 16px 44px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42">
+          <div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER ONE</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">2</div>
+        </div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42">
+          <div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">1</div>
+        </div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:rgba(45,255,158,.12);box-shadow:inset 0 0 0 1px #2dff9e,0 0 16px rgba(45,255,158,.28)">
+          <div style="font-size:9px;letter-spacing:.1em;color:#a5ffd8">PLAYER TWO</div>
+          <div style="font-size:22px;font-weight:600;line-height:1.15">0</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-icon" style="border-radius:11px;width:44px;height:44px;flex:none" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"><path d="M40 96h176M40 160h176"></path><circle cx="100" cy="96" r="20" fill="#161826"></circle><circle cx="164" cy="160" r="20" fill="#161826"></circle></svg>
+      </button>
+    </div>
+    <div style="margin:16px 0 12px;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;background:rgba(45,255,158,.09);box-shadow:inset 0 0 0 1px rgba(45,255,158,.38)">
+      <span style="font-size:17px;font-weight:600;color:#4dffb0;text-shadow:0 0 10px rgba(45,255,158,.9)">○</span>
+      <span style="font-size:14px;font-weight:600">Player Two, you're up!</span>
+      <span style="margin-left:auto;font-size:12px;color:#c9b3ff">Play the middle board</span>
+    </div>
+    <dc-import name="Board" quads="{{ boardMid }}" hint-size="100%,370px"></dc-import>
+    <div style="margin-top:auto;padding-top:22px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#b2b6ca">
+        <span style="width:15px;height:15px;flex:none;border-radius:4px;border:2px solid #d2cefd;box-shadow:0 0 10px 2px rgba(181,171,252,.7)"></span>
+        They played here last — that's what sent you.
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;font-size:12px;color:#b2b6ca">
+        <span style="width:15px;height:15px;flex:none;border-radius:5px;border:2px solid #b57cff;box-shadow:0 0 12px 3px rgba(181,124,255,.6)"></span>
+        The only board you can play in right now.
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1f"><div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Modal — in-game settings / quick actions</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="position:relative;min-height:874px;background:#161826;color:#e9e9ed;padding:62px 16px 44px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:8px;filter:blur(1px);opacity:.5">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER ONE</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">2</div></div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">1</div></div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER TWO</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div></div>
+      </div>
+      <div style="width:44px;height:44px;flex:none;border-radius:11px;box-shadow:inset 0 0 0 1px #2b2f42"></div>
+    </div>
+    <div style="margin-top:56px;filter:blur(2px);opacity:.4;isolation:isolate">
+      <dc-import name="Board" quads="{{ boardMid }}" hint-size="100%,370px"></dc-import>
+    </div>
+    <div style="position:absolute;inset:0;background:rgba(15,16,24,.72);z-index:10;display:flex;align-items:flex-end;padding:20px 16px 34px">
+      <div style="width:100%;background:#232532;border-radius:20px;padding:20px;box-shadow:0 0 0 1px #595d6c,0 16px 40px rgba(0,0,0,.65);display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;margin-bottom:6px">
+          <div style="font-size:20px;font-weight:600;letter-spacing:-.01em">Settings</div>
+          <button class="btn btn-secondary btn-icon" style="margin-left:auto;border-radius:10px" aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round"><path d="M200 56 56 200M56 56l144 144"></path></svg>
+          </button>
+        </div>
+        <sc-for list="{{ toggles }}" as="s" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 2px">
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">{{ s.name }}</div>
+              <div style="font-size:11.5px;color:#75798c">{{ s.hint }}</div>
+            </div>
+            <sc-if value="{{ s.on }}" hint-placeholder-val="{{ true }}">
+              <span style="width:52px;height:31px;flex:none;border-radius:999px;background:rgba(145,132,217,.28);box-shadow:inset 0 0 0 1.5px #9184d9,0 0 14px rgba(145,132,217,.35);display:flex;align-items:center;justify-content:flex-end;padding:3px">
+                <span style="width:25px;height:25px;border-radius:50%;background:#d2cefd;box-shadow:0 0 10px rgba(181,171,252,.8)"></span>
+              </span>
+            </sc-if>
+            <sc-if value="{{ s.off }}" hint-placeholder-val="{{ false }}">
+              <span style="width:52px;height:31px;flex:none;border-radius:999px;background:#161826;box-shadow:inset 0 0 0 1.5px #3f424d;display:flex;align-items:center;justify-content:flex-start;padding:3px">
+                <span style="width:25px;height:25px;border-radius:50%;background:#595d6c"></span>
+              </span>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="height:1px;margin:8px 0 12px;background:linear-gradient(to right,transparent,rgba(233,233,237,.16) 40px,rgba(233,233,237,.16) calc(100% - 40px),transparent)"></div>
+        <div style="font-size:11.5px;color:#595d6c;margin-bottom:4px">Themes live on the main menu — you can't switch mid-game.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-primary btn-block" style="margin:0;font-size:16px;padding:15px;border-radius:12px;border-width:2px">Back to the game</button>
+          <a class="btn btn-secondary btn-block" href="#1a" style="margin:0;font-size:15px;padding:14px;border-radius:12px;color:#b2b6ca">Exit to Main Menu</a>
+        </div>
+        <div style="text-align:center;font-size:11px;color:#595d6c;margin-top:8px">Your game and score are saved automatically.</div>
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1g"><div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Modal — winner, over the finished board</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="position:relative;min-height:874px;background:#161826;color:#e9e9ed;padding:62px 16px 44px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:8px;opacity:.6">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER ONE</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">2</div></div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">1</div></div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER TWO</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div></div>
+      </div>
+      <div style="width:44px;height:44px;flex:none;border-radius:11px;box-shadow:inset 0 0 0 1px #2b2f42"></div>
+    </div>
+    <div style="margin-top:56px;isolation:isolate">
+      <dc-import name="Board" quads="{{ boardWon }}" hint-size="100%,370px"></dc-import>
+    </div>
+    <div style="position:absolute;inset:0;background:radial-gradient(70% 40% at 50% 62%,rgba(255,61,113,.2),transparent 70%),rgba(15,16,24,.62);z-index:10;display:flex;align-items:flex-end;padding:20px 16px 34px">
+      <div style="width:100%;background:#232532;border-radius:20px;padding:24px 20px 20px;box-shadow:0 0 0 1px #ff3d71,0 0 46px rgba(255,61,113,.3),0 16px 40px rgba(0,0,0,.65);display:flex;flex-direction:column;align-items:center">
+        <div style="font-size:52px;font-weight:600;line-height:1;color:#ff5c85;text-shadow:0 0 30px rgba(255,61,113,.95)">✕</div>
+        <div style="font-size:28px;font-weight:600;letter-spacing:-.02em;margin-top:12px;text-align:center">Player One takes it!</div>
+        <div style="font-size:13.5px;color:#9397ab;margin-top:6px;text-align:center;text-wrap:pretty">Three boards in a row, straight down the middle.</div>
+        <div style="width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:20px 0 18px">
+          <div style="border-radius:11px;padding:10px 6px;text-align:center;background:rgba(255,61,113,.16);box-shadow:inset 0 0 0 1px #ff3d71">
+            <div style="font-size:9px;letter-spacing:.1em;color:#ff9fb6">PLAYER ONE</div>
+            <div style="font-size:27px;font-weight:600;line-height:1.15">3</div>
+            <div style="font-size:10px;color:#ff9fb6">+1</div>
+          </div>
+          <div style="border-radius:11px;padding:10px 6px;text-align:center;background:#161826;box-shadow:inset 0 0 0 1px #2b2f42">
+            <div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div>
+            <div style="font-size:27px;font-weight:600;line-height:1.15;color:#b2b6ca">1</div>
+            <div style="font-size:10px;color:#3f424d">—</div>
+          </div>
+          <div style="border-radius:11px;padding:10px 6px;text-align:center;background:#161826;box-shadow:inset 0 0 0 1px #2b2f42">
+            <div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER TWO</div>
+            <div style="font-size:27px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div>
+            <div style="font-size:10px;color:#3f424d">—</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin:0;font-size:18px;padding:18px;border-radius:13px;border-width:2px;box-shadow:0 0 22px rgba(145,132,217,.3)">REMATCH</button>
+        <div style="font-size:11.5px;color:#75798c;margin-top:10px">Player One goes first next time.</div>
+        <a class="btn btn-ghost" href="#1a" style="margin-top:10px;font-size:14px;color:#b2b6ca">Exit to Main Menu</a>
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+<div class="dv-opt" id="1h"><div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>Modal — the draw, same card</div><div class="dv-card">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+  <div style="position:relative;min-height:874px;background:#161826;color:#e9e9ed;padding:62px 16px 44px;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:8px;opacity:.6">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER ONE</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">2</div></div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">TIES</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">1</div></div>
+        <div style="border-radius:10px;padding:8px 6px;text-align:center;background:#1b1e2c;box-shadow:inset 0 0 0 1px #2b2f42"><div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER TWO</div><div style="font-size:22px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div></div>
+      </div>
+      <div style="width:44px;height:44px;flex:none;border-radius:11px;box-shadow:inset 0 0 0 1px #2b2f42"></div>
+    </div>
+    <div style="margin-top:56px;isolation:isolate">
+      <dc-import name="Board" quads="{{ boardDrawn }}" hint-size="100%,370px"></dc-import>
+    </div>
+    <div style="position:absolute;inset:0;background:rgba(15,16,24,.62);z-index:10;display:flex;align-items:flex-end;padding:20px 16px 34px">
+      <div style="width:100%;background:#232532;border-radius:20px;padding:24px 20px 20px;box-shadow:0 0 0 1px #595d6c,0 16px 40px rgba(0,0,0,.65);display:flex;flex-direction:column;align-items:center">
+        <div style="display:flex;align-items:center;gap:10px;font-size:44px;font-weight:600;line-height:1"><span style="color:#ff5c85;opacity:.55">✕</span><span style="font-size:18px;color:#3f424d">/</span><span style="color:#4dffb0;opacity:.55">○</span></div>
+        <div style="font-size:28px;font-weight:600;letter-spacing:-.02em;margin-top:12px;text-align:center">Nobody wins this one!</div>
+        <div style="font-size:13.5px;color:#9397ab;margin-top:6px;text-align:center;text-wrap:pretty">The big board filled up with no three in a row. Cat game.</div>
+        <div style="width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:20px 0 18px">
+          <div style="border-radius:11px;padding:10px 6px;text-align:center;background:#161826;box-shadow:inset 0 0 0 1px #2b2f42">
+            <div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER ONE</div>
+            <div style="font-size:27px;font-weight:600;line-height:1.15;color:#b2b6ca">2</div>
+            <div style="font-size:10px;color:#3f424d">—</div>
+          </div>
+          <div style="border-radius:11px;padding:10px 6px;text-align:center;background:rgba(233,233,237,.09);box-shadow:inset 0 0 0 1px #b2b6ca">
+            <div style="font-size:9px;letter-spacing:.1em;color:#e4e7f5">TIES</div>
+            <div style="font-size:27px;font-weight:600;line-height:1.15">2</div>
+            <div style="font-size:10px;color:#e4e7f5">+1</div>
+          </div>
+          <div style="border-radius:11px;padding:10px 6px;text-align:center;background:#161826;box-shadow:inset 0 0 0 1px #2b2f42">
+            <div style="font-size:9px;letter-spacing:.1em;color:#75798c">PLAYER TWO</div>
+            <div style="font-size:27px;font-weight:600;line-height:1.15;color:#b2b6ca">0</div>
+            <div style="font-size:10px;color:#3f424d">—</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin:0;font-size:18px;padding:18px;border-radius:13px;border-width:2px;box-shadow:0 0 22px rgba(145,132,217,.3)">REMATCH</button>
+        <div style="font-size:11.5px;color:#75798c;margin-top:10px">Player One goes first again — a tie doesn't pass it on.</div>
+        <a class="btn btn-ghost" href="#1a" style="margin-top:10px;font-size:14px;color:#b2b6ca">Exit to Main Menu</a>
+      </div>
+    </div>
+  </div>
+</x-import>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "give me two more main-menu layouts" · "show the pending-move preview state on <a class="dv-oid" href="#1e">1e</a>" · "design the Theme overlay and the New Game name prompt"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const mk = (s = {}) => Array.from({ length: 9 }, (_, i) => ({
+  x: (s.x || []).indexOf(i) > -1,
+  o: (s.o || []).indexOf(i) > -1,
+  last: s.last === i,
+  pending: s.pending === i,
+  ghostX: s.ghostX === i,
+  ghostO: s.ghostO === i,
+}));
+
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      nine: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      games: [
+        { name: 'ItSaMeMaRiO', p1: 3, tie: 1, p2: 2, when: '2 hours ago' },
+        { name: 'Dad', p1: 0, tie: 0, p2: 4, when: 'Yesterday' },
+        { name: 'Jules', p1: 1, tie: 2, p2: 1, when: 'Sat, 14 Jun' },
+      ],
+      team: [
+        { name: 'Name here', role: 'Role placeholder' },
+        { name: 'Name here', role: 'Role placeholder' },
+        { name: 'Name here', role: 'Role placeholder' },
+        { name: 'Name here', role: 'Role placeholder' },
+      ],
+      toggles: [
+        { name: 'Sound effects', hint: 'Buzzes, pops and splats', on: true, off: false },
+        { name: 'Music', hint: 'Background track', on: false, off: true },
+        { name: 'Vibrate on touch', hint: 'A little buzz on every valid tap', on: true, off: false },
+        { name: 'Animations', hint: 'Marks pop, glow and jiggle', on: true, off: false },
+      ],
+      boardFresh: Array.from({ length: 9 }, () => ({ open: true, cells: mk() })),
+      boardMid: [
+        { cx: true, cells: mk({ x: [0, 4, 8], o: [1, 2] }) },
+        { locked: true, cells: mk({ x: [0], o: [4] }) },
+        { cat: true, cells: mk({ x: [0, 2, 3, 7, 8], o: [1, 4, 5, 6] }) },
+        { locked: true, cells: mk({ o: [2] }) },
+        { forced: true, cells: mk({ x: [0], o: [8] }) },
+        { locked: true, cells: mk() },
+        { locked: true, cells: mk({ x: [3] }) },
+        { co: true, cells: mk({ o: [2, 4, 6], x: [0, 1] }) },
+        { locked: true, cells: mk({ x: [4, 7], o: [1], last: 4 }) },
+      ],
+      boardPending: [
+        { cx: true, cells: mk({ x: [0, 4, 8], o: [1, 2] }) },
+        { locked: true, cells: mk({ x: [0], o: [4] }) },
+        { cat: true, cells: mk({ x: [0, 2, 3, 7, 8], o: [1, 4, 5, 6] }) },
+        { locked: true, cells: mk({ o: [2] }) },
+        { forced: true, cells: mk({ x: [0], o: [8], ghostO: 6, pending: 6 }) },
+        { locked: true, cells: mk() },
+        { locked: true, dest: true, cells: mk({ x: [3] }) },
+        { co: true, cells: mk({ o: [2, 4, 6], x: [0, 1] }) },
+        { locked: true, cells: mk({ x: [4, 7], o: [1], last: 4 }) },
+      ],
+      boardWon: [
+        { cx: true, cells: mk({ x: [0, 4, 8], o: [1, 2] }) },
+        { co: true, cells: mk({ o: [0, 4, 8], x: [1, 2] }) },
+        { cat: true, cells: mk({ x: [0, 2, 3, 7, 8], o: [1, 4, 5, 6] }) },
+        { locked: true, cells: mk({ x: [0], o: [4] }) },
+        { cx: true, cells: mk({ x: [2, 4, 6], o: [0, 1] }) },
+        { co: true, cells: mk({ o: [2, 4, 6], x: [0, 3] }) },
+        { locked: true, cells: mk({ x: [3], o: [5] }) },
+        { cx: true, cells: mk({ x: [0, 3, 6], o: [1, 2], last: 6 }) },
+        { locked: true, cells: mk({ o: [1] }) },
+      ],
+      boardDrawn: [
+        { cx: true, cells: mk({ x: [0, 4, 8], o: [1, 2] }) },
+        { co: true, cells: mk({ o: [0, 4, 8], x: [1, 2] }) },
+        { cx: true, cells: mk({ x: [2, 4, 6], o: [0, 1] }) },
+        { co: true, cells: mk({ o: [2, 4, 6], x: [0, 3] }) },
+        { cat: true, cells: mk({ x: [0, 2, 3, 7, 8], o: [1, 4, 5, 6] }) },
+        { cx: true, cells: mk({ x: [0, 1, 2], o: [3, 4] }) },
+        { co: true, cells: mk({ o: [0, 3, 6], x: [1, 2] }) },
+        { cat: true, cells: mk({ x: [0, 2, 3, 7, 8], o: [1, 4, 5, 6], last: 8 }) },
+        { cx: true, cells: mk({ x: [0, 4, 8], o: [2, 6] }) },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

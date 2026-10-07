@@ -27,6 +27,7 @@ RECOGNIZED_FORMATS = {
     "wav": (".wav",),
     "mp3": (".mp3",),
     "mp4": (".mp4",),
+    "mov": (".mov",),
 }
 
 # R38 — version one's two settled defaults.
@@ -38,7 +39,7 @@ DEFAULT_MODELS = {
 ALL_FIELDS = {
     "name", "type", "operation", "model", "prompt", "prompt_key", "output",
     "format", "inputs", "input_files", "frame_count", "frame_size", "layout",
-    "frames", "source",
+    "frames", "source", "resize", "matte",
 }
 REQUIRED_FIELDS = {"name", "type", "output", "format"}
 CALL_FIELDS = {"model", "prompt", "prompt_key", "inputs", "input_files"}
@@ -78,6 +79,8 @@ class Entry:
     layout: dict | None
     frames: list | None
     source: str | None
+    resize: list | None  # extract_frames only: every frame is fitted into [w, h]
+    matte: dict | None  # extract_frames only: alpha from a mask video, outline restored
 
 
 def load_manifest_raw(manifest_path: Path):
@@ -237,12 +240,20 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
 
     # R42/R43 — every file reference must resolve to a real file, now.
     for key, ref in (raw.get("input_files") or {}).items():
-        resolve_reference(config, ref, context=f"entry {name!r} input_files[{key!r}]")
+        context = f"entry {name!r} input_files[{key!r}]"
+        if isinstance(ref, list):
+            if not ref:
+                raise ManifestError(f"{context}: a list of file references must not be empty")
+            for one in ref:
+                resolve_reference(config, one, context=context)
+        else:
+            resolve_reference(config, ref, context=context)
     if operation == "assemble_sheet":
         for ref in frames_list:
             resolve_reference(config, ref, context=f"entry {name!r} frames")
     if operation == "extract_frames":
         resolve_reference(config, source, context=f"entry {name!r} source")
+    _validate_matte(name, operation, raw, config)
 
     return Entry(
         name=name,
@@ -262,6 +273,8 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
         layout=layout,
         frames=frames_list,
         source=source,
+        resize=raw.get("resize"),
+        matte=raw.get("matte"),
     )
 
 
@@ -342,8 +355,64 @@ def _is_int(value) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
+MATTE_KEYS = {"mask", "background", "grow", "threshold", "feather", "effect"}
+
+
+def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
+    if "matte" not in raw:
+        return
+    if operation != "extract_frames":
+        raise ManifestError(f"entry {name!r}: 'matte' is legal only for extract_frames")
+    matte = raw["matte"]
+    if not isinstance(matte, dict) or "mask" not in matte:
+        raise ManifestError(f"entry {name!r}: 'matte' must be a mapping with at least 'mask'")
+    unknown = set(matte) - MATTE_KEYS
+    if unknown:
+        raise ManifestError(
+            f"entry {name!r}: matte has unknown key(s) {', '.join(sorted(unknown))}; "
+            f"legal keys are {', '.join(sorted(MATTE_KEYS))}"
+        )
+    resolve_reference(config, matte["mask"], context=f"entry {name!r} matte.mask")
+    background = matte.get("background", "auto")
+    if background != "auto" and not (
+        isinstance(background, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", background)
+    ):
+        raise ManifestError(
+            f"entry {name!r}: matte.background must be 'auto' or a '#rrggbb' colour, "
+            f"got {background!r}"
+        )
+    for key, low, high in (("grow", 0, 16), ("threshold", 0, 441), ("feather", 0, 8)):
+        if key in matte:
+            value = matte[key]
+            if not (isinstance(value, (int, float)) and not isinstance(value, bool)) or not (
+                low <= value <= high
+            ):
+                raise ManifestError(
+                    f"entry {name!r}: matte.{key} must be a number from {low} to {high}, got {value!r}"
+                )
+    if "effect" in matte and not isinstance(matte["effect"], bool):
+        raise ManifestError(
+            f"entry {name!r}: matte.effect must be a bool, got {matte['effect']!r}"
+        )
+
+
 def _validate_geometry(name, type_, operation, raw, frame_count, frame_size, layout) -> None:
     is_sheet = type_ == "sprite_sheet"
+    if "resize" in raw:
+        if operation != "extract_frames":
+            raise ManifestError(
+                f"entry {name!r}: 'resize' is legal only for extract_frames"
+            )
+        resize = raw["resize"]
+        if not (
+            isinstance(resize, list)
+            and len(resize) == 2
+            and all(_is_int(v) and v > 0 for v in resize)
+        ):
+            raise ManifestError(
+                f"entry {name!r}: 'resize' must be a [width, height] list of two "
+                f"positive integers, got {resize!r}"
+            )
     if is_sheet:
         missing = [k for k in ("frame_count", "frame_size", "layout") if k not in raw]
         if missing:
