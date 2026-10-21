@@ -73,9 +73,9 @@ planning rather than a one-time puzzle.
 
 ## Combat
 
-Combat is turn-based tactics. Turn order is determined by the speed attribute of the chosen
-members and the speed of the enemies. On a guild member's turn, that member is highlighted and
-the player selects the target of the next attack.
+Combat is turn-based tactics. Turn order is determined by the speed attribute of the
+chosen members and the speed of the enemies. On a guild member's turn, that member is
+highlighted and the player selects the target of the next attack.
 
 Each member has a special bar that fills over time. When it's full, the player can use a
 special.
@@ -86,9 +86,9 @@ the second row can then be hit.
 
 ## Training Missions
 
-However far down the player has reached, they can send automated "training" missions down to
-that depth, to let members gain experience. These training missions are sent from the dungeon
-board.
+However far down the player has reached, they can send automated "training" missions down
+to that depth, to let members gain experience. These training missions are sent from the
+dungeon board.
 
 ## Open Questions
 
@@ -97,4 +97,5 @@ board.
 - What types of characters can the player recruit? (parked for later)
 - What does changing formation mid-battle cost the player, if anything?
 - How far can a training mission level a member?
-- With multiple dungeons, is the depth a training mission can reach tracked per dungeon, or shared across them?
+- With multiple dungeons, is the depth a training mission can reach tracked per dungeon,
+  or shared across them?
