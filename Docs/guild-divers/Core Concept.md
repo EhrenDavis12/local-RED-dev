@@ -1,7 +1,7 @@
 # Guild Divers
 
-> **Status:** Early concept. Nothing is built yet — this is the first pass at what the
-> game is.
+> **Status:** Early concept. Nothing is built yet — the systems are taking shape, but most
+> of the numbers aren't set.
 
 ## The Premise
 
@@ -27,11 +27,14 @@ train in a dungeon.
 
 ## The Party
 
-A party is made of multiple divers, plus support characters. Support characters have a
-reason for being there and need to be protected by the party. Support characters have
-out-of-combat abilities — for example, a porter, who adds a lot more carrying capacity on
-top of what any party member already carries, and a cook who helps healing between
-battles. That list isn't complete.
+A party is made of multiple divers, plus specialists. Specialists have a reason for being
+there and need to be protected by the party. Specialists have out-of-combat abilities —
+for example, a porter, who adds a lot more carrying capacity on top of what any party
+member already carries, and a cook who helps healing between battles. That list isn't
+complete.
+
+The maximum team is 15 members, including specialists, and the player chooses how many of
+that to take.
 
 ## Missions
 
@@ -49,6 +52,19 @@ Mission failure normally results in an injured status, not death. The exception:
 an under-levelled individual member on a mission, even one the guild is otherwise suited
 for, carries a chance that member is killed.
 
+Missions pay, and they also collect items and materials the guild can sell; some mission
+rewards can themselves be items.
+
+## The Economy
+
+Gold is the money in the game.
+
+At rank F the guild has access to a shop. The guild sells items and materials there, and
+the shop sells to the guild too — the player can buy items and equipment.
+
+At higher ranks the guild can recruit blacksmiths, armourers and alchemists, and having
+one gives the guild that kind of crafting.
+
 ## The Dungeon
 
 Dungeon diving is the main gameplay. Death in the dungeon is permanent — there is no way
@@ -60,22 +76,44 @@ the player may choose to return to the top and exit the dungeon. Retreating alwa
 the loot gathered since the last safe floor — any party member can carry some of it, but a
 porter, if one came along, carries far more.
 
+Dungeon diving yields materials or items, and sometimes small amounts of gold.
+
+## Entering the Dungeon
+
+There is a cost to enter the dungeon, and the more members taken, the more expensive it
+is. This makes party size a choice for the player.
+
+A large party can have advantages — boss floors where more members are needed to secure
+victory — while for exploring, a large party is less advantageous.
+
+There is an inherent risk in diving that the members brought might not be right for the
+floors ahead.
+
+The Scout is a specialist that can "Search" the next 5 floors for the party and give an
+idea of what is coming. It is not a guarantee. With it, the player can choose to return
+and build a new team, or train to be more powerful, before continuing.
+
+The player re-enters at the last rest area reached, and must pay the entry fee again plus
+a teleportation fee. This stops the player exploring five floors, returning, and
+rearranging the party with no penalty.
+
 ## Formation
 
 The player sets the team up on a grid of nodes, 3 wide and 5 deep. It's managed in a
 planning sub-menu. Enemies use the same style of grid.
 
-Support characters occupy a node on the grid too, but they take no turn of their own —
-their value is entirely outside combat.
+Specialists occupy a node on the grid too, but they take no turn of their own — their
+value is entirely outside combat.
 
 The player can also change formation in the middle of battle — formation is ongoing battle
 planning rather than a one-time puzzle.
 
 ## Combat
 
-Combat is turn-based tactics. Turn order is determined by the speed attribute of the
-chosen members and the speed of the enemies. On a guild member's turn, that member is
-highlighted and the player selects the target of the next attack.
+Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
+enemies'. On a guild member's turn, that member is highlighted. Default attacks are
+auto-selected. The player can select one enemy to be specifically targeted by the entire
+party — this cuts down on clicks during gameplay.
 
 Each member has a special bar that fills over time. When it's full, the player can use a
 special.
@@ -92,9 +130,7 @@ dungeon board.
 
 ## Open Questions
 
-- How many divers and support characters go on a dive?
 - What changes at each rank from F to SSS?
-- What types of characters can the player recruit? (parked for later)
 - What does changing formation mid-battle cost the player, if anything?
 - How far can a training mission level a member?
 - With multiple dungeons, is the depth a training mission can reach tracked per dungeon,
