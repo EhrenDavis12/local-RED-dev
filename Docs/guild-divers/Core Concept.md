@@ -62,8 +62,8 @@ Gold is the money in the game.
 At rank F the guild has access to a shop. The guild sells items and materials there, and
 the shop sells to the guild too — the player can buy items and equipment.
 
-At higher ranks the guild can recruit blacksmiths, armourers and alchemists, and having
-one gives the guild that kind of crafting.
+At higher ranks the guild can recruit blacksmiths, armourers and alchemists as
+specialists, and having one gives the guild that kind of crafting.
 
 ## The Dungeon
 
