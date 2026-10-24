@@ -49,8 +49,8 @@ There's backend variance on top of that, though: a mission can turn out easier o
 than its stated rank suggests. That's deliberate, to give the player a sense of mystery.
 
 Mission failure normally results in an injured status, not death. The exception: sending
-an under-levelled individual member on a mission, even one the guild is otherwise suited
-for, carries a chance that member is killed.
+an individual member whose own rank is below the mission's rank, even one the guild as a
+whole is otherwise suited for, carries a chance that member is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
 rewards can themselves be items.
@@ -99,8 +99,8 @@ rearranging the party with no penalty.
 
 ## Formation
 
-The player sets the team up on a grid of nodes, 3 wide and 5 deep. It's managed in a
-planning sub-menu. Enemies use the same style of grid.
+The player sets the team up on a grid of nodes, 5 wide and 3 deep — three rows of five
+positions each. It's managed in a planning sub-menu. Enemies use the same style of grid.
 
 Specialists occupy a node on the grid too, but they take no turn of their own — their
 value is entirely outside combat.

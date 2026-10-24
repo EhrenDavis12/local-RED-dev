@@ -1,7 +1,8 @@
 # Guild Members
 
-> **Status:** Early design. Nothing is built yet — the help percentages are settled, but
-> what they apply to, and what a type advantage is worth, are not.
+> **Status:** Early design. Nothing is built yet — the help percentages and the member
+> rank ladder are settled, but what help applies to, and what a type advantage is worth,
+> are not.
 
 ## Combat Types
 
@@ -64,6 +65,40 @@ The power of the fighting members is based on five base stats:
 
 Dexterity is also the speed attribute: it's what determines turn order in combat.
 
+A member's defence comes from Constitution plus their equipment.
+
+There is no minimum damage — enough defence can reduce a hit to nothing.
+
+## Levels and Experience
+
+Each level a member gains increases one base stat. Which stat goes up is weighted
+random — a member's type makes certain stats more likely but not guaranteed, so members
+of the same type turn out slightly different from each other. Specialists gain base
+stats the same way divers do, and their specialty improves alongside.
+
+Experience is awarded per floor: once a floor's battles resolve, experience is the number
+of enemies defeated by the party divided by the number of party members, counting
+specialists.
+
+## Member Rank
+
+Each member has their own rank, separate from guild rank and mission rank, on the same
+ladder: F → E → D → C → B → A → S → SS → SSS.
+
+To rank a member up from F to E, the member must reach level 16, and the player must pay
+gold for the official rank up — both are required. Ranking up resets the member's level
+to 1; the stats already earned are kept, and only the level counter resets.
+
+A member stops gaining levels once they reach the threshold for their next rank, and stays
+there until the player pays the gold for the official rank up — so neglecting a promotion
+wastes the experience the party keeps earning in the meantime.
+
+The level a member needs doubles at each rank: F to E is level 16, E to D is level 32,
+and so on — 16, 32, 64, 128, 256, 512, 1024, 2048.
+
+Every type ranks up this way, including specialists. Specialists level and rank up
+too — for a specialist, ranking up means more supporting functionality.
+
 ## Specialists
 
 Specialist types include Porter, Cook, Scout, Herbalist, Miner, Blacksmith, Armourer, and
@@ -79,4 +114,4 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 
 - What is having a type advantage actually worth in a fight?
 - What does a support bonus increase — damage, the base stats, or something else?
-- What are the stats, skills and abilities for each individual type?
+- Does the experience a defeated enemy is worth scale with dungeon depth?
