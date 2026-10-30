@@ -1,9 +1,0 @@
-{
-  "name": "guild-divers",
-  "aliases": ["gd"],
-  "title": "Guild Divers",
-  "docsRoot": "Docs/guild-divers",
-  "prds": "Docs/guild-divers/PRDs",
-  "roadmap": "Docs/guild-divers/roadmap.md",
-  "srcRoots": []
-}

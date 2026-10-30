@@ -1,4 +1,4 @@
-# Guild Divers
+# Guild Master's Descent
 
 > **Status:** Early concept. Nothing is built yet — the systems are taking shape, but most
 > of the numbers aren't set.
