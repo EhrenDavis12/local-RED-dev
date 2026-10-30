@@ -106,7 +106,8 @@ Specialists occupy a node on the grid too, but they take no turn of their own �
 value is entirely outside combat.
 
 The player can also change formation in the middle of battle — formation is ongoing battle
-planning rather than a one-time puzzle.
+planning rather than a one-time puzzle. Some enemy types can reposition mid-battle too,
+but not all of them can.
 
 ## Combat
 
@@ -115,12 +116,14 @@ enemies'. On a guild member's turn, that member is highlighted. Default attacks 
 auto-selected. The player can select one enemy to be specifically targeted by the entire
 party — this cuts down on clicks during gameplay.
 
-Each member has a special bar that fills over time. When it's full, the player can use a
-special.
+Each member has a special bar. When it's full, the player can use a special. Every
+attack a member makes charges that member's bar — that's the base, and it's the same
+for every type. Each combat type also has its own bonus condition that charges its bar
+on top of that.
 
 Characters and enemies have either close-range or far-range attacks, with possible AoE
 effects. Close-combat reach is the first available row: if the first row has been removed,
-the second row can then be hit.
+the second row can then be hit. A far-range attack can reach any row on the enemy's grid.
 
 ## Training Missions
 

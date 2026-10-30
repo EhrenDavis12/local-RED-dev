@@ -69,6 +69,15 @@ A member's defence comes from Constitution plus their equipment.
 
 There is no minimum damage — enough defence can reduce a hit to nothing.
 
+A member's evasion comes from Dexterity and Luck.
+
+An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
+land on a space rather than on a person, so evasion does nothing against them. They do
+pay a reduced defence, though: defence still applies to them, but at less than its usual
+value.
+
+Strength drives physical damage; Intelligence drives magic damage.
+
 ## Levels and Experience
 
 Each level a member gains increases one base stat. Which stat goes up is weighted
