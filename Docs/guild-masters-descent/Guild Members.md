@@ -1,8 +1,8 @@
 # Guild Members
 
-> **Status:** Early design. Nothing is built yet — the help percentages and the member
-> rank ladder are settled, but what help applies to, and what a type advantage is worth,
-> are not.
+> **Status:** Early design. Nothing is built yet — the help percentages and both member
+> ladders — ranks and tiers — are settled, but what help applies to, and what a type
+> advantage is worth, are not.
 
 ## Combat Types
 
@@ -89,25 +89,23 @@ Experience is awarded per floor: once a floor's battles resolve, experience is t
 of enemies defeated by the party divided by the number of party members, counting
 specialists.
 
-## Member Rank
+## Promotion
 
-Each member has their own rank, separate from guild rank and mission rank, on the same
-ladder: F → E → D → C → B → A → S → SS → SSS.
+Divers have their own rank, separate from guild rank and mission rank, on the same
+ladder: F → E → D → C → B → A → S → SS → SSS. Specialists don't use that ladder —
+instead they climb nine tiers of their own, named in the specialists doc.
 
-To rank a member up from F to E, the member must reach level 16, and the player must pay
-gold for the official rank up — both are required. Ranking up resets the member's level
+To promote a member, the member must reach the level threshold, and the player must pay
+gold for the official promotion — both are required. Promotion resets the member's level
 to 1; the stats already earned are kept, and only the level counter resets.
 
-A member stops gaining levels once they reach the threshold for their next rank, and stays
-there until the player pays the gold for the official rank up — so neglecting a promotion
-wastes the experience the party keeps earning in the meantime.
+A member stops gaining levels once they reach the threshold for their next rank or tier,
+and stays there until the player pays the gold for the official promotion — so neglecting
+a promotion wastes the experience the party keeps earning in the meantime.
 
-The level a member needs doubles at each rank: F to E is level 16, E to D is level 32,
-and so on — 16, 32, 64, 128, 256, 512, 1024, 2048.
-
-Every type ranks up this way, including specialists. Specialists level and rank up
-too — for a specialist, ranking up makes the same ability stronger rather than adding a
-new one.
+The level a member needs doubles at each promotion: the first is level 16, the second is
+32, and so on — 16, 32, 64, 128, 256, 512, 1024, 2048. The same eight thresholds serve
+both ladders — nine tiers means eight promotions, exactly as many as nine ranks.
 
 ## Specialists
 

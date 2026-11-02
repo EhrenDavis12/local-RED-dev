@@ -46,8 +46,8 @@ There's backend variance on top of that, though: a mission can turn out easier o
 than its stated rank suggests. That's deliberate, to give the player a sense of mystery.
 
 Mission failure normally results in an injured status, not death. The exception: sending
-an individual member whose own rank is below the mission's rank, even one the guild as a
-whole is otherwise suited for, carries a chance that member is killed.
+an individual member whose own rank or tier is below the mission's rank, even one the
+guild as a whole is otherwise suited for, carries a chance that member is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
 rewards can themselves be items.
@@ -119,6 +119,23 @@ on top of that.
 Characters and enemies have either close-range or far-range attacks, with possible AoE
 effects. Close-combat reach is the first available row: if the first row has been removed,
 the second row can then be hit. A far-range attack can reach any row on the enemy's grid.
+
+## Equipment Durability
+
+Gear wears down as it is used — weapons degrade from attacking, armour from being hit. It
+works fully until it reaches zero, then breaks and contributes nothing — there is no
+gradual decline before that.
+
+Broken armour means the member's defence falls back to Constitution alone.
+
+A broken weapon leaves the member unarmed and much weaker: they still attack, for a
+fraction of the damage, and their combat type's attack shape still applies — a Brute with
+a broken weapon still cleaves, just feebly.
+
+Repairs happen in the guild hall between dives. A crafter in the party can also repair in
+the field, a convenience rather than a requirement. Field repair only works on gear that
+is still above zero. Once an item breaks it stays broken for the rest of the dive — a
+crafter in the party cannot bring it back.
 
 ## Training Missions
 
