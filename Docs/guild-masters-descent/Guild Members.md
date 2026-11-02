@@ -106,7 +106,8 @@ The level a member needs doubles at each rank: F to E is level 16, E to D is lev
 and so on — 16, 32, 64, 128, 256, 512, 1024, 2048.
 
 Every type ranks up this way, including specialists. Specialists level and rank up
-too — for a specialist, ranking up means more supporting functionality.
+too — for a specialist, ranking up makes the same ability stronger rather than adding a
+new one.
 
 ## Specialists
 

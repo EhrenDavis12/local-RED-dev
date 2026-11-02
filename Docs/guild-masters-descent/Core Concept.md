@@ -28,10 +28,7 @@ train in a dungeon.
 ## The Party
 
 A party is made of multiple divers, plus specialists. Specialists have a reason for being
-there and need to be protected by the party. Specialists have out-of-combat abilities —
-for example, a porter, who adds a lot more carrying capacity on top of what any party
-member already carries, and a cook who helps healing between battles. That list isn't
-complete.
+there and need to be protected by the party. Specialists have out-of-combat abilities.
 
 The maximum team is 15 members, including specialists, and the player chooses how many of
 that to take.
@@ -62,8 +59,7 @@ Gold is the money in the game.
 At rank F the guild has access to a shop. The guild sells items and materials there, and
 the shop sells to the guild too — the player can buy items and equipment.
 
-At higher ranks the guild can recruit blacksmiths, armourers and alchemists as
-specialists, and having one gives the guild that kind of crafting.
+Having a blacksmith, armourer or alchemist in the guild gives it that kind of crafting.
 
 ## The Dungeon
 
@@ -73,8 +69,8 @@ will survive, or send a team and see who comes back.
 
 Each floor has 2–3 battles. Every 5th floor is a safe rest area, where the party heals and
 the player may choose to return to the top and exit the dungeon. Retreating always costs
-the loot gathered since the last safe floor — any party member can carry some of it, but a
-porter, if one came along, carries far more.
+the loot gathered since the last safe floor — any party member can carry some of it, so
+how much is lost depends on who came along.
 
 Dungeon diving yields materials or items, and sometimes small amounts of gold.
 
@@ -89,9 +85,8 @@ victory — while for exploring, a large party is less advantageous.
 There is an inherent risk in diving that the members brought might not be right for the
 floors ahead.
 
-The Scout is a specialist that can "Search" the next 5 floors for the party and give an
-idea of what is coming. It is not a guarantee. With it, the player can choose to return
-and build a new team, or train to be more powerful, before continuing.
+A Scout in the party is what turns that risk into a decision: the player can choose to
+return and build a new team, or train to be more powerful, before continuing.
 
 The player re-enters at the last rest area reached, and must pay the entry fee again plus
 a teleportation fee. This stops the player exploring five floors, returning, and
