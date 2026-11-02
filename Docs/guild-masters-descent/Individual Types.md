@@ -11,7 +11,8 @@ little defence on top of its Constitution, so there's less to subtract than agai
 properly armoured type, and a Fighter's many strikes keep most of their damage.
 
 The Brute's ordinary attack cleaves too: it hits the targeted enemy and the two directly
-next to it, on whichever row its close range can reach.
+next to it, on whichever row its close range can reach, and each of them can evade it
+individually.
 
 The Brute's special skips the nearest occupied row and cleaves the two rows behind it, or
 whatever rows remain if there are fewer. The cleave hits the targeted enemy and the two
@@ -40,9 +41,9 @@ The Fighter attacks at close range, with many smaller strikes — the property b
 matchups turn on.
 
 Its special is a flurry of up to 6 strikes on a single target. If the target dies before
-the strikes run out, the remaining strikes carry to another enemy. If any enemy is killed
-during the flurry, the Fighter's charge bar refills to 90% — that refill is the
-Fighter's bonus charge condition.
+the strikes run out, the remaining strikes carry to the nearest enemy still standing. If
+any enemy is killed during the flurry, the Fighter's charge bar refills to 90% — that
+refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 

@@ -45,9 +45,12 @@ or below the guild's own grade; a guild cannot reach for a mission ranked above 
 There's backend variance on top of that, though: a mission can turn out easier or harder
 than its stated rank suggests. That's deliberate, to give the player a sense of mystery.
 
-Mission failure normally results in an injured status, not death. The exception: sending
-an individual member whose own rank or tier is below the mission's rank, even one the
-guild as a whole is otherwise suited for, carries a chance that member is killed.
+Mission failure normally results in an injured status, not death. An injured member is out
+of action until healed — they can't be sent on a mission or taken on a dive. They recover
+on their own for free, though slowly — or the player can pay gold to speed it up. The
+exception: sending an individual member whose own rank or tier is below the mission's
+rank, even one the guild as a whole is otherwise suited for, carries a chance that member
+is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
 rewards can themselves be items.
@@ -97,8 +100,7 @@ rearranging the party with no penalty.
 The player sets the team up on a grid of nodes, 5 wide and 3 deep — three rows of five
 positions each. It's managed in a planning sub-menu. Enemies use the same style of grid.
 
-Specialists occupy a node on the grid too, but they take no turn of their own — their
-value is entirely outside combat.
+Specialists occupy a node on the grid too, and can be attacked there like anyone else.
 
 The player can also change formation in the middle of battle — formation is ongoing battle
 planning rather than a one-time puzzle. Some enemy types can reposition mid-battle too,
@@ -116,6 +118,13 @@ attack a member makes charges that member's bar — that's the base, and it's th
 for every type. Each combat type also has its own bonus condition that charges its bar
 on top of that.
 
+A specialist takes a turn like anyone else. On it, the specialist makes a basic attack
+against a single target — a close-range attack, so its reach is the first available row
+like any close attacker, the enemy front line. The attack is weak — the intent is that
+specialists help a little rather than being a full detriment to the battle. A specialist
+has no special bar at all, and their attack damage comes from Strength, like other
+physical attackers.
+
 Characters and enemies have either close-range or far-range attacks, with possible AoE
 effects. Close-combat reach is the first available row: if the first row has been removed,
 the second row can then be hit. A far-range attack can reach any row on the enemy's grid.
@@ -132,16 +141,16 @@ A broken weapon leaves the member unarmed and much weaker: they still attack, fo
 fraction of the damage, and their combat type's attack shape still applies — a Brute with
 a broken weapon still cleaves, just feebly.
 
-Repairs happen in the guild hall between dives. A crafter in the party can also repair in
-the field, a convenience rather than a requirement. Field repair only works on gear that
-is still above zero. Once an item breaks it stays broken for the rest of the dive — a
-crafter in the party cannot bring it back.
+Repairs happen in the guild hall between dives. A Blacksmith or Armourer in the party can
+also repair in the field, a convenience rather than a requirement. Field repair only works
+on gear that is still above zero. Once an item breaks it stays broken for the rest of the
+dive — a Blacksmith or Armourer in the party cannot bring it back.
 
 ## Training Missions
 
 However far down the player has reached, they can send automated "training" missions down
 to that depth, to let members gain experience. These training missions are sent from the
-dungeon board.
+dungeon board. A training run can injure a member, but can never kill one.
 
 ## Open Questions
 

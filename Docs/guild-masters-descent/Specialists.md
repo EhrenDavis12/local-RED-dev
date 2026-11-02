@@ -24,7 +24,12 @@ Grandmaster SSS where SSS sits.
 
 Promoting a specialist works exactly the way a diver's rank up does.
 
-For a specialist, promotion makes the same ability stronger rather than adding a new one.
+For a specialist, promotion makes the same ability stronger.
+
+## Equipment
+
+A specialist has no equipment — no weapon and no armour. So a specialist's defence comes
+from Constitution alone.
 
 ## The Porter
 
@@ -39,7 +44,7 @@ of the rest area's own healing.
 ## The Scout
 
 The Scout can "Search" the next 5 floors for the party and give an idea of what is coming.
-It is not a guarantee. The Scout can also Search at rest areas.
+It is not a guarantee. The Scout can Search at rest areas.
 
 ## The Herbalist and the Miner
 
@@ -59,8 +64,8 @@ between battles — armour, consistent with its trade.
 
 ## The Alchemist
 
-The Alchemist makes potions. On a dive, the Alchemist can brew from what the party has
-gathered.
+The Alchemist makes potions. Potions are temporary buffs: they raise stats for a fight. At
+a rest area, the Alchemist can brew from what the party has gathered.
 
 ## Open Questions
 
