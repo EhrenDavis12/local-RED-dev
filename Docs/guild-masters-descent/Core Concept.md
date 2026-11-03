@@ -8,11 +8,17 @@
 The player manages a guild. The player has no presence or avatar in the world — they are
 not a character in it. The main screen is the inside of a guild hall.
 
+## Time
+
+Time passes in real time, and it keeps passing while the game is closed — missions
+complete and injuries heal while the player is away.
+
 ## Guild Rank
 
 The game starts at an F-rank guild. Grade is raised by clearing milestone quests — named,
-one-off tests that appear when the guild is close to promotion. They're separate from the
-routine work on the mission board. The full ladder, in order:
+one-off tests that appear when the guild is close to promotion. They appear on the mission
+board, marked out as the promotion test, and they're separate from the routine work there.
+The full ladder, in order:
 
 F → E → D → C → B → A → S → SS → SSS
 
@@ -36,19 +42,31 @@ member sent on one is not available for the dungeon dive.
 
 Missions have a stated rank, using the same F–SSS ladder as guild rank — a mission marked
 C is one a C-rank guild is expected to handle. The mission board only offers missions at
-or below the guild's own grade; a guild cannot reach for a mission ranked above itself.
-There's backend variance on top of that, though: a mission can turn out easier or harder
-than its stated rank suggests. That's deliberate, to give the player a sense of mystery.
+or below the guild's own grade; a guild cannot reach for a mission ranked above itself. A
+milestone quest is the exception: it's deliberately above the guild's grade, and the board
+shows it anyway because it's a test rather than a job. There's backend variance on top of
+that, though: a mission can turn out easier or harder than its stated rank suggests.
+That's deliberate, to give the player a sense of mystery.
+
+A few missions can run at once, and the cap grows with guild rank. Anything the guild
+sends people out on takes one of those slots — a claim mission and a milestone quest
+included, not just routine work. How many members a mission needs varies by the mission
+— some want one, some want several. How long a mission takes varies by its rank: low-rank
+missions take minutes, high-rank ones take hours.
 
 Mission failure normally results in an injured status, not death. An injured member is out
 of action until healed — they can't be sent on a mission or taken on a dive. They recover
-on their own for free, though slowly — or the player can pay gold to speed it up. The
-exception: sending an individual member whose own rank or tier is below the mission's
+on their own for free, though slowly — or the player can pay gold to speed it up. Gold
+only reaches the injury: a mission timer runs its full length whatever the player pays.
+The exception: sending an individual member whose own rank or tier is below the mission's
 rank, even one the guild as a whole is otherwise suited for, carries a chance that member
 is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
 rewards can themselves be items.
+
+The intent is that mission rewards keep the guild going but don't advance it — the climb
+comes from milestone quests and from what the dungeon yields.
 
 ## The Recruiting Board
 
