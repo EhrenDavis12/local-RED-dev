@@ -1,12 +1,17 @@
 # Specialists
 
 > **Status:** Early design. Nothing is built yet — every specialist type is gated by guild
-> rank, but which rank unlocks which isn't settled.
+> rank, and the schedule of which rank unlocks which is set.
 
 ## Recruiting
 
-Every specialist type is gated by guild rank, and the unlocks are spread across the
-ladder. The crafters — Blacksmith, Armourer and Alchemist — come in at the higher ranks.
+Every specialist type is gated by guild rank, and the unlocks are front-loaded into the
+first three ranks — the player needs access to the supports early, so that the chance to
+level them up is available.
+
+- F — the Cook and the Porter
+- E — the Scout, the Herbalist and the Miner
+- D — the Armourer, the Alchemist and the Blacksmith
 
 The guild can hold more than one of a specialist type.
 
@@ -68,5 +73,3 @@ The Alchemist makes potions. Potions are temporary buffs: they raise stats for a
 a rest area, the Alchemist can brew from what the party has gathered.
 
 ## Open Questions
-
-- Which guild rank unlocks each specialist type?

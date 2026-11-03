@@ -55,6 +55,30 @@ is killed.
 Missions pay, and they also collect items and materials the guild can sell; some mission
 rewards can themselves be items.
 
+## The Recruiting Board
+
+The recruiting board is where new members are hired — divers and specialists alike.
+Recruiting costs gold. A recruit's rank or tier caps out at the guild's own: an A-rank
+guild can hire up to A-rank members.
+
+A candidate on the board shows its type and its rank or tier plainly, along with a rough
+impression of where its strengths lie — promising, unremarkable, that kind of thing. There
+are no exact stat numbers.
+
+The board restocks over time: new candidates appear as time passes, so a poor board is
+worth waiting out.
+
+The guild's roster size grows with guild rank. That's separate from the fifteen-member
+party cap, which stays the same regardless of guild rank.
+
+A member can be dismissed to make room on the roster. The gold spent recruiting and
+promoting that member is lost.
+
+The intent is that a member raised up through the ranks ends up stronger than one hired at
+that rank, because it keeps the stats earned at every level climbed along the way.
+
+Which specialist types the guild can recruit is covered in the Specialists doc.
+
 ## The Economy
 
 Gold is the money in the game.
@@ -63,6 +87,25 @@ At rank F the guild has access to a shop. The guild sells items and materials th
 the shop sells to the guild too — the player can buy items and equipment.
 
 Having a blacksmith, armourer or alchemist in the guild gives it that kind of crafting.
+
+## Finding Dungeons
+
+Dungeons are found through the mission board. The missions that find a dungeon are the
+challenge the player works against.
+
+There are two ways to find one. There's a small chance of finding a dungeon on an ordinary
+mission. When the guild ranks up, one mission appears on the board to claim that rank's
+dungeon — the claim mission requires a big group to go and take it. A claim mission can
+fail, and it stays on the board — the dungeon isn't lost, so the guild can try again.
+
+Once a dungeon is found, the guild claims it. A dungeon's depth is random when it's
+created.
+
+The player can only find dungeons at or below the guild's rank, so ranking up is what
+makes new dungeons findable at all. Finding is the only gate — once a dungeon is claimed,
+it can be dived, with no separate rank requirement to enter one the guild already holds.
+
+The intent is that the player tries to find as many dungeons as they can.
 
 ## The Dungeon
 
