@@ -20,11 +20,6 @@ F → E → D → C → B → A → S → SS → SSS
 
 The hall has three boards — a mission board, a recruiting board, and a dungeon board.
 
-The dungeon board has three functions: dungeon information, which shows the types of
-monster and enemy found in each of the dungeons; dungeon planning, where the team that
-will go into a dungeon is built; and dungeon training, which handles the team that will
-train in a dungeon.
-
 ## The Party
 
 A party is made of multiple divers, plus specialists. Specialists have a reason for being
@@ -78,6 +73,27 @@ The intent is that a member raised up through the ranks ends up stronger than on
 that rank, because it keeps the stats earned at every level climbed along the way.
 
 Which specialist types the guild can recruit is covered in the Specialists doc.
+
+## The Dungeon Board
+
+The dungeon board has three functions: dungeon information, which shows the types of
+monster and enemy found in each of the dungeons; dungeon planning, where the team that
+will go into a dungeon is built; and dungeon training, which handles the team that will
+train in a dungeon.
+
+A newly claimed dungeon starts near-blank. The enemy types and the floor layout appear
+as the party reaches each floor.
+
+For each dungeon, the board shows the deepest floor reached and the dungeon's depth,
+side by side.
+
+Planning happens in two steps: the player selects the members first, then arranges them
+on the grid. That second step is a zoomed-in view of the battle map rather than a
+separate screen. The system does the initial placement, putting combat types in front and
+making support links where it can — the player can edit it from there.
+
+The dungeon board is also where the player enters a dungeon, and where they re-enter at
+the last rest area reached.
 
 ## The Economy
 
@@ -144,7 +160,7 @@ rearranging the party with no penalty.
 ## Formation
 
 The player sets the team up on a grid of nodes, 5 wide and 3 deep — three rows of five
-positions each. It's managed in a planning sub-menu. Enemies use the same style of grid.
+positions each. Enemies use the same style of grid.
 
 Specialists occupy a node on the grid too, and can be attacked there like anyone else.
 
@@ -194,14 +210,13 @@ dive — a Blacksmith or Armourer in the party cannot bring it back.
 
 ## Training Missions
 
-However far down the player has reached, they can send automated "training" missions down
-to that depth, to let members gain experience. These training missions are sent from the
-dungeon board. A training run can injure a member, but can never kill one.
+The player can send automated "training" missions into a dungeon, down to the deepest
+floor the party has reached in that dungeon, to let members gain experience — the depth a
+training mission can reach is tracked per dungeon. These training missions are sent from
+the dungeon board. A training run can injure a member, but can never kill one.
 
 ## Open Questions
 
 - What changes at each rank from F to SSS?
 - What does changing formation mid-battle cost the player, if anything?
 - How far can a training mission level a member?
-- With multiple dungeons, is the depth a training mission can reach tracked per dungeon,
-  or shared across them?
