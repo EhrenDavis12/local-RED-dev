@@ -93,17 +93,20 @@ Having a blacksmith, armourer or alchemist in the guild gives it that kind of cr
 Dungeons are found through the mission board. The missions that find a dungeon are the
 challenge the player works against.
 
-There are two ways to find one. There's a small chance of finding a dungeon on an ordinary
-mission. When the guild ranks up, one mission appears on the board to claim that rank's
-dungeon — the claim mission requires a big group to go and take it. A claim mission can
-fail, and it stays on the board — the dungeon isn't lost, so the guild can try again.
-
-Once a dungeon is found, the guild claims it. A dungeon's depth is random when it's
-created.
-
 The player can only find dungeons at or below the guild's rank, so ranking up is what
-makes new dungeons findable at all. Finding is the only gate — once a dungeon is claimed,
-it can be dived, with no separate rank requirement to enter one the guild already holds.
+makes new dungeons findable at all. Finding is the only gate — a dungeon the guild
+already holds needs no rank to enter.
+
+There is a small chance of finding a dungeon on an ordinary mission, and a dungeon found
+that way is claimed outright — finding and claiming are one event on this route.
+
+Ranking up reveals that a dungeon is there, and nothing more about it: the guild knows it
+exists and no more than that. A claim mission then appears on the board, and it requires a
+big group to go and take it. A claim mission can fail, and it stays on the board — the
+dungeon isn't lost, so the guild can try again.
+
+A dungeon's depth is random when the dungeon is created, and it isn't known until the
+dungeon is claimed.
 
 The intent is that the player tries to find as many dungeons as they can.
 
