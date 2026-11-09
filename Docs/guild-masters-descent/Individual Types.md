@@ -38,7 +38,8 @@ attacked.
 ## The Fighter
 
 The Fighter attacks at close range, with many smaller strikes — the property both of its
-matchups turn on.
+matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
+hit harder rather than adding more strikes.
 
 Its special is a flurry of up to 6 strikes on a single target. If the target dies before
 the strikes run out, the remaining strikes carry to the nearest enemy still standing. If

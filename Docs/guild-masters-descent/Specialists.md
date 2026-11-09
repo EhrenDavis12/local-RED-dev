@@ -31,6 +31,8 @@ Promoting a specialist works exactly the way a diver's rank up does.
 
 For a specialist, promotion makes the same ability stronger.
 
+Each specialist type's stat weighting is covered in the Guild Members doc.
+
 ## Equipment
 
 A specialist has no equipment — no weapon and no armour. So a specialist's defence comes
@@ -71,5 +73,8 @@ between battles — armour, consistent with its trade.
 
 The Alchemist makes potions. Potions are temporary buffs: they raise stats for a fight. At
 a rest area, the Alchemist can brew from what the party has gathered.
+
+A potion's strength scales with the Alchemist's Intelligence, so a cleverer Alchemist
+brews stronger buffs.
 
 ## Open Questions

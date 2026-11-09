@@ -1,8 +1,8 @@
 # Guild Members
 
-> **Status:** Early design. Nothing is built yet — the help percentages and both member
-> ladders — ranks and tiers — are settled, but what help applies to, and what a type
-> advantage is worth, are not.
+> **Status:** Early design. Nothing is built yet — the help percentages, both member
+> ladders — ranks and tiers — and each type's stat weighting are settled, but what help
+> applies to, and what a type advantage is worth, are not.
 
 ## Combat Types
 
@@ -78,6 +78,12 @@ value.
 
 Strength drives physical damage; Intelligence drives magic damage.
 
+## Starting Stats
+
+A newly recruited member's starting stats are set by its type and its rank or tier. The
+type sets the shape of those stats; the rank or tier sets their magnitude — so a C-rank
+hire starts higher across the board than an F-rank one.
+
 ## Levels and Experience
 
 Each level a member gains increases one base stat. Which stat goes up is weighted
@@ -88,6 +94,27 @@ stats the same way divers do, and their specialty improves alongside.
 Experience is awarded per floor: once a floor's battles resolve, experience is the number
 of enemies defeated by the party divided by the number of party members, counting
 specialists.
+
+## Stat Weighting by Type
+
+Each type has an ordering of all five base stats, from most likely to gain on a
+level-up through least likely.
+
+- Brute — Strength, Constitution, Dexterity, Luck, Intelligence
+- Tank — Constitution, Strength, Dexterity, Luck, Intelligence
+- Fighter — Strength, Dexterity, Constitution, Luck, Intelligence
+- Rogue — Dexterity, Luck, Strength, Constitution, Intelligence
+- Archer — Dexterity, Strength, Luck, Constitution, Intelligence
+- Mage — Intelligence, Dexterity, Constitution, Luck, Strength
+
+- Porter — Strength, Constitution, Luck, Dexterity, Intelligence
+- Cook — Constitution, Dexterity, Strength, Luck, Intelligence
+- Scout — Dexterity, Luck, Constitution, Strength, Intelligence
+- Herbalist — Luck, Dexterity, Constitution, Strength, Intelligence
+- Miner — Constitution, Strength, Luck, Dexterity, Intelligence
+- Blacksmith — Strength, Luck, Constitution, Dexterity, Intelligence
+- Armourer — Constitution, Luck, Strength, Dexterity, Intelligence
+- Alchemist — Intelligence, Luck, Dexterity, Constitution, Strength
 
 ## Promotion
 
