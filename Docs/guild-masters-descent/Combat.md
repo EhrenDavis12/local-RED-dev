@@ -47,7 +47,7 @@ and defence is subtracted from it separately.
 
 Enemies pick a target from whatever they can reach. The choice is weighted by both how
 much damage that target has dealt and how easy it is to kill. A taunt overrides both of
-those factors for its duration.
+those factors until the taunted enemy's next hit — one attack, then it's spent.
 
 ## Equipment Durability
 

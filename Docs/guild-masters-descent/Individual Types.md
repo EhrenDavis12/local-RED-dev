@@ -60,8 +60,10 @@ dodged.
 The Rogue's ordinary attack is two quick strikes. Its strikes don't hit as hard as a
 Fighter's, because the weapon it carries adds less damage.
 
-The Rogue's special is called Vanish: the Rogue becomes untargetable. It can attack once
-while vanished, and that attack breaks the Vanish. Vanish fails if the Rogue is the only
+The Rogue's special is called Vanish: the Rogue becomes untargetable. Its attacks don't
+break Vanish, so it can keep attacking while vanished, and while Vanish is active those
+attacks hit automatically — there's no hit check. Vanish ends when an enemy's area attack
+hits the Rogue, or when its fixed length runs out. Vanish fails if the Rogue is the only
 thing an enemy can reach — then the Rogue can be hit anyway.
 
 The Rogue's bonus charge condition is evading an attack.
