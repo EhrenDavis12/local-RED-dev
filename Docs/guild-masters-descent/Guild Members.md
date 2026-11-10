@@ -1,8 +1,8 @@
 # Guild Members
 
-> **Status:** Early design. Nothing is built yet — the help percentages, both member
-> ladders — ranks and tiers — and each type's stat weighting are settled, but what help
-> applies to, and what a type advantage is worth, are not.
+> **Status:** Early design. Nothing is built yet — the help percentages and what they
+> apply to, both member ladders — ranks and tiers — and each type's stat weighting are
+> settled, but what a type advantage is worth isn't.
 
 ## Combat Types
 
@@ -21,6 +21,10 @@ The second triangle:
 - Rogue has advantage on Archer
 - Archer has advantage on Mage
 - Mage has advantage on Rogue
+
+A type advantage is a damage multiplier: an advantaged attack deals proportionally more
+damage than the same attack without the advantage. Each matchup's own mechanism is
+covered in the Individual Types doc.
 
 ## The Support Ring
 
@@ -53,6 +57,10 @@ The bonus diminishes as the count of helpers grows, so surrounding a member isn'
 straight multiplication but a percentage increase. The first help is 5%. Each subsequent
 help is 49% of the previous bonus — so the second help is 2.45%.
 
+The bonus applies to the receiving member's primary stat — the stat its type's ordering
+leads on. The first help rounds up to at least one point; every later help is exact, so
+at low stats a later help can come to nothing.
+
 ## Base Stats
 
 The power of the fighting members is based on five base stats:
@@ -65,24 +73,29 @@ The power of the fighting members is based on five base stats:
 
 Dexterity is also the speed attribute: it's what determines turn order in combat.
 
+A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
+ranks highest, plus their weapon.
+
 A member's defence comes from Constitution plus their equipment.
+
+Damage is the stat plus what you carry, defence is the stat plus what you wear.
 
 There is no minimum damage — enough defence can reduce a hit to nothing.
 
-A member's evasion comes from Dexterity and Luck.
+A member's evasion comes from Luck.
 
 An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
 land on a space rather than on a person, so evasion does nothing against them. They do
 pay a reduced defence, though: defence still applies to them, but at less than its usual
 value.
 
-Strength drives physical damage; Intelligence drives magic damage.
-
 ## Starting Stats
 
 A newly recruited member's starting stats are set by its type and its rank or tier. The
 type sets the shape of those stats; the rank or tier sets their magnitude — so a C-rank
 hire starts higher across the board than an F-rank one.
+
+A newly recruited level-1 F-rank member starts with single-digit stats.
 
 ## Levels and Experience
 
@@ -148,5 +161,4 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 ## Open Questions
 
 - What is having a type advantage actually worth in a fight?
-- What does a support bonus increase — damage, the base stats, or something else?
 - Does the experience a defeated enemy is worth scale with dungeon depth?

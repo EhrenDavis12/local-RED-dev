@@ -30,8 +30,8 @@ A specialist takes a turn like anyone else. On it, the specialist makes a basic 
 against a single target — a close-range attack, so its reach is the first available row
 like any close attacker, the enemy front line. The attack is weak — the intent is that
 specialists help a little rather than being a full detriment to the battle. A specialist
-has no special bar at all, and their attack damage comes from Strength, like other
-physical attackers.
+has no special bar at all, and their attack damage works the way it does for anyone
+else.
 
 Characters and enemies have either close-range or far-range attacks, with possible AoE
 effects. Close-combat reach is the first available row: if the first row has been removed,
