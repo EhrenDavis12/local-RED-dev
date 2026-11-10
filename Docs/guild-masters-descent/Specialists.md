@@ -64,10 +64,15 @@ than an ordinary member, though not as much as a Porter.
 The Blacksmith makes weapons. On a dive, the Blacksmith can repair damaged gear in the
 field, between battles — weapons, consistent with its trade.
 
+The quality of the weapons the Blacksmith makes follows its tier — a grandmaster makes
+better weapons than an apprentice.
+
 ## The Armourer
 
 The Armourer makes armour. On a dive, the Armourer can repair damaged gear in the field,
 between battles — armour, consistent with its trade.
+
+The quality of the armour the Armourer makes follows its tier.
 
 ## The Alchemist
 

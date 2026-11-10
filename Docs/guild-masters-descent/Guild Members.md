@@ -89,6 +89,23 @@ land on a space rather than on a person, so evasion does nothing against them. T
 pay a reduced defence, though: defence still applies to them, but at less than its usual
 value.
 
+## Weapons and Armour
+
+Each combat type carries one kind of weapon and wears one kind of armour, and both kinds
+are fixed by the type — neither changes over a member's life. What changes is their
+quality.
+
+How much damage a weapon adds depends on its kind, so the kinds differ from each other.
+
+Quality is the axis gear improves along, for armour as well as weapons.
+
+Gear sits in the guild's stores rather than belonging to any one member; the player
+assigns pieces to members from there.
+
+Where gear quality comes from — the crafters — is covered in the Specialists doc. The shop
+it's bought from is covered in the Core Concept doc, and gear wearing out and breaking is
+covered in the Combat doc.
+
 ## Starting Stats
 
 A newly recruited member's starting stats are set by its type and its rank or tier. The

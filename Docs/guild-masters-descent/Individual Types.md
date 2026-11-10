@@ -70,15 +70,18 @@ The Rogue's bonus charge condition is evading an attack.
 
 ## The Archer
 
-The Archer attacks at far range. Its special is called Volley: it hits the target, the
-enemies one to each side of it, and the one directly behind it. If the target is in the
-enemy's back row, with nothing behind it, the extra hit spills forward instead — onto the
-position in front of the target. The target takes the full hit; its neighbours take
+The Archer attacks at far range. Its ordinary attack is a single shot, and that one shot
+carries the type's whole damage at once. Its special is called Volley: it hits the target,
+the enemies one to each side of it, and the one directly behind it. If the target is in
+the enemy's back row, with nothing behind it, the extra hit spills forward instead — onto
+the position in front of the target. The target takes the full hit; its neighbours take
 reduced damage. Volley is an area attack, so it can't be dodged — evasion does nothing
 against it.
 
 The Archer's bonus charge condition is hitting the same target twice running. Specials
-are outside the streak entirely — a Volley neither continues nor breaks it.
+are outside the streak entirely — a Volley neither continues nor breaks it. Hitting the
+same target twice running also raises the Archer's accuracy and its damage — a continuous
+percentage increase that caps at 10%. A miss resets the streak.
 
 ## The Mage
 
