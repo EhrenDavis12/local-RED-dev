@@ -26,11 +26,12 @@ The Tank attacks at close range. It has advantage over the Fighter: the Tank's d
 subtracted from each incoming hit, and a Fighter lands many smaller strikes, so every one
 of them pays that subtraction and loses most of its damage.
 
+The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
+
 The Tank's special is called Shields Up. It temporarily increases the Tank's own defence,
 and it also adds that defence to all the allies behind him in his own column — two of them
-when he's in the front row. It lasts a fixed number of turns, and if more than one Tank
-uses it, the contributions are fully additive: an ally behind two Tanks gets both lots of
-defence.
+when he's in the front row. If more than one Tank uses it, the contributions are fully
+additive: an ally behind two Tanks gets both lots of defence.
 
 Being attacked is the Tank's bonus: the bar charges faster while the Tank is being
 attacked.
@@ -39,12 +40,13 @@ attacked.
 
 The Fighter attacks at close range, with many smaller strikes — the property both of its
 matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
-hit harder rather than adding more strikes.
+hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
+its damage is spread across them.
 
-Its special is a flurry of up to 6 strikes on a single target. If the target dies before
-the strikes run out, the remaining strikes carry to the nearest enemy still standing. If
-any enemy is killed during the flurry, the Fighter's charge bar refills to 90% — that
-refill is the Fighter's bonus charge condition.
+Its special is a flurry of up to 6 strikes on a single target. The flurry's strikes hit
+hard. If the target dies before the strikes run out, the remaining strikes carry to the
+nearest enemy still standing. If any enemy is killed during the flurry, the Fighter's
+charge bar refills to 90% — that refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 
@@ -54,6 +56,9 @@ The Rogue attacks at far range and has high evasion. Its advantage over the Arch
 against the Archer's ordinary shots: a single shot is a single chance to miss, so
 high evasion beats it. It's weak to the Mage because the Mage's area attacks can't be
 dodged.
+
+The Rogue's ordinary attack is two quick strikes. Its strikes don't hit as hard as a
+Fighter's, because the weapon it carries adds less damage.
 
 The Rogue's special is called Vanish: the Rogue becomes untargetable. It can attack once
 while vanished, and that attack breaks the Vanish. Vanish fails if the Rogue is the only
@@ -81,8 +86,8 @@ rows. It's weak to the Archer because the Mage can neither dodge nor absorb, so 
 precise single shot is what kills it.
 
 Its special is a lingering field: it covers two columns of the enemy's grid and keeps
-damaging enemies standing in it for several turns. The field affects enemies only — it
-never damages the player's own members.
+damaging enemies standing in it. The field affects enemies only — it never damages the
+player's own members.
 
 The Mage's bonus charge condition is allies in front of it in its own column taking hits.
 
