@@ -6,7 +6,7 @@
 
 The Brute attacks at close range. It has advantage over the Tank — it can push the Tank's
 shield aside and bash the weak points in the armour underneath, bypassing the defence
-subtraction entirely. It's weak to the Fighter: the Brute wears light armour, which adds a
+subtraction entirely. It's weak to the Fighter: the Brute wears tanned hide, which adds a
 little defence on top of its Constitution, so there's less to subtract than against a
 properly armoured type, and a Fighter's many strikes keep most of their damage.
 

@@ -57,9 +57,9 @@ gradual decline before that.
 
 Broken armour means the member's defence falls back to Constitution alone.
 
-A broken weapon leaves the member unarmed and much weaker: they still attack, for a
-fraction of the damage, and their combat type's attack shape still applies — a Brute with
-a broken weapon still cleaves, just feebly.
+A broken weapon stops being added to the attack at all — the member's damage falls back to
+their stat alone. They still attack, and their combat type's attack shape still applies —
+a Brute with a broken weapon still cleaves, just feebly.
 
 Gear can break partway through a multi-strike sequence, so later strikes in the same
 attack can deal or face different damage than earlier ones.
