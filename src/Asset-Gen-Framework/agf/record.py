@@ -15,8 +15,8 @@ from agf.manifest import Entry
 
 RECORD_ENTRY_KEYS = (
     "operation", "type", "model", "model_version", "prompt", "prompt_key",
-    "seed", "inputs", "input_files", "output", "format", "frame_count",
-    "frame_size", "layout", "frames", "source", "resize", "matte",
+    "seed", "inputs", "input_files", "inline_inputs", "output", "format",
+    "frame_count", "frame_size", "layout", "frames", "source", "resize", "matte",
 )
 
 
@@ -80,6 +80,7 @@ def build_record_entry(entry: Entry, model_version: str | None, seed) -> dict:
         "seed": seed,
         "inputs": entry.inputs,
         "input_files": entry.input_files,
+        "inline_inputs": entry.inline_inputs,
         "output": entry.output,
         "format": entry.format,
         "frame_count": entry.frame_count,

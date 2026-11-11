@@ -3,6 +3,12 @@ The manifest — cli-v1 R34-R46, R55-R56, R58, R60-R64, plus R13/R45 output
 rules and the R70 reserved prefix. The framework reads it and never writes
 it (R34). Every entry in the whole file is validated, in manifest order,
 before any command acts on the one it was asked for (R34).
+
+`inline_inputs`: an optional boolean field. When `true`, every file named
+under the entry's `input_files` is sent to the provider as a data URI built
+from the file's own bytes instead of being uploaded first — some Replicate
+models (`lucataco/real-esrgan-video`) reject a file-endpoint URL and only
+accept an inline one. Absent or `false`, the file is uploaded as before.
 """
 from __future__ import annotations
 
@@ -36,13 +42,25 @@ DEFAULT_MODELS = {
     "music": "stability-ai/stable-audio-2.5",
 }
 
+# inline_inputs: mime by extension, shared with execute.py — which builds
+# the actual data URI at generate time from the same table, so the two
+# never drift apart. Any extension outside this table is a manifest error
+# naming the file, not a guess.
+INLINE_MIME_TYPES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".mp4": "video/mp4",
+}
+
 ALL_FIELDS = {
     "name", "type", "operation", "model", "prompt", "prompt_key", "output",
     "format", "inputs", "input_files", "frame_count", "frame_size", "layout",
-    "frames", "source", "resize", "matte",
+    "frames", "source", "resize", "matte", "inline_inputs",
 }
 REQUIRED_FIELDS = {"name", "type", "output", "format"}
-CALL_FIELDS = {"model", "prompt", "prompt_key", "inputs", "input_files"}
+CALL_FIELDS = {"model", "prompt", "prompt_key", "inputs", "input_files", "inline_inputs"}
 
 _PLACEHOLDER_RE = re.compile(r"\{n(?::([^}]*))?\}")
 
@@ -81,6 +99,7 @@ class Entry:
     source: str | None
     resize: list | None  # extract_frames only: every frame is fitted into [w, h]
     matte: dict | None  # extract_frames only: alpha from a mask video, outline restored
+    inline_inputs: bool  # every input_files reference is sent as a data URI, never uploaded
 
 
 def load_manifest_raw(manifest_path: Path):
@@ -238,6 +257,12 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
     if operation == "extract_frames" and source is None:
         raise ManifestError(f"entry {name!r}: 'source' is required for extract_frames")
 
+    if "inline_inputs" in raw and not isinstance(raw["inline_inputs"], bool):
+        raise ManifestError(
+            f"entry {name!r}: inline_inputs must be a bool, got {raw['inline_inputs']!r}"
+        )
+    inline_inputs = raw.get("inline_inputs", False)
+
     # R42/R43 — every file reference must resolve to a real file, now.
     for key, ref in (raw.get("input_files") or {}).items():
         context = f"entry {name!r} input_files[{key!r}]"
@@ -246,8 +271,12 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
                 raise ManifestError(f"{context}: a list of file references must not be empty")
             for one in ref:
                 resolve_reference(config, one, context=context)
+                if inline_inputs:
+                    _validate_inline_extension(one, context)
         else:
             resolve_reference(config, ref, context=context)
+            if inline_inputs:
+                _validate_inline_extension(ref, context)
     if operation == "assemble_sheet":
         for ref in frames_list:
             resolve_reference(config, ref, context=f"entry {name!r} frames")
@@ -275,6 +304,7 @@ def _validate_entry(raw, index: int, config: Config) -> Entry:
         source=source,
         resize=raw.get("resize"),
         matte=raw.get("matte"),
+        inline_inputs=inline_inputs,
     )
 
 
@@ -349,13 +379,24 @@ def _validate_extension_matches_format(name: str, output: str, format_: str) -> 
         )
 
 
+def _validate_inline_extension(ref, context: str) -> None:
+    suffix = PurePosixPath(str(ref)).suffix.lower()
+    if suffix not in INLINE_MIME_TYPES:
+        raise ManifestError(
+            f"{context}: inline_inputs cannot encode {ref!r} — unrecognized extension {suffix!r}"
+        )
+
+
 def _is_int(value) -> bool:
     # bool is a subclass of int; a manifest author writing `true` for a
     # count or a dimension is not writing a number.
     return isinstance(value, int) and not isinstance(value, bool)
 
 
-MATTE_KEYS = {"mask", "background", "grow", "threshold", "feather", "effect"}
+MATTE_KEYS = {
+    "mask", "background", "grow", "erode", "threshold", "feather", "effect",
+    "despill", "despill_slack", "drop_backdrop_inside", "drop_excess",
+}
 
 
 def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
@@ -381,7 +422,10 @@ def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
             f"entry {name!r}: matte.background must be 'auto' or a '#rrggbb' colour, "
             f"got {background!r}"
         )
-    for key, low, high in (("grow", 0, 16), ("threshold", 0, 441), ("feather", 0, 8)):
+    for key, low, high in (
+        ("grow", 0, 16), ("erode", 0, 16), ("threshold", 0, 441), ("feather", 0, 8),
+        ("despill_slack", 0, 255), ("drop_excess", 0, 255),
+    ):
         if key in matte:
             value = matte[key]
             if not (isinstance(value, (int, float)) and not isinstance(value, bool)) or not (
@@ -390,10 +434,11 @@ def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
                 raise ManifestError(
                     f"entry {name!r}: matte.{key} must be a number from {low} to {high}, got {value!r}"
                 )
-    if "effect" in matte and not isinstance(matte["effect"], bool):
-        raise ManifestError(
-            f"entry {name!r}: matte.effect must be a bool, got {matte['effect']!r}"
-        )
+    for key in ("effect", "despill", "drop_backdrop_inside"):
+        if key in matte and not isinstance(matte[key], bool):
+            raise ManifestError(
+                f"entry {name!r}: matte.{key} must be a bool, got {matte[key]!r}"
+            )
 
 
 def _validate_geometry(name, type_, operation, raw, frame_count, frame_size, layout) -> None:

@@ -244,4 +244,8 @@ happens at the boundary where a human is on the other side — which is you, eve
 Everything below this line comes from the system named here. Swapping systems means changing
 this one line — and running `/set-system`, which also rewrites the `settings.json` half.
 
+<<<<<<< HEAD
 @.claude/systems/silk/SYSTEM.md
+=======
+@.claude/systems/annie/SYSTEM.md
+>>>>>>> 56b46214bb15c2916b528bcdc72a9d761dcc3c69

@@ -1,0 +1,7 @@
+[
+  {"name": "knight_hero", "type": "character", "prompt": "1boy, knight, silver armor, red cape, holding sword", "count": 4, "seed": 1001},
+  {"name": "mage_girl", "type": "character", "prompt": "1girl, mage, purple robe, witch hat, holding staff", "count": 4},
+  {"name": "blacksmith_shop", "type": "building", "prompt": "small medieval blacksmith shop, anvil sign, chimney smoke", "count": 3},
+  {"name": "treasure_chest", "type": "prop", "prompt": "wooden treasure chest, gold trim, closed", "count": 2},
+  {"name": "forest_meadow", "type": "background", "prompt": "sunny forest meadow, flowers, distant hills, blue sky", "count": 2}
+]

@@ -8,7 +8,8 @@
   "roadmap": "Docs/asset-animation-demo/roadmap.md",
   "srcRoots": [
     "src/asset-animation-demo",
-    "src/Asset-Gen-Framework"
+    "src/Asset-Gen-Framework",
+    "src/unity-side-scroler"
   ],
   "stack": "Flutter / Dart (the demo app) + Python (Asset-Gen-Framework, which the pipeline extends where a step is missing)",
   "testing": {

@@ -1,0 +1,6 @@
+[
+  {"name": "test_knight", "type": "character", "prompt": "1boy, knight, blue and silver plate armor, helmet with red plume, holding sword, holding blue shield", "count": 1, "seed": 1001},
+  {"name": "test_archer", "type": "character", "prompt": "1girl, archer, green hooded cloak, leather armor, holding bow, quiver", "count": 1, "seed": 2001},
+  {"name": "test_mage", "type": "character", "prompt": "1boy, old wizard, long white beard, purple robe, pointed hat, holding wooden staff", "count": 1, "seed": 3001},
+  {"name": "test_bandit", "type": "character", "prompt": "1boy, bandit, brown leather vest, red bandana mask, holding dagger", "count": 1, "seed": 4001}
+]

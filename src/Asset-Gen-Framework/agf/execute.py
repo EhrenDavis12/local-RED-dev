@@ -4,6 +4,7 @@ Running one entry's step and committing it — cli-v1 R19/R20, R27 steps
 """
 from __future__ import annotations
 
+import base64
 import io
 import json
 import os
@@ -25,9 +26,10 @@ from agf.errors import (
     CredentialError,
     DestinationError,
     ExtractionFailedError,
+    ManifestError,
     ProviderCallError,
 )
-from agf.manifest import Entry
+from agf.manifest import INLINE_MIME_TYPES, Entry
 from agf.refs import resolve_reference
 
 
@@ -193,6 +195,35 @@ def _cleanup_failed_run(staging_dir: Path, marker_path: Path) -> None:
     marker_path.unlink(missing_ok=True)
 
 
+def _resolve_input_value(config: Config, ref: str, context: str, credential: str, inline: bool):
+    """One `input_files` reference, resolved to whatever the provider
+    actually receives: an uploaded file's URL, or — when the entry sets
+    `inline_inputs` — the file's own bytes as a data URI, with
+    `provider.upload` never called at all."""
+    path = resolve_reference(config, ref, context=context)
+    if inline:
+        return _inline_data_uri(path, context)
+    return provider.upload(path, credential)
+
+
+def _inline_data_uri(path: Path, context: str) -> str:
+    # The manifest already refuses an unsupported extension at load time
+    # (agf.manifest._validate_inline_extension); this is a guard against a
+    # file that has since changed on disk, not the primary check.
+    mime = INLINE_MIME_TYPES.get(path.suffix.lower())
+    if mime is None:
+        raise ManifestError(
+            f"{context}: inline_inputs cannot encode {path.name!r} — unrecognized "
+            f"extension {path.suffix!r}"
+        )
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise ManifestError(f"{context}: could not read {path} to inline it: {exc}") from exc
+    payload = base64.b64encode(raw).decode("ascii")
+    return f"data:{mime};base64,{payload}"
+
+
 def _run_model_op(config: Config, entry: Entry, credential: str, destination_rel: str):
     inputs = dict(entry.inputs or {})
     if entry.prompt is not None:
@@ -205,11 +236,11 @@ def _run_model_op(config: Config, entry: Entry, credential: str, destination_rel
             # say) is declared as a list of references and arrives as a
             # list of URLs, in the order written.
             inputs[key] = [
-                provider.upload(resolve_reference(config, one, context=context), credential)
+                _resolve_input_value(config, one, context, credential, entry.inline_inputs)
                 for one in ref
             ]
         else:
-            inputs[key] = provider.upload(resolve_reference(config, ref, context=context), credential)
+            inputs[key] = _resolve_input_value(config, ref, context, credential, entry.inline_inputs)
 
     result = provider.run(entry.resolved_model, inputs, credential)
     version = result["version"]

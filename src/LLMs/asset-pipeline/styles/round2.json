@@ -1,0 +1,48 @@
+{
+  "_comment": "Round 2 trial. NOT the locked style - style.json is untouched until the look is approved.",
+  "comfy_url": "http://127.0.0.1:8188",
+  "checkpoint": "animagine-xl-4.0-opt.safetensors",
+  "loras": [
+    {
+      "_comment": "Your chibi style LoRA. Put the file in ComfyUI/models/loras and set enabled to true.",
+      "file": "my_chibi_style.safetensors",
+      "strength": 0.8,
+      "enabled": false
+    }
+  ],
+  "style_prompt": "chibi, thick black outline, bold lineart, cel shading, glossy highlights, vibrant colors, game sprite",
+  "quality_prompt": "masterpiece, high score, great score, absurdres",
+  "negative_prompt": "lowres, bad anatomy, bad hands, text, watermark, signature, logo, blurry, jpeg artifacts, cropped, multiple views, realistic, 3d, sketch, monochrome, pale colors, thin lines, covered face",
+  "sampler": {
+    "steps": 28,
+    "cfg": 5.0,
+    "sampler_name": "euler_ancestral",
+    "scheduler": "normal"
+  },
+  "types": {
+    "character": {
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt_suffix": "chibi, super deformed, big head, small body, full body, standing, fighting stance, three quarter view, face visible, simple background, white background"
+    },
+    "building": {
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt_suffix": "isometric, building, no humans, simple background, white background"
+    },
+    "prop": {
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt_suffix": "object, no humans, simple background, white background"
+    },
+    "background": {
+      "width": 1344,
+      "height": 768,
+      "transparent": false,
+      "prompt_suffix": "scenery, landscape, no humans, wide shot"
+    }
+  }
+}

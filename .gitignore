@@ -1,1 +1,21 @@
+<<<<<<< HEAD
 CLAUDE.md
+=======
+.venv/
+__pycache__/
+.DS_Store
+# Generated images and clips stay local; nobody else needs them.
+*.png
+*.PNG
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.mp4
+*.mov
+*.webm
+*.zip
+!src/LLMs/asset-pipeline.zip
+comfyui.log
+src/LLMs/asset-pipeline/output/
+>>>>>>> 56b46214bb15c2916b528bcdc72a9d761dcc3c69
