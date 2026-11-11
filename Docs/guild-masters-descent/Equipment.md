@@ -33,6 +33,10 @@ The six armour kinds, one per combat type:
 
 How much defence armour adds depends on its kind too. The Tank's full armour adds more
 defence than the Brute's tanned hide, and the Fighter's light armour sits between the two.
+The Rogue's hooded armour, the Archer's leather and the Mage's robe aren't placed
+against those three or against each other: each kind of armour can only be worn by its
+own combat type, so the player never chooses between kinds, and the rest don't need
+ranking.
 
 A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
 ranks highest, plus their weapon. A member's defence comes from Constitution plus their
@@ -53,8 +57,10 @@ weapon has its own Attack Damage range, and so does each class — the ranges di
 kind so the damage comes out balanced across the combat types. But a weapon's range is not
 a fixed figure for its kind and class: each kind at each class has a wider band, and an
 individual piece's own range is drawn from inside that band when the piece is made, so two
-pieces of the same kind and class are not the same. The bands for neighbouring classes
-overlap, so a well-rolled piece of a lower class can be better than a poorly-rolled piece
+pieces of the same kind and class are not the same. The span itself is rolled too, not
+just where it sits in the band — one piece's range can come out wider or narrower than
+another's, not only higher or lower within it. The bands for neighbouring classes overlap,
+so a well-rolled piece of a lower class can be better than a poorly-rolled piece
 of a higher one. An F-class knife, for instance, draws from a band of 2–12, so one F-class
 knife might come out 10–12 while another comes out 2–4. One individual weapon's rolled
 range might come out 4–6, and when that member attacks, 4–6 is what the weapon adds to the
@@ -75,6 +81,9 @@ figure — how much damage reduction the armour gives, and it's drawn from a ban
 way a weapon's range is. Armour's durability works the same way a weapon's does: it
 counts down by hits taken, not by attacks faced, and a missed attack spends none of it.
 
+A piece's Attack Damage, its Defence and its Durability are each rolled once, at
+creation, and fixed for the life of that piece.
+
 Both ranges roll separately for every strike of a multi-strike attack: the attacker's
 Attack Damage range is rolled afresh for each strike, and because each strike already
 resolves on its own — rolling to hit separately and subtracting defence separately —
@@ -84,27 +93,45 @@ The shop sells equipment of a baseline quality, and that baseline rises with gui
 crafter in the guild produces better than the shop's baseline.
 
 Weapon quality follows the Blacksmith's tier and armour quality the Armourer's — a
-grandmaster makes better weapons than an apprentice.
+grandmaster makes better weapons than an apprentice. The tier decides which class the
+crafter makes at; within that class, the crafter's Luck is what gives a crafted piece its
+edge over the shop's baseline, because the crafter adds its Luck stat when rolling for the
+band — the Blacksmith's Luck on a weapon, the Armourer's on armour. When the guild holds
+more than one Blacksmith, it is the Blacksmith assigned to the smithy whose tier and Luck
+set the weapon quality.
 
 ## Where Gear Comes From
 
-The guild gets equipment from the shop and from crafting.
+The guild gets equipment from the shop, from crafting, and from drops.
 
 The shop is available from rank F, where the player can buy items and equipment.
 
 Crafting is something the guild has only by holding a Blacksmith or an Armourer — the
 Blacksmith and the Armourer unlock at guild rank D.
 
+Gear can drop too: both the dungeon and missions can drop a weapon or a piece of armour,
+alongside the materials and items they yield.
+
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
 
 ## Assignment
 
-Gear sits in the guild's stores rather than belonging to any one member; the player
-assigns pieces to members from there.
+Gear sits in the guild's stores rather than belonging to any one member. The player
+assigns weapons and armour to members in the Dorms, a part of the guild hall where they
+see a piece's stats and hand gear to members.
+
+Nothing stops the player giving a member gear of a higher class than the member's own
+rank — a C-class piece on an F-rank diver is allowed.
 
 A specialist has no equipment — no weapon and no armour — so a specialist's defence comes
 from Constitution alone.
+
+A newly recruited member has a chance to arrive already carrying gear, but not always.
+
+If a member dies in the dungeon, the party brings their gear back if there's room left
+in the party's carrying capacity — the same capacity the Porter adds a lot of and any
+member contributes to by carrying some of the loot; otherwise the gear is lost.
 
 ## Durability
 
@@ -138,43 +165,35 @@ strikes in the same attack can deal or face different damage than earlier ones.
 
 ## Repair
 
-Repairs happen in the guild hall between dives.
+Repairs happen in the guild hall between dives. Repairing a piece that still has
+durability left costs gold; fixing a piece that has broken costs gold and materials
+both.
 
 A Blacksmith or Armourer in the party can also repair in the field, between battles — a
 convenience rather than a requirement, and each is scoped to its own trade: the Blacksmith
-repairs weapons, the Armourer armour.
+repairs weapons, the Armourer armour. How much a field repair restores is decided by the
+repairing specialist's rank.
 
-Field repair only works on gear that is still above zero. Once an item breaks it stays
-broken for the rest of the dive; a Blacksmith or Armourer in the party cannot bring it
-back.
+Field repair only works on gear that is still above zero, and once a piece breaks it
+stays broken for the rest of the dive — a Blacksmith or Armourer in the party cannot bring
+it back there. Back at the guild hall, though, a broken piece can be fixed, for gold and
+materials.
 
 ## Open Questions
 
 - How much does a step of quality add to armour's defence?
-- How much better than the shop's baseline is a crafter's work?
-- What does a repair in the guild hall cost?
-- How much does a field repair restore, and does the Blacksmith's or Armourer's tier
-  change that? Can the guild hall fix a piece that broke on the dive, or is a broken piece
-  gone for good?
-- Does the dungeon or a mission ever drop a weapon or a piece of armour, or is gear only
-  bought and crafted?
+- Are the six kinds of weapon in a fixed order of damage?
 - What does crafting consume, and how long does it take? Can a crafter work while out on a
   mission or a dive?
-- When the guild holds two Blacksmiths, whose tier sets the weapon quality?
-- When a member dies in the dungeon, what happens to the gear they were carrying?
-- Does a newly recruited member arrive with gear, or fight unarmed until the player
-  assigns some?
-- Is there anything stopping the player handing the best gear in the stores to an F-rank
-  diver?
-- Where does the player assign gear, and how much of a piece does the player see — exact
-  numbers, or a rough impression the way the recruiting board shows a candidate's
-  strengths?
-- Are the six kinds of weapon in a fixed order of damage?
-- How is a piece's own range picked out of its band — is the span always the same width,
-  with only where it sits rolled, or can one piece have a wider span than another?
-- Are a piece's range and its durability rolled once when the piece is made and fixed
-  for the life of that piece?
-- Does a crafter beat the shop's baseline by rolling higher inside the band, or by
-  producing a higher class outright?
-- Where do the Rogue's hooded armour, the Archer's leather and the Mage's robe sit
-  against full armour, light armour and tanned hide?
+- How narrow or wide can a rolled span be — can a piece come out with a single figure
+  rather than a range, or with a span as wide as the whole band?
+- How does a crafter's Luck enter the roll — does it move where the span sits in the band,
+  widen it, or lift both ends?
+- Is dropped gear rolled the same way a crafted or bought piece is, and does its class
+  follow the dungeon floor or the mission's rank?
+- Does the gold a repair costs scale with the piece's class, and which materials does a
+  broken piece need?
+- Does the player see a piece's exact rolled range and durability in the Dorms, or only a
+  rough impression the way the recruiting board shows a candidate's strengths?
+- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
+  deciding which of two Armourers sets armour quality?
