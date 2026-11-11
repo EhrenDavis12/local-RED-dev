@@ -13,6 +13,9 @@ not a character in it. The main screen is the inside of a guild hall.
 Time passes in real time, and it keeps passing while the game is closed — missions
 complete and injuries heal while the player is away.
 
+A dive in progress is the exception: it doesn't advance while the game is closed. It
+pauses, and picks up again right where it left off.
+
 ## Guild Rank
 
 The game starts at an F-rank guild. Grade is raised by clearing milestone quests — named,
