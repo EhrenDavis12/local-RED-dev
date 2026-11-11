@@ -14,3 +14,4 @@ __pycache__/
 *.zip
 !src/LLMs/asset-pipeline.zip
 comfyui.log
+src/LLMs/asset-pipeline/output/
