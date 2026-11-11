@@ -1,9 +1,8 @@
 # Equipment
 
-> **Status:** Early design. Nothing is built yet — the weapon and armour kinds, quality
-> ladder, each piece's two attributes, that figures are rolled once and fixed for life,
-> condition, wear and breakage, that gear drops, crafter's Luck as its baseline edge, and
-> that repair costs gold and materials if broken, are settled — but the bands aren't: no
+> **Status:** Early design. Nothing is built yet — the kinds, the quality ladder, each
+> piece's attributes rolled once for life, condition, wear and breaking, where gear comes
+> from — the crafter's Luck as its edge — and repair are settled, but the bands aren't: no
 > kind has a damage or defence band set at any class, apart from the one example here.
 
 ## What a Member Carries
