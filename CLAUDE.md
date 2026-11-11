@@ -244,4 +244,4 @@ happens at the boundary where a human is on the other side — which is you, eve
 Everything below this line comes from the system named here. Swapping systems means changing
 this one line — and running `/set-system`, which also rewrites the `settings.json` half.
 
-@.claude/systems/forge/SYSTEM.md
+@.claude/systems/annie/SYSTEM.md

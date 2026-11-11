@@ -142,6 +142,10 @@ def apply(frame_data: bytes, mask_data: bytes, options: dict) -> bytes:
     threshold = float(options.get("threshold", 60))
     feather = float(options.get("feather", 0))
     effect = bool(options.get("effect", False))
+    despill = bool(options.get("despill", False))
+    despill_slack = float(options.get("despill_slack", 4))
+    drop_backdrop_inside = bool(options.get("drop_backdrop_inside", False))
+    drop_excess = float(options.get("drop_excess", 90))
 
     rgb = np.array(_decode(frame_data).convert("RGB")).astype(float)
     mask = np.array(_decode(mask_data).convert("L"))
@@ -248,6 +252,65 @@ def apply(frame_data: bytes, mask_data: bytes, options: dict) -> bytes:
             sub_confidence = confidence[crop]
             sel = band[crop] & (sub_alpha > 0) & (sub_confidence < 1.0) & filled
             colour[crop][sel] = colour_fill[sel]
+
+    if not effect and (despill or drop_backdrop_inside):
+        if grow <= 0 or not core.any():
+            # Only recompute if the band branch above didn't already run --
+            # it measures the same background when it does.
+            background = background_of(rgb, options.get("background", "auto"))
+        # The backdrop's "chroma channels" are whichever sit within 60 of its
+        # own largest channel -- one, for a single-colour backdrop like
+        # chroma green; two, for magenta, cyan, or yellow, where the colour
+        # splits across a pair of channels -- and the rest are its "off
+        # channels". A neutral or lightly tinted backdrop (grey, white,
+        # black) has every channel within 60 of the largest, so it has no
+        # off channel at all, and must stay inert rather than have an empty
+        # max default to 0 and read as a spurious, huge dominance.
+        chroma_mask = background >= background.max() - 60
+        off_mask = ~chroma_mask
+        dominance = (
+            background[chroma_mask].min() - background[off_mask].max()
+            if off_mask.any() else -np.inf
+        )
+        # Both cleanups require the measured backdrop itself to be a
+        # strongly saturated colour: unless its chroma channels clear its
+        # off channels by at least 100, clamping or dropping against it
+        # would misfire on ordinary colour rather than spill.
+        if dominance >= 100:
+            # Both key off the pixel's *final* colour (`colour`, not the
+            # raw decoded `rgb`): a band pixel the nearest-body fill above
+            # has already recovered to its true colour must be judged on
+            # that recovered colour, not reclamped against the raw
+            # background blend it replaced. A pixel's excess is the
+            # smallest of its chroma channels minus the largest of its off
+            # channels -- for a single-channel backdrop this is
+            # byte-identical to the old dominant-minus-max-of-the-others
+            # reading.
+            excess = colour[..., chroma_mask].min(axis=-1) - colour[..., off_mask].max(axis=-1)
+
+            if drop_backdrop_inside:
+                # Scoped to `eroded_core` only -- never the band, and never
+                # the ring between `core` and `eroded_core` even though
+                # that ring is still `mask >= 128` -- both already trust
+                # the colour key's own graded alpha.
+                eroded_core = _erode(core, erode) if erode > 0 else core
+                if erode > 0 and not eroded_core.any():
+                    eroded_core = core
+                distance = np.sqrt(((colour - background) ** 2).sum(axis=-1))
+                drop = eroded_core & (excess > drop_excess) & (distance <= threshold)
+                alpha = np.where(drop, 0.0, alpha)
+
+            if despill:
+                # Every chroma channel is pulled down by the same amount --
+                # (excess - despill_slack) -- in lockstep, not independently
+                # clamped to a per-channel ceiling: that is what keeps a
+                # two-channel spill (a purple or teal fringe) from having
+                # only one of its two tinted channels corrected.
+                spill = (alpha > 0) & (excess > despill_slack)
+                reduction = np.where(spill, excess - despill_slack, 0.0)
+                colour[..., chroma_mask] = np.maximum(
+                    colour[..., chroma_mask] - reduction[..., None], 0.0
+                )
 
     alpha_img = Image.fromarray((alpha * 255).round().astype(np.uint8))
     if feather > 0:

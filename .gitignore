@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+.DS_Store
+# Generated images and clips stay local; nobody else needs them.
+*.png
+*.PNG
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.mp4
+*.mov
+*.webm
+*.zip
+!src/LLMs/asset-pipeline.zip
+comfyui.log

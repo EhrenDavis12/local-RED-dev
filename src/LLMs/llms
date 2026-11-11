@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+# Brings up and controls the local models (ComfyUI, native on Apple Silicon, no Docker).
+#
+#   ./llms install   install ComfyUI and download every model in models.txt (safe to re-run)
+#   ./llms start     start ComfyUI in the background on http://127.0.0.1:8188
+#   ./llms stop      stop it
+#   ./llms free      unload models from memory but leave the server up
+#   ./llms status    is it up, and which models are installed
+#   ./llms logs      follow the server log
+#
+# One server runs both models. It loads a model when a job needs it and evicts the other
+# to make room, so only one is in memory at a time.
+#
+# COMFY_DIR (default ~/AI/ComfyUI) and LLMS_PORT (default 8188) override the defaults.
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+COMFY_DIR="${COMFY_DIR:-$HOME/AI/ComfyUI}"
+PORT="${LLMS_PORT:-8188}"
+# --fp32-vae: at the default precision the video VAE fails on Apple's GPU and returns grey frames.
+# --gpu-only: otherwise the text encoder and the matte model run on the CPU, about 10x slower.
+# --cache-none: keep no earlier results in memory; every job starts fresh.
+COMFY_ARGS="${LLMS_ARGS---fp32-vae --gpu-only --cache-none}"
+# The most memory the models may take, in GB. Past it a job fails with "MPS backend out of
+# memory" instead of swapping the Mac to a standstill. 0 removes the cap.
+MEMORY_CAP_GB="${LLMS_MEMORY_CAP_GB:-28}"
+URL="http://127.0.0.1:$PORT"
+GGUF_NODE_COMMIT=6ea2651e7df66d7585f6ffee804b20e92fb38b8a
+RUN="$HERE/.run"
+PID_FILE="$RUN/comfyui.pid"
+LOG="$RUN/comfyui.log"
+
+say() { printf "\033[1;36m==> %s\033[0m\n" "$*"; }
+is_up() { curl -s -m 3 "$URL/system_stats" >/dev/null 2>&1; }
+server_pid() { lsof -ti "tcp:$PORT" -sTCP:LISTEN 2>/dev/null | head -1; }
+
+# Prints "<folder> <filename> <url>" for each model line.
+models() {
+  grep -v -E '^\s*(#|$)' "$HERE/models.txt" | while read -r dir url; do
+    echo "$dir $(basename "$url") $url"
+  done
+}
+
+cmd_install() {
+  [[ "$(uname -m)" == "arm64" ]] || { echo "Apple Silicon only."; exit 1; }
+  command -v brew >/dev/null || { echo "Homebrew not found - install it from https://brew.sh and re-run."; exit 1; }
+  brew list python@3.11 >/dev/null 2>&1 || brew install python@3.11
+  local py; py="$(brew --prefix python@3.11)/bin/python3.11"
+
+  say "ComfyUI in $COMFY_DIR"
+  mkdir -p "$(dirname "$COMFY_DIR")"
+  [[ -d "$COMFY_DIR" ]] || git clone https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR"
+  if [[ ! -d "$COMFY_DIR/venv" ]]; then
+    "$py" -m venv "$COMFY_DIR/venv"
+    "$COMFY_DIR/venv/bin/pip" install --upgrade pip
+    "$COMFY_DIR/venv/bin/pip" install torch torchvision torchaudio   # macOS wheels include Metal (MPS)
+    "$COMFY_DIR/venv/bin/pip" install -r "$COMFY_DIR/requirements.txt"
+  fi
+
+  # The one custom node: ComfyUI-GGUF (Apache 2.0) loads the quantised edit and keyframe models.
+  # Their native fp8/bf16 files cannot run here - Apple's GPU has no fp8 and bf16 does not fit 32 GB.
+  local gguf="$COMFY_DIR/custom_nodes/ComfyUI-GGUF"
+  if [[ ! -d "$gguf" ]]; then
+    say "custom node ComfyUI-GGUF"
+    git clone https://github.com/city96/ComfyUI-GGUF.git "$gguf"
+    git -C "$gguf" checkout -q "$GGUF_NODE_COMMIT"
+    "$COMFY_DIR/venv/bin/pip" install -r "$gguf/requirements.txt"
+  fi
+
+  models | while read -r dir file url; do
+    local dest="$COMFY_DIR/models/$dir/$file"
+    if [[ -f "$dest" ]]; then
+      echo "have  $dir/$file"
+    else
+      say "downloading $dir/$file"
+      mkdir -p "$(dirname "$dest")"
+      curl -L --fail -C - -o "$dest.part" "$url"   # -C - resumes an interrupted download
+      mv "$dest.part" "$dest"
+    fi
+  done
+  say "Installed. Next: ./llms start"
+}
+
+cmd_start() {
+  if is_up; then echo "already running at $URL"; return; fi
+  [[ -x "$COMFY_DIR/venv/bin/python" ]] || { echo "ComfyUI is not installed - run ./llms install"; exit 1; }
+  mkdir -p "$RUN"
+  cd "$COMFY_DIR"
+  # PyTorch caps the GPU at a ratio of the Mac's recommended working set (1.7 by default, more
+  # than this machine has), so the GB cap is turned into that ratio here.
+  local high low
+  read -r high low < <(./venv/bin/python -c "import torch; r = $MEMORY_CAP_GB * 2**30 / torch.mps.recommended_max_memory(); print(f'{r:.3f} {r * 0.8:.3f}')")
+  echo "memory cap: ${MEMORY_CAP_GB} GB"
+  # shellcheck disable=SC2086
+  PYTORCH_MPS_HIGH_WATERMARK_RATIO="$high" PYTORCH_MPS_LOW_WATERMARK_RATIO="$low" \
+  PYTORCH_ENABLE_MPS_FALLBACK=1 nohup ./venv/bin/python main.py --listen 127.0.0.1 --port "$PORT" \
+    $COMFY_ARGS >"$LOG" 2>&1 </dev/null &
+  echo $! >"$PID_FILE"
+  disown
+  for _ in $(seq 60); do
+    if is_up; then echo "running at $URL (pid $(cat "$PID_FILE"))"; return; fi
+    kill -0 "$(cat "$PID_FILE")" 2>/dev/null || { echo "ComfyUI exited during startup:"; tail -20 "$LOG"; exit 1; }
+    sleep 2
+  done
+  echo "ComfyUI did not answer within 2 minutes - see ./llms logs"; exit 1
+}
+
+cmd_stop() {
+  local pid; pid="$(server_pid)"
+  if [[ -z "$pid" ]]; then echo "not running"; rm -f "$PID_FILE"; return; fi
+  kill "$pid"
+  for _ in $(seq 20); do kill -0 "$pid" 2>/dev/null || break; sleep 0.5; done
+  kill -0 "$pid" 2>/dev/null && kill -9 "$pid"
+  rm -f "$PID_FILE"
+  echo "stopped"
+}
+
+cmd_free() {
+  is_up || { echo "not running"; return; }
+  curl -s -m 30 -X POST "$URL/free" -H 'Content-Type: application/json' \
+    -d '{"unload_models": true, "free_memory": true}' >/dev/null
+  echo "models unloaded from memory (the server stays up; the next job reloads what it needs)"
+}
+
+cmd_status() {
+  if is_up; then echo "server:  running at $URL (pid $(server_pid))"; else echo "server:  stopped"; fi
+  models | while read -r dir file url; do
+    if [[ -f "$COMFY_DIR/models/$dir/$file" ]]; then echo "model:   ok       $dir/$file"
+    else echo "model:   MISSING  $dir/$file   (run ./llms install)"; fi
+  done
+}
+
+case "${1:-}" in
+  install) cmd_install ;;
+  start)   cmd_start ;;
+  stop)    cmd_stop ;;
+  restart) cmd_stop; cmd_start ;;
+  free)    cmd_free ;;
+  status)  cmd_status ;;
+  logs)    tail -f "$LOG" ;;
+  *)       sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

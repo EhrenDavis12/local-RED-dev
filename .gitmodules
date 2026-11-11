@@ -13,3 +13,6 @@
 [submodule "src/unity-side-scroler"]
 	path = src/unity-side-scroler
 	url = git@github.com:EhrenDavis12/unity-side-scroler.git
+[submodule "src/guildmasters-descent"]
+	path = src/guildmasters-descent
+	url = git@github.com:EhrenDavis12/guildmasters-descent.git

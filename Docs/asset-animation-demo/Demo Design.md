@@ -82,6 +82,11 @@ It is two pieces:
   an action resets that timer. The blink is a fidget rather than part of the base loop,
   because a blink on a fixed five-second cycle is exactly what gives a loop away.
 
+In a crowd nobody idles in step: every fighter starts its base loop at its own random frame,
+and head turns and weight shifts are peppered in at random times per fighter — two or three
+each over a 36-second stretch, many at once is fine, never in sync — so the army never looks
+uniform.
+
 The base loop's prompt asks for a character standing nearly motionless with only the breath
 visible, and never asks the knees to bend with the breath: nobody breathes with their knees,
 and it turns the whole body into a bob. Fidgets keep the end frame pinned like every
@@ -94,14 +99,14 @@ catalog alike: it never becomes a button, and only the idle player plays it.
 
 ## The Pipeline
 
-The pipeline is the `animate-characters` skill (`.claude/skills/animate-characters/`); this
-project is its first user and the place it was worked out. Everything this project decides —
-the style bibles, the characters, their skills, the actions, the sheet geometry — is data
-in `animate.yaml` beside `assetgen.yaml`. Every generated step is an Asset-Gen-Framework
-manifest entry, run by name and recorded, so a character can be regenerated exactly and a
-new one is a few lines of YAML. The skill's script writes the manifest one stage at a time
-as inputs come into existence, because the framework refuses a manifest that names a file
-that is not there.
+The pipeline is the `animate-characters` skill (`.claude/skills/AnimationSkills/animate-characters/`);
+this project is its first user and the place it was worked out. Everything this project
+decides — the style bibles, the characters, their skills, the actions, the sheet geometry
+— is data in `animate.yaml` beside `assetgen.yaml`. Every generated step is an
+Asset-Gen-Framework manifest entry, run by name and recorded, so a character can be
+regenerated exactly and a new one is a few lines of YAML. The skill's script writes the
+manifest one stage at a time as inputs come into existence, because the framework refuses
+a manifest that names a file that is not there.
 
 Per character:
 
@@ -232,6 +237,143 @@ and 18 masks; three videos regenerated for motion (a hurt that read as a lunge, 
 spinning weapons that wandered before the spin moved into code), and all six bursts
 regenerated once more so they stay inside their cells; the app's sheets roughly doubled to
 about 62 MB.
+
+## The Game in Unity
+
+What the demo proved now goes into the Unity side-scroller (`src/unity-side-scroler`).
+Battle scenes, their intro, scenery motion and hit effects are built and recorded there, in
+annie's sandbox, and the Flutter app stays the demo.
+
+### Actions
+
+- An action snaps from the idle straight into the already-wound-up pose, with no
+  anticipation in between, then plays the action and its follow-through. The anticipation is
+  what makes an action feel slow, so it is cut.
+- An action ends on the spot it started. A push-back is fine, but the character is back home
+  by the last frame, and the knock-back stays small so the return is short and stepped, never
+  slid.
+- A character's own animation holds only that character and their weapon: no other
+  character in any frame and no blood. Enemies come from the game, and blood is a separate
+  effect.
+- A death or a hurt is played by the video model in one go from the character's look — same
+  character, same side-on angle — rather than built from drawn keys, and a take is judged on
+  how epic it looks over how controlled it is.
+- A new enemy starts from five designs to choose from, each shown relaxed and at the ready,
+  and its animations wait until the user picks one. They use the Archer and Assassin method. An enemy needs no attack wind-up, jumping
+  right to the strike, and no run, run start, run stop or death animation.
+- Every character and enemy keeps to one roster style: the same height, heads per figure
+  and outline width, and colours kept within shared colour families picked from the Archer,
+  so a new character never drifts to a look of its own.
+- The party's main characters are the Archer, the Assassin, the Tank, the Brute, the Fighter
+  and the Mage. The Tank gets a new weapon. The Porter, the Scout, the Blacksmith and the
+  Alchemist are back-line utility members who barely fight but still get every animation the
+  others have. The Cleric is an extra. Enemies are chibi but drawn as monsters, not humanized
+  monsters: goblin, spider, skeleton and the dragon boss among them.
+- A character with no death animation made for them holds their hurt pose and disintegrates
+  into particles that fade, a reusable Unity sequence, so enemies need no death sheets.
+- The Assassin is a melee character. Before his attack he closes the distance to the Archer
+  with a single dash or jump moved by code, with no separate animation for it, and the attack
+  animation plays once he arrives: "a single jump is fine by me where we just move it through
+  code and not having to do another animation."
+
+### Battle Scene 1
+
+The backdrop is parallax layers of separate cut-outs, never one continuous strip: a bold sky
+with separate bold clouds on three drift layers; separate mountains, a front range and a paler
+back range, flat two-tone; hills; trees in the T-B style, some planted on the terrain at the
+ground's speed so they blend into it; the ground as a texture only (sandy soil with fine
+stones, no grass edge); and S-B bushes, with rocks, grass and ground patches moving with the
+terrain. Each side fields three columns by five rows, the enemy side mirrored, back rows
+smaller; the spacing grows as the figures shrink, so every column stays a straight line from
+front to back.
+
+The close trees, grass and bushes sway in the wind, moved by a grey pattern layer that pushes
+pixels sideways only — tree tops lean about 16 px, bases stay planted. The strong sway is the
+one used; a gentler one is barely noticeable. The ground varies by a mask blend: grass and soil
+as two layers mixed by a third, invisible grey pattern, and different patterns chained one
+after another, each starting and ending all white, so no join or repeat shows. A grey pattern
+never moves a character — it was tried as a still character's breath and did not work.
+
+The battle opens fast, on an empty battlefield, and nobody just appears on screen. Over about
+4 s the camera scrolls with parallax, the player's side runs in at run pace, each runner coming
+on at a random moment so they do not arrive in lines, and the enemies
+scroll in from off screen right as if approached; they stop raggedly and the background eases
+to a stop. A gamer wants to get to the action, so the intro stays short.
+
+Health and mana show as a thin vertical bar at each character's side, red over blue, about
+15 px out from the character and drawn on top of every character whatever the stack. A unit
+at full health shows no bar. The bar stays still and does not follow the body; it moves only
+on a hit or an attack, when it nudges out of the way and then comes back. The body gets no
+glow or rim, and where a bar sits on the quiver of the archer in front, it is left that way.
+The user picked this set: "1,5,11 thesee are what we want to go with for the Health bar
+system."
+
+The second scene is a cave: a small enclosed tunnel, its near wall moving almost at floor
+speed with no far distance, a solid rock ceiling with stalactites here and there, and veins of
+ore in the rock.
+
+### Effects
+
+A hit effect is many stacked layers, each one toggleable: a one-frame flash, a drawn core,
+particles out the front of the hit and out the back of the target, a trail, lingering bits and
+light, using drawn particle sprites. An arrow's trail is a thin faint streak, so it reads as
+an arrow and not a missile. The full stack suits a dramatic hit; a plain arrow hit may be
+toned down later.
+
+Floating combat text pops up over the fighters: a red damage number on each hit, a green
+number on a heal, and the words Miss and Blocked. It uses a chubby chibi-style font that matches the characters, at half the size first tried
+so a full field stays readable. Each one pops in with a scale-in, drifts in a random upward
+direction, tilts slightly and fades out.
+
+### Sound
+
+The battle music is medieval, Celtic background music, not happy or cheerful: "we're looking
+for Celtic background music." It sits low, with no high, ear-piercing sounds, and leans
+toward a low sea shanty. The music stays Celtic and sea shanty and never sounds Arabian or
+Middle-Eastern: traditional Celtic instruments, a traditional Celtic scale with no awkward
+flat notes from an Arabian scale, and the sea-shanty crew chanting voices. The strings stay a
+violin and never turn into a fiddle. Battle music is intense; menu music is light-hearted on the same
+themes. A victory song and a defeat song are real songs in the same Celtic / sea-shanty
+style, kept low too. The songs are long and need no perfect loop: at the end the volume
+fades out and comes back up as the song starts again. Arrow sounds come in four sets — release when the bow fires,
+hit when the arrow strikes a body, miss when it flies past or lands in the ground, and blocked
+when it knocks on a shield or weapon — and each shot picks one at random from its set, pitch
+and level varied a little, so a crowd of archers firing together never repeats one sound.
+The variety is what the user liked: "I love the variety in the arrow shots."
+
+Menu sounds come in two pools, and each button or menu names the pool it pulls from: clicks,
+and paper, which is the paper rustle and the scroll unrolling and rolling back up. Gold has
+one bucket of coin sounds, used for gaining gold and for a purchase. Characters have voices — hurt grunts and
+battle cries, male and female. Hurt grunts are the five shortest of each voice: "the longer one don't sound
+right." Every sound set is sorted into labelled buckets the game picks from at random; which bucket plays
+for which action is chosen later by the user.
+
+### Menus
+
+The main menu is one fixed screen: an inked map on old parchment, seen from above at an angle,
+where each building is a button to a part of the game — the player's home, the Arena, the
+cave entrance, the Guild Hall and an Armory — with no labels on the map. Every menu, pop-up
+and button, in Unity too, uses the "R04 One Rod" scroll: paper rolled on one rod, not circles
+at the ends. Item icons are painted (code shapes with a local painted pass), not drawn by code
+alone, in the "Scorched Edge" style: soft oil paint with a warm glowing centre ("IO3 the
+scorched Edge is the way to go here"). A pop-up's close button is a red ink X of hard
+slashes in the same painted scroll style, set on a tan button, or given a darker edge where it
+sits on a red one so it does not vanish.
+
+A menu or pop-up opens by the scroll unrolling and closes by it rolling back up, done by code:
+the rod rolls across while the writing stays still, 0.8 s each way, and closing is the opening
+played backward.
+
+All text in the game uses one font, "Steady Manuscript": Eagle Lake, an open-licence font,
+with an ink treatment that looks written by a quill. Damage text over the fighters is the one
+exception and stays chibi.
+
+The victory and loss screens are pop-ups on the One Rod scroll, which unrolls open, with VICTORY
+and DEFEAT in the game's quill-and-ink font. Victory is a tall scroll with the loot written
+as a list of icon, name and amount above the buttons, with Exit as the red one. Defeat is
+plain brown ink on the same paper with Retry as the red one, and a loss gives no loot. Button
+labels are lettered in the same font. Gold and crystal are the two currencies, each with its own icon: a gold coin with a star and
+a violet cut gem, for now.
 
 ## Open Questions
 

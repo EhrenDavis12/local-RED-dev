@@ -393,7 +393,10 @@ def _is_int(value) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
-MATTE_KEYS = {"mask", "background", "grow", "erode", "threshold", "feather", "effect"}
+MATTE_KEYS = {
+    "mask", "background", "grow", "erode", "threshold", "feather", "effect",
+    "despill", "despill_slack", "drop_backdrop_inside", "drop_excess",
+}
 
 
 def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
@@ -420,7 +423,8 @@ def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
             f"got {background!r}"
         )
     for key, low, high in (
-        ("grow", 0, 16), ("erode", 0, 16), ("threshold", 0, 441), ("feather", 0, 8)
+        ("grow", 0, 16), ("erode", 0, 16), ("threshold", 0, 441), ("feather", 0, 8),
+        ("despill_slack", 0, 255), ("drop_excess", 0, 255),
     ):
         if key in matte:
             value = matte[key]
@@ -430,10 +434,11 @@ def _validate_matte(name: str, operation: str, raw: dict, config) -> None:
                 raise ManifestError(
                     f"entry {name!r}: matte.{key} must be a number from {low} to {high}, got {value!r}"
                 )
-    if "effect" in matte and not isinstance(matte["effect"], bool):
-        raise ManifestError(
-            f"entry {name!r}: matte.effect must be a bool, got {matte['effect']!r}"
-        )
+    for key in ("effect", "despill", "drop_backdrop_inside"):
+        if key in matte and not isinstance(matte[key], bool):
+            raise ManifestError(
+                f"entry {name!r}: matte.{key} must be a bool, got {matte[key]!r}"
+            )
 
 
 def _validate_geometry(name, type_, operation, raw, frame_count, frame_size, layout) -> None:
