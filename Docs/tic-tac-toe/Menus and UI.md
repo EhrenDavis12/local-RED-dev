@@ -11,9 +11,9 @@
 The game needs a main menu.
 
 **Buttons:**
-- **Play Game** — if there are no existing games, takes the player straight into a new
-  two-player same-phone game. If there are existing games, takes the player to a screen
-  listing all open games. Large.
+- **Play Game** — if there are no existing games, starts a new one straight away. If there
+  are existing games, takes the player to a screen listing all open games. Either way the
+  new-game questions are the same — see **Playing the AI**. Large.
 - **Theme** — opens theme selection. Large, same weight as Play Game.
   See [Theming](./Theming.md).
 - **Settings** — opens the settings menu. Smaller than the three above it.
@@ -155,6 +155,12 @@ see Open Questions.
 **The footer drawn on `1b` — "Three saved games. Starting a fourth replaces the oldest." —
 does not ship.** Nothing ever removes a game the player did not choose to delete, so the
 drawing is stale on that point, and what the footer says instead is unwritten.
+
+**The empty-state path asks the same questions as any other new game.** Play Game with
+nothing to resume skips the open-games list, not the prompts: it asks who you are playing,
+then on AI which level, then for the name — pre-filled with **ItSaMeMaRiO** and the text
+selected, exactly as it comes up when the list was there. So there is one new-game flow
+rather than two, and what the empty state saves the player is the list, nothing else.
 
 **The opponent name typed at New Game does not replace "Player Two" in game.** It titles
 the game in the open-games list and nothing else. In a game on this phone the players are
@@ -379,15 +385,77 @@ no delete affordance at all on screen `1b` — this section is the source of the
 not the drawing.
 
 ## A New Game → What It Starts
-- A **two player game on the same exact phone**. One device, passed back and forth.
+- Either a **two player game on the same exact phone** — one device, passed back and forth
+  — or a **game against the AI**, whichever the player picked. See **Playing the AI** below.
 - It starts **empty** — no marks anywhere on the nine boards, a score of **0–0–0**, and
   **Player One** to move (see [Rules](./Rules.md) → Turn Order Across Games).
 - Turn order alternates: Player One → Player Two → Player One → Player Two → ...
 - After a player makes their move, it becomes the other player's turn.
-- No AI opponent. This section is the game on this phone; an online game is started from
-  the same New Game, by choosing Online — see **Play Game → Where It Takes You** →
-  **Starting a game — on this phone or online** above, and
-  [Tech Design](./Tech%20Design.md) → Online Play.
+
+## Playing the AI
+How the AI actually plays — the three levels and what each one looks at — is
+[AI](./AI.md). This section is how a player reaches it.
+
+**Creating a new game asks who you are playing, and it asks first — before the prompt for
+the game's name.** Which mode you are in is what everything after it depends on, so it is
+answered before anything else about the game.
+
+The prompt offers three choices:
+
+- **Two Player** — the pass-and-play game above.
+- **AI** — a game against the AI. It opens **a second overlay asking which level** —
+  Beginner, Medium or Advanced.
+- **Versus** — **online play, and it is disabled.** It is drawn in the list so a player can
+  see it is coming, and it cannot be picked. What it becomes is written when it is built;
+  nothing here specifies it.
+
+**The order is mode, then level, then name.** An AI game takes three answers to start —
+who you are playing, how hard they play, and what the game is called — and they are asked
+in that order, so the level sits between the mode prompt and the name prompt.
+
+**All three are overlays, not screens of their own** — the mode prompt, the level select
+and the name prompt alike. Whatever the player was looking at stays mounted and painted
+behind them, with the scrim over it — the open-games list on the ordinary path, the main
+menu on the empty-state path — the same way theme selection sits over the main menu (see
+**Theme Selection** below). Starting a game is a few short questions, not somewhere the
+player travels to, and nothing about the surface behind them needs to be torn down to ask.
+
+One flow of one kind of surface also means backing out of any of the three leaves the
+player where they started, rather than partway down a stack of screens.
+
+**An AI game is named exactly the way a two-player game is.** Same prompt, same
+**ItSaMeMaRiO** default, same 16 characters, same fallback when it is left empty — see
+**Play Game → Where It Takes You** above. The AI mode changes nothing about it.
+
+### The level select
+**It opens with Beginner already highlighted**, so there is always a level on it and a
+player who does not care can move on without choosing.
+
+Beginner is the default because it is the rung a player who has just learned the rules can
+beat, and the game teaches its own central mechanic on the board itself (see **How to Play
+— the On-Board Legend and Hint** below). A player who wants more moves up; one who is
+handed Advanced first has already lost.
+
+**The level currently in use is highlighted with theme selection's active-row treatment** —
+a ring around the row **and** a badge, both drawn from the theme, exactly the way the theme
+picker marks the theme that is in use (see **Theme Selection** below). A ring on its own,
+or a badge on its own, isn't the highlight, the same as it isn't there.
+
+Two consequences of reusing that treatment rather than authoring a second one. It carries
+the theme values that already exist behind it, so no theme has to author a new highlight to
+support this screen — which matters, because a highlight written into it in code would
+break the rule that every visual value comes from the selected theme (see
+[Theming](./Theming.md) → Architectural Rule). And a theme that restyles its active row
+restyles both lists at once, so the two can never drift apart.
+
+### Changing the level later
+**The game over screen carries a menu option that selects the AI difficulty**, offering the
+same three levels with the one in use highlighted the same way. So the level can be changed
+between games in a series without leaving the game.
+
+**The level is saved with the game, not app wide** — two open games can sit in the list at
+two different levels. What that means for the running score is
+[AI](./AI.md) → The Level Belongs to the Game.
 
 ## Pass-and-Play Turn Handoff
 - The game switches the active player automatically after each move.
@@ -404,6 +472,19 @@ is confirmed, and it changes there and then. Nothing sits between the confirming
 the opponent's turn: no interstitial, no "pass the phone" screen, no intermediate state
 of any kind. The approved handoff says it the same way — *"Turn handoff is instant —
 no 'pass the phone' screen; there is no hidden info."*
+
+## The AI's Turn on the Board
+**A small banner runs across the bottom of the board saying "Thinking" while the AI takes
+its turn.** It comes up when the player's move is confirmed and goes when the AI plays, so
+the two to three seconds the AI waits (see [AI](./AI.md) → Thinking Time) is something the
+game is visibly doing rather than a stall.
+
+The word is fixed in code and the theme styles it, like every other string in the app (see
+[Theming](./Theming.md) → What a Theme Does NOT Control).
+
+The bottom of the board already carries the state-dependent how-to-play strip below, and
+which content belongs to which board state is an open question — the AI's turn is one more
+state it now has to answer for.
 
 ## How to Play — the On-Board Legend and Hint
 **The game explains its own central mechanic — this is in scope to build out.** The
@@ -482,17 +563,21 @@ right now."* already says it.
 1. **Main Menu** — Play Game + Theme + Settings + About Us buttons.
 2. **Open Games List** — lists all open games, with New Game at the top of the list;
    reached from Play Game when open games exist.
-3. **New Game Prompt** — asks first whether the game is on this phone, an invite to a friend
-   or an anonymous game, then, for a game on this phone, asks for the opponent's name with
-   **ItSaMeMaRiO** as the default. Undecided whether it's its own screen or an overlay.
-4. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
-5. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
+3. **New Game Mode Prompt** — an **overlay**, not its own screen. Asks whether the game is
+   Two Player, AI or invite to a friend, before anything else about the game. Versus is drawn and
+   disabled. See **Playing the AI**.
+4. **AI Level Select** — an **overlay**, not its own screen. Asks which level, on picking
+   AI, with Beginner highlighted. See **Playing the AI** → The level select.
+5. **New Game Name Prompt** — an **overlay**, not its own screen, like the two above it.
+   Asks for the opponent's name, with **ItSaMeMaRiO** as the default.
+6. **Game Screen** — the board (see [Game Board Design](./Game%20Board%20Design.md)).
+7. **Theme Selection** — an **overlay on the main menu**, not its own screen. Opened by
    the Theme button. Three themes at launch — **Neon**, **Classic Red vs Blue** and
    **Sewing** (see [Theming](./Theming.md)). See [Theme Selection](#theme-selection)
    below.
-6. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
+8. **Settings** — reachable from *both* the main menu and the gameplay screen (top-right
    button → quick actions).
-7. **About Us** — reached from the main menu (About Us button). A full screen of its own,
+9. **About Us** — reached from the main menu (About Us button). A full screen of its own,
    not an overlay: nothing stays visible behind it. See Main Menu → About Us.
 8. **Parental Gate** — the grown-up check, over whatever raised it rather than in place of
    it. See [The Parental Gate](#the-parental-gate) below.
@@ -503,6 +588,10 @@ right now."* already says it.
     game's board is opened on this phone, where each player picks which of the theme's two
     marks is theirs. See Play Game → Where It Takes You → Pick your Icon.
 
+**The mode prompt and the AI level select are the two surfaces with no approved drawing.**
+Every other screen has one in
+[Design Handoff](./design_handoff_game_ui/README.md), which was drawn before the AI
+existed:
 The first seven each have an approved drawing in
 [Design Handoff](./design_handoff_game_ui/README.md); the parental gate, the searching
 screen and Pick your Icon have none:
@@ -511,6 +600,9 @@ screen and Pick your Icon have none:
 |---|---|
 | Main Menu | `1a — Main Menu` |
 | Open Games List | `1b — Select Game` |
+| New Game Mode Prompt | *not drawn* |
+| AI Level Select | *not drawn* |
+| New Game Name Prompt | `2c — New Game, opponent name prompt` |
 | New Game Prompt | `2c — New Game, opponent name prompt` |
 | Game Screen | `1d` (free choice), `1e` (forced quadrant), `2d` (pending move) |
 | Theme Selection | `2a — Theme Select (overlay, with paywall)` |
@@ -881,6 +973,9 @@ leave a finished game. The result stays up until one of its buttons is pressed, 
 destroys nothing — the game and its score are already saved, and the series is picked back
 up from the open-games list exactly as it stands.
 
+**In an AI game the card also carries the difficulty menu**, so the level can be changed
+before taking the next game — see **Playing the AI** → Changing the level later.
+
 **Next game is the affirmative action and takes the heavier button treatment; back to the
 main menu is the lighter alternative.** Continuing the session is what the game is built
 around (see [Game Overview](./Game%20Overview.md) → Session Structure), and that weighting
@@ -897,6 +992,7 @@ builds the card.
 | **Animations toggle** | ✅ Remembered in whatever state it was left |
 | **Scoreboard** | ✅ Per game — each open game carries its own scoreboard, saved with that game |
 | **Game in progress** | ✅ Saved to device storage — resumable from the open-games list |
+| **AI difficulty** | ✅ Per game — saved with that game, not app wide. See [AI](./AI.md) → The Level Belongs to the Game |
 
 So there are five persisted preferences — theme, music, sound, vibration, and animations —
 plus game state: every open game is saved, each with its own scoreboard. How that gets

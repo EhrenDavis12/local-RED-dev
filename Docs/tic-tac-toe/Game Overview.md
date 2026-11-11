@@ -96,7 +96,7 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
 
 ## Target Audience & Platform
 - **Phone.** Two players sharing one device, or two players each on their own phone over
-  Game Center — see Modes below.
+  Game Center — see Modes below, or one player against the AI on their own.
 - **Kids are a target audience** — swappable themes exist specifically to make it fun
   for kids. See [Theming](./Theming.md).
 
@@ -104,16 +104,22 @@ move* — the provisional cell, the ghost mark, and the destination quadrant it 
 <!-- Ultimate Tic Tac Toe, other games, mechanics you liked elsewhere -->
 
 ## Modes
-**Two modes:**
+<<<<<<< HEAD
+**Current scope — two modes:**
 - **Two player, same phone (pass-and-play).** Turns alternate Player One → Player Two →
-  Player One → Player Two. Started from the **Play Game** button on the main menu.
+  Player One → Player Two.
+- **One player against the AI**, at one of three levels — Beginner, Medium or Advanced.
+  **The AI is Player Two**, and everything else about a game is the same: the same board,
+  the same scoreboard, the same series. See [AI](./AI.md).
 - **Two player, online.** Remote play against someone on their own phone, over Apple Game
   Center turn-based matches. A match waits as long as it takes for the other player to
   move, so a game can run over days. Started from **New Game** in the open-games list, by
   choosing either **Invite a friend** or **Play an anonymous game**. iOS only, and there is
   no same-room play.
 
-**No single-player mode and no AI opponent** — every mode is two real players.
+
+Both start from the **Play Game** button on the main menu, and starting a game asks which
+of them it is before it asks anything else.
 
 See [Menus and UI](./Menus%20and%20UI.md) for the menu and screen flow, and
 [Tech Design](./Tech%20Design.md) → Online Play for how an online game works.
