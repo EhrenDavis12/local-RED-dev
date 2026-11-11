@@ -71,7 +71,8 @@ The power of the fighting members is based on five base stats:
 - Intelligence
 - Luck
 
-Dexterity is also the speed attribute: it's what determines turn order in combat.
+Dexterity is also the speed attribute: it's what determines how fast a member's cooldown
+is met in combat.
 
 A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
 ranks highest, plus their weapon.
