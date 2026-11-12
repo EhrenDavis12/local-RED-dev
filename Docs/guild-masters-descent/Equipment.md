@@ -59,12 +59,29 @@ a fixed figure for its kind and class: each kind at each class has a wider band,
 individual piece's own range is drawn from inside that band when the piece is made, so two
 pieces of the same kind and class are not the same. The span itself is rolled too, not
 just where it sits in the band — one piece's range can come out wider or narrower than
-another's, not only higher or lower within it. The bands for neighbouring classes overlap,
-so a well-rolled piece of a lower class can be better than a poorly-rolled piece
-of a higher one. An F-class knife, for instance, draws from a band of 2–12, so one F-class
-knife might come out 10–12 while another comes out 2–4. One individual weapon's rolled
-range might come out 4–6, and when that member attacks, 4–6 is what the weapon adds to the
-damage calculation.
+another's, not only higher or lower within it.
+
+Each kind's F-class Attack Damage band, in ascending order:
+
+- Knife, the Rogue's — 2–12
+- Staff, the Mage's — 3–15
+- Two-handed sword, the Fighter's — 4–16
+- Club, the Brute's — 4–18
+- Short sword, the Tank's — 5–21
+- Bow, the Archer's — 6–26
+
+A band is set by how much work one strike has to do: a kind that strikes more than once in
+an attack, or lands on more than one enemy, carries a smaller band than one putting
+everything into a single hit on a single target.
+
+Each class doubles the band below it — E is double F, D double E, and so on up the nine
+rungs to SSS. The knife's F-class band of 2–12 doubles to an E-class band of 4–24, and by
+the time it reaches SSS it has doubled all the way to 512–3072. That doubling is also why
+the bands for neighbouring classes overlap: an E-class band starts inside the F-class band
+it sits above, so a well-rolled piece of a lower class can be better than a poorly-rolled
+piece of a higher one. An F-class knife, for instance, might come out 10–12 while another
+comes out 2–4, and whatever range a piece rolls is what that weapon adds when the member
+attacks.
 
 Durability works the same way: a piece's Durability is drawn from a band for its kind and
 class rather than being a fixed figure, and the individual piece's figure is rolled from
@@ -181,8 +198,8 @@ materials.
 
 ## Open Questions
 
-- How much does a step of quality add to armour's defence?
-- Are the six kinds of weapon in a fixed order of damage?
+- What is each kind of armour's Defence band at F class, and does it double from class to
+  class the way a weapon's does?
 - What does crafting consume, and how long does it take? Can a crafter work while out on a
   mission or a dive?
 - How narrow or wide can a rolled span be — can a piece come out with a single figure
@@ -197,3 +214,6 @@ materials.
   rough impression the way the recruiting board shows a candidate's strengths?
 - Does the Armourer have a station of its own the way the Blacksmith has the smithy,
   deciding which of two Armourers sets armour quality?
+- What durability band does each kind get at each class? The Brute's cleave and the Mage's
+  column each land three hits in one attack where the two-strike kinds land two, so the
+  hits a kind spends per attack are not the same as its strikes.
