@@ -75,6 +75,11 @@ a member makes charges that member's bar — that's the base, and it's the same 
 type. Each combat type also has its own bonus condition that charges its bar on top of
 that — covered in the Individual Types doc.
 
+The bar caps at full — the special is never lost, and it waits until the player uses it.
+While it sits full, charge is wasted: attacks the member makes while full charge nothing,
+and so does the type's bonus condition — that progress toward the next special is gone.
+Using the special empties the bar, and it charges again from there.
+
 ## Lasting Effects
 
 Vanish, Shields Up and the Mage's lingering field all last the same number of the
@@ -115,8 +120,6 @@ the Equipment doc.
 - If the member whose effect it is dies partway through, does the effect go with them?
   The Mage's lingering field especially, since it sits on the battlefield rather than
   on the Mage.
-- Does a full special bar stay full until the player uses it, or does the chance pass
-  after a while?
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
 - Does the special bar still charge per attack, now that a faster attacker attacks more
