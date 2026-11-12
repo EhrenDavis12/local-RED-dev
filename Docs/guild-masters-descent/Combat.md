@@ -1,8 +1,8 @@
 # Combat
 
-> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing and
-> Dexterity setting the cooldown are settled, but when the player acts and how the Luck
-> reset's chance works aren't.
+> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing,
+> Dexterity setting the cooldown and the tick-based simulation are settled, but when the
+> player acts and how the Luck reset's chance works aren't.
 
 ## Formation
 
@@ -21,6 +21,14 @@ Combat is not turn-based. Every guild member and every enemy runs on its own coo
 process that sets how often that combatant attacks. How fast a member's cooldown is met is
 determined by Dexterity, and a cooldown is something that can be bettered at higher
 levels.
+
+The fight is simulated in discrete ticks. Everything the simulation counts — a cooldown,
+an effect's remaining cycles, a durability count — is a whole number, never a fraction of
+one. What the player watches is continuous motion; the ticks themselves are never drawn
+on screen. The simulation stays whole numbers because a fight built that way can be
+reasoned about and balanced — a fight with fifteen guild members and a facing force of
+enemies run on a continuous clock would be far harder to balance, and far harder to
+chase a bug through.
 
 Because cooldown speed comes from Dexterity, the types that rank Dexterity lower attack
 less often — the Brute and the Tank among them — and that's intended rather than something
@@ -90,7 +98,10 @@ the Equipment doc.
 ## Open Questions
 
 - What does changing formation mid-battle cost the player, if anything?
-- Does the fight run on a real-time clock, or in discrete ticks?
+- How much real time is a tick worth — how fast does the simulation run against what the
+  player is watching?
+- Can the player speed a fight up or slow it down, and does that change anything in the
+  simulation or only how fast it's drawn?
 - How does Dexterity convert into cooldown speed, and does it cap?
 - How many of the owner's own cooldown cycles do Vanish, Shields Up and the Mage's
   lingering field last?
