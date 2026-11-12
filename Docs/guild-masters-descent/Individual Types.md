@@ -104,7 +104,7 @@ through two separate events: a character standing in the field takes damage from
 that character begins its own attack, and a character that moves into the field, changing
 its position, takes damage for entering. Reaching in to attack from outside the field
 doesn't count as entering — an attacker reaching in to attack a character standing in the
-field takes no damage from it.
+field takes no damage from it. If the Mage dies, the field disappears.
 
 The Mage's bonus charge condition is allies in front of it in its own column taking hits.
 

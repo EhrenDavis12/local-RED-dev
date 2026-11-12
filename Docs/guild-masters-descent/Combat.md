@@ -144,6 +144,12 @@ row like any close attacker, the enemy front line. The attack is weak — the in
 specialists help a little rather than being a full detriment to the battle. A specialist
 has no special bar at all, and their attack damage works the way it does for anyone else.
 
+## Enemies
+
+Enemies are built from the same six combat types as guild members, working the same way.
+What changes with a dungeon is their gear: the dungeon's rank determines the chance
+that an enemy carries a weapon and the chance that it wears armour.
+
 ## Enemy Targeting
 
 Enemies pick a target from whatever they can reach. The choice is weighted by both how
@@ -164,9 +170,8 @@ the Equipment doc.
   simulation or only how fast it's drawn?
 - How many of the owner's own cooldown cycles do Vanish, Shields Up and the Mage's
   lingering field last?
-- If the member whose effect it is dies partway through, does the effect go with them?
-  The Mage's lingering field especially, since it sits on the battlefield rather than
-  on the Mage.
+- Shields Up adds the Tank's defence to the allies behind it — if the Tank dies, does
+  that defence go with it?
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
@@ -177,3 +182,7 @@ the Equipment doc.
 - When a free attack is a multi-strike attack, does it land all of its strikes?
 - After a successful reset, can the member take another Luck check once their next
   cooldown has charged normally, or is there a longer lockout?
+- Enemies are built from the same combat types, but what rank or level are they, and
+  how does that follow the dungeon's rank and the depth reached?
+- The dungeon board shows the types of monster and enemy found in a dungeon. Is a
+  monster something other than an enemy built from the six combat types?
