@@ -97,11 +97,13 @@ ordinary attack is an area attack covering a whole column of the enemy's grid �
 rows. It's weak to the Archer because the Mage can neither dodge nor absorb, so a
 precise single shot is what kills it.
 
-Its special is a lingering field: it covers two columns of the enemy's grid and keeps
-damaging enemies standing in it. The field affects enemies only — it never damages the
-player's own members. A character that enters the field to attack takes no damage from
-it — entering only happens when a character moves into the field, changing its
-position; reaching in to attack from outside the field doesn't count as entering.
+Its special is a lingering field: it covers two columns of the enemy's grid. The field
+affects enemies only — it never damages the player's own members. The field deals damage
+through two separate events: a character standing in the field takes damage from it when
+that character begins its own attack, and a character that moves into the field, changing
+its position, takes damage for entering. Reaching in to attack from outside the field
+doesn't count as entering — an attacker reaching in to attack a character standing in the
+field takes no damage from it.
 
 The Mage's bonus charge condition is allies in front of it in its own column taking hits.
 
