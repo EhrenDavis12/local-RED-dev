@@ -32,39 +32,59 @@ settles them. Each is also listed under Open Questions for the user's word.
 
 1. A save holds the whole guild as the data model builds it — rank, gold, every member field,
    every stores piece field, both ID counters, and each member's weapon and armour slots — and
-   loading it gives back a guild equal to the saved one, field for field.
-   *Source: `queue/focus.md` § Goal ("In: … save and load"); the model in `Core/Guild/`.*
+   loading it gives back a guild equal to the saved one, field for field. Equality is tested
+   with no time passing between the save and the load (elapsed 0), so settling changes
+   nothing. *Source: `queue/focus.md` § Goal ("In: … save and load"); the model in
+   `Core/Guild/`; engineering decision (main loop, 2026-11-11).*
 2. A save also holds a format version (this feature ships version 1) and the moment the
-   guild's time was last settled (R14), as whole seconds of UTC wall-clock time. The saved
+   guild's time was last settled (R14), as Unix epoch seconds (UTC) in a `long`. The saved
    shape still holds no floating point, as the data model's tests already require.
-   *Source: build brief (versioned save); `Core Concept.md` § Time.*
+   *Source: build brief (versioned save); `Core Concept.md` § Time; engineering decision
+   (main loop, 2026-11-11).*
 3. Saves are on the device, one per slot. The number of slots is a placeholder,
-   `Tuning.SaveSlotCount = 3`. *Source: build brief; `queue/focus.md` § Goal, "Missing
-   details".*
+   `Tuning.SaveSlotCount = 3`. A slot index outside 0 to `SaveSlotCount − 1` is never
+   thrown on: a load or a status read reports it as a failed load, a save or new game reports
+   it as a failed save, and nothing is touched. *Source: build brief; `queue/focus.md` §
+   Goal, "Missing details"; engineering decision (main loop, 2026-11-11).*
 4. A save never destroys the save before it. If the write fails or the app dies partway, the
    slot holds either the previous save whole or the new one whole, never a mix or a fragment.
-   A failed save is reported to the caller. *Source: build brief (a wrong guess loses or
-   corrupts saves).*
-5. Every saved enum value — rank, tier rung, member type, gear kind — keeps its meaning in
-   every later version, and a test pins today's stored values so that reordering an enum
-   fails the build rather than silently changing old saves. Member types and gear kinds are
+   A failed save is reported to the caller. Core owns this protocol: the injected storage
+   offers only primitives — write a temporary entry for a slot, commit (swap) the temporary
+   entry into the slot, read a slot, and ask whether a slot exists — and Core writes the
+   temporary entry, then commits. A fake storage used in EditMode can be made to fail at any
+   one of those steps, and the tests prove that a failure at each step leaves the previous
+   save whole and loadable. The Game layer's file storage implements the primitives thinly (a
+   temporary file, then `File.Replace`, or `File.Move` when no slot file exists yet).
+   *Source: build brief (a wrong guess loses or corrupts saves); engineering decision (main
+   loop, 2026-11-11).*
+5. Every saved enum value — rank, tier rung, member type, gear kind — is stored as its
+   integer value and keeps its meaning in every later version. A test pins today's integer
+   values so that reordering an enum fails the build rather than silently changing old
+   saves. Member types and gear kinds are
    expected to grow: the other six specialists are out of the MVP only for now, and the
    specialist list "isn't complete". *Source: `queue/focus.md` § Not included;
-   `Guild Members.md` § Specialists.*
+   `Guild Members.md` § Specialists; engineering decision (main loop, 2026-11-11).*
 
 ### Loading
 
 6. Loading a slot has exactly four outcomes: **loaded**, **empty**, **corrupt**, and
    **newer version**. Only *loaded* hands back a guild. *Source: build brief.*
 7. Loading never writes to, moves, or deletes the save file, whatever the outcome. A corrupt
-   or newer-version save stays on the device untouched. *Source: build brief.*
-8. A save whose version is above the game's own is *newer version*, not *corrupt*. A save
-   that can't be parsed, has no readable version, or holds a value the model gives no meaning
-   to (a member type that doesn't exist) is *corrupt*. Version 1 is the first, so there is
-   nothing older to migrate and no migration is built now. *Source: build brief.*
+   or newer-version save stays on the device untouched. A leftover temporary entry from an
+   interrupted save (R4) is ignored — not read, not deleted — and the committed slot is what
+   loads. *Source: build brief; engineering decision (main loop, 2026-11-11).*
+8. The version is read before the guild body. A save whose version is above the game's own
+   is *newer version*, not *corrupt*, even when the rest of the file won't parse. A save that
+   can't be parsed, has no readable version, has no guild body, or holds a value the model
+   gives no meaning to is *corrupt*: every enum field must pass `Enum.IsDefined`, and every
+   rung must be 0 to 8. Version 1 is the first, so there is nothing older to migrate and no
+   migration is built now. *Source: build brief; engineering decision (main loop,
+   2026-11-11).*
 9. A slot's status — which of the four outcomes a load would give — can be read without
-   bringing the guild into play, and reading it changes nothing. The title menu uses this to
-   decide which buttons to show. *Source: build brief (core API for the title menu).*
+   bringing the guild into play, and reading it changes nothing. It runs the full load checks
+   (R8, R10–R12), so a slot it reports as loadable does load. The title menu uses this to
+   decide which buttons to show. *Source: build brief (core API for the title menu);
+   engineering decision (main loop, 2026-11-11).*
 
 ### Checking a loaded save
 
@@ -86,39 +106,52 @@ settles them. Each is also listed under Open Questions for the user's word.
 
 ### Time while away
 
-14. **Settling** advances the guild to *now*: elapsed time is *now* minus the saved
-    last-settled moment, in whole seconds; every time-driven part of the guild advances by
-    that much; then last-settled becomes *now*. A load settles after the checks above and
-    before handing the guild back. *Source: `Core Concept.md` § Time; `queue/focus.md` §
-    Goal.*
+14. **Settling** advances the guild to *now*. The guild holds the injected clock (not saved
+    state) and its last-settled moment (saved, R2). One settle operation, given *now*,
+    computes elapsed = *now* − last-settled in whole seconds, never negative (R19); advances
+    every time-driven part of the guild by that much; then moves last-settled to *now*. A
+    load settles after the checks above and before handing the guild back. *Source:
+    `Core Concept.md` § Time; `queue/focus.md` § Goal; engineering decision (main loop,
+    2026-11-11).*
 15. Every second counts exactly once. Settling in pieces gives the same guild as settling
     once over the same span, including across a save and a load; settling twice at the same
     *now* is the same as settling once. Nothing advances injury time (or, later, restock
     time) except through settling — anything that did would leave last-settled behind, and
     the next load would count that time again. *Source: `Core Concept.md` § Time.*
-16. Settling advances each member's injury by the elapsed time, the free, slow recovery
+16. **Settle before any change to time-driven state.** Injuring a member goes through a
+    guild-level path that settles to *now* first, so a new injury starts with its full time
+    and is never credited time from before it existed. Restocking and paid healing, when they
+    land, go through the same kind of path. A test pins this sequence: load at t0, injure a
+    member at t0 + 25 min, settle at t0 + 26 min — the injury has 1800 − 60 = 1740 s left.
+    *Source: `Core Concept.md` § Time; engineering decision (main loop, 2026-11-11).*
+17. Settling advances each member's injury by the elapsed time, the free, slow recovery
     `Core Concept.md` § Missions describes. It touches nothing else on a member — in
     particular not health, whose behaviour back in the hall is unsettled (`EhrensDocs/Guild
     Members.md`, "Every member starts with 10 health"). *Source: `Core Concept.md` § Time,
     § Missions.*
-17. **Recruiting board hook.** The board isn't in the code yet. Settling gives the board the
-    same thing it gives injuries — the elapsed seconds — under the same once-only rule (R15),
-    so a restock is neither lost nor doubled across a save and a load. The board's own state,
-    including its progress toward the next restock, is saved with the guild when the board
-    lands. This feature builds no board and no restock rule. *Source: `Core Concept.md` §
-    The Recruiting Board ("restocks over time").*
-18. Time is UTC wall-clock time, so a time-zone change or daylight-saving shift neither adds
-    nor removes away-time. *Source: `Core Concept.md` § Time ("real time").*
+18. **Recruiting board hook.** The board isn't in the code yet. Settling walks one internal
+    list of time-driven parts and gives each the elapsed seconds; injuries are the first
+    part, and the board joins the same list when it lands, under the same once-only rule
+    (R15), so a restock is neither lost nor doubled across a save and a load. A test adds a
+    fake part to the list and proves it receives exactly the elapsed seconds, once. The
+    board's own state, including its progress toward the next restock, is saved with the
+    guild when the board lands. This feature builds no board and no restock rule. *Source:
+    `Core Concept.md` § The Recruiting Board ("restocks over time"); engineering decision
+    (main loop, 2026-11-11).*
 19. **Clock going backwards. [Provisional]** If *now* is earlier than last-settled, elapsed
     is zero and last-settled stays where it was — it never moves backwards. The guild's
     clocks stand still until the device clock passes the saved moment again. This blocks
-    "set the clock back, then forward" from granting time twice. *Source: build brief.*
+    "set the clock back, then forward" from granting time twice. Time is UTC, so a time-zone
+    change or daylight-saving shift neither adds nor removes away-time. *Source: build brief;
+    `Core Concept.md` § Time ("real time").*
 20. **No cap on away-time. [Provisional]** All of the elapsed time counts, however long the
     player was away, and there is no defence against the device clock being set forward. No
     doc names a cap. *Source: `Core Concept.md` § Time.*
-21. Returning to the app from the background settles exactly as a load does. On the iPhone a
-    backgrounded app is often never closed, and the away-time must still count.
-    *Source: `Core Concept.md` § Time; `EhrensDocs/Platform.md` § Orientation (iPhone).*
+21. Returning to the app from the background settles the guild already in memory — it does
+    not reload the save. The reason: on the iPhone a backgrounded app is often never closed,
+    so without this the time spent backgrounded would never count. Injuries visibly counting
+    down while the app is open is a Game-layer refresh that calls the same settle; it adds no
+    rule. *Source: `Core Concept.md` § Time; engineering decision (main loop, 2026-11-11).*
 
 ### New game, saving, and the seams
 
@@ -128,22 +161,24 @@ settles them. Each is also listed under Open Questions for the user's word.
     one) is refused unless the caller explicitly asks to overwrite; the core never replaces a
     save by default. *Source: `queue/focus.md` § Goal ("new game"); build brief.*
 23. **[Provisional]** The game saves by itself: the loaded guild is saved to its slot when the
-    app goes to the background or quits. There is no Save button. On the iPhone a
+    app goes to the background or quits. There is no Save button. The reason: on the iPhone a
     backgrounded app can be killed with no warning, so a guild saved only on request would
-    lose play. *Source: `EhrensDocs/Platform.md` § Orientation (iPhone); build brief.*
-24. The clock and the save storage are injected. Every rule above lives in the Core assembly,
-    which stays engine-free (`CoreAssemblyTests`), and is tested in EditMode with a fake clock
-    and in-memory storage — no real disk, no real time. The device's real clock and file
-    storage live in the Game layer. Core can't reach `JsonUtility`, so the serializer is either
-    pure C# in Core or handed in from Game. *Source: build brief;
-    `GuildMastersDescent.Core.asmdef` (`noEngineReferences`).*
+    lose play. *Source: build brief; `queue/focus.md` § Goal (target is the iPhone).*
+24. The clock, the save storage and the serializer are injected. Every rule above lives in
+    the Core assembly, which stays engine-free (`CoreAssemblyTests`), and is tested in
+    EditMode with a fake clock and in-memory storage — no real disk, no real time. Core can't
+    reach `JsonUtility`, so the Game layer hands it in; EditMode tests use `JsonUtility` the
+    way `GuildSerializationTests` does. The Game layer holds only the real clock, the file
+    storage (R4), and the background/quit hook (R21, R23) — no rule. *Source: build brief;
+    `GuildMastersDescent.Core.asmdef` (`noEngineReferences`); engineering decision (main
+    loop, 2026-11-11).*
 
 ### Placeholder numbers
 
 | Number | Value | Where | Note |
 |---|---|---|---|
 | `SaveSlotCount` | 3 | new in `Tuning.cs` | R3 |
-| `InjuryDurationSeconds` | 1800 | already in `Tuning.cs` | how long a new injury lasts; settling uses it unchanged |
+| `InjuryDurationSeconds` | 1800 | already in `Tuning.cs` | how long a new injury lasts; settling uses it unchanged (R16's test assumes 1800) |
 | Restock interval, board size | — | not added | they belong to the recruiting board; a placeholder with no reader would be dead code |
 
 ## Out of Scope
@@ -157,7 +192,8 @@ settles them. Each is also listed under Open Questions for the user's word.
 - A dive in progress — the dive isn't built, so there is nothing of it to save yet.
 - Anything the guild doesn't hold yet: the starting dungeon (`EhrensDocs/The Dungeon.md`),
   dive records. Each joins the save when its feature lands.
-- Cloud sync, backups beyond R4, and protection against a player editing the save file.
+- Cloud sync, backups beyond R4, protection against a player editing the save file, and
+  cleaning up a leftover temporary entry (R7).
 
 ## Open Questions
 
