@@ -86,6 +86,9 @@ The dungeon board, finding and entering dungeons, and training missions.
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line, open question).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open question).
-- New docs proposed for the originals: none.
+- `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
+  runs landscape only.
+  - Orientation
+  - Open Questions
 
 The design docs themselves are the source of truth; consult them, not this map, for content.
