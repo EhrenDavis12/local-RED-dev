@@ -1,8 +1,8 @@
 # Combat
 
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing,
-> Dexterity setting the cooldown and the tick-based simulation are settled, but when the
-> player acts and how the Luck reset's chance works aren't.
+> Dexterity setting the cooldown, the tick-based simulation, and that the fight never
+> pauses for the player are settled, but how the Luck reset's chance works isn't.
 
 ## Formation
 
@@ -51,6 +51,13 @@ Dexterity sets the rhythm; Luck occasionally skips the wait.
 
 Default attacks are auto-selected. The player can select one enemy to be specifically
 targeted by the entire party — this cuts down on clicks during gameplay.
+
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — using a member's special once that bar is full,
+changing formation, and marking the focus target.
+
+The fight doesn't wait for the player, so the moment to use a special goes by while the
+fight carries on around it.
 
 ## Attacks and Reach
 
@@ -108,7 +115,10 @@ the Equipment doc.
 - If the member whose effect it is dies partway through, does the effect go with them?
   The Mage's lingering field especially, since it sits on the battlefield rather than
   on the Mage.
-- When does the player get to act, and does anything pause for them?
+- Does a full special bar stay full until the player uses it, or does the chance pass
+  after a while?
+- With a party of fifteen filling bars while the fight runs, how does the player see
+  which specials are ready at a glance?
 - Does the special bar still charge per attack, now that a faster attacker attacks more
   often?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
