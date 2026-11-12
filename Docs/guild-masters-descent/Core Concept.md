@@ -100,11 +100,12 @@ Which specialist types the guild can recruit is covered in the Specialists doc.
 Gold is the money in the game.
 
 At rank F the guild has access to a shop. The guild sells items and materials there, and
-the shop sells to the guild too — the player can buy items and equipment. The equipment
-the shop sells is of a baseline quality, and that baseline rises with guild rank.
+the shop sells to the guild too — the player can buy items and equipment.
 
-Having a blacksmith, armourer or alchemist in the guild gives it that kind of crafting. A
-crafter in the guild produces better than the shop's baseline.
+Having a blacksmith, armourer or alchemist in the guild gives it that kind of crafting.
+
+The quality of the equipment the shop sells, and how a crafter's work compares, are
+covered in the Equipment doc.
 
 ## Open Questions
 

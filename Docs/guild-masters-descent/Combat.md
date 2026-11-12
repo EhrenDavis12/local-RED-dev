@@ -81,23 +81,8 @@ those factors until the taunted enemy's next hit — one attack, then it's spent
 
 ## Equipment Durability
 
-Gear wears down as it is used — weapons degrade from attacking, armour from being hit. It
-works fully until it reaches zero, then breaks and contributes nothing — there is no
-gradual decline before that.
-
-Broken armour means the member's defence falls back to Constitution alone.
-
-A broken weapon stops being added to the attack at all — the member's damage falls back to
-their stat alone. They still attack, and their combat type's attack shape still applies —
-a Brute with a broken weapon still cleaves, just feebly.
-
-Gear can break partway through a multi-strike sequence, so later strikes in the same
-attack can deal or face different damage than earlier ones.
-
-Repairs happen in the guild hall between dives. A Blacksmith or Armourer in the party can
-also repair in the field, a convenience rather than a requirement. Field repair only works
-on gear that is still above zero. Once an item breaks it stays broken for the rest of the
-dive — a Blacksmith or Armourer in the party cannot bring it back.
+How gear wears down, what breaking costs a member in combat, and repair are covered in
+the Equipment doc.
 
 ## Open Questions
 
