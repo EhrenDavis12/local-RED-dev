@@ -2,7 +2,7 @@
 
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
 > reset's chance, and the never-pausing simulation are settled; what a tick costs in real
-> time and whether the player can speed it up, how effects and multi-strike cases resolve,
+> time and whether the player can speed it up, how multi-strike cases resolve,
 > and what formation costs and how the bars read at a glance are not.
 
 ## Formation
@@ -136,11 +136,14 @@ Using the special empties the bar, and it charges again from there.
 
 ## Lasting Effects
 
-Vanish, Shields Up and the Mage's lingering field all last the same number of the
-owner's own cooldown cycles — the member whose effect it is. So "the same length" means
-the same count, not the same stretch of real time: a fast member's effect is brief on
-the clock while a slow member's runs long, and every member gets the same number of
-cycles of value out of it. Each of the three is covered in the Individual Types doc.
+Vanish, Shields Up and the Mage's lingering field all last three of the owner's own
+cooldown cycles — the member whose effect it is. So "the same length" means the same
+count, not the same stretch of real time: a fast member's effect is brief on the clock
+while a slow member's runs long, and every member gets the same number of cycles of value
+out of it. Three comes from Vanish: while it's up, the Rogue can't be targeted and
+attacks can't miss, so every extra cycle is another free, unanswerable attack. Three is
+enough to be decisive and short enough to stay a window rather than a phase, and the other
+two take the same count from it. Each of the three is covered in the Individual Types doc.
 
 A lasting effect ends when the member whose effect it is dies. That isn't obvious for
 the two of the three that sit somewhere other than on their owner: the Mage's lingering
@@ -193,8 +196,6 @@ the Equipment doc.
   player is watching?
 - Can the player speed a fight up or slow it down, and does that change anything in the
   simulation or only how fast it's drawn?
-- How many of the owner's own cooldown cycles do Vanish, Shields Up and the Mage's
-  lingering field last?
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
