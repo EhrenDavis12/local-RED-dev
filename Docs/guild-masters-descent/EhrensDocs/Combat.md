@@ -94,6 +94,11 @@ When a member's health reaches 0 in a battle on a dive, they die on the spot, fo
 
 Health only matters inside a dive. Back at the guild hall a member's health is back to
 full; injury is what carries from one dive to the next.
+
+For now a dive never leaves a member injured: a member comes home fine, or doesn't come
+home. Where everyone stands at the end of a battle is where they start the next one, and
+the dead leave their places empty. A special bar doesn't carry over — every bar starts
+each battle empty.
 ```
 
 **Why:** Answered: health — stay hurt from battle to battle. Answered too: a member whose
@@ -106,6 +111,10 @@ paragraph is unchanged, and The Dungeon's "Death in the dungeon is permanent" al
 agrees. Not settled by this: what reaching 0 health does on a training run, which "can
 injure a member, but can never kill one"; whether a dive can leave a member injured; and
 how much health the Cook and a rest area give back.
+The dive is built with a default for now on whether a dive can leave a member injured,
+and on two things nothing raised — whether the formation and the special bars carry from
+one battle to the next — in the last paragraph; each is proposed as a question for
+`## Open Questions`.
 
 ## Change: Turn order within a round, and how a battle ends
 
@@ -268,7 +277,12 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
   does it also make its ordinary attack?
 - If a Tank uses Shields Up, or a Mage casts its field, while its last one is still
   running, do the two stack, or does the new one replace the old?
+- Can a dive leave a member injured?
+- Does the formation carry from one battle to the next?
+- Does a special bar carry over from one battle of a dive to the next?
 ```
 
 **Why:** None of the docs answers these. The turn order above is a default for now. The
 third question comes from how a taunt is spent once the six types' specials are built. The last two come from the specials that strike no one, as the six combat types are built.
+The last three come from the dive as it's built: each has a default for now in "Members
+stay hurt from battle to battle, and 0 health is death".

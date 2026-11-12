@@ -105,12 +105,21 @@ on who came along.
 
 ```
 Every 5th floor is a safe rest area, where the party heals and the player may choose to
-return to the top and exit the dungeon. The party can turn back anywhere, not only at a
-rest area — but leaving between rest areas loses the gold found since the last rest area.
+return to the top and exit the dungeon. For now a rest area is a safe floor with no
+battles on it, so it drops no gold and gives no experience. The party can turn back
+anywhere, not only at a rest area — but leaving between rest areas loses the gold found
+since the last rest area. For now "anywhere" means between two battles, not in the middle
+of one, and a battle that ends in a stand-off counts as the party turning back there.
 
 There is a carry limit for each person. Each member can carry up to 10 gold coming out,
 and each Porter up to 100. Gold beyond what the party can carry is left behind. Both
 numbers are made up for now, to be balanced later.
+
+For now a Porter's 100 is on top of the 10 every member carries. The party holds all the
+gold it finds while it's inside, and the limit only bites on the way out: leaving between
+rest areas first loses the gold found since the last one, and then whatever is left over
+the limit stays behind. Only the living carry, so a party with no one left alive brings
+nothing out. A dead member's gear doesn't count against the limit.
 ```
 
 **Why:** Answered: yes, there is a carry limit each person — up to 10 gold coming out, a
@@ -123,6 +132,9 @@ all the gold found since the last rest area whoever came along, and who came alo
 decides instead how much gold comes out at all. Not settled by this: whether a Porter's
 100 is on top of the 10 every member carries, how much more the Herbalist and the Miner
 carry, and how a dead member's gear counts against a limit measured in gold.
+The dive is built with a default for now on the first and the last of those, in the
+third paragraph, and with defaults on rest areas, turning back mid-battle and stand-offs
+in the first; each is proposed as a question for `## Open Questions`.
 
 ## Change: The dungeon's enemies are monsters
 
@@ -181,6 +193,75 @@ Brute's tanned hide adds a little defence, and the Rogue's weapon adds less dama
 a monster Brute or Rogue carries none. `## The Dungeon Board`'s "the types of monster and
 enemy found in each of the dungeons" is left as it is.
 
+## Change: A floor's monsters are the same every dive, for now
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## The Dungeon Board`, second paragraph
+
+**Now says:**
+
+```
+A newly claimed dungeon starts near-blank. The enemy types and the floor layout appear
+as the party reaches each floor.
+```
+
+**Proposed:**
+
+```
+A newly claimed dungeon starts near-blank. The enemy types and the floor layout appear
+as the party reaches each floor.
+
+For now a floor's monsters are the same on every dive: which monsters, their levels and
+where they stand are set once, when the dungeon is created. A floor counts as reached
+once the party starts its first battle there, or arrives there if it's a rest area.
+```
+
+**Why:** The dive is built this way. "Appear as the party reaches each floor" reads as a
+floor's enemies being fixed, but nothing said so outright, or what counts as reaching a
+floor for the deepest floor reached. Both are proposed as questions for
+`## Open Questions`.
+
+## Change: Where a party re-enters, and what it pays, for now
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Entering the Dungeon`, last paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+The player re-enters at the last rest area reached, and must pay the entry fee again plus
+a teleportation fee. This stops the player exploring five floors, returning, and
+rearranging the party with no penalty.
+```
+
+**Proposed:**
+
+```
+The player re-enters at the last rest area reached, and must pay the entry fee again plus
+a teleportation fee. This stops the player exploring five floors, returning, and
+rearranging the party with no penalty.
+
+For now the last rest area reached is the deepest one the most recent dive reached, and
+a dive that re-entered counts the rest area it started at. So the re-entry point can move
+back up, from floor 10 to floor 5, and a dive that reaches no rest area leaves none. Any
+party can re-enter, not only the one that got there, and its first battle is on the floor
+after the rest area. There's no re-entering at a rest area with no floor past it.
+
+For now the entry fee is so much for each member of the party, and the teleportation fee
+is one flat amount whatever the party's size. Both amounts are placeholders.
+
+For now, once a party is in, the guild hall can't be reached until the dive ends — no
+hiring, shopping or changing gear partway through a dive and then carrying on with it.
+```
+
+**Why:** The dive is built this way. "The last rest area reached" reads two ways — the
+deepest one ever reached, or the one the most recent dive reached — and nothing said
+whether the teleportation fee grows with the party the way the entry fee does, or whether
+the player can leave a dive for the guild hall and come back to it. All three are
+proposed as questions for `## Open Questions`.
+
 ## Change: A question on turning back mid-battle
 
 > Proposed 2026-11-12 · for review
@@ -202,3 +283,43 @@ enemy found in each of the dungeons" is left as it is.
 
 **Why:** "The party can turn back anywhere" doesn't say whether that includes the middle
 of a battle.
+
+## Change: Questions on the dive's defaults
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- Is a rest-area floor a floor of battles with a rest at the end, or a safe floor with no
+  battles?
+- What does a battle that ends in a stand-off do to the dive?
+- Does a Porter carry 100 in total, or 110 — the 100 on top of the 10 everyone carries?
+- When does the carry limit bite: is extra gold lost as soon as it's found, or only when
+  the party walks out?
+- How does a dead member's gear count against a carry limit measured in gold?
+- Is a floor's set of monsters the same every dive, or new each time?
+- When does a floor count as reached, for the deepest floor reached?
+- "The last rest area reached": is that the deepest rest area ever reached, or the one the
+  most recent dive reached?
+- Is the teleportation fee flat, or does it rise with party size the way the entry fee
+  does?
+- While a dive is in progress, can the player leave it for the guild hall — hire, shop,
+  change gear — and come back to it?
+- If a dungeon is deeper than its last rest area, what happens when the bottom floor is
+  cleared?
+```
+
+**Why:** The dive is built with a default for now on each of these but the last, in the
+changes above, and none of the docs settles them. The last is open because nothing says;
+the starting dungeon's depth is set to end on a rest area, so it doesn't come up yet. The
+pending "A question on turning back mid-battle" change to this list is unchanged.

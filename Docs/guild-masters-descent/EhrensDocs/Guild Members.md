@@ -23,6 +23,10 @@ A newly recruited level-1 F-rank member starts with single-digit stats.
 A member's starting health is based on their rank. An F-rank member starts with 10
 health, and a higher-rank hire starts with more. For now those are basic numbers, and
 placeholders to be tuned — 10 and every other rank's health alike.
+
+For now a member's health comes from their rank or tier alone. Level and Constitution
+don't change it, a promotion moves the member to the new rank's or tier's figure, and a
+specialist's tier works the same way as a diver's rank.
 ```
 
 **Why:** Answered: let's just start with a basic health number at 10. Answered too: based
@@ -33,6 +37,8 @@ hire starts higher across the board than an F-rank one". The existing paragraph 
 unchanged. Not settled by this: how much health each rank above F starts with; whether a
 specialist's starting health follows their tier the same way; whether health grows with
 level or with a promotion; and whether Constitution plays into it.
+The game is built with a default for now on all but the first of those, in the last
+paragraph, and the question is proposed for `## Open Questions`.
 
 ## Change: Three questions on levelling and promotion
 
@@ -61,6 +67,34 @@ level or with a promotion; and whether Constitution plays into it.
 ```
 
 **Why:** None of the docs answers these. The existing entries are unchanged.
+
+## Change: Who shares a floor's experience, for now
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Levels and Experience`, second paragraph
+
+**Now says:**
+
+```
+Experience is awarded per floor: once a floor's battles resolve, experience is the number
+of enemies defeated by the party divided by the number of party members, counting
+specialists.
+```
+
+**Proposed:**
+
+```
+Experience is awarded per floor: once a floor's battles resolve, experience is the number
+of enemies defeated by the party divided by the number of party members, counting
+specialists. For now the members counted are the ones still alive when the floor's last
+battle is won, and only they get a share. A floor left before all its battles are won —
+turned back from, lost, or ended in a stand-off — gives no experience.
+```
+
+**Why:** The dive is built this way. "The number of party members" didn't say whether it's
+the ones who started the floor or the ones still alive, and nothing said whether a floor
+left partway through gives any. Both are proposed as a question for `## Open Questions`.
 
 ## Change: Help counts where everyone stands right now
 
@@ -144,3 +178,30 @@ below.
 the Tank as "bypassing the defence subtraction entirely", while `## Combat Types` says a
 type advantage "is a damage multiplier". The pending "Three questions on levelling and
 promotion" change to this list is unchanged.
+
+## Change: Two questions on health and sharing experience
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Open Questions`, after the last entry
+
+**Now says:**
+
+```
+- Does the experience a defeated enemy is worth scale with dungeon depth?
+```
+
+**Proposed:**
+
+```
+- Does the experience a defeated enemy is worth scale with dungeon depth?
+- Does a member's health grow with level, with a promotion, or with Constitution, or come
+  from rank or tier alone? Does a specialist's health follow their tier the same way?
+- In "divided by the number of party members", which members count: the ones who started
+  the floor or the ones still alive? And does a floor left partway through give any
+  experience?
+```
+
+**Why:** The game is built with a default for now on each, in the changes above. The
+pending "Three questions on levelling and promotion" and "Two questions on type advantage
+and defence" changes to this list are unchanged.

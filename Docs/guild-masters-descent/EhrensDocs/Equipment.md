@@ -80,6 +80,38 @@ else — no materials, no items, and no dropped gear.
 dropping gear and yielding materials or items, which the first version doesn't do; they
 stay as the longer-term design, and the new paragraph scopes the first version.
 
+## Change: A dead member's gear comes home, for now
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Assignment`, last paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+If a member dies in the dungeon, the party brings their gear back if there's room left
+in the party's carrying capacity — the same capacity the Porter adds a lot of and any
+member contributes to by carrying some of the loot; otherwise the gear is lost.
+```
+
+**Proposed:**
+
+```
+If a member dies in the dungeon, the party brings their gear back if there's room left
+in the party's carrying capacity — the same capacity the Porter adds a lot of and any
+member contributes to by carrying some of the loot; otherwise the gear is lost.
+
+For now, though, a dead member's gear always comes home when the party walks out, whatever
+gold the party is carrying, and goes back to the stores, held by no one. If a battle
+leaves no one in the party alive, every piece the party took in is lost.
+```
+
+**Why:** The dive is built this way. The carry limit is now measured in gold (the
+`The Dungeon.md` change "A party can turn back anywhere, and carries only so much gold
+out"), and nothing says how gear counts against it, so for now it doesn't; that question
+is proposed in The Dungeon's changes. The original didn't say what happens to the gear
+when no one comes back.
+
 ## Change: Gear can be sold back to the shop
 
 > Proposed 2026-11-11 · for review
