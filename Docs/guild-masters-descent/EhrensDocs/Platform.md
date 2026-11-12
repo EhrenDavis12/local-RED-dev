@@ -15,6 +15,12 @@ backgrounded app can be killed with no warning, and a guild saved only on reques
 lose play. Coming back from the background carries on with the guild as it was and
 counts the time spent there, because the iPhone often never closes a backgrounded app.
 
+A dive in progress is saved too. If the game is sent to the background or killed partway
+through a dive, the save holds the dive itself, and opening the game again carries the
+dive on where it stopped — partway through a floor, if that's where it was. Closing the
+game never undoes a death: a member who died on the dive is still dead when the game
+opens again.
+
 A save never costs the player the save before it. If saving fails, or the phone dies
 partway through, the slot still holds the last good save, whole.
 
@@ -33,7 +39,3 @@ For now:
   on two members stays with the one hired first.
 
 ## Open Questions
-
-- What happens to a dive in progress when the app is closed or killed — is it saved and
-  resumed, lost, or something else? It decides whether closing the app mid-battle can
-  dodge a death.
