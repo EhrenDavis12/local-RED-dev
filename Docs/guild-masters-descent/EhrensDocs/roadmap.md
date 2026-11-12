@@ -86,8 +86,8 @@ The dungeon board, finding and entering dungeons, and training missions.
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line, open question,
   members stay hurt between battles and 0 health is death, turn order within a round and
-  how a battle ends, base charge and using a special, effect length, targeting weights and
-  taunts, open questions on turn order and taunts).
+  how a battle ends, base charge, using a special and a special taking the turn, effect length and a second cast stacking, targeting weights and
+  taunts, open questions on turn order, taunts and specials).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted).
@@ -98,9 +98,13 @@ The dungeon board, finding and entering dungeons, and training missions.
   set by rank and F rank starts at 10, open questions on levelling and promotion, help
   follows the board live, type advantage after defence for now, open questions on type
   advantage and defence).
-- `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (the flurry's
-  leftover strikes stay within reach, a failed Vanish fails for one strike, the Mage's
-  field goes straight through for now, open questions on Vanish, taunts and the field).
+- `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (a Brute's
+  hit on a Tank skips all its defence, where the Brute's cleaves land, the Tank's taunt,
+  Shields Up and bonus for now, the Fighter's damage split before defence, the Rogue's
+  strikes and bonus for now, the flurry's leftover strikes stay within reach, a failed
+  Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's column,
+  field and bonus for now, open questions on Vanish, taunts, the field and the types'
+  defaults).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself.
   - Orientation

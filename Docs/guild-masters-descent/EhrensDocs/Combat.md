@@ -170,12 +170,15 @@ attack a member makes charges that member's bar — that's the base, and it's th
 for every type. Each combat type also has its own bonus condition that charges its bar
 on top of that. The base charge comes once per attack, whether the attack hits or not.
 Using a special empties the bar, and the special then charges it like any other attack,
-unless its type says otherwise — the Fighter's flurry doesn't.
+unless its type says otherwise — the Fighter's flurry doesn't. A special takes the
+turn in place of the ordinary attack. For now that holds for Vanish, Shields Up and the
+field too, which strike no one: on the turn one of them is cast, its caster makes no
+ordinary attack.
 ```
 
 **Why:** The combat engine is built this way. "Every attack" didn't say whether a miss
 charges, or whether a multi-strike attack charges once or per strike, and nothing said
-what using a special does to the bar.
+what using a special does to the bar. Nothing said whether a special that strikes no one leaves the caster its ordinary attack as well; the six combat types are built with the special as the whole turn, and that's proposed as a question below.
 
 ## Change: Whose turns an effect's length counts
 
@@ -196,12 +199,14 @@ fixed number of turns. Each of the three is covered in the Individual Types doc.
 Vanish, Shields Up and the Mage's lingering field all last the same length — the same
 fixed number of turns, a placeholder. The turns counted are the caster's own: the turn it
 was cast on doesn't count, and it lasts that many of the caster's turns after. If the
-caster dies, the effect ends with it — a Tank's Shields Up goes when the Tank does. Each
-of the three is covered in the Individual Types doc.
+caster dies, the effect ends with it — a Tank's Shields Up goes when the Tank does. For
+now a Shields Up or a field cast while the caster's last one is still running stacks
+with it: both run, each to its own end, so the two lots of defence add up and both fields
+do their damage. Each of the three is covered in the Individual Types doc.
 ```
 
 **Why:** The combat engine is built this way. "A fixed number of turns" didn't say whose
-turns, whether the cast turn counts, or what happens to an effect when its caster dies.
+turns, whether the cast turn counts, or what happens to an effect when its caster dies. Nothing said what happens when one is cast again while the last is still running; the six combat types are built to stack them, and that's proposed as a question below.
 
 ## Change: What the targeting weights count, and how a taunt is spent
 
@@ -259,7 +264,11 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 - Should help to a Rogue's or an Archer's Dexterity move them in the turn order?
 - When a taunted member or enemy uses a special that hits its own choice of targets
   rather than one it aims at, is the taunt spent?
+- On the turn a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field,
+  does it also make its ordinary attack?
+- If a Tank uses Shields Up, or a Mage casts its field, while its last one is still
+  running, do the two stack, or does the new one replace the old?
 ```
 
 **Why:** None of the docs answers these. The turn order above is a default for now. The
-third question comes from how a taunt is spent once the six types' specials are built.
+third question comes from how a taunt is spent once the six types' specials are built. The last two come from the specials that strike no one, as the six combat types are built.
