@@ -62,9 +62,11 @@ placeholder in `Tuning.cs`.
    (Open Questions); as built, it does. (IT § The Brute, first paragraph; GM\* "Two
    questions on type advantage and defence")
 7. **Special.** Skips the nearest occupied enemy row and cleaves the grid rows behind it —
-   two, or whatever rows remain. Its strikes are individually evadable like the ordinary
-   cleave. *Which enemy it centres on, and whether it hits one row or both, is blocking —
-   see Open Questions.* (IT § The Brute, third paragraph)
+   two, or whatever rows remain. In **each** of those rows it cleaves three wide: the
+   enemy in the same column as the Brute's chosen front-row target, and the enemies
+   directly left and right of that node — up to six enemies in all. Empty nodes are not
+   hit. Its strikes are individually evadable like the ordinary cleave. (IT § The Brute,
+   third paragraph; the centring and the two-row reach are defaults — see Open Questions)
 8. **The Brute's move to the front and back is presentation only.** In the engine the
    Brute never leaves its node, and nothing acts between the cleave and its return. (IT
    § The Brute, "all in the same action")
@@ -183,6 +185,16 @@ placeholder in `Tuning.cs`.
 | `ArcherStreakCharge` | 10 | Bonus charge per continued streak hit. |
 | `MageColumnHitCharge` | 5 | Bonus charge per hit on an ally in front in the Mage's column. |
 
+### Engine
+
+30. **The type contract gains a before-defence damage share.** A type's plan can set, per
+    target, a share of the attacker's damage that is applied before defence is
+    subtracted, alongside the existing after-defence `DamageShare`. The Fighter's
+    ordinary strikes (req. 13), the flurry (req. 14) and the Rogue's strikes (req. 16) use
+    it. Without it, splitting damage after defence makes many light strikes total the same
+    as one big hit, and the Tank's advantage over the Fighter disappears. (IT § The Tank,
+    "every one of them pays that subtraction and loses most of its damage")
+
 ## Out of Scope
 
 - The engine's own rules — turn order, targeting weights, how taunts are spent, the
@@ -197,18 +209,15 @@ placeholder in `Tuning.cs`.
 
 ## Open Questions
 
-**Blocking** — the Brute's special can't be built without these:
-
-- **Which enemy does the Brute's special centre on?** "The cleave hits the targeted
-  enemy and the two directly next to it" (IT § The Brute), but the targeted enemy of a
-  close attack is in the front row, which the special skips. Options: (a) the enemy in
-  the same column as the chosen front-row target; (b) a target picked — selected enemy,
-  taunt or weighted draw — from the rows the special hits; (c) something else.
-- **Does the Brute's special hit a three-wide cleave in each of the two rows (up to six
-  enemies), or three enemies in all?**
-
 **With a cheap default we'd go ahead with** (proposed defaults are this PRD's, not the
 docs'):
+
+- Which enemy does the Brute's special centre on? "The cleave hits the targeted enemy
+  and the two directly next to it" (IT § The Brute), but the targeted enemy of a close
+  attack is in the front row, which the special skips. *Default: the enemy in the same
+  column as the chosen front-row target.*
+- Does the Brute's special hit a three-wide cleave in each of the two rows (up to six
+  enemies), or three enemies in all? *Default: three wide in each row.*
 
 - When the nearest occupied row is the grid's back row, so no row remains behind it, what
   does the Brute's special hit? *Default: nothing; the bar still takes its base charge.*
