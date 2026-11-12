@@ -105,10 +105,12 @@ A newly recruited level-1 F-rank member starts with single-digit stats.
 
 ## Levels and Experience
 
-Each level a member gains increases one base stat. Which stat goes up is weighted
-random — a member's type makes certain stats more likely but not guaranteed, so members
-of the same type turn out slightly different from each other. Specialists gain base
-stats the same way divers do, and their specialty improves alongside.
+Each level a member gains increases every base stat by one, and one stat gets an
+additional point on top of that. Which stat gets the extra point is the weighted-random
+part — a member's type makes certain stats more likely but not guaranteed, which is still
+what makes members of the same type turn out slightly different from each other.
+Specialists gain base stats the same way divers do, and their specialty improves
+alongside.
 
 Experience is awarded per floor: once a floor's battles resolve, experience is the number
 of enemies defeated by the party divided by the number of party members, counting
@@ -116,8 +118,8 @@ specialists.
 
 ## Stat Weighting by Type
 
-Each type has an ordering of all five base stats, from most likely to gain on a
-level-up through least likely.
+Each type has an ordering of all five base stats. The ordering decides which stat gets the
+additional point on a level-up, from most likely through least likely.
 
 - Brute — Strength, Constitution, Dexterity, Luck, Intelligence
 - Tank — Constitution, Strength, Dexterity, Luck, Intelligence

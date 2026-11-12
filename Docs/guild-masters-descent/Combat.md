@@ -1,8 +1,9 @@
 # Combat
 
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing,
-> Dexterity setting the cooldown, the tick-based simulation, and that the fight never
-> pauses for the player are settled, but how the Luck reset's chance works isn't.
+> Dexterity's conversion into cooldown ticks, the tick-based simulation, and that the
+> fight never pauses for the player are settled, but how the Luck reset's chance works
+> isn't.
 
 ## Formation
 
@@ -29,6 +30,27 @@ on screen. The simulation stays whole numbers because a fight built that way can
 reasoned about and balanced — a fight with fifteen guild members and a facing force of
 enemies run on a continuous clock would be far harder to balance, and far harder to
 chase a bug through.
+
+A cooldown is a number of ticks. The wait is 120 ticks divided by (1 + Dexterity ÷ 20),
+and it never goes below a floor of 12 ticks, however high Dexterity climbs:
+
+- Dexterity 5, a newly recruited F-rank member — 96 ticks
+- Dexterity 10 — 80 ticks
+- Dexterity 20 — 60 ticks
+- Dexterity 40 — 40 ticks
+- Dexterity 80 — 24 ticks
+- Dexterity 180 and above — 12 ticks, the floor
+
+The conversion divides rather than subtracts because Dexterity starts single-digit and
+climbs for thousands of levels, so anything that subtracts from a flat wait either does
+nothing early or runs past zero later. Dividing gives a new member a visible gain from
+their first few points while a veteran needs ever more for ever less.
+
+The floor is there because without it the fast types would run away with the fight — a
+member with Dexterity in the hundreds would act many times over for each attack a slow one
+lands. The floor compresses that gap at the top, so the slower types keep gaining after
+the fastest have stopped. That protects the deliberate slowness of the Brute and the
+Tank, which this doc already states is intended.
 
 Because cooldown speed comes from Dexterity, the types that rank Dexterity lower attack
 less often — the Brute and the Tank among them — and that's intended rather than something
@@ -117,7 +139,6 @@ the Equipment doc.
   player is watching?
 - Can the player speed a fight up or slow it down, and does that change anything in the
   simulation or only how fast it's drawn?
-- How does Dexterity convert into cooldown speed, and does it cap?
 - How many of the owner's own cooldown cycles do Vanish, Shields Up and the Mage's
   lingering field last?
 - If the member whose effect it is dies partway through, does the effect go with them?
