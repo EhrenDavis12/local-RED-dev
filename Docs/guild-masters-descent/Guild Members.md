@@ -81,6 +81,13 @@ ranks highest, plus their weapon.
 
 A member's defence comes from Constitution plus their equipment.
 
+A member's health is their Constitution times ten — at F rank, where stats are
+single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
+through defence is taken off that pool. Because it comes from Constitution, it grows as
+Constitution grows, with no separate rule for levelling. Constitution already means
+toughness, so it is the pool and the base of defence both, and health needs no stat of its
+own.
+
 Damage is the stat plus what you carry, defence is the stat plus what you wear.
 
 There is no minimum damage — enough defence can reduce a hit to nothing.
@@ -174,11 +181,12 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
   six advantages aren't necessarily worth the same amount. Should they be, or is it fine
   for some matchups to bite harder than others?
 - Does the experience a defeated enemy is worth scale with dungeon depth?
-- Damage is worked out per strike and defence is subtracted from it, but nothing says what
-  the damage actually reduces. A member has Strength, Dexterity, Constitution,
-  Intelligence and Luck, and no pool of health among them — so what does damage take away,
-  and what does a member have to lose before they die? Death is all through these docs,
-  permanent in the dungeon, and there is nothing yet for it to come out of.
+- When a member's health runs out, are they dead on the spot? Death in the dungeon is
+  permanent, and a failed mission leaves a member injured rather than dead, so it isn't
+  clear whether running out in a fight kills outright or leaves them in some other state.
+- A floor has two or three battles and the party heals at a rest area every fifth floor.
+  Does any health come back between the battles on a floor, or does the party carry its
+  damage from the first fight all the way to the next rest area?
 - Area attacks pay a reduced defence — defence still applies but at less than its usual
   value. How much less? Nothing sets it, so the Mage's column attack can't be worked out
   at all.
