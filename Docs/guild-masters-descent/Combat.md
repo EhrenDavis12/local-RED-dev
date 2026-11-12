@@ -31,15 +31,20 @@ reasoned about and balanced — a fight with fifteen guild members and a facing 
 enemies run on a continuous clock would be far harder to balance, and far harder to
 chase a bug through.
 
-A cooldown is a number of ticks. The wait is 120 ticks divided by (1 + Dexterity ÷ 20),
-and it never goes below a floor of 12 ticks, however high Dexterity climbs:
+A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
+and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
+100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
+simulation counts in whole ticks, as this section already says. It never goes below a
+floor of a tenth of the type's own base, however high Dexterity climbs: 18 ticks for a
+Brute or Tank, 14 for a Fighter or Mage, 10 for a Rogue or Archer. That floor is reached
+at Dexterity 180 whatever the type.
 
-- Dexterity 5, a newly recruited F-rank member — 96 ticks
-- Dexterity 10 — 80 ticks
-- Dexterity 20 — 60 ticks
-- Dexterity 40 — 40 ticks
-- Dexterity 80 — 24 ticks
-- Dexterity 180 and above — 12 ticks, the floor
+A worked list for the Rogue, base 100:
+
+- Dexterity 5, a newly recruited F-rank member — 80 ticks
+- Dexterity 20 — 50 ticks
+- Dexterity 80 — 20 ticks
+- Dexterity 180 and above — 10 ticks, the floor
 
 The conversion divides rather than subtracts because Dexterity starts single-digit and
 climbs for thousands of levels, so anything that subtracts from a flat wait either does
@@ -51,6 +56,12 @@ member with Dexterity in the hundreds would act many times over for each attack 
 lands. The floor compresses that gap at the top, so the slower types keep gaining after
 the fastest have stopped. That protects the deliberate slowness of the Brute and the
 Tank, which this doc already states is intended.
+
+Because the base and the floor are both properties of the type, the ratio between a slow
+type and a fast one holds at every point on the curve — a Brute waits the same multiple of
+a Rogue's wait at Dexterity 5, at Dexterity 80, and at the floor. That makes the
+deliberate slowness of the Brute and the Tank structural rather than something that only
+shows early.
 
 Because cooldown speed comes from Dexterity, the types that rank Dexterity lower attack
 less often — the Brute and the Tank among them — and that's intended rather than something
