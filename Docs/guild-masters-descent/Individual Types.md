@@ -48,10 +48,12 @@ type — its many strikes all belong to that single attack. Its special bar ther
 charges more slowly than a faster type's; the flurry is what offsets that over the course
 of a longer fight.
 
-Its special is a flurry of up to 6 strikes on a single target. The flurry's strikes hit
-hard. If the target dies before the strikes run out, the remaining strikes carry to the
-nearest enemy still standing. If any enemy is killed during the flurry, the Fighter's
-charge bar refills to 90% — that refill is the Fighter's bonus charge condition.
+Its special is a flurry of between 4 and 6 strikes on a single target. The first four
+strikes always land; each of the two after that happens on a Luck check, so the flurry
+only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
+If the target dies before the strikes run out, the remaining strikes carry to the nearest
+enemy still standing. If any enemy is killed during the flurry, the Fighter's charge bar
+refills to 90% — that refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 
@@ -107,3 +109,5 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 - How fast does a special charge?
 - How many strikes is the Fighter's ordinary attack? Its count is fixed by its type, but
   the number isn't set.
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
