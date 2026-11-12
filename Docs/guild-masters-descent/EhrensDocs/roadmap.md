@@ -86,14 +86,16 @@ The dungeon board, finding and entering dungeons, and training missions.
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line, open question).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
-  into debt, open questions on the roster, injury and a new guild).
+  into debt, open questions on the roster, injury and a new guild, how time away is
+  counted).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive loot is gold only, open questions on stores and condition).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (every member starts
   with 10 health, open questions on levelling and promotion).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
-  runs landscape only.
+  runs landscape only, and the game saves by itself.
   - Orientation
+  - Saving
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles, enemies are monsters).
