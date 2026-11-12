@@ -62,8 +62,11 @@ that — covered in the Individual Types doc.
 
 ## Lasting Effects
 
-Vanish, Shields Up and the Mage's lingering field all last the same length as each other.
-Each of the three is covered in the Individual Types doc.
+Vanish, Shields Up and the Mage's lingering field all last the same number of the
+owner's own cooldown cycles — the member whose effect it is. So "the same length" means
+the same count, not the same stretch of real time: a fast member's effect is brief on
+the clock while a slow member's runs long, and every member gets the same number of
+cycles of value out of it. Each of the three is covered in the Individual Types doc.
 
 ## Specialists in Combat
 
@@ -89,8 +92,11 @@ the Equipment doc.
 - What does changing formation mid-battle cost the player, if anything?
 - Does the fight run on a real-time clock, or in discrete ticks?
 - How does Dexterity convert into cooldown speed, and does it cap?
-- Vanish, Shields Up and the Mage's lingering field all last the same length — what is
-  that length measured in now?
+- How many of the owner's own cooldown cycles do Vanish, Shields Up and the Mage's
+  lingering field last?
+- If the member whose effect it is dies partway through, does the effect go with them?
+  The Mage's lingering field especially, since it sits on the battlefield rather than
+  on the Mage.
 - When does the player get to act, and does anything pause for them?
 - Does the special bar still charge per attack, now that a faster attacker attacks more
   often?
