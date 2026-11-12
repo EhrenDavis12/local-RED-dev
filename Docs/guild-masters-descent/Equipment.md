@@ -1,9 +1,9 @@
 # Equipment
 
-> **Status:** Early design. Nothing is built yet — the kinds, the quality ladder, each
-> piece's attributes rolled once for life, condition, wear and breaking, where gear comes
-> from — the crafter's Luck as its edge — repair, and the damage and defence bands, each
-> class doubling the last, are settled; only armour's durability bands aren't.
+> **Status:** Early design. Nothing is built yet — the kinds, the quality ladder, the
+> bands for damage, defence and durability, wear and breaking, and repair are settled,
+> but how crafting and repair are costed, how a roll is made, and what the player is
+> shown of a piece isn't.
 
 ## What a Member Carries
 
@@ -132,6 +132,18 @@ on top of it — that keeps defence meaningful against every incoming strike wit
 zeroing hits out as a matter of course. The ladder is the same as the weapons': each
 class doubles the band below it, up all nine rungs, so defence keeps pace with damage.
 
+Armour's Durability band is the same for every kind: 60–120. Unlike the weapons, armour
+isn't grouped by kind — there's nothing to group by. A weapon's band follows the hits it
+lands in an attack, which runs from one to three depending on the kind, but every kind of
+armour takes hits the same way, so the thing that organised the weapon bands has nothing
+to organise here.
+
+Where it sits follows how much more slowly armour wears than a weapon does: a member lands
+one to three hits an attack but only takes hits when an enemy chooses them, spread across
+a party of up to fifteen. 60–120 sits between the one-hit weapon band at 40–80 and the
+two-hit band at 80–160, putting a typical member's armour at roughly a weapon's lifetime.
+Like weapon durability, it doesn't change with class — the same band at F as at SSS.
+
 A piece's Attack Damage, its Defence and its Durability are each rolled once, at
 creation, and fixed for the life of that piece.
 
@@ -240,8 +252,6 @@ materials.
 
 ## Open Questions
 
-- Armour's Durability band isn't set for any kind. A weapon's is grouped by the hits it
-  lands in an attack — what groups armour's, when every kind takes hits the same way?
 - What does crafting consume, and how long does it take? Can a crafter work while out on a
   mission or a dive?
 - How narrow or wide can a rolled span be — can a piece come out with a single figure
