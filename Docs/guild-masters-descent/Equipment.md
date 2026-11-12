@@ -33,10 +33,8 @@ The six armour kinds, one per combat type:
 
 How much defence armour adds depends on its kind too. The Tank's full armour adds more
 defence than the Brute's tanned hide, and the Fighter's light armour sits between the two.
-The Rogue's hooded armour, the Archer's leather and the Mage's robe aren't placed
-against those three or against each other: each kind of armour can only be worn by its
-own combat type, so the player never chooses between kinds, and the rest don't need
-ranking.
+Each kind of armour can only be worn by its own combat type, so the player never chooses
+between kinds.
 
 A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
 ranks highest, plus their weapon. A member's defence comes from Constitution plus their
@@ -119,6 +117,20 @@ and a Durability. Defence is a range, the way Attack Damage is a range, and not 
 figure — how much damage reduction the armour gives, and it's drawn from a band the same
 way a weapon's range is. Armour's durability works the same way a weapon's does: it
 counts down by hits taken, not by attacks faced, and a missed attack spends none of it.
+
+Each kind's F-class Defence band, in ascending order:
+
+- Robe, the Mage's — 1–6
+- Hooded armour, the Rogue's — 2–8
+- Tanned hide, the Brute's — 2–9
+- Leather, the Archer's — 3–10
+- Light armour, the Fighter's — 4–13
+- Full armour, the Tank's — 6–18
+
+Armour covers roughly a third of a typical strike at the same class, with Constitution
+on top of it — that keeps defence meaningful against every incoming strike without
+zeroing hits out as a matter of course. The ladder is the same as the weapons': each
+class doubles the band below it, up all nine rungs, so defence keeps pace with damage.
 
 A piece's Attack Damage, its Defence and its Durability are each rolled once, at
 creation, and fixed for the life of that piece.
@@ -226,8 +238,8 @@ materials.
 
 ## Open Questions
 
-- What is each kind of armour's Defence band at F class, and does it double from class to
-  class the way a weapon's does?
+- Armour's Durability band isn't set for any kind. A weapon's is grouped by the hits it
+  lands in an attack — what groups armour's, when every kind takes hits the same way?
 - What does crafting consume, and how long does it take? Can a crafter work while out on a
   mission or a dive?
 - How narrow or wide can a rolled span be — can a piece come out with a single figure
