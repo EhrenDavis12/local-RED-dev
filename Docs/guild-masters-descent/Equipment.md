@@ -242,5 +242,3 @@ materials.
   rough impression the way the recruiting board shows a candidate's strengths?
 - Does the Armourer have a station of its own the way the Blacksmith has the smithy,
   deciding which of two Armourers sets armour quality?
-- The Mage's lingering field keeps damaging enemies standing in it. Does each of those
-  count as a hit against their armour, so a field strips armour for as long as it lasts?
