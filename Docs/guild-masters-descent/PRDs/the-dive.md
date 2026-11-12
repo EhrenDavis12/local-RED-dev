@@ -35,22 +35,37 @@ Already built and relied on, not re-specified: the battle engine and the six typ
 wear during battle, XP sub-units and level-ups (`Member.AwardXp`), gold that never goes below
 zero (`Guild.TrySpend`), and injured members being unavailable (`Member.IsAvailable`).
 
+**Unsettled: what the save holds while a dive is in progress.** Requirements 4, 8, 9, 13,
+17 and 24, and D15, all depend on what happens when the app is closed, killed or
+backgrounded during a dive. That has not been decided. It is the first blocking entry under
+Open Questions. Until it is answered, those requirements say what the guild holds *once a
+dive ends*. They do not say what is on disk while a dive is still running.
+
 ### The guild's dungeon
 
 1. Every guild holds one F-rank dungeon from the moment the game is new. A save from before
    this feature loads with that dungeon added, nothing reached in it.
    *TD-CN "A guild starts off with a single F-rank dungeon"; FOCUS Goal "one dungeon".*
-2. The dungeon's depth is drawn when it is created, from a range in the tuning file. The
-   range is at least 10 floors and keeps the dungeon to two rest areas, so it is 10 to 14.
-   The default range is 10 to 10 (see Open Questions 3).
+2. The dungeon's depth is drawn when it is created, from a range in the tuning file. For now
+   that range is exactly 10 to 10. The user was asked about this, and the build goes ahead
+   with 10, so the bottom floor is the second rest area and nothing lies beyond it.
    *TD § Finding Dungeons "A dungeon's depth is random when the dungeon is created"; FOCUS
    In "one dungeon at least 10 floors deep with two rest areas".*
 3. Every 5th floor is a rest area: floors 5 and 10.
    *TD § The Dungeon.*
-4. The save records two things for the dungeon: the deepest floor reached and the last rest
-   area reached. Both survive a save and load. The deepest floor reached never goes down.
+4. The save records four things for the dungeon, and all four survive a save and load:
+   - the depth drawn under requirement 2;
+   - every floor's monsters under D14 (each battle's monster type, level and cell);
+   - the deepest floor reached, which never goes down;
+   - the re-entry point under D17.
+
+   Because the save gains these fields, `SaveFile.CurrentVersion` goes up from 1 to 2.
+   Version-1 saves still load under requirement 1. Saved dungeon data that the game cannot
+   make sense of is handled the way `SaveManager` already handles corruption: the load
+   reports `Corrupt` and leaves the slot as it is.
    *TD § The Dungeon Board ("the deepest floor reached"); TD § Entering the Dungeon ("re-enters
-   at the last rest area reached").*
+   at the last rest area reached"); PF § Saving ("A save the game can't read… is reported as
+   such and left on the phone as it is").*
 
 ### Health
 
@@ -76,16 +91,19 @@ zero (`Guild.TrySpend`), and injured members being unavailable (`Member.IsAvaila
 
 10. A party is 1 to 15 members from the roster, counting specialists. No member is injured,
     no member appears twice, and each member stands on their own node of the 5-by-3 party
-    grid. *CC § The Party; CC § Missions ("can't be sent on a mission or taken on a dive");
-    CB § Formation.*
+    grid. The dungeon board queue item comes later, so until then the build needs a minimal,
+    temporary way for the player to choose the party and place it on the grid before
+    entering. Its layout is not this PRD's concern. *CC § The Party; CC § Missions ("can't
+    be sent on a mission or taken on a dive"); CB § Formation.*
 11. **Enter** starts the party at floor 1 and costs the entry fee. A bigger party always costs
     more than a smaller one, so the fee strictly rises with party size. The amounts are in
     the tuning file (see D16).
     *TD § Entering the Dungeon.*
-12. **Re-enter** is offered once a rest area has been reached. The party starts at the last
-    rest area reached, and its first battle is on the floor after it. Re-entering costs the
-    entry fee for this party plus a teleport fee. The party does not have to be the one that
-    reached the rest area.
+12. **Re-enter** is offered when there is a re-entry point (D17) and that point is not the
+    bottom floor. With a depth of 10, that means Re-enter is never offered from floor 10.
+    The party starts at the re-entry point, and its first battle is on the floor after it.
+    Re-entering costs the entry fee for this party plus a teleport fee. The party does not
+    have to be the one that reached the rest area.
     *TD § Entering the Dungeon; TD § The Dungeon Board ("where they re-enter at the last
     rest area reached").*
 13. If the guild cannot pay the fee, the dive does not start and nothing changes. A fee it
@@ -138,8 +156,9 @@ zero (`Guild.TrySpend`), and injured members being unavailable (`Member.IsAvaila
 23. When the party walks out, it carries out at most the sum of its living members' carry
     limits: 10 for each member, and for a Porter the figure in D1. Gold over that sum is left
     behind, and the guild receives the rest. A party with no living members carries out
-    nothing. *Same TD-CN ("Gold beyond what the party can carry is left behind"). Defaults
-    D1, D3.*
+    nothing. Requirement 22 is applied first: the gold found since the last rest area is
+    dropped. Only then does the carry limit apply to what is left. *Same TD-CN ("Gold
+    beyond what the party can carry is left behind"). Defaults D1, D3.*
 
 ### Death, gear and the end of the dive
 
@@ -169,8 +188,9 @@ is cheap to change, and every number in them lives in the tuning file.
   alone. A monster can be any of the six types. This is already how the code is built.
   *(Open Question 5)*
 - **D6.** Health comes from rank or tier alone. Level, Constitution and promotion do nothing
-  to it beyond moving the member to a new rung's figure. Every specialist tier is 10, and the
-  E placeholder is also 10, so a first promotion changes nothing visible. *(Open Question 6)*
+  to it beyond moving the member to a new rung's figure. `Guild.TryPromote` also sets
+  `MaxHealth` from the health table for the new rung. Every specialist tier is 10, and the E
+  placeholder is also 10, so a first promotion changes nothing visible. *(Open Question 6)*
 - **D7.** A rest-area floor has no battles. It drops no gold and gives no experience.
   *(Open Question 7)*
 - **D8.** A battle that ends in a stand-off counts as the party turning back at that point,
@@ -185,13 +205,20 @@ is cheap to change, and every number in them lives in the tuning file.
   dead leave their nodes empty. *(Open Question 12)*
 - **D13.** Every special bar starts empty at the start of each battle, which is how the code
   is built. *(Open Question 13)*
-- **D14.** A floor's monsters, meaning their types and levels, are the same on every dive.
-  They are fixed when the dungeon is created and are part of what the save holds for it.
-  *(Open Question 14)*
+- **D14.** A floor's monsters, meaning their types, levels and cells, are the same on every
+  dive. They are drawn once, when the dungeon is created, and saved (requirement 4). Each
+  battle's monster type is drawn uniformly from the six combat types, and its cell uniformly
+  from the 15 nodes of the monster grid. Both draws use a seeded RNG, which is a
+  placeholder. Its level comes from the per-floor table (requirement 15). *(Open Question
+  14)*
 - **D15.** A floor counts as reached once the party starts its first battle there, or
   arrives there if it is a rest area. *(Open Question 15)*
 - **D16.** The entry fee is a per-member amount times the party size. The teleport fee is one
   flat amount. *(Open Question 16)*
+- **D17.** The re-entry point is the deepest rest area the most recent dive reached. A
+  re-entered dive counts the rest area it started at. So the point can move back up, for
+  example from 10 to 5, and a dive that reaches no rest area leaves no re-entry point. The
+  user has been asked, and the build goes ahead with this. *(Open Question 17)*
 
 ## Out of Scope
 
@@ -214,10 +241,19 @@ is cheap to change, and every number in them lives in the tuning file.
 
 - *PF Open Questions:* "What happens to a dive in progress when the app is closed or killed —
   is it saved and resumed, lost, or something else? It decides whether closing the app
-  mid-battle can dodge a death." There is no cheap default here. The game already saves
-  when it is sent to the background, so today a dive killed mid-battle would leave members
-  alive in the hall, hurt, with the fee spent. Requirement 9 rules out the "hurt" part
-  whatever the answer is. Everything else waits on this.
+  mid-battle can dodge a death." It is unsettled, and there is no default. Requirements 4,
+  8, 9, 13, 17 and 24, and D15, depend on it. The game already saves whenever it is sent
+  to the background (PF § Saving). The answer is expected to be one of two shapes, and
+  either one slots in as a single sentence:
+  - **(i)** The disk keeps the guild as it was before the dive. The dive works on a copy and
+    commits it only when the dive ends. A dive cut short leaves no trace: no fee paid, no
+    deaths, no experience, no new depth, no wear.
+  - **(ii)** The disk keeps whatever the last background save caught. The fee is gone, and
+    the experience, deepest floor and gear wear earned up to that save are kept.
+
+  Sub-question, under either shape: does a member who died during the dive come back after
+  a reload? Whatever the answer, requirement 9 holds: no member is ever in the hall below
+  full health.
 
 **Unanswered by the user. The build uses the default named.**
 
@@ -226,9 +262,9 @@ is cheap to change, and every number in them lives in the tuning file.
 2. How does a dead member's gear count against a carry limit measured in gold? TD-CN: "how a
    dead member's gear counts against a limit measured in gold". *(D2)*
 3. When does the carry limit bite: is extra gold lost as soon as it is found, or only when
-   the party walks out? *(D3)* Related: should the dungeon ever be deeper than 10? A deeper
-   dungeon has battle floors past the last rest area, and nothing says what happens when the
-   bottom floor is cleared. That is why the default depth range is 10 to 10.
+   the party walks out? *(D3)* Separately, depth is pinned at 10 for now (requirement 2).
+   If it is ever raised, there would be battle floors past the last rest area, and nothing
+   says what happens when the bottom floor is cleared.
 4. Can a dive leave a member injured? CB-CN: "whether a dive can leave a member injured".
    *(D4)*
 5. Do monsters get their attack and defence from level stats alone, or from figures set by
@@ -255,6 +291,8 @@ is cheap to change, and every number in them lives in the tuning file.
 15. When does a floor count as "reached" for the deepest floor reached? *(D15)*
 16. Is the teleport fee flat, or does it rise with party size the way the entry fee does?
     *(D16)*
+17. "The last rest area reached": is that the deepest rest area ever reached, or the one the
+    most recent dive reached? *(D17)*
 - Every amount: the fees, the gold each floor drops, monster levels by floor, rest-area and
   Cook healing, the carry limits, and the depth range. Each is a placeholder in the tuning
   file, to be balanced later.
