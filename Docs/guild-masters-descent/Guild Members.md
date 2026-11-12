@@ -1,8 +1,9 @@
 # Guild Members
 
 > **Status:** Early design. Nothing is built yet — the help percentages and what they
-> apply to, both member ladders — ranks and tiers — and each type's stat weighting are
-> settled, but what a type advantage is worth isn't.
+> apply to, both member ladders — ranks and tiers — each type's stat weighting, and how
+> a type advantage works are settled, but whether the six advantages are worth the same
+> isn't.
 
 ## Combat Types
 
@@ -22,9 +23,10 @@ The second triangle:
 - Archer has advantage on Mage
 - Mage has advantage on Rogue
 
-A type advantage is a damage multiplier: an advantaged attack deals proportionally more
-damage than the same attack without the advantage. Each matchup's own mechanism is
-covered in the Individual Types doc.
+A type advantage isn't a multiplier added on top of an attack. Each matchup comes out of
+rules already in play — evasion against a single shot, defence subtracted from every
+strike separately, area attacks that can't be dodged, and how much defence each kind of
+armour adds. Each matchup's own mechanism is covered in the Individual Types doc.
 
 ## The Support Ring
 
@@ -168,5 +170,7 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 
 ## Open Questions
 
-- What is having a type advantage actually worth in a fight?
+- With each matchup working through its own mechanism rather than a shared multiplier, the
+  six advantages aren't necessarily worth the same amount. Should they be, or is it fine
+  for some matchups to bite harder than others?
 - Does the experience a defeated enemy is worth scale with dungeon depth?
