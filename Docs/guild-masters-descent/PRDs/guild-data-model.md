@@ -33,14 +33,19 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
 1. The model lives in the `GuildMastersDescent.Core` assembly and references no
    `UnityEngine` assembly. The existing `CoreAssemblyTests` guard this. [queue item #31]
 2. All guild, member and gear state is plain data that a serializer can round-trip. Saved
-   state holds no engine objects, delegates or RNG instances. Format, versioning and save
-   slots belong to #32. [queue item #31]
+   state holds no engine objects, delegates or RNG instances. The testable form: a guild
+   with members, gear, assignments and an injury, serialized with Unity's `JsonUtility` and
+   read back, gives equal values. `JsonUtility` is the only serializer the project has. The
+   round-trip test lives in the EditMode test assembly, so Core itself stays engine-free
+   (R1). Format, versioning and save slots belong to #32. [queue item #31]
 3. Every random outcome in this PRD comes from an RNG the caller supplies: the level-up stat
    pick (R14) and the gear rolls (R24). The same seed and the same sequence of calls give the
    same results. [queue item #31]
 4. Every **P*n*** is a `[Placeholder]` field in `Assets/Scripts/Core/Tuning/Tuning.cs` and
-   shows up in `Tuning.ListPlaceholders()`. *Settled* numbers stay out of `Tuning`, because
-   `TuningTests` require every public static field there to carry `[Placeholder]`.
+   shows up in `Tuning.ListPlaceholders()`. For a table placeholder (P4, P10–P12), the
+   listing shows its values, not the name of its type. *Settled* numbers stay out of
+   `Tuning`, because `TuningTests` require every public static field there to carry
+   `[Placeholder]`.
    [`queue/focus.md` § Goal, "Missing details"]
 
 ### Guild
@@ -53,7 +58,9 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
    nothing. [`Guild Members.md` § Promotion: level and gold "both are required"]
 7. The roster holds at most **P2** members at guild rank F, divers and specialists together.
    Adding a member to a full roster is refused. This cap is separate from the 15-member party
-   cap, which this PRD does not handle. [`Core Concept.md` § The Recruiting Board]
+   cap, which this PRD does not handle. Counting specialists toward the cap is a
+   provisional default; the docs don't say (see Open Questions).
+   [`Core Concept.md` § The Recruiting Board]
 
 ### Members
 
@@ -67,16 +74,20 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
    Novice sits where F sits. Both full ladders can be represented, even though the MVP only
    reaches the second rung (R18). [`Guild Members.md` § Promotion; `Specialists.md` § Tiers]
 10. A member holds:
+    - a stable ID that never changes and is never reused within the guild
     - its type and its rank or tier
     - its level and XP
     - five integer base stats (Strength, Dexterity, Constitution, Intelligence, Luck)
-    - its health
+    - its maximum health and its current health
     - whether it is injured (R19)
-    - if it is a diver, at most one assigned weapon and at most one assigned armour (R27)
+    - if it is a diver, a weapon slot and an armour slot, each empty or holding one piece's
+      ID (R27)
 
-    [`Guild Members.md` § Base Stats; `Equipment.md` § What a Member Carries;
-    `Core Concept.md` § Missions]
-11. A new member starts at level 1 with 0 XP, uninjured, with **P3** health.
+    Stable IDs, and holding both health figures, are provisional defaults: the docs don't
+    address them. Current health matters only to combat later. [`Guild Members.md` § Base
+    Stats; `Equipment.md` § What a Member Carries; `Core Concept.md` § Missions]
+11. A new member starts at level 1 with 0 XP and uninjured. Both its maximum and its current
+    health are **P3**.
     [`Guild Members.md` § Starting Stats; `EhrensDocs/Guild Members.md` § Every member starts
     with 10 health]
 12. A new member's starting stats depend on its type and its rank or tier, and nothing else.
@@ -97,9 +108,15 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
     weighting from the supplied RNG. Specialists level the same way divers do.
     [`Guild Members.md` § Levels and Experience]
 15. XP awarded to a member adds up. The member gains a level whenever the total reaches
-    **P7**, the XP needed per level. One award can give several levels, and each level gets
-    its own stat pick. How much XP an award is worth is calculated by the dive, not here.
-    [`Guild Members.md` § Levels and Experience]
+    **P7**, the XP needed per level. Leftover XP carries toward the next level, so one award
+    can give several levels, and each level gets its own stat pick. Carry-over is a
+    provisional default (see Open Questions). How much XP an award is worth is calculated by
+    the dive, not here. [`Guild Members.md` § Levels and Experience]
+
+    XP is held exactly, as a whole number of sub-units in a `long`, with 360360 sub-units
+    per 1 XP. 360360 divides evenly by every party size from 1 to 15, so a per-floor share
+    never needs rounding. No `float` or `double` is used. This is a provisional default.
+    Freezing it as the save representation is #32's job.
 16. A member stops gaining levels at the threshold for its next promotion. The thresholds are
     *settled*: 16 at F or Novice, 32 at E or Apprentice. XP awarded at the threshold is
     thrown away, not saved for after promotion. That includes the rest of an award that
@@ -123,8 +140,10 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
 
 19. A member is either injured or not. A new injury lasts **P9** of real time. The model can
     advance an injury by a given amount of elapsed time, and the member is healed once the
-    remaining time reaches zero. Reading the wall clock belongs to #32. What causes an injury
-    belongs to whichever feature inflicts it.
+    remaining time reaches zero. Injuring a member who is already injured keeps the longer
+    of the two remaining times. That rule is a provisional default (see Open Questions).
+    Reading the wall clock belongs to #32. What causes an injury belongs to whichever feature
+    inflicts it.
     [`Core Concept.md` § Time, § Missions: injured members "recover on their own for free,
     though slowly"]
 20. An injured member counts as unavailable for a dive or a mission.
@@ -133,6 +152,8 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
 ### Gear pieces
 
 21. A gear piece is either a weapon or an armour. It has:
+    - a stable ID that never changes and is never reused within the guild (a provisional
+      default)
     - a kind
     - a class on the F → SSS quality ladder
     - a rolled range (min–max), which is Attack Damage for a weapon and Defence for armour
@@ -170,14 +191,16 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
 25. Current durability goes down one use at a time, and combat decides when. It never goes
     below zero. At zero the piece is broken. A broken piece stays in the stores, because it
     can be repaired later. [`Equipment.md` § Quality, § Durability, § Repair]
-26. A piece's condition comes from current durability as a percentage of the maximum:
-    - Good: above 50%
-    - Worn: 25% to 49%
-    - Ragged: 1% to 24%
-    - Broken: 0%
+26. A piece's condition comes from current durability against the maximum. The model
+    compares the exact ratio in integers, checking these in order:
+    - Good when `current × 2 > max`
+    - Worn when `current × 4 >= max`
+    - Ragged when `current > 0`
+    - Broken when `current = 0`
 
-    The condition at exactly 50% is an open question (see Open Questions).
-    [`Equipment.md` § Durability]
+    So exactly 50% is Worn, exactly 25% is Worn, and any durability above zero that is under
+    25% is Ragged. How the doc's whole-percentage bands are read at their edges is a
+    provisional default; the bands themselves are from [`Equipment.md` § Durability].
 
 ### Stores and assignment
 
@@ -189,6 +212,14 @@ Numbers marked **P*n*** are placeholders, listed under Placeholders below. Numbe
     - into the matching slot, at one weapon and one armour per diver
 
     A piece's class may be higher than the member's rank.
+
+    The link is stored on one side only. The member's slots hold piece IDs, and a piece holds
+    no reference to its holder. Who holds a piece is found from the slots, so a save cannot
+    contradict itself. (A provisional default.)
+
+    Assigning a piece that another member holds, or assigning into a slot that is already
+    filled, is refused: it returns failure and nothing changes. The player unassigns first.
+    (A provisional default.)
     [`Equipment.md` § Assignment; `Guild Members.md` § Weapons and Armour;
     `Specialists.md` § Equipment]
 
@@ -231,22 +262,15 @@ implementer may pick others that meet the constraint shown.
 
 ## Open Questions
 
-**Blocks building one requirement:**
+None of these blocks this PRD. Each provisional default is already written into the
+requirement it governs.
 
-- R26: The condition bands are "above 50%" for Good and "25% to 49%" for Worn. At exactly
-  50%, which is a piece? And between whole percentages (49.5%, 24.5%, 0.5%), is a piece in
-  the band below? *(Proposal, mine: yes, the band below; and 0.5% counts as Ragged, because
-  only 0 is broken.)*
-- R15: XP per floor is "the number of enemies defeated by the party divided by the number of
-  party members". When that doesn't divide evenly (3 enemies, 4 members), does each member
-  get the fraction, or is it rounded, and which way? This decides the type of the XP field.
-  *(Proposal, mine: store XP exactly, fractions included. Then any later rounding rule needs
-  no save change.)*
-
-**Notes, not blocking this PRD:**
-
-- When a level-up uses up XP, does the leftover carry toward the next level? *(Proposal,
-  mine: it carries. R15 assumes this unless told otherwise.)*
+- When a level-up uses up XP, does the leftover carry toward the next level? *(Provisional
+  default, R15: it carries.)*
+- Does the roster cap count specialists as well as divers? *(Provisional default, R7: it
+  does.)*
+- If an already-injured member is injured again, what happens to the time left on the
+  injury? *(Provisional default, R19: the longer remaining time is kept.)*
 - Do two recruits of the same type and rank start with identical stats? `Guild Members.md`
   says starting stats are "set by its type and its rank or tier". The recruiting board shows
   "a rough impression of where its strengths lie — promising, unremarkable", which suggests
