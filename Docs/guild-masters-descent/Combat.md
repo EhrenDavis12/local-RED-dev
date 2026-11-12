@@ -147,8 +147,11 @@ has no special bar at all, and their attack damage works the way it does for any
 ## Enemies
 
 Enemies are built from the same six combat types as guild members, working the same way.
-What changes with a dungeon is their gear: the dungeon's rank determines the chance
-that an enemy carries a weapon and the chance that it wears armour.
+What changes with a dungeon is tied to the dungeon's own rank: it sets both the rank of
+the enemies found there and their chance of gear. An enemy is either the dungeon's own
+rank or one grade below it, and no other grade — a C-rank dungeon fields C-rank and
+D-rank enemies, nothing higher and nothing lower. The dungeon's rank also determines the
+chance that an enemy carries a weapon and the chance that it wears armour.
 
 ## Enemy Targeting
 
@@ -182,7 +185,7 @@ the Equipment doc.
 - When a free attack is a multi-strike attack, does it land all of its strikes?
 - After a successful reset, can the member take another Luck check once their next
   cooldown has charged normally, or is there a longer lockout?
-- Enemies are built from the same combat types, but what rank or level are they, and
-  how does that follow the dungeon's rank and the depth reached?
+- Does depth change the enemies at all, or does a dungeon's rank set them the same on
+  the first floor as on the fiftieth?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
