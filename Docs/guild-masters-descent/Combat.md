@@ -142,6 +142,13 @@ the same count, not the same stretch of real time: a fast member's effect is bri
 the clock while a slow member's runs long, and every member gets the same number of
 cycles of value out of it. Each of the three is covered in the Individual Types doc.
 
+A lasting effect ends when the member whose effect it is dies. That isn't obvious for
+the two of the three that sit somewhere other than on their owner: the Mage's lingering
+field sits on the battlefield rather than on the Mage, and Shields Up's defence sits on
+the allies behind the Tank rather than on the Tank. The duration is a count of the
+owner's own cooldown cycles, and a member who is dead completes no more of them, so
+there's no clock left for the effect to run on.
+
 ## Specialists in Combat
 
 A specialist attacks on its own cooldown like anyone else. The specialist makes a basic
@@ -188,8 +195,6 @@ the Equipment doc.
   simulation or only how fast it's drawn?
 - How many of the owner's own cooldown cycles do Vanish, Shields Up and the Mage's
   lingering field last?
-- Shields Up adds the Tank's defence to the allies behind it — if the Tank dies, does
-  that defence go with it?
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
