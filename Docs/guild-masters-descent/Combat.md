@@ -73,6 +73,12 @@ When a member finishes an attack, there's a Luck check for whether the cooldown 
 instantly. On success, the member attacks again immediately, with no cooldown wait at all.
 That free attack gets no Luck check of its own — that's what "only once" means, so the
 effect can't chain into a second free attack. On failure, the cooldown charges normally.
+Apart from costing no wait, the free attack is an ordinary attack in every way: all its
+strikes land, it spends durability per hit the same as any other attack, and it charges
+the special bar the same as any other attack. The member is eligible for a check again on
+its very next attack, the one that charges its cooldown normally — the lockout runs no
+further than the one free attack itself. Enemies get the Luck reset too, on the same terms
+as guild members.
 
 The chance is a quarter at most: 25% × Luck ÷ (Luck + 60). It approaches that quarter
 without ever reaching it, so there's no cap rule and no point where Luck stops doing
@@ -188,12 +194,6 @@ the Equipment doc.
   which specials are ready at a glance?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
   at once?
-- Does a free attack spend durability and charge the special bar the way a normal attack
-  does?
-- Do enemies get the Luck reset too, or is it a member-only advantage?
-- When a free attack is a multi-strike attack, does it land all of its strikes?
-- After a successful reset, can the member take another Luck check once their next
-  cooldown has charged normally, or is there a longer lockout?
 - The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
