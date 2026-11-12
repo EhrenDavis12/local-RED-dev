@@ -8,7 +8,7 @@ The Brute attacks at close range. It has advantage over the Tank — it can push
 shield aside and bash the weak points in the armour underneath, bypassing the defence
 subtraction entirely. It's weak to the Fighter: the Brute wears tanned hide, which adds a
 little defence on top of its Constitution, so there's less to subtract than against a
-properly armoured type, and a Fighter's many strikes keep most of their damage.
+properly armoured type, and a Fighter's two strikes keep most of their damage.
 
 The Brute's ordinary attack cleaves too: it hits the targeted enemy and the two directly
 next to it, on whichever row its close range can reach, and each of them can evade it
@@ -23,7 +23,7 @@ hitting multiple enemies.
 ## The Tank
 
 The Tank attacks at close range. It has advantage over the Fighter: the Tank's defence is
-subtracted from each incoming hit, and a Fighter lands many smaller strikes, so every one
+subtracted from each incoming hit, and a Fighter lands two smaller strikes, so every one
 of them pays that subtraction and loses most of its damage.
 
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
@@ -38,13 +38,13 @@ attacked.
 
 ## The Fighter
 
-The Fighter attacks at close range, with many smaller strikes — the property both of its
+The Fighter attacks at close range, with two smaller strikes — the property both of its
 matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
 hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
 its damage is spread across them.
 
 Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
-type — its many strikes all belong to that single attack. Its special bar therefore
+type — its two strikes all belong to that single attack. Its special bar therefore
 charges more slowly than a faster type's; the flurry is what offsets that over the course
 of a longer fight.
 
@@ -107,7 +107,5 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 
 - What are the stats, skills and abilities for each individual type?
 - How fast does a special charge?
-- How many strikes is the Fighter's ordinary attack? Its count is fixed by its type, but
-  the number isn't set.
 - The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
   same check that can reset a cooldown, or a separate roll of its own?
