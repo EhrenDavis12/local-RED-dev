@@ -124,9 +124,20 @@ turn out slightly different from each other.
 Specialists gain base stats the same way divers do, and their specialty improves
 alongside.
 
-Experience is awarded per floor: once a floor's battles resolve, experience is the number
-of enemies defeated by the party divided by the number of party members, counting
-specialists.
+Experience comes from kills, and what a kill is worth is set by the defeated enemy's rank:
+
+- F — 1
+- E — 5
+- D — 10
+- C — 15
+- B — 20
+- A — 25
+- S — 30
+- SS — 35
+- SSS — 40
+
+The total is added up at the end of a combat and divided equally between all party
+members, counting specialists.
 
 ## Stat Weighting by Type
 
@@ -183,7 +194,9 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 - With each matchup working through its own mechanism rather than a shared multiplier, the
   six advantages aren't necessarily worth the same amount. Should they be, or is it fine
   for some matchups to bite harder than others?
-- Does the experience a defeated enemy is worth scale with dungeon depth?
+- How much experience does a level cost? The promotion thresholds are levels — the first
+  at 16, then 32, then 64 — and a kill is now worth a known amount, but nothing converts
+  one into the other.
 - A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
   the five per cent for the floor as well?
 - The Mage's lingering field damages what stands in it. Does that damage count as an area
