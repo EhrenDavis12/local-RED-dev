@@ -1,9 +1,9 @@
 # Combat
 
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
-> reset's chance, and the never-pausing simulation are settled; what a tick costs in real
-> time and whether the player can speed it up, how multi-strike cases resolve,
-> and what formation costs and how the bars read at a glance are not.
+> reset's chance, and the never-pausing simulation are settled; whether a fight can be
+> sped up, how multi-strike cases resolve, what formation costs, how the bars read at a
+> glance, and whether the enemy grid keeps filling are not.
 
 ## Formation
 
@@ -66,6 +66,20 @@ shows early, and it's intended rather than something to be balanced away.
 The pacing intent: a low-level fight feels a little slow at first, and a higher-level
 fight has more going on, but a fight should take about the same real time at either end,
 so combat stays fairly balanced across levels.
+
+A tick is 50 milliseconds — twenty ticks a second. That turns the ticks above into waits
+a player actually feels:
+
+- A newly recruited F-rank Rogue, 71 ticks — about 3.6 seconds between attacks
+- The same Fighter, 104 ticks — about 5.2 seconds
+- The same Tank, 138 ticks — about 6.9 seconds
+- A Rogue at the cooldown floor, 10 ticks — half a second
+- A Tank at the floor, 18 ticks — just under a second
+
+That's what stops the rate being changed casually: at F rank it makes a slow type's wait
+deliberate without being tedious, and at the floor every type is acting about once a
+second, which is the pacing this doc already asks for — a low-level fight feeling a little
+slow and a higher-level one having more going on.
 
 ## The Luck Reset
 
@@ -192,8 +206,6 @@ the Equipment doc.
 ## Open Questions
 
 - What does changing formation mid-battle cost the player, if anything?
-- How much real time is a tick worth — how fast does the simulation run against what the
-  player is watching?
 - Can the player speed a fight up or slow it down, and does that change anything in the
   simulation or only how fast it's drawn?
 - With a party of fifteen filling bars while the fight runs, how does the player see
