@@ -24,9 +24,9 @@ The second triangle:
 - Mage has advantage on Rogue
 
 A type advantage isn't a multiplier added on top of an attack. Each matchup comes out of
-rules already in play — evasion against a single shot, defence subtracted from every
-strike separately, area attacks that can't be dodged, and how much defence each kind of
-armour adds. Each matchup's own mechanism is covered in the Individual Types doc.
+rules already in play — evasion against a single shot, area attacks that can't be dodged,
+and how much defence each kind of armour adds. Each matchup's own mechanism is covered in
+the Individual Types doc.
 
 ## The Support Ring
 
@@ -77,7 +77,24 @@ Dexterity is also the speed attribute: it's what determines how fast a member's 
 is met in combat.
 
 A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
-ranks highest, plus their weapon.
+ranks highest, plus their weapon's rolled range. That total is multiplied by a fraction,
+K ÷ (K + Defence), where Defence is the target's own defence and K comes from the
+attacker's rank. K is the defence at which half the damage gets through — against a
+target whose defence equals K, the fraction comes out to exactly one half.
+
+K by rank:
+
+- F — 20
+- E — 40
+- D — 80
+- C — 160
+- B — 320
+- A — 640
+- S — 1,280
+- SS — 2,560
+- SSS — 5,120
+
+K doubles at each rank, the same way the damage and defence bands double.
 
 A member's defence comes from Constitution plus their equipment.
 
@@ -99,8 +116,8 @@ A member's evasion comes from Luck.
 
 An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
 land on a space rather than on a person, so evasion does nothing against them. They do
-pay a reduced defence, though: defence still applies to them, but at two-thirds of its
-usual value.
+pay a reduced defence, though: an area attack uses two-thirds of the target's defence
+when working the fraction above.
 
 ## Weapons and Armour
 
@@ -219,3 +236,6 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 - The Mage's lingering field damages what stands in it. Does that damage count as an area
   attack too, paying two-thirds defence, or is the reduction only for an attack that is
   aimed?
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.

@@ -131,7 +131,7 @@ effects. Close-combat reach is the first available row: if the first row has bee
 the second row can then be hit. A far-range attack can reach any row on the enemy's grid.
 
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
-and defence is subtracted from it separately.
+and the defender's mitigation is applied to it separately.
 
 ## The Special Bar
 

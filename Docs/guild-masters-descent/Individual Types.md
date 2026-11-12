@@ -5,10 +5,10 @@
 ## The Brute
 
 The Brute attacks at close range. It has advantage over the Tank — it can push the Tank's
-shield aside and bash the weak points in the armour underneath, bypassing the defence
-subtraction entirely. It's weak to the Fighter: the Brute wears tanned hide, which adds a
-little defence on top of its Constitution, so there's less to subtract than against a
-properly armoured type, and a Fighter's two strikes keep most of their damage.
+shield aside and bash the weak points in the armour underneath, halving the Tank's
+defence in the calculation. It's weak to the Fighter: the Fighter halves the Brute's
+defence in the calculation. The Brute wears tanned hide, which adds a little defence on
+top of its Constitution.
 
 The Brute's ordinary attack cleaves too: it hits the targeted enemy and the two directly
 next to it, on whichever row its close range can reach, and each of them can evade it
@@ -22,9 +22,8 @@ hitting multiple enemies.
 
 ## The Tank
 
-The Tank attacks at close range. It has advantage over the Fighter: the Tank's defence is
-subtracted from each incoming hit, and a Fighter lands two smaller strikes, so every one
-of them pays that subtraction and loses most of its damage.
+The Tank attacks at close range. It has advantage over the Fighter: the Tank's defence
+counts double in the calculation against a Fighter.
 
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
 

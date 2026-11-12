@@ -151,8 +151,8 @@ Each strike also carries the member's own damage stat in full, the same as its w
 — the stat isn't split between the strikes of an attack. Both ranges roll separately for
 every strike of a multi-strike attack: the attacker's Attack Damage range is rolled afresh
 for each strike, and because each strike already resolves on its own — rolling to hit
-separately and subtracting defence separately — the defender's Defence range is rolled per
-strike as well.
+separately and applying the defender's mitigation separately — the defender's Defence
+range is rolled per strike as well.
 
 The shop sells equipment of a baseline quality, and that baseline rises with guild rank. A
 crafter in the guild produces better than the shop's baseline.
