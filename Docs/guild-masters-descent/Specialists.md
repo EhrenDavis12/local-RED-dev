@@ -45,8 +45,8 @@ carries.
 
 ## The Cook
 
-The Cook heals a little after every battle, and substantially more at a rest area — on top
-of the rest area's own healing.
+The Cook heals a little between floors — another five per cent — and substantially more at
+a rest area — a further fifteen per cent — on top of what the party gets anyway.
 
 ## The Scout
 

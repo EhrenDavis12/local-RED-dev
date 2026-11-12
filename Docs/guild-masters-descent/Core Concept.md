@@ -66,13 +66,13 @@ included, not just routine work. How many members a mission needs varies by the 
 — some want one, some want several. How long a mission takes varies by its rank: low-rank
 missions take minutes, high-rank ones take hours.
 
-Mission failure normally results in an injured status, not death. An injured member is out
-of action until healed — they can't be sent on a mission or taken on a dive. They recover
-on their own for free, though slowly — or the player can pay gold to speed it up. Gold
-only reaches the injury: a mission timer runs its full length whatever the player pays.
-The exception: sending an individual member whose own rank or tier is below the mission's
-rank, even one the guild as a whole is otherwise suited for, carries a chance that member
-is killed.
+Mission failure normally results in an injured status, not death — members abandon a
+mission before dying. An injured member is out of action until healed — they can't be sent
+on a mission or taken on a dive. They recover on their own for free, though slowly — or
+the player can pay gold to speed it up. Gold only reaches the injury: a mission timer runs
+its full length whatever the player pays. The exception: sending an individual member
+whose own rank or tier is below the mission's rank, even one the guild as a whole is
+otherwise suited for, carries a chance that member is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
 rewards can themselves be items. A mission can also bring back gear — a weapon or a piece

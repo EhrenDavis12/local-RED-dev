@@ -88,6 +88,9 @@ Constitution grows, with no separate rule for levelling. Constitution already me
 toughness, so it is the pool and the base of defence both, and health needs no stat of its
 own.
 
+When a member's health reaches zero, they are dead. What that means in the dungeon is
+covered in the Dungeon doc.
+
 Damage is the stat plus what you carry, defence is the stat plus what you wear.
 
 There is no minimum damage — enough defence can reduce a hit to nothing.
@@ -181,12 +184,8 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
   six advantages aren't necessarily worth the same amount. Should they be, or is it fine
   for some matchups to bite harder than others?
 - Does the experience a defeated enemy is worth scale with dungeon depth?
-- When a member's health runs out, are they dead on the spot? Death in the dungeon is
-  permanent, and a failed mission leaves a member injured rather than dead, so it isn't
-  clear whether running out in a fight kills outright or leaves them in some other state.
-- A floor has two or three battles and the party heals at a rest area every fifth floor.
-  Does any health come back between the battles on a floor, or does the party carry its
-  damage from the first fight all the way to the next rest area?
+- A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
+  the five per cent for the floor as well?
 - Area attacks pay a reduced defence — defence still applies but at less than its usual
   value. How much less? Nothing sets it, so the Mage's column attack can't be worked out
   at all.
