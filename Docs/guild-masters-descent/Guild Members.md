@@ -127,14 +127,14 @@ alongside.
 Experience comes from kills, and what a kill is worth is set by the defeated enemy's rank:
 
 - F — 1
-- E — 5
-- D — 10
-- C — 15
-- B — 20
-- A — 25
-- S — 30
-- SS — 35
-- SSS — 40
+- E — 3
+- D — 6
+- C — 12
+- B — 24
+- A — 48
+- S — 96
+- SS — 192
+- SSS — 384
 
 The total is added up at the end of a combat and divided equally between all party
 members, counting specialists.
@@ -209,10 +209,11 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
   a level threshold — 16 levels for the first, doubling after. Does the experience buy
   those levels at an even rate, or do the two run on separate counters with whichever is
   slower deciding?
-- The experience a rank costs multiplies by five each step, while what a kill is worth
-  goes up by five a rank. Those don't keep pace: at around six enemies a fight and a party
-  of six, F to E takes about twenty fights and SS to SSS takes about forty-four thousand.
-  Which side gets tuned — the cost of a rank, or what a stronger enemy is worth?
+- The experience a rank costs multiplies by five each step while what a kill is worth
+  doubles, so every rank takes about two and a half times the fights of the one before —
+  at around six enemies a fight and a party of six, F to E is about twenty fights and SS
+  to SSS about eight thousand, roughly thirteen and a half thousand for the whole climb.
+  Which side gets tuned, the cost of a rank or what a stronger enemy is worth?
 - A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
   the five per cent for the floor as well?
 - The Mage's lingering field damages what stands in it. Does that damage count as an area
