@@ -90,5 +90,6 @@ The dungeon board, finding and entering dungeons, and training missions.
   runs landscape only.
   - Orientation
   - Open Questions
+- `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon).
 
 The design docs themselves are the source of truth; consult them, not this map, for content.
