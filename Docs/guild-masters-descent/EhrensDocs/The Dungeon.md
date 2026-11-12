@@ -85,3 +85,40 @@ count but not how one battle leads into the next, or where the loot drops. The 3
 are inside the existing 2–3 range, so the range stays for dungeons in general. What the
 board's floor layout shows, whether a party picks a route, and what makes a boss floor are
 not settled by this. The rest-area and retreat sentences are unchanged.
+
+## Change: The dungeon's enemies are monsters
+
+> Proposed 2026-11-11 · for review
+
+**Where:** `## The Dungeon`, first paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+Dungeon diving is the main gameplay. Death in the dungeon is permanent — there is no way
+to bring a dead member back. The risk is inherent in the choice: send someone you know
+will survive, or send a team and see who comes back.
+```
+
+**Proposed:**
+
+```
+Dungeon diving is the main gameplay. Death in the dungeon is permanent — there is no way
+to bring a dead member back. The risk is inherent in the choice: send someone you know
+will survive, or send a team and see who comes back.
+
+The dungeon's enemies are monsters. For now the monsters might be limited to just the
+Archer's animations; anything a monster has no art for is a bright yellow shape with its
+name written on it.
+```
+
+**Why:** Answered: the enemies are monsters, but for now we might be limited to just the
+archer animations. The docs gave enemies a grid, targeting and repositioning but never
+said what they are. The yellow-shape clause is the project's standing rule for missing
+art. The first paragraph is unchanged. Not settled by this: whether monsters use the six
+combat types' attacks, specials and type advantage; whether they carry gear; and where
+their stats come from. For the owner to reconcile: `Guild Members.md`, `## The Support
+Ring`, gives the example "an enemy force of, say, nine Brutes" — the Brute is a guild
+combat type, so either monsters carry combat types or the example wants a monster in
+place of the Brute. `## The Dungeon Board`'s "the types of monster and enemy found in
+each of the dungeons" is left as it is.
