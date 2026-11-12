@@ -178,6 +178,17 @@ The level a member needs doubles at each promotion: the first is level 16, the s
 32, and so on — 16, 32, 64, 128, 256, 512, 1024, 2048. The same eight thresholds serve
 both ladders — nine tiers means eight promotions, exactly as many as nine ranks.
 
+Crossing a rank also costs a set amount of experience, multiplying by five at each step:
+
+- F to E — 20
+- E to D — 100
+- D to C — 500
+- C to B — 2,500
+- B to A — 12,500
+- A to S — 62,500
+- S to SS — 312,500
+- SS to SSS — 1,562,500
+
 ## Specialists
 
 Specialist types include Porter, Cook, Scout, Herbalist, Miner, Blacksmith, Armourer, and
@@ -194,9 +205,14 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 - With each matchup working through its own mechanism rather than a shared multiplier, the
   six advantages aren't necessarily worth the same amount. Should they be, or is it fine
   for some matchups to bite harder than others?
-- How much experience does a level cost? The promotion thresholds are levels — the first
-  at 16, then 32, then 64 — and a kill is now worth a known amount, but nothing converts
-  one into the other.
+- Crossing a rank costs a set amount of experience, and reaching the next rank also needs
+  a level threshold — 16 levels for the first, doubling after. Does the experience buy
+  those levels at an even rate, or do the two run on separate counters with whichever is
+  slower deciding?
+- The experience a rank costs multiplies by five each step, while what a kill is worth
+  goes up by five a rank. Those don't keep pace: at around six enemies a fight and a party
+  of six, F to E takes about twenty fights and SS to SSS takes about forty-four thousand.
+  Which side gets tuned — the cost of a rank, or what a stronger enemy is worth?
 - A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
   the five per cent for the floor as well?
 - The Mage's lingering field damages what stands in it. Does that damage count as an area
