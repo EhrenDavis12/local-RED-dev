@@ -46,3 +46,36 @@ stats", which said the opposite.
 
 **Why:** Answered: the Dorms shows nothing of a piece's numbers for now, written into
 Assignment.
+
+## Change: For now a dive yields only gold
+
+> Proposed 2026-11-11 · for review
+
+**Where:** `## Where Gear Comes From`, fourth and fifth paragraphs
+
+**Now says:**
+
+```
+Gear can drop too: both the dungeon and missions can drop a weapon or a piece of armour,
+alongside the materials and items they yield.
+
+Materials feed better equipment: some missions are hunts for materials to make better
+equipment, and dives yield materials or items.
+```
+
+**Proposed:**
+
+```
+Gear can drop too: both the dungeon and missions can drop a weapon or a piece of armour,
+alongside the materials and items they yield.
+
+Materials feed better equipment: some missions are hunts for materials to make better
+equipment, and dives yield materials or items.
+
+For now, though, loot is just gold. In the first version a dive yields gold and nothing
+else — no materials, no items, and no dropped gear.
+```
+
+**Why:** Answered: for now loot will just be gold. Both paragraphs have the dungeon
+dropping gear and yielding materials or items, which the first version doesn't do; they
+stay as the longer-term design, and the new paragraph scopes the first version.
