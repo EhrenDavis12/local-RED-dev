@@ -128,7 +128,7 @@ carry, and how a dead member's gear counts against a limit measured in gold.
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## The Dungeon`, first paragraph (a new paragraph after it)
+**Where:** `## The Dungeon`, first paragraph (new paragraphs after it)
 
 **Now says:**
 
@@ -148,15 +148,28 @@ will survive, or send a team and see who comes back.
 The dungeon's enemies are monsters. For now the monsters might be limited to just the
 Archer's animations; anything a monster has no art for is a bright yellow shape with its
 name written on it.
+
+Every monster is assigned one of the six combat types, just like the guild's members,
+and has the same characteristics of that type — a monster Tank or a monster Archer has
+that type's attacks, its special and its type advantages. Monsters carry no gear.
+
+A monster is given a level like a member is, and uses the same stat rules. Deeper floors
+have higher-level monsters. What level the monsters on each floor are is a placeholder,
+to be balanced later.
 ```
 
 **Why:** Answered: the enemies are monsters, but for now we might be limited to just the
-archer animations. The docs gave enemies a grid, targeting and repositioning but never
-said what they are. The yellow-shape clause is the project's standing rule for missing
-art. The first paragraph is unchanged. Not settled by this: whether monsters use the six
-combat types' attacks, specials and type advantage; whether they carry gear; and where
-their stats come from. For the owner to reconcile: `Guild Members.md`, `## The Support
-Ring`, gives the example "an enemy force of, say, nine Brutes" — the Brute is a guild
-combat type, so either monsters carry combat types or the example wants a monster in
-place of the Brute. `## The Dungeon Board`'s "the types of monster and enemy found in
-each of the dungeons" is left as it is.
+archer animations. Answered too: yes, monsters will be assigned one of the types just
+like the characters and have those same characteristics of that type; on gear, fixed
+numbers; and on where a monster's strength comes from, levels, with deeper floors having
+higher-level monsters. The docs gave enemies a grid, targeting and repositioning but
+never said what they are. The yellow-shape clause is the project's standing rule for
+missing art. The first paragraph is unchanged. With monsters carrying combat types,
+`Guild Members.md`'s example of "an enemy force of, say, nine Brutes" fits as written.
+Not settled by this: how a monster's attack and defence are worked out — the answer on
+gear was fixed numbers, while a member's damage is its stat plus its weapon and its
+defence is Constitution plus its armour, and monsters follow a member's stat rules.
+For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
+Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
+a monster Brute or Rogue carries none. `## The Dungeon Board`'s "the types of monster and
+enemy found in each of the dungeons" is left as it is.
