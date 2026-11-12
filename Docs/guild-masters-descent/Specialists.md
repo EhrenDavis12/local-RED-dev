@@ -82,4 +82,10 @@ a rest area, the Alchemist can brew from what the party has gathered.
 A potion's strength scales with the Alchemist's Intelligence, so a cleverer Alchemist
 brews stronger buffs.
 
+The Alchemist also adds its Luck when rolling what it brews — the same advantage the
+Blacksmith gets on a weapon and the Armourer on armour.
+
 ## Open Questions
+
+- A weapon and a piece of armour are each rolled from a band for their kind and class —
+  what is it that a potion rolls, for the Alchemist's Luck to improve?

@@ -29,6 +29,15 @@ F → E → D → C → B → A → S → SS → SSS
 
 The hall has three boards — a mission board, a recruiting board, and a dungeon board.
 
+## The Dorms and the Smithy
+
+The Dorms are where the player sees members' stats and assigns their weapons and armour.
+
+The smithy is where a Blacksmith is assigned. When the guild holds more than one
+Blacksmith, it is the one assigned to the smithy whose work counts.
+
+How gear and quality actually work is covered in the Equipment doc.
+
 ## The Party
 
 A party is made of multiple divers, plus specialists. Specialists have a reason for being
@@ -66,7 +75,8 @@ rank, even one the guild as a whole is otherwise suited for, carries a chance th
 is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
-rewards can themselves be items.
+rewards can themselves be items. A mission can also bring back gear — a weapon or a piece
+of armour.
 
 The intent is that mission rewards keep the guild going but don't advance it — the climb
 comes from milestone quests and from what the dungeon yields.

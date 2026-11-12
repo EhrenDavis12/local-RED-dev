@@ -59,7 +59,8 @@ the player may choose to return to the top and exit the dungeon. Retreating alwa
 the loot gathered since the last safe floor — any party member can carry some of it, so
 how much is lost depends on who came along.
 
-Dungeon diving yields materials or items, and sometimes small amounts of gold.
+Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
+also drop a weapon or a piece of armour.
 
 Gold is covered in the Core Concept doc.
 
