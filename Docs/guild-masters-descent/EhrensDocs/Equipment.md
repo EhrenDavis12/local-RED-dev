@@ -79,3 +79,30 @@ else — no materials, no items, and no dropped gear.
 **Why:** Answered: for now loot will just be gold. Both paragraphs have the dungeon
 dropping gear and yielding materials or items, which the first version doesn't do; they
 stay as the longer-term design, and the new paragraph scopes the first version.
+
+## Change: Two questions on stores and condition
+
+> Proposed 2026-11-11 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
+  deciding which of two Armourers sets armour quality?
+```
+
+**Proposed:**
+
+```
+- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
+  deciding which of two Armourers sets armour quality?
+- Are the guild's stores capped?
+- Where do the condition bands' edges fall? Good is above 50% and Worn is 25% to 49%, so a
+  piece at exactly 50% — or between 49% and 50%, or between 24% and 25% — sits in no band.
+```
+
+**Why:** None of the docs answers the first. The second is a gap in `## Durability`'s
+condition list. The existing entries, and the pending deletion of the Dorms question, are
+unchanged.
