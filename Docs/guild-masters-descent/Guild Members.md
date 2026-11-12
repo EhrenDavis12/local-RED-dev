@@ -99,8 +99,8 @@ A member's evasion comes from Luck.
 
 An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
 land on a space rather than on a person, so evasion does nothing against them. They do
-pay a reduced defence, though: defence still applies to them, but at less than its usual
-value.
+pay a reduced defence, though: defence still applies to them, but at two-thirds of its
+usual value.
 
 ## Weapons and Armour
 
@@ -186,6 +186,6 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 - Does the experience a defeated enemy is worth scale with dungeon depth?
 - A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
   the five per cent for the floor as well?
-- Area attacks pay a reduced defence — defence still applies but at less than its usual
-  value. How much less? Nothing sets it, so the Mage's column attack can't be worked out
-  at all.
+- The Mage's lingering field damages what stands in it. Does that damage count as an area
+  attack too, paying two-thirds defence, or is the reduction only for an attack that is
+  aimed?
