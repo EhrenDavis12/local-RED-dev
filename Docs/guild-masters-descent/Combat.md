@@ -204,3 +204,9 @@ the Equipment doc.
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
+- When a fight starts, where do the cooldowns stand — everyone's empty and waiting out a
+  full first wait, everyone's ready at once, or staggered somehow? The opening of a fight
+  plays out completely differently depending on which.
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?

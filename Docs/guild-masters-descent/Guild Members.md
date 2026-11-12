@@ -174,3 +174,11 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
   six advantages aren't necessarily worth the same amount. Should they be, or is it fine
   for some matchups to bite harder than others?
 - Does the experience a defeated enemy is worth scale with dungeon depth?
+- Damage is worked out per strike and defence is subtracted from it, but nothing says what
+  the damage actually reduces. A member has Strength, Dexterity, Constitution,
+  Intelligence and Luck, and no pool of health among them — so what does damage take away,
+  and what does a member have to lose before they die? Death is all through these docs,
+  permanent in the dungeon, and there is nothing yet for it to come out of.
+- Area attacks pay a reduced defence — defence still applies but at less than its usual
+  value. How much less? Nothing sets it, so the Mage's column attack can't be worked out
+  at all.
