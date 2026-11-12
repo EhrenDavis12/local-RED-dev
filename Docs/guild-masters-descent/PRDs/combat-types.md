@@ -42,13 +42,16 @@ placeholder in `Tuning.cs`.
    the engine still picks a target before the plan runs, as built today. Whether that
    spends a taunt is an open question in the docs (Open Questions); the PRD pins nothing
    about whether a target roll is drawn, and tests must not depend on it either way. The
-   party's selected enemy is never spent by this. (C § Combat; C\* "Questions on turn
-   order and taunts")
+   party's selected enemy is never spent by this. Scripted-RNG tests of Shields Up, Vanish
+   and the field should give the caster a single reachable enemy, or set the party's
+   selected enemy, so they hold whether or not a target is drawn. (C § Combat; C\*
+   "Questions on turn order and taunts")
 4. **The three timed effects** — Vanish, Shields Up, the field — each last
    `Tuning.EffectTurns` of the caster's turns and end early only when the caster dies, or
    (Vanish only) when an enemy area attack hits the Rogue. In particular **the field does
-   not end when an enemy in it, or the enemy it was aimed at, dies.** Today the engine
-   ends any effect whose named target dies; the field must not be tied to one. (C § Combat
+   not end when an enemy in it, or the enemy it was aimed at, dies.** The engine ends an
+   effect whose named target dies, so the field is created with no named target, which the
+   engine already handles — no engine change. (C § Combat
    third paragraph; C\* "Whose turns an effect's length counts"; IT § The Rogue)
 
 ### The Brute
@@ -72,7 +75,8 @@ placeholder in `Tuning.cs`.
    § The Brute, "all in the same action")
 9. **Bonus charge — hitting multiple enemies.** An attack whose strikes land on two or
    more different enemies earns `BruteMultiHitCharge`. Misses and passed-over vanished
-   enemies do not count. (IT § The Brute)
+   enemies do not count. (IT § The Brute; once per attack and landed strikes only are
+   defaults — see Open Questions on how often each bonus pays)
 
 ### The Tank
 
@@ -85,7 +89,8 @@ placeholder in `Tuning.cs`.
     defence")
 12. **Bonus charge — being attacked.** Each enemy strike aimed at the Tank, hit or miss,
     earns `TankAttackedCharge`. Field damage is not a strike and earns nothing. (IT § The
-    Tank)
+    Tank; per strike, hit or miss, and field damage earning nothing are defaults — see
+    Open Questions on how often each bonus pays)
 
 ### The Fighter
 
@@ -93,18 +98,23 @@ placeholder in `Tuning.cs`.
     count never changes with level. Each strike carries `1 / FighterStrikeCount` of the
     Fighter's damage, **and that split happens before defence is subtracted** — every
     light strike pays the full defence subtraction. This is what the Tank's advantage over
-    the Fighter rests on. *The engine's `DamageShare` is applied after defence, so the
-    contract needs a before-defence share for this.* (IT § The Fighter; IT § The Tank,
+    the Fighter rests on; it uses the before-defence share (req. 30). (IT § The Fighter;
+    IT § The Tank,
     "every one of them pays that subtraction")
 14. **Special — flurry.** Up to 6 strikes on the chosen target, each carrying
     `FlurryStrikeShare` of the Fighter's damage. When the target dies, the rest carry to
     the nearest enemy still standing within close reach, passing over a vanished Rogue
     unless that is all there is; if none is in reach, they are lost. (IT\* "The flurry's
     leftover strikes stay within reach")
-15. **The flurry's own strikes charge nothing** — no base charge, no bonus. If any enemy
-    is killed during the flurry, the Fighter's bar is set to 90% of full; otherwise it is
-    left empty. 90% is settled, not a placeholder. (IT § The Fighter; C\* "The base charge
-    is once per attack")
+15. **The flurry's own strikes charge nothing** — no base charge (`ChargesBar` off), and
+    no charge from any strike except the refill below. If any enemy is killed during the
+    flurry, the Fighter's bar is set to 90% of full; otherwise it is left empty. 90% is
+    settled, not a placeholder. Because `AttackPlan.BarFraction` is fixed before any strike
+    lands, the refill goes through the Fighter's `BonusCharge`: on the flurry's first
+    strike that kills, it returns what brings the bar to `floor(0.9 ×
+    Tuning.SpecialBarSize)`, and on every other flurry strike it returns 0.
+    `BarFraction` is not used. (IT § The Fighter; C\* "The base charge is once per
+    attack")
 
 ### The Rogue
 
@@ -129,16 +139,18 @@ placeholder in `Tuning.cs`.
     defence. It hits the chosen target for full damage, and for `VolleyNeighbourShare` of
     the damage: the enemy one node to each side, and the one directly behind (the next row
     back). When the target is in the grid's back row, that last hit lands on the node in
-    front of it instead. Empty nodes take nothing. (IT § The Archer; GM § Base Stats, area
-    attacks)
+    front of it instead. Empty nodes take nothing. The neighbour share is applied after
+    defence (the existing `DamageShare`). (IT § The Archer; GM § Base Stats, area attacks)
 22. **The streak.** An ordinary shot that hits the same enemy as the Archer's previous
     ordinary shot continues the streak; a miss resets it, and a hit on a different enemy
     starts a new one. Volley neither continues nor breaks it. Each continued hit earns
     `ArcherStreakCharge`. (IT § The Archer)
-23. **The streak's edge.** While a streak continues, each further shot at that enemy is
-    raised by `ArcherStreakStepPercent` more per consecutive hit — both its damage and its
-    accuracy (points off the target's miss chance) — capped at 10% each. 10% is settled.
-    (IT § The Archer; see Open Questions)
+23. **The streak's edge.** The second consecutive hit on an enemy starts the raise, so the
+    first shot it applies to is the third. After k consecutive hits (k ≥ 2), the next
+    ordinary shot at that enemy is raised by `min(10, (k − 1) × ArcherStreakStepPercent)`
+    percent — in accuracy as that many points off the target's miss chance, and in damage
+    as that many percent more (after defence). The 10% cap is settled; the rest are
+    defaults. (IT § The Archer; see Open Questions)
 
 ### The Mage
 
@@ -148,7 +160,9 @@ placeholder in `Tuning.cs`.
     Mage's field goes straight through, for now")
 25. **Special — lingering field.** Covers two columns of the enemy grid. At the start of
     each of the Mage's turns while it lasts, every enemy standing in those columns then
-    takes damage (how much is a defaulted open question, below). The damage goes
+    takes the same fixed amount, set once at cast: `floor((the Mage's Intelligence with
+    help + Battle.RollWeapon(mage)) × FieldDamageShare)` (req. 31). The cast spends no use
+    of the staff. This amount is a default — see Open Questions. The damage goes
     straight through: no hit roll, no defence, no armour wear. It never hurts the caster's
     own side. Field damage counts toward the Mage's damage dealt for enemy targeting.
     (IT § The Mage; IT\* "The Mage's field goes straight through"; C\* "What the
@@ -192,15 +206,30 @@ placeholder in `Tuning.cs`.
     subtracted, alongside the existing after-defence `DamageShare`. The Fighter's
     ordinary strikes (req. 13), the flurry (req. 14) and the Rogue's strikes (req. 16) use
     it. Without it, splitting damage after defence makes many light strikes total the same
-    as one big hit, and the Tank's advantage over the Fighter disappears. (IT § The Tank,
-    "every one of them pays that subtraction and loses most of its damage")
+    as one big hit, and the Tank's advantage over the Fighter disappears. One strike's
+    damage, in this order with a single rounding at the end:
+    `floor(max(0, (damage stat + weapon roll) × before-defence share − defence) ×
+    advantage multiplier × DamageShare × DamageMultiplier)`. It defaults to 1, so every
+    existing plan is unchanged. (IT § The Tank, "every one of them pays that subtraction
+    and loses most of its damage"; EQ § Quality, weapon rolled per strike)
+31. **`Battle.RollWeapon(Combatant)` — a weapon roll a plan can ask for.** Public on
+    `Battle`. Returns one roll of the combatant's weapon range, drawn from the battle's
+    own RNG, or 0 when the combatant has no weapon, its weapon is broken, or it is a
+    monster — the same rule a strike uses. It spends no use of the weapon. The Mage's
+    field (req. 25) is its only caller here; it keeps one RNG and one broken-gear rule.
+    (C § Equipment Durability, "A broken weapon stops being added")
+32. **`CombatTypes.For(MemberType)`** is the public factory that maps each member type to
+    its combat type — the six types, and one shared specialist type for the Cook and the
+    Porter — and is what the game passes to `new Battle(guild, rng, CombatTypes.For)`.
+    Combat types hold no per-battle state on a shared instance: the Archer's streak is
+    kept per combatant per battle.
 
 ## Out of Scope
 
 - The engine's own rules — turn order, targeting weights, how taunts are spent, the
   support ring, the type-advantage multiplier's value, gear wear, evasion from Luck.
-  Built already. The two contract gaps this needs (before-defence share, req. 13; a field
-  with no named target, req. 4) are the only engine changes.
+  Built already. The only engine changes are the before-defence share (req. 30) and
+  `Battle.RollWeapon` (req. 31).
 - Stats and starting stats per type — what makes the Rogue's evasion high comes from its
   Luck, already set.
 - How a special is chosen on screen, and any animation, including the Brute's move.
