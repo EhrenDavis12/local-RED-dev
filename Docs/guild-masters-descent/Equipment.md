@@ -2,8 +2,8 @@
 
 > **Status:** Early design. Nothing is built yet — the kinds, the quality ladder, each
 > piece's attributes rolled once for life, condition, wear and breaking, where gear comes
-> from — the crafter's Luck as its edge — repair, and the weapon damage bands, each class
-> doubling the last, are settled; armour's defence bands and durability bands aren't.
+> from — the crafter's Luck as its edge — repair, and the damage and defence bands, each
+> class doubling the last, are settled; only armour's durability bands aren't.
 
 ## What a Member Carries
 
@@ -135,10 +135,12 @@ class doubles the band below it, up all nine rungs, so defence keeps pace with d
 A piece's Attack Damage, its Defence and its Durability are each rolled once, at
 creation, and fixed for the life of that piece.
 
-Both ranges roll separately for every strike of a multi-strike attack: the attacker's
-Attack Damage range is rolled afresh for each strike, and because each strike already
-resolves on its own — rolling to hit separately and subtracting defence separately —
-the defender's Defence range is rolled per strike as well.
+Each strike also carries the member's own damage stat in full, the same as its weapon roll
+— the stat isn't split between the strikes of an attack. Both ranges roll separately for
+every strike of a multi-strike attack: the attacker's Attack Damage range is rolled afresh
+for each strike, and because each strike already resolves on its own — rolling to hit
+separately and subtracting defence separately — the defender's Defence range is rolled per
+strike as well.
 
 The shop sells equipment of a baseline quality, and that baseline rises with guild rank. A
 crafter in the guild produces better than the shop's baseline.

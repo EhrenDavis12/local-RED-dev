@@ -40,8 +40,9 @@ attacked.
 
 The Fighter attacks at close range, with two smaller strikes — the property both of its
 matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
-hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
-its damage is spread across them.
+hit harder rather than adding more strikes. The Fighter's ordinary strikes are light,
+because its two-handed sword's damage band is smaller than that of a kind putting
+everything into a single hit.
 
 Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
 type — its two strikes all belong to that single attack. Its special bar therefore
