@@ -2,8 +2,8 @@
 
 > **Status:** Early design. Nothing is built yet — the kinds, the quality ladder, each
 > piece's attributes rolled once for life, condition, wear and breaking, where gear comes
-> from — the crafter's Luck as its edge — and repair are settled, but the bands aren't: no
-> kind has a damage or defence band set at any class, apart from the one example here.
+> from — the crafter's Luck as its edge — repair, and the weapon damage bands, each class
+> doubling the last, are settled; armour's defence bands and durability bands aren't.
 
 ## What a Member Carries
 
