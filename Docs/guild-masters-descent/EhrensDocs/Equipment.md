@@ -80,6 +80,63 @@ else — no materials, no items, and no dropped gear.
 dropping gear and yielding materials or items, which the first version doesn't do; they
 stay as the longer-term design, and the new paragraph scopes the first version.
 
+## Change: Gear can be sold back to the shop
+
+> Proposed 2026-11-11 · for review
+
+**Where:** `## Where Gear Comes From`, second paragraph
+
+**Now says:**
+
+```
+The shop is available from rank F, where the player can buy items and equipment.
+```
+
+**Proposed:**
+
+```
+The shop is available from rank F, where the player can buy items and equipment. The
+player can sell gear back to the shop too, for a share of its price. The share is a
+placeholder, to be balanced later.
+```
+
+**Why:** Answered: sure, yes — the player can sell gear back to the shop. No doc said gear
+can be sold: `Core Concept.md`'s `## The Economy` has the guild selling items and
+materials at the shop, and that sentence is left as it is. With a dive yielding only gold
+for now, gear is the one thing the guild has to sell. What a piece's price is — each piece
+is rolled, so two of the same kind and class differ, and crafted or dropped gear was never
+bought — is not settled by this.
+
+## Change: For now repair costs gold only
+
+> Proposed 2026-11-11 · for review
+
+**Where:** `## Repair`, first paragraph
+
+**Now says:**
+
+```
+Repairs happen in the guild hall between dives. Repairing a piece that still has
+durability left costs gold; fixing a piece that has broken costs gold and materials
+both.
+```
+
+**Proposed:**
+
+```
+Repairs happen in the guild hall between dives. Repairing a piece that still has
+durability left costs gold; fixing a piece that has broken costs gold and materials
+both. For now, though, repair costs gold only: in the first version a broken piece is
+fixed for gold and no materials.
+```
+
+**Why:** Answered: for now, repair costs gold only. Nothing in the first version gives the
+guild materials, so a broken piece could not otherwise be fixed. The paragraph, the third
+paragraph's "for gold and materials" and the status line's "repair costs gold and
+materials if broken" stay as the longer-term design; the new sentence scopes the first
+version. The open question on which materials a broken piece needs stays open for that
+longer-term design.
+
 ## Change: Two questions on stores and condition
 
 > Proposed 2026-11-11 · for review

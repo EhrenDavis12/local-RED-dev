@@ -89,7 +89,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
-  question, dive loot is gold only, open questions on stores and condition).
+  question, dive loot is gold only, selling gear back, repair costs gold only for now,
+  open questions on stores and condition).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (every member starts
   with 10 health, open questions on levelling and promotion).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
@@ -98,6 +99,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Saving
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
-  loot is gold only, a floor is a series of battles, enemies are monsters).
+  loot is gold only, a floor is a series of battles whose gold drops at the end, turning
+  back anywhere and the carry limit, enemies are monsters).
 
 The design docs themselves are the source of truth; consult them, not this map, for content.
