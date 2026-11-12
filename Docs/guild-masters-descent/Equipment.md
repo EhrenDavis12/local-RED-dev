@@ -88,9 +88,31 @@ class rather than being a fixed figure, and the individual piece's figure is rol
 that band when the piece is made. Once rolled, it counts down by hits, not by attacks:
 each hit the weapon lands spends one use, and an attack that misses spends none. Because
 the kinds land different numbers of hits per attack, durability is balanced per weapon
-kind to make the kinds come out even — a kind that strikes many times per attack needs
-a higher durability figure than a kind that strikes once. The weapon breaks when it
+kind to make the kinds come out even — a kind that lands more hits in an attack needs a
+higher durability figure than a kind that lands fewer, and what's counted is hits landed,
+not strikes made: the Brute's cleave and the Mage's column land three hits from one
+strike, the same as a kind that strikes three separate times. The weapon breaks when it
 reaches zero.
+
+Each kind's F-class Durability band, grouped by how many hits it lands in one attack:
+
+- Bow, the Archer's, and short sword, the Tank's — 40–80. One strike on one target, so
+  one hit an attack.
+- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
+  hits an attack.
+- Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
+  so three hits an attack.
+
+A kind's band scales with the hits it lands in an attack, so every kind lasts about the
+same number of attacks — somewhere around sixty at the middle of its band.
+
+Unlike the damage bands, a kind's Durability band is the same at every class — an SSS
+weapon is no more durable than an F one; what it has is a far bigger damage band. Higher
+floors mean tougher enemies and longer fights, so durability that grew with class would
+simply cancel out, and gear breaking is meant to go on mattering at every rank rather
+than only early. It also means losing a weapon hurts more the better it is, which agrees
+with the rule above: a broken weapon costs little early and a great deal once damage is
+in the hundreds or thousands.
 
 Armour carries two attributes as well, the same shape as a weapon's pair: a Defence range
 and a Durability. Defence is a range, the way Attack Damage is a range, and not a single
@@ -180,6 +202,12 @@ damage is in the hundreds or thousands, what the weapon was adding means a lot.
 Both a weapon and an armour can break partway through a multi-strike sequence, so later
 strikes in the same attack can deal or face different damage than earlier ones.
 
+A special spends none of the attacker's own weapon durability, however many hits it
+lands — the Fighter's flurry, the Archer's Volley, the Brute's two-row cleave and the
+Mage's field cost the weapon nothing. Armour spends durability for every hit it takes
+regardless, whoever lands it and whether it came from an ordinary attack or a special: a
+weapon only wears from ordinary attacks, armour wears from everything.
+
 ## Repair
 
 Repairs happen in the guild hall between dives. Repairing a piece that still has
@@ -214,6 +242,5 @@ materials.
   rough impression the way the recruiting board shows a candidate's strengths?
 - Does the Armourer have a station of its own the way the Blacksmith has the smithy,
   deciding which of two Armourers sets armour quality?
-- What durability band does each kind get at each class? The Brute's cleave and the Mage's
-  column each land three hits in one attack where the two-strike kinds land two, so the
-  hits a kind spends per attack are not the same as its strikes.
+- The Mage's lingering field keeps damaging enemies standing in it. Does each of those
+  count as a hit against their armour, so a field strips armour for as long as it lasts?
