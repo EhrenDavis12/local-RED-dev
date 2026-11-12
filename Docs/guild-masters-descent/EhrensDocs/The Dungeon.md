@@ -156,6 +156,12 @@ that type's attacks, its special and its type advantages. Monsters carry no gear
 A monster is given a level like a member is, and uses the same stat rules. Deeper floors
 have higher-level monsters. What level the monsters on each floor are is a placeholder,
 to be balanced later.
+
+In a battle, for now, a monster's damage is its damage stat alone and its defence its
+Constitution alone — there's no weapon or armour in either. Its health follows a
+member's: for now that's the 10 a new F-rank member starts with, whatever the monster's
+level. Monsters get the support ring among themselves, a special bar and the Tank's taunt
+the same as members do, and a monster uses its special as soon as its bar is full.
 ```
 
 **Why:** Answered: the enemies are monsters, but for now we might be limited to just the
@@ -166,10 +172,33 @@ higher-level monsters. The docs gave enemies a grid, targeting and repositioning
 never said what they are. The yellow-shape clause is the project's standing rule for
 missing art. The first paragraph is unchanged. With monsters carrying combat types,
 `Guild Members.md`'s example of "an enemy force of, say, nine Brutes" fits as written.
-Not settled by this: how a monster's attack and defence are worked out — the answer on
-gear was fixed numbers, while a member's damage is its stat plus its weapon and its
-defence is Constitution plus its armour, and monsters follow a member's stat rules.
+How a monster fights is a default for now: the answer on gear was fixed numbers, read as
+the monster's own stats with nothing added for gear — while a member's damage is its stat
+plus its weapon and its defence is Constitution plus its armour — and its health, the
+support ring, the bar and the taunt follow a member's.
 For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
 a monster Brute or Rogue carries none. `## The Dungeon Board`'s "the types of monster and
 enemy found in each of the dungeons" is left as it is.
+
+## Change: A question on turning back mid-battle
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- Can a party turn back in the middle of a battle, or only between battles?
+```
+
+**Why:** "The party can turn back anywhere" doesn't say whether that includes the middle
+of a battle.

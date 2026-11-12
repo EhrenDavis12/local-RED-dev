@@ -85,15 +85,22 @@ The dungeon board, finding and entering dungeons, and training missions.
 ## Files with pending changes
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line, open question,
-  members stay hurt between battles and 0 health is death).
+  members stay hurt between battles and 0 health is death, turn order within a round and
+  how a battle ends, base charge and using a special, effect length, targeting weights and
+  taunts, open questions on turn order and taunts).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive loot is gold only, selling gear back, repair costs gold only for now,
-  open questions on stores and condition).
+  open questions on stores and condition, a zero-damage hit still wears gear).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (starting health is
-  set by rank and F rank starts at 10, open questions on levelling and promotion).
+  set by rank and F rank starts at 10, open questions on levelling and promotion, help
+  follows the board live, type advantage after defence for now, open questions on type
+  advantage and defence).
+- `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (the flurry's
+  leftover strikes stay within reach, a failed Vanish fails for one strike, the Mage's
+  field goes straight through for now, open questions on Vanish, taunts and the field).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself.
   - Orientation
@@ -101,6 +108,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
-  back anywhere and the carry limit, enemies are monsters).
+  back anywhere and the carry limit, enemies are monsters and how they fight for now, open
+  question on turning back mid-battle).
 
 The design docs themselves are the source of truth; consult them, not this map, for content.

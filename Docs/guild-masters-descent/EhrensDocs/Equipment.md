@@ -163,3 +163,29 @@ longer-term design.
 **Why:** None of the docs answers the first. The second is a gap in `## Durability`'s
 condition list. The existing entries, and the pending deletion of the Dorms question, are
 unchanged.
+
+## Change: A hit that does nothing still wears gear
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Durability`, first paragraph
+
+**Now says:**
+
+```
+Gear wears down as it is used — weapons degrade from attacking, armour from being hit. It
+works fully until it reaches zero, then breaks and contributes nothing — there is no
+gradual decline before that.
+```
+
+**Proposed:**
+
+```
+Gear wears down as it is used — weapons degrade from attacking, armour from being hit. It
+works fully until it reaches zero, then breaks and contributes nothing — there is no
+gradual decline before that. A hit counts even when defence takes all of its damage: the
+weapon that landed it and the armour that took it each still spend a use.
+```
+
+**Why:** The combat engine is built this way. With no minimum damage, a hit can do nothing,
+and "each hit the weapon lands" didn't say whether such a hit still counts.

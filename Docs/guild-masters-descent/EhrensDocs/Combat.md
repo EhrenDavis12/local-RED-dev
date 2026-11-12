@@ -62,7 +62,8 @@ stays free for now.
 - What does changing formation mid-battle cost the player, if anything?
 ```
 
-**Proposed:** delete. The `## Open Questions` heading stays, with no entries.
+**Proposed:** delete. The `## Open Questions` heading stays, with the entries proposed in
+"Questions on turn order and taunts" below.
 
 **Why:** Answered: free for now, written into Formation.
 
@@ -105,3 +106,160 @@ paragraph is unchanged, and The Dungeon's "Death in the dungeon is permanent" al
 agrees. Not settled by this: what reaching 0 health does on a training run, which "can
 injure a member, but can never kill one"; whether a dive can leave a member injured; and
 how much health the Cook and a rest area give back.
+
+## Change: Turn order within a round, and how a battle ends
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Combat`, first paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
+enemies'. On a guild member's turn, that member is highlighted. Default attacks are
+auto-selected. The player can select one enemy to be specifically targeted by the entire
+party — this cuts down on clicks during gameplay.
+```
+
+**Proposed:**
+
+```
+Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
+enemies'. For now everyone acts once a round, members and enemies in one shared order,
+highest Dexterity first. The order is set at the start of each round from each one's own
+Dexterity, so help from the support ring never moves anyone in it. Ties go to members
+before enemies, then front row first, left to right. On a guild member's turn, that
+member is highlighted. Default attacks are auto-selected. The player can select one enemy
+to be specifically targeted by the entire party — this cuts down on clicks during
+gameplay. A member with no enemy selected, or who can't reach the one selected, picks
+its target the way an enemy does.
+
+A battle ends when one side has no one left standing. For now a battle also ends after a
+set number of rounds, a placeholder, as a stand-off — and a stand-off kills no one
+further.
+```
+
+**Why:** The combat engine is built this way, and no doc said how many times a combatant
+acts, whether help changes the order, how ties break, what a member does with no target
+selected, or whether a battle can run forever. The original sentences are unchanged;
+the new ones sit between them. Whether higher Dexterity should mean acting more often, and
+whether help to Dexterity should move anyone in the order, stay open — see the questions
+proposed for `## Open Questions`.
+
+## Change: The base charge is once per attack, and a special empties the bar
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Combat`, second paragraph
+
+**Now says:**
+
+```
+Each member has a special bar. When it's full, the player can use a special. Every
+attack a member makes charges that member's bar — that's the base, and it's the same
+for every type. Each combat type also has its own bonus condition that charges its bar
+on top of that.
+```
+
+**Proposed:**
+
+```
+Each member has a special bar. When it's full, the player can use a special. Every
+attack a member makes charges that member's bar — that's the base, and it's the same
+for every type. Each combat type also has its own bonus condition that charges its bar
+on top of that. The base charge comes once per attack, whether the attack hits or not.
+Using a special empties the bar, and the special then charges it like any other attack,
+unless its type says otherwise — the Fighter's flurry doesn't.
+```
+
+**Why:** The combat engine is built this way. "Every attack" didn't say whether a miss
+charges, or whether a multi-strike attack charges once or per strike, and nothing said
+what using a special does to the bar.
+
+## Change: Whose turns an effect's length counts
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Combat`, third paragraph
+
+**Now says:**
+
+```
+Vanish, Shields Up and the Mage's lingering field all last the same length — the same
+fixed number of turns. Each of the three is covered in the Individual Types doc.
+```
+
+**Proposed:**
+
+```
+Vanish, Shields Up and the Mage's lingering field all last the same length — the same
+fixed number of turns, a placeholder. The turns counted are the caster's own: the turn it
+was cast on doesn't count, and it lasts that many of the caster's turns after. If the
+caster dies, the effect ends with it — a Tank's Shields Up goes when the Tank does. Each
+of the three is covered in the Individual Types doc.
+```
+
+**Why:** The combat engine is built this way. "A fixed number of turns" didn't say whose
+turns, whether the cast turn counts, or what happens to an effect when its caster dies.
+
+## Change: What the targeting weights count, and how a taunt is spent
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Enemy Targeting`, the paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+Enemies pick a target from whatever they can reach. The choice is weighted by both how
+much damage that target has dealt and how easy it is to kill. A taunt overrides both of
+those factors until the taunted enemy's next hit — one attack, then it's spent.
+```
+
+**Proposed:**
+
+```
+Enemies pick a target from whatever they can reach. The choice is weighted by both how
+much damage that target has dealt and how easy it is to kill. The damage counted is what
+the target has dealt in this battle, the Mage's lingering field included; how easy it is
+to kill is how low its health is now, next to the others the enemy can reach. How much
+each counts is a placeholder. A taunt overrides both of those factors until the taunted
+enemy's next hit — one attack, then it's spent.
+
+The taunt is spent by that attack whether it hits or misses. While the taunter is out of
+reach, the taunted one picks as normal, and the taunt keeps for its next attack that can
+reach the taunter. A newer taunt replaces an older one, and a taunt ends if the taunter
+dies. A taunt overrides the party's selected enemy too: a member taunted by an enemy Tank
+goes for the Tank.
+```
+
+**Why:** The combat engine is built this way. "Damage dealt" didn't say over what span,
+and "easy to kill" didn't say how it's judged. "Next hit — one attack" read two ways; this
+takes it as one attack, hit or miss. Nothing said what a taunt does while the taunter is
+out of reach, when two taunts overlap, when the taunter dies, or against the party's
+selected enemy — and with monsters having the six types, a monster Tank taunts members.
+
+## Change: Questions on turn order and taunts
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Open Questions`, in place of the formation-cost entry deleted above
+
+**Now says:**
+
+```
+- What does changing formation mid-battle cost the player, if anything?
+```
+
+**Proposed:**
+
+```
+- Should higher Dexterity mean acting more often, rather than only acting earlier?
+- Should help to a Rogue's or an Archer's Dexterity move them in the turn order?
+- When a taunted member or enemy uses a special that hits its own choice of targets
+  rather than one it aims at, is the taunt spent?
+```
+
+**Why:** None of the docs answers these. The turn order above is a default for now. The
+third question comes from how a taunt is spent once the six types' specials are built.
