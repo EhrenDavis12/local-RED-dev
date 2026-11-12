@@ -117,7 +117,9 @@ without changing the engine. Every roll is reproducible from an injected RNG.
 ### Targeting
 
 19. A close-range attack reaches the frontmost row of the other grid that still holds a living
-    combatant; a far-range attack reaches any row. (`Combat.md` §Combat)
+    combatant; a far-range attack reaches any row. (`Combat.md` §Combat) This is the default
+    an attack's declared range implies; a type's attack or special may pick targets outside it
+    (req 26).
 20. A monster picks its target from what it can reach, weighted both by how much damage each
     target has dealt and by how easy it is to kill. The weights are placeholders. (`Combat.md`
     §Enemy Targeting) The details are default P4.
@@ -145,8 +147,12 @@ without changing the engine. Every roll is reproducible from an injected RNG.
     contract, and adding one changes nothing in the engine. The contract must be able to say
     each of the following, because a settled type rule depends on it (`Individual Types.md`,
     each type's section, unless noted):
-    - which targets an attack hits, from what it can reach — one target, a target and its two
-      neighbours, whole rows, a column, the one behind (Brute, Archer, Mage);
+    - each attack's range, close or far (`Combat.md` §Combat);
+    - which targets it hits, picked by the attack itself with the whole enemy grid and the
+      board state in view — one target, a target and its two neighbours, whole rows, a column,
+      the one behind. Req 19's reach is the default its range implies, and the attack may
+      override it: the Brute's special skips the nearest occupied row and cleaves the two
+      behind, and must be expressible without changing the engine (Brute, Archer, Mage);
     - how many strikes land on each target (Fighter, Rogue);
     - whether the attack is an area attack (req 12);
     - a reduced damage share for some targets (Volley's neighbours);
@@ -173,9 +179,10 @@ without changing the engine. Every roll is reproducible from an injected RNG.
 27. Every random roll — hit, weapon, defence, targeting, monster level-ups, tie-breaks if any
     are random — goes through the injected `IRng`, so a battle run twice with the same scripted
     RNG plays out the same. (`Assets/Scripts/Core/Guild/IRng.cs`)
-28. A finished battle reports which side won, every combatant that died, and how many monsters
-    the party defeated, which the dive needs for experience. (`Guild Members.md` §Levels and
-    Experience; `EhrensDocs/Combat.md`, "Members stay hurt")
+28. A finished battle reports its outcome (default D6), every combatant that died, each
+    member's remaining health, and how many monsters the party defeated, which the dive needs
+    for experience. (`Guild Members.md` §Levels and Experience; `EhrensDocs/Combat.md`,
+    "Members stay hurt")
 29. Every new number is a `[Placeholder]` field in `Tuning.cs`, listed by
     `Tuning.ListPlaceholders()`. (`Assets/Scripts/Core/Tuning/Tuning.cs`; `queue/focus.md`
     Goal, "Missing details")
@@ -185,7 +192,11 @@ without changing the engine. Every roll is reproducible from an injected RNG.
 - Each of the six types' attack shapes, specials and bonus-charge conditions, and the
   specialist's weak attack — the later types item. That includes what an ordinary multi-strike
   attack does with strikes left over when its target dies; only the flurry's is settled.
-- The battle screen: highlighting, input, showing hits and deaths, moving members mid-battle.
+- The battle screen: highlighting, input, showing hits and deaths, and the controls for
+  moving members mid-battle (the engine's move operation is P14).
+- Monsters repositioning mid-battle — `Combat.md` §Formation says some enemy types can, but
+  not which.
+- Retreating mid-battle (default D7).
 - The dive: healing after a battle or at a rest area, field repair, removing the dead from the
   roster, bringing their gear home, awarding experience, full health back in the hall, and
   which level the monsters on each floor are.
@@ -217,21 +228,33 @@ without changing the engine. Every roll is reproducible from an injected RNG.
   "bypassing the defence subtraction entirely", while `Guild Members.md` §Combat Types says a
   type advantage "is a damage multiplier". Open to the user: before or after defence, and
   whether a Brute on a Tank gets both or only one.
+- **D6. Battle end.** A battle ends when one side has no living combatant, or when a
+  placeholder round cap is reached (`Tuning`, 50 rounds). The outcome is exactly one of
+  PartyWon, PartyLost (every member dead) and Stalemate (the cap reached). A Stalemate kills
+  nobody further; the dive treats it as the party turning back, which is the dive's to build.
+- **D7. No retreat mid-battle.** The engine has no way to leave a battle part-way, because
+  turning back happens only between battles.
 
 ### Defaults proposed by this PRD — not from any doc, cheap to change
 
-- **P1.** Misses come only from evasion: miss chance is the target's Luck times a placeholder
-  percentage, capped at a placeholder. The Archer's accuracy increase lowers it.
+- **P1.** Misses come only from evasion: miss chance, in whole percent, is the target's Luck
+  times a placeholder percentage, capped at a placeholder. The Archer's accuracy increase
+  lowers it. The hit roll is `IRng.NextInt(0, 100)`; the strike misses when the roll is below
+  the miss chance.
 - **P2.** Helps are summed exactly, the first raised to one point if it comes to less, and the
   total is rounded down once before it is added to the stat.
 - **P3.** A multi-target attack wears the weapon once per target it hits, reading "each hit
   the weapon lands" literally.
-- **P4.** "Damage dealt" counts this battle only; "easy to kill" is lowest current health; the
-  choice is a weighted random draw through the RNG.
+- **P4.** "Damage dealt" counts this battle only; "easy to kill" is lowest current health. Each
+  reachable target's weight is 1 + a placeholder damage weight × the damage it has dealt this
+  battle + a placeholder kill weight × (the highest current health among the reachable
+  targets − its own current health). The draw is `IRng.NextInt(0, total weight)`, walked
+  through the targets front row first, left to right.
 - **P5.** A member with no focus target, or whose focus it cannot reach, picks its target the
   way a monster does (req 20).
 - **P6.** A taunt is spent by the taunted combatant's next attack, hit or miss. It lapses if
-  the taunter dies, and is ignored while the taunter is out of reach. A newer taunt replaces
+  the taunter dies. While the taunter is out of reach the taunted combatant targets as normal
+  and the taunt is kept, not spent, for its next attack that can reach. A newer taunt replaces
   an older one. A monster Tank's taunt overrides a member's focus target.
 - **P7.** Using a special empties the bar; the special then charges it like any attack unless
   its type says otherwise, as the flurry does. A monster uses its special as soon as its bar
@@ -241,7 +264,15 @@ without changing the engine. Every roll is reproducible from an injected RNG.
   and left to right — so ties need no RNG.
 - **P10.** Magic damage, the Mage's, meets the same defence as any other damage.
 - **P11.** Within a strike the rolls are drawn in a fixed order — hit, then weapon, then
-  defence — so a scripted-RNG test can drive them.
+  defence — so a scripted-RNG test can drive them. A roll that is skipped is not drawn: no
+  weapon or defence roll after a miss, no hit roll for an area or auto-hit strike, no defence
+  roll when defence is bypassed. A multi-target attack draws target by target in the order
+  the contract returns its targets.
+- **P12.** Each damage result is rounded down once, at the final step, after the type
+  multiplier, the area defence factor and any reduced damage share.
+- **P13.** Health clamps at 0, and a special bar caps at full.
+- **P14.** The engine exposes a move-combatant operation for formation changes, free of cost,
+  which the screen calls between turns.
 
 ### From the design docs, still open
 
