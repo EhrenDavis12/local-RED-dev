@@ -5,7 +5,8 @@
 > `Individual Types.md`, and the change notes under `EhrensDocs/` for each of these, plus
 > `EhrensDocs/Platform.md`, `queue/focus.md` and `queue/reports/3-member-health.md`. Read
 > against the code under `src/guildmasters-descent/Assets/Scripts/Core`. Where a change
-> note and the original disagree, the change note wins.
+> note and the original disagree, the change note wins. Revised 2026-11-12: a dive in
+> progress is saved and resumed (PF § Saving), requirements 26 to 29.
 
 Citations: `TD` = `The Dungeon.md`, `CB` = `Combat.md`, `GM` = `Guild Members.md`, `SP` =
 `Specialists.md`, `EQ` = `Equipment.md`, `CC` = `Core Concept.md`, `PF` =
@@ -34,12 +35,9 @@ Already built and relied on, not re-specified: the battle engine and the six typ
 (`Battle`, `Combatant`, `BattleResult`), monster stats from level (`Battle.AddMonster`), gear
 wear during battle, XP sub-units and level-ups (`Member.AwardXp`), gold that never goes below
 zero (`Guild.TrySpend`), and injured members being unavailable (`Member.IsAvailable`).
-
-**Unsettled: what the save holds while a dive is in progress.** Requirements 4, 8, 9, 13,
-17 and 24, and D15, all depend on what happens when the app is closed, killed or
-backgrounded during a dive. That has not been decided. It is the first blocking entry under
-Open Questions. Until it is answered, those requirements say what the guild holds *once a
-dive ends*. They do not say what is on disk while a dive is still running.
+Also built: the dungeon's depth, floors and deepest floor reached, already in the version-1
+save (`Guild.Dungeons`, added by the dungeon board), and the save that runs when the game
+goes to the background or quits (`SaveLifecycle`).
 
 ### The guild's dungeon
 
@@ -59,10 +57,12 @@ dive ends*. They do not say what is on disk while a dive is still running.
    - the deepest floor reached, which never goes down;
    - the re-entry point under D17.
 
-   Because the save gains these fields, `SaveFile.CurrentVersion` goes up from 1 to 2.
-   Version-1 saves still load under requirement 1. Saved dungeon data that the game cannot
-   make sense of is handled the way `SaveManager` already handles corruption: the load
-   reports `Corrupt` and leaves the slot as it is.
+   The first three are already in the version-1 save. The re-entry point and the dive in
+   progress (requirement 26) are new, and with them `SaveFile.CurrentVersion` goes up from
+   1 to 2. Version-1 saves still load: one with no dungeon under requirement 1, and every
+   version-1 save as holding no re-entry point and no dive in progress. Saved dungeon or
+   dive data that the game cannot make sense of is handled the way `SaveManager` already
+   handles corruption: the load reports `Corrupt` and leaves the slot as it is.
    *TD § The Dungeon Board ("the deepest floor reached"); TD § Entering the Dungeon ("re-enters
    at the last rest area reached"); PF § Saving ("A save the game can't read… is reported as
    such and left on the phone as it is").*
@@ -84,8 +84,11 @@ dive ends*. They do not say what is on disk while a dive is still running.
    ends. *Same CB-CN; TD § The Dungeon ("there is no way to bring a dead member back").*
 9. When a dive ends, every member who survived it is at full health. A member in the guild
    hall is never below full health, and that includes right after a load. Today the code
-   keeps `CurrentHealth` between dives, which this replaces.
-   *CB-CN "Members stay hurt…" ("Back at the guild hall a member's health is back to full").*
+   keeps `CurrentHealth` between dives, which this replaces. A member on a dive that is
+   still in progress is not in the hall: a load gives them back the health they had when
+   the game saved (requirement 26).
+   *CB-CN "Members stay hurt…" ("Back at the guild hall a member's health is back to full");
+   PF § Saving.*
 
 ### Starting a dive
 
@@ -172,6 +175,37 @@ dive ends*. They do not say what is on disk while a dive is still running.
     *EQ § Assignment ("the party brings their gear back if there's room left… otherwise the
     gear is lost").*
 
+### A dive in progress is saved
+
+26. A dive is in progress from the moment its fee is taken (requirement 13) until it ends
+    (requirement 24). Whenever the game saves while a dive is in progress, the slot holds
+    the dive along with the guild, and holds everything the dive has changed so far: the
+    fee stays paid, experience from floors already cleared stays awarded, the deepest floor
+    reached stays reached, gear wear stays worn, and the dead stay dead. The gold found on
+    the dive is held by the party, not the guild, and the save keeps both how much has
+    been found and how much of it was found since the last rest area passed, so that
+    requirements 22 and 23 still apply when the dive ends. *PF § Saving ("the save holds
+    the dive itself").*
+27. Loading a slot whose save holds a dive in progress puts the player back in that dive,
+    not in the guild hall, at the point where it stopped. At a rest area, the player has
+    the same push-on or go-home choice. Partway through a floor, the battles already won
+    stay won, the next battle is the one that was next, and the monsters already defeated
+    on that floor still count toward its experience (requirement 17). Each member stands
+    where they stood (D12), with the health they had. *PF § Saving ("carries the dive on
+    where it stopped — partway through a floor, if that's where it was").*
+28. If the game saved during a battle, the load carries that battle on from the turn it
+    closed on, never from the battle's start (D18). The battle is as it was: every
+    combatant's health and node, special bars, effects and taunts in force, the round,
+    whose turn is next, and the party's focus. A turn the engine has already played counts
+    as played, even if its playback on screen had not finished. The rest of the battle
+    plays out exactly as it would have if the game had never closed, because closing and
+    reopening must not re-roll a turn. *PF § Saving ("Closing the game never undoes a
+    death"); queue item #43 build default.*
+29. A member who died on the dive is still dead when the game opens again. They take no
+    part in the rest of the dive, nothing brings them back, and requirements 8 and 25
+    apply to them when the dive ends exactly as if the game had never closed. *PF § Saving
+    ("a member who died on the dive is still dead when the game opens again").*
+
 ### Defaults standing in for open questions
 
 Each of these is the build's behavior until the user answers the matching open question. Each
@@ -219,6 +253,9 @@ is cheap to change, and every number in them lives in the tuning file.
   re-entered dive counts the rest area it started at. So the point can move back up, for
   example from 10 to 5, and a dive that reaches no rest area leaves no re-entry point. The
   user has been asked, and the build goes ahead with this. *(Open Question 17)*
+- **D18.** A battle the game reopens in carries on from the exact turn it closed on, not
+  from the battle's start, so closing never dodges a death (requirement 28). Recorded on
+  queue item #43. *(Open Question 18)*
 
 ## Out of Scope
 
@@ -234,26 +271,10 @@ is cheap to change, and every number in them lives in the tuning file.
 - Monster art. The battle screen draws each monster with its own type's art, as
   `Tuning.MonstersUseMemberTypeArt` is set. TD-CN says monsters "might be limited to just
   the Archer's animations". That is the battle screen's to settle, not the dive's.
+- How a resumed dive or battle looks on screen, including whether a turn whose playback
+  was cut off by the close is played again (requirement 28 says only that it counts).
 
 ## Open Questions
-
-**Blocking: needs an answer before what the save holds during a dive can be built.**
-
-- *PF Open Questions:* "What happens to a dive in progress when the app is closed or killed —
-  is it saved and resumed, lost, or something else? It decides whether closing the app
-  mid-battle can dodge a death." It is unsettled, and there is no default. Requirements 4,
-  8, 9, 13, 17 and 24, and D15, depend on it. The game already saves whenever it is sent
-  to the background (PF § Saving). The answer is expected to be one of two shapes, and
-  either one slots in as a single sentence:
-  - **(i)** The disk keeps the guild as it was before the dive. The dive works on a copy and
-    commits it only when the dive ends. A dive cut short leaves no trace: no fee paid, no
-    deaths, no experience, no new depth, no wear.
-  - **(ii)** The disk keeps whatever the last background save caught. The fee is gone, and
-    the experience, deepest floor and gear wear earned up to that save are kept.
-
-  Sub-question, under either shape: does a member who died during the dive come back after
-  a reload? Whatever the answer, requirement 9 holds: no member is ever in the hall below
-  full health.
 
 **Unanswered by the user. The build uses the default named.**
 
@@ -293,6 +314,12 @@ is cheap to change, and every number in them lives in the tuning file.
     *(D16)*
 17. "The last rest area reached": is that the deepest rest area ever reached, or the one the
     most recent dive reached? *(D17)*
+18. PF § Saving says the dive carries on "partway through a floor, if that's where it was",
+    and does not say how far inside a battle. If the game reopens mid-battle, does the
+    battle carry on from the turn it closed on, or start again? *(D18)*
+19. *Proposal, not from the docs:* while a dive is in progress, can the player leave it for
+    the guild hall (hire, shop, change gear) and come back to it? Nothing says. The PRD
+    offers no way to the hall from a dive until the dive ends.
 - Every amount: the fees, the gold each floor drops, monster levels by floor, rest-area and
   Cook healing, the carry limits, and the depth range. Each is a placeholder in the tuning
   file, to be balanced later.
