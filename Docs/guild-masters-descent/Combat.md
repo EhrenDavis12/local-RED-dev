@@ -1,9 +1,9 @@
 # Combat
 
-> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing,
-> Dexterity's conversion into cooldown ticks, the tick-based simulation, and that the
-> fight never pauses for the player are settled, but how the Luck reset's chance works
-> isn't.
+> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
+> reset's chance, and the never-pausing simulation are settled; what a tick costs in real
+> time and whether the player can speed it up, how effects and multi-strike cases resolve,
+> and what formation costs and how the bars read at a glance are not.
 
 ## Formation
 
@@ -61,11 +61,7 @@ Because the base and the floor are both properties of the type, the ratio betwee
 type and a fast one holds at every point on the curve — a Brute waits the same multiple of
 a Rogue's wait at Dexterity 5, at Dexterity 80, and at the floor. That makes the
 deliberate slowness of the Brute and the Tank structural rather than something that only
-shows early.
-
-Because cooldown speed comes from Dexterity, the types that rank Dexterity lower attack
-less often — the Brute and the Tank among them — and that's intended rather than something
-to be balanced away.
+shows early, and it's intended rather than something to be balanced away.
 
 The pacing intent: a low-level fight feels a little slow at first, and a higher-level
 fight has more going on, but a fight should take about the same real time at either end,
@@ -77,6 +73,22 @@ When a member finishes an attack, there's a Luck check for whether the cooldown 
 instantly. On success, the member attacks again immediately, with no cooldown wait at all.
 That free attack gets no Luck check of its own — that's what "only once" means, so the
 effect can't chain into a second free attack. On failure, the cooldown charges normally.
+
+The chance is a quarter at most: 25% × Luck ÷ (Luck + 60). It approaches that quarter
+without ever reaching it, so there's no cap rule and no point where Luck stops doing
+anything — it just gets steadily less worth chasing.
+
+A worked list:
+
+- Luck 5, a newly recruited F-rank member — 2%
+- Luck 20 — 6%
+- Luck 60 — 12.5%, half the ceiling
+- Luck 180 — 19%
+- Higher still — closer and closer to 25%, never past it
+
+The ceiling is there because a reset is a free attack, so the chance *is* the percentage
+by which that member's attack rate goes up. A quarter is strong and clearly felt without
+ever approaching the doubling that an uncapped chance would allow.
 
 Dexterity sets the rhythm; Luck occasionally skips the wait.
 
@@ -159,8 +171,6 @@ the Equipment doc.
   which specials are ready at a glance?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
   at once?
-- How does Luck convert into the chance of an instant reset, and is it capped? A member
-  whose Luck took the chance near certain would attack about twice as often.
 - Does a free attack spend durability and charge the special bar the way a normal attack
   does?
 - Do enemies get the Luck reset too, or is it a member-only advantage?
