@@ -153,6 +153,15 @@ rank or one grade below it, and no other grade — a C-rank dungeon fields C-ran
 D-rank enemies, nothing higher and nothing lower. The dungeon's rank also determines the
 chance that an enemy carries a weapon and the chance that it wears armour.
 
+Depth is a second dial, separate from rank. The deeper into a dungeon the player goes,
+the more enemies turn up in each fight, and the better the equipment those enemies carry.
+Think of it as the enemies getting luckier the deeper the dungeon runs — rank sets what
+grade they are and whether they're equipped at all; depth decides how many show up and how
+good that gear is. That luck is in the generation, not the stat — it only shapes how many
+enemies and how much gear the fight creates; the enemies' own Luck stat is untouched,
+exactly what their type and rank would otherwise give, so depth doesn't make them evade
+more or reset their cooldowns more often.
+
 ## Enemy Targeting
 
 Enemies pick a target from whatever they can reach. The choice is weighted by both how
@@ -185,7 +194,7 @@ the Equipment doc.
 - When a free attack is a multi-strike attack, does it land all of its strikes?
 - After a successful reset, can the member take another Luck check once their next
   cooldown has charged normally, or is there a longer lockout?
-- Does depth change the enemies at all, or does a dungeon's rank set them the same on
-  the first floor as on the fiftieth?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
