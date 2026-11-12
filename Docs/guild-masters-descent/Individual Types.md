@@ -43,6 +43,11 @@ matchups turn on. The number of strikes is fixed by its type; levelling makes ea
 hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
 its damage is spread across them.
 
+Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
+type — its many strikes all belong to that single attack. Its special bar therefore
+charges more slowly than a faster type's; the flurry is what offsets that over the course
+of a longer fight.
+
 Its special is a flurry of up to 6 strikes on a single target. The flurry's strikes hit
 hard. If the target dies before the strikes run out, the remaining strikes carry to the
 nearest enemy still standing. If any enemy is killed during the flurry, the Fighter's
@@ -100,3 +105,5 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 
 - What are the stats, skills and abilities for each individual type?
 - How fast does a special charge?
+- How many strikes is the Fighter's ordinary attack? Its count is fixed by its type, but
+  the number isn't set.

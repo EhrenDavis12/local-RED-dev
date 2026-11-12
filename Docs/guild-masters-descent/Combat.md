@@ -72,8 +72,11 @@ and defence is subtracted from it separately.
 
 Each member has a special bar. When it's full, the player can use a special. Every attack
 a member makes charges that member's bar — that's the base, and it's the same for every
-type. Each combat type also has its own bonus condition that charges its bar on top of
-that — covered in the Individual Types doc.
+type. The bar charges per attack, not per strike: a multi-strike attack charges it once,
+the same as a single-strike attack does. So a member that attacks more often charges
+faster, and the slower-attacking types charge more slowly. Each combat type also has its
+own bonus condition that charges its bar on top of that — covered in the Individual Types
+doc.
 
 The bar caps at full — the special is never lost, and it waits until the player uses it.
 While it sits full, charge is wasted: attacks the member makes while full charge nothing,
@@ -122,8 +125,6 @@ the Equipment doc.
   on the Mage.
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
-- Does the special bar still charge per attack, now that a faster attacker attacks more
-  often?
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
   at once?
 - How does Luck convert into the chance of an instant reset, and is it capped? A member
