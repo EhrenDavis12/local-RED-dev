@@ -33,7 +33,10 @@ save made by an older version still loading.
    and the Mage's column charge up to 30. A hit counts whatever damage it does, as it does
    for durability. A special's own hits charge nothing — the flurry, Volley, the two-row
    cleave and the Mage's field alike, since the bar fills from what wears the weapon and a
-   special wears it not at all. — Combat.md § The Special Bar ¶1, ¶2; Equipment.md § Quality
+   special wears it not at all. A special puts nothing at all into its owner's bar — no base
+   and no bonus, so a Brute's two-row cleave landing on two or more enemies earns no +15 —
+   with the Fighter's refill to 90 (requirement 4) the one exception, because Individual
+   Types.md spells it out. — Combat.md § The Special Bar ¶1, ¶2; Equipment.md § Quality
    "what's counted is hits landed, not strikes made", § Durability ¶5. *(Our change note
    disagrees; the originals win — see Open Questions.)*
 2. **A Luck-reset free attack charges like any other attack.** — Combat.md § The Luck Reset
@@ -97,6 +100,10 @@ save made by an older version still loading.
   type says otherwise" (EhrensDocs/Combat.md "A special's own hits charge the bar, for now")
   — and the originals win. *Default for now: a special's hits charge nothing (requirement
   1).*
+- **Can a special earn its owner's bonus condition?** Only the Brute's two-row cleave can meet
+  one today (two or more enemies hit); no doc says whether it pays. *(Mine.)* *Default for
+  now: no — a special puts nothing into its owner's bar, the Fighter's refill to 90 excepted.
+  Cheap to change: one condition.*
 - **Do the Mage's field's hits charge the Mage's bar?** *(Mine.)* *Default for now: field
   damage charges nobody* — as built, and now in agreement with the default above.
 - **The Fighter: 15, or refill to 90?** Combat.md gives every type's bonus +15; Individual
