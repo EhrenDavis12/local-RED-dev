@@ -270,3 +270,74 @@ member's own Constitution, and what's taken stays taken, for now", and none of t
 settles them. The pending "Three questions on levelling and promotion" and "A question on
 sharing experience" changes to this list are unchanged; these go after the entries they
 add.
+
+## Change: Experience is the bar, level is the number
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Promotion`, last paragraph and its list (new paragraphs after them)
+
+**Now says:**
+
+```
+Crossing a rank also costs a set amount of experience, multiplying by five at each step:
+
+- F to E — 20
+- E to D — 100
+- D to C — 500
+- C to B — 2,500
+- B to A — 12,500
+- A to S — 62,500
+- S to SS — 312,500
+- SS to SSS — 1,562,500
+```
+
+**Proposed:**
+
+```
+Crossing a rank also costs a set amount of experience, multiplying by five at each step:
+
+- F to E — 20
+- E to D — 100
+- D to C — 500
+- C to B — 2,500
+- B to A — 12,500
+- A to S — 62,500
+- S to SS — 312,500
+- SS to SSS — 1,562,500
+
+Level is a number and experience is a bar — one bar, not two counters. The experience a
+rank costs is exactly what takes a member from level 1 to that rank's level threshold,
+spread across the levels: F to E's 20 takes a member from level 1 to level 16, and E to
+D's 100 takes them from level 1 to level 32. Reaching the threshold and having earned the
+rank's experience happen at the same moment.
+
+For now the steps are uneven by at most a point, so a rank's total stays exact: level N of
+a rank is reached once ceil(cost × (N−1) ÷ (threshold−1)) experience has been earned in
+that rank. For F to E that puts level 2 at 2, level 3 at 3, level 4 at 4, level 5 at 6,
+and level 16 at 20.
+```
+
+**Why:** Answered 2026-11-13: "level is a number experience as a bar". How the cost is cut
+into single levels isn't settled; the even spread, rounded up, is a placeholder for now
+and cheap to change.
+
+## Change: Experience-and-levels question answered
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, second entry
+
+**Now says:**
+
+```
+- Crossing a rank costs a set amount of experience, and reaching the next rank also needs
+  a level threshold — 16 levels for the first, doubling after. Does the experience buy
+  those levels at an even rate, or do the two run on separate counters with whichever is
+  slower deciding?
+```
+
+**Proposed:** delete. The other entries in `## Open Questions` stay as they are.
+
+**Why:** Answered: one bar, written into Promotion (see "Experience is the bar, level is
+the number").

@@ -113,7 +113,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   levelling and promotion, who shares a combat's experience, help follows the board live,
   an open question on sharing experience, a specialist's K from its tier, a hit rounding
   down once for now, the Mage's field as an area attack for now, health from a member's
-  own Constitution and what's taken staying taken for now, and questions on health).
+  own Constitution and what's taken staying taken for now, questions on health, experience
+  as the bar and level as the number for now, and the experience-and-levels question
+  answered).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
