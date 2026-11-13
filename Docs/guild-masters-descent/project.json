@@ -1,10 +1,17 @@
 {
   "name": "guild-masters-descent",
-  "aliases": ["gmd"],
+  "aliases": [
+    "gmd"
+  ],
   "title": "Guild Master's Descent",
   "summary": "A guild-management game where you send divers into dungeons and they don't always come back.",
   "docsRoot": "Docs/guild-masters-descent",
   "prds": "Docs/guild-masters-descent/PRDs",
-  "roadmap": "Docs/guild-masters-descent/roadmap.md",
-  "srcRoots": []
+  "roadmap": "Docs/guild-masters-descent/EhrensDocs/roadmap.md",
+  "srcRoots": [
+    "src/guildmasters-descent"
+  ],
+  "stack": "Unity / C#",
+  "docsReadOnly": true,
+  "docChanges": "Docs/guild-masters-descent/EhrensDocs"
 }
