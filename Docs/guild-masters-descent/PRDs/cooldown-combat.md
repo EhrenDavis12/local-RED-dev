@@ -45,7 +45,41 @@ and changing it later should be a small, local change.
    have … the same rolls and all").
 3. Rounds and turns are gone. There is no round counter, no per-round turn queue, and no
    Dexterity-ordered round. This replaces the built `StepTurn`, `RoundOrder`, `NextActor`,
-   `PlayRound` and `Round`. — `Combat.md` § Cooldowns ("Combat is not turn-based").
+   `PlayRound`, `Run`'s round loop, `Round`, `Turns`, `LastTurn` and `TurnReport`. —
+   `Combat.md` § Cooldowns ("Combat is not turn-based").
+3a. The engine has two ways to move forward, and nothing else advances it (technical
+   decision, main loop):
+   - **Advance by ticks.** `AdvanceTicks(n)` advances up to *n* ticks, or fewer if the
+     battle ends first. It returns the reports of every action resolved, in the order they
+     were resolved.
+   - **Advance by one action.** A single-action step moves the clock forward to the next
+     action that is due and resolves that one action only. Anything else due on the same
+     tick stays pending for the next call, which resolves it without advancing the clock.
+     A Luck-reset free attack is its own action, so it is the next call's result. The step
+     returns that action's report. It returns nothing once the battle is over, and if the
+     stand-off cap (R25) comes before the next action, it advances to the cap and ends the
+     battle.
+   - Either way, the same state and RNG resolve the same actions with the same rolls. R2
+     applies across any mix of the two.
+   - `Run()` stays as "step until over".
+3b. Each action produces one **action report**. It holds the actor, the tick it resolved
+   on, whether it was a Luck-reset free attack, whether it was a special, the field hits
+   the action set off (R18, including one that killed the actor before it struck), and the
+   strikes it made. The battle keeps every report, oldest first, in place of `Turns` and
+   `LastTurn`; that list is not saved, as `Turns` isn't today. `Strikes` stays as built,
+   and it is still saved. A move (`Move`) is not an action. The field hit a move into a
+   field sets off is returned by that `Move` call and added to the battle's field-hit
+   record, so a caller can show it.
+3c. Tick counting: a battle stands at tick 0 when it is built. Advancing one tick moves it
+   to tick T+1 and resolves everything due at T+1. An action that resolves at tick T and
+   then starts a wait of W next acts at tick T+W, so a wait of W resolves on the W-th tick
+   advanced after it starts. A remaining wait is stored as the ticks left until that
+   combatant is due. A remaining wait of 0 is valid only for a combatant that is due on
+   the current tick and has not been resolved yet. That state exists only between two
+   single-action steps on one tick.
+3d. The dive drives a battle through the same two ways. `Dive.StepTurn` is replaced by
+   dive-level equivalents of the single-action step and of advancing by ticks. They take
+   in a finished battle the same way `StepTurn` does today.
 
 ### Cooldowns
 
@@ -53,7 +87,13 @@ and changing it later should be a small, local change.
    When the cooldown comes up, the combatant acts and a new wait begins. — `Combat.md`
    § Cooldowns, § Specialists in Combat, § Enemies.
 5. The wait is the type's base ÷ (1 + Dexterity ÷ 20), rounded to the **nearest** whole
-   tick. It never goes below a tenth of the base. The bases are Brute and Tank 180, Fighter
+   tick, with an exact half rounding **up**. It never goes below a tenth of the base. It is
+   computed in integers, never in floating point:
+   W = max(⌊base ÷ 10⌋, ⌊(40 × base + 20 + Dex) ÷ (2 × (20 + Dex))⌋). That expression is
+   20 × base ÷ (20 + Dex), rounded half up. So every type at Dexterity 12 rounds up: a Rogue
+   waits 63, not 62.5, and not the 62 that C#'s round-half-to-even would give. The
+   half-up rule is a technical decision, because the docs say only "rounded to whole
+   ticks". The bases are Brute and Tank 180, Fighter
    and Mage 140, Rogue and Archer 100. These numbers are settled, not placeholders. Check
    values: a Rogue at Dexterity 5 waits 80, at 20 waits 50, at 80 waits 20, and at 180 or
    more waits 10. A Fighter at Dexterity 7 waits 104: 103.7 rounds up, which is why this is
@@ -66,9 +106,9 @@ and changing it later should be a small, local change.
    build's F-rank starting Dexterity is Rogue 6, Fighter 5, Tank 4, which matches neither
    list. Tests assert the formula and do not assert either list's "new recruit" figures.
 6. A specialist's base wait is a placeholder in the tuning file; the build uses 180, the
-   slowest base. The formula and the tenth-of-base floor apply to it as to any type. — `Combat.md` § Specialists in Combat
-   says a specialist attacks on its own cooldown but gives no base. Per `queue/focus.md`, a
-   missing number gets a placeholder.
+   slowest base. The formula and the tenth-of-base floor apply to it as to any type. —
+   `Combat.md` § Specialists in Combat says a specialist attacks on its own cooldown but
+   gives no base. Per `queue/focus.md`, a missing number gets a placeholder.
 7. **[Default]** The Dexterity in the formula is the combatant's own stat. Support-ring help
    does not count, which is how the turn order is built today. This stands in for "Should
    help to a Rogue's or an Archer's Dexterity shorten its cooldown?"
@@ -77,7 +117,18 @@ and changing it later should be a small, local change.
    RNG. The share lies between a placeholder minimum and maximum, and the build uses 0 to ½.
    Setting both to 0 gives "everyone's empty", and both to 1 gives "everyone's ready at
    once". This stands in for the `Combat.md` open question on where cooldowns stand when a
-   fight starts.
+   fight starts. How the draw is made (technical decision, main loop):
+   - It happens when the combatant is added (`AddMember`, `AddMonster`), immediately after
+     that combatant's own existing draws. A monster's level-up stat picks come first, and a
+     member has none. So the draws run in add order.
+   - With W the combatant's wait (R5), the draw is
+     `elapsed = NextInt(⌊min × W⌋, ⌊max × W⌋ + 1)`, and the remaining wait is
+     `max(1, W − elapsed)`. A remaining wait of 1 acts on the first tick advanced.
+   - A draw is made even when min = max, so retuning the share never shifts the rest of
+     the RNG sequence.
+   - Restoring a battle from a save draws nothing.
+   - The opening waits are therefore part of the battle's state from tick 0, and R33
+     saves them like any other remaining wait.
 9. **[Default]** When several cooldowns come up on the same tick, they act one after another
    in the built tie order: higher Dexterity first, then members before monsters, then front
    row first, then left to right. A combatant killed earlier in that tick does not act.
@@ -92,6 +143,14 @@ and changing it later should be a small, local change.
     chance is 25% × Luck ÷ (Luck + 60). The chance is not rounded to a whole percent: Luck 5
     is 1.92%, not 2%. Members, specialists and monsters all make the check, on the same
     terms. — `Combat.md` § The Luck Reset; § Enemies (depth leaves enemies' Luck untouched).
+    How the roll is made (technical decision, main loop):
+    - It is exact, in integers: success is `NextInt(0, 4 × (Luck + 60)) < Luck`, where Luck
+      is the attacker's own Luck stat.
+    - It is drawn after all of that attack's other draws.
+    - It is drawn even at Luck 0, where it always fails, so the RNG sequence does not
+      depend on Luck being 0.
+    - An action that makes no attack makes no check: one whose actor the field killed
+      first (R20), and a special (R14).
 12. On a success the attacker makes a free attack at once: on the same tick, before any
     other combatant acts. The free attack is the type's ordinary attack, never its special.
     It is ordinary in every other way too. Its strikes land on their own rolls, it spends
@@ -176,16 +235,31 @@ and changing it later should be a small, local change.
     never pauses, and nothing waits for the player").
 29. Tapping an enemy to set or clear the focus works at any time, as built. —
     `Combat.md` § Player Input.
-30. The screen feeds the engine the real time that has passed, as whole ticks, and carries
-    any fraction over to the next frame. The engine never waits for an animation. Each
-    action starts drawing on the tick it happens. Different combatants' actions draw at the
-    same time rather than queuing, so the picture never falls further and further behind the
-    fight. — `Combat.md` § Cooldowns ("What the player watches is continuous motion"),
-    § Player Input (the player acts while it runs); `EhrensDocs/Platform.md` § Saving ("An
-    attack already made counts as made, even if it hadn't finished showing on screen").
+30. The battle is driven by real time, through the presenter. `BattleController` is the
+    only caller of `AdvanceTicks` while a screen shows a battle. Each frame the screen hands
+    it the seconds elapsed. The controller turns them into whole ticks at 20 a second,
+    carries the leftover fraction to the next call, calls `AdvanceTicks` with the whole
+    ticks, and returns the action reports.
+    - The screen starts drawing each returned report on the frame it is returned. Reports
+      from different actors play at the same time rather than queuing, so the picture never
+      falls further and further behind the fight.
+    - The engine never waits for an animation. `TurnPlayback` is built from an action
+      report instead of a turn report. The controller's turn phases (`AwaitingPlayer`,
+      `AutoTurn`), `ChooseAttack`, `ChooseSpecial` and `StepAuto` go. `Over`, `Result`,
+      `Focus` and `TapEnemy` stay.
+    - The controller is Core code, so all of this is testable with made-up seconds and no
+      Unity time.
+    - Sources: `Combat.md` § Cooldowns ("What the player watches is continuous motion"),
+      § Player Input (the player acts while it runs); `EhrensDocs/Platform.md` § Saving
+      ("An attack already made counts as made, even if it hadn't finished showing on
+      screen").
 31. Time the game spends closed or in the background advances no ticks. A battle picks up
     at the tick where it stopped. — `Core Concept.md` § Time ("A dive in progress … doesn't
-    advance while the game is closed").
+    advance while the game is closed"). To make that hold however a platform reports a gap
+    (technical decision), one controller call feeds at most a placeholder number of
+    seconds. The build uses 0.25 s, which is 5 ticks, and drops the rest along with the
+    carried fraction. So a return from the background, or a long hitch, never fast-forwards
+    the fight.
 32. **[Default]** For this item, members' specials cannot be used from the screen, and the
     Special button is removed along with Attack. A member's bar fills and sits full. The
     engine keeps the hook from R24, so the later item that adds specials to the screen only
@@ -193,28 +267,92 @@ and changing it later should be a small, local change.
 
 ### The mid-battle save
 
-33. A save made during a battle catches it between ticks. Loading it plays the rest of the
-    battle exactly as an uninterrupted battle would have, roll for roll. On top of what is
-    saved today, the save holds the ticks elapsed, each combatant's remaining wait, and each
-    effect's cycles counted. — `Core Concept.md` § Time; `EhrensDocs/Platform.md` § Saving.
+33. A save made during a battle catches it between two actions. That is usually between
+    ticks, but it can be between two single-action steps on one tick. Loading it plays the
+    rest of the battle exactly as an uninterrupted battle would have, roll for roll.
+    - On top of what is saved today, the save holds the current tick and each combatant's
+      remaining wait (R3c; 0 means due on this tick and not yet resolved). It holds whether
+      a combatant is owed a Luck-reset free attack it hasn't made yet, and each effect's
+      cycles counted (R15, R16).
+    - That list is complete. The opening waits are drawn when combatants are added (R8), so
+      they are saved remaining waits like any other. Restoring draws nothing.
+    - The round, the turn queue and `TurnsStarted` are no longer written.
+    - Sources: `Core Concept.md` § Time; `EhrensDocs/Platform.md` § Saving.
 34. The save format moves to version 3. Version 1 and version 2 saves still load, and
-    loading never rewrites the slot. A version 3 battle that doesn't make sense, such as a
-    negative wait, loads as corrupt and leaves the slot alone, like every other corrupt
-    save. — `EhrensDocs/Platform.md` § Saving.
+    loading never rewrites the slot. A version 3 battle that can't be true whatever the
+    tuning loads as corrupt and leaves the slot alone, like every other corrupt save. That
+    means a negative tick, a negative remaining wait, negative cycles counted, a list whose
+    count doesn't match the combatants, or a free attack owed to someone dead or to someone
+    not due on the current tick. Nothing is checked against a bound that comes from a
+    tuning placeholder: a remaining wait longer than the combatant's computed wait is
+    accepted. — `EhrensDocs/Platform.md` § Saving.
 35. **[Default]** A version 2 save made mid-battle cannot resume exactly, because it holds
     rounds, not cooldowns. It loads keeping everything it holds: who has died, health,
-    bars, effects (turns counted become cycles counted), taunts and focus. The cooldowns
-    restart as at the opening of a fight (R8), and ticks elapsed start at 0. A version 2
-    save made between battles loads as it is.
+    bars, effects, taunts and focus.
+    - Each effect's built `TurnsStarted` = k becomes cycles counted = min(k, 2). That leaves
+      max(1, 3 − k) cycles, so an effect that was live is never loaded as already ended.
+    - Each living combatant's remaining wait is its full wait W (R5), with no draw, so
+      loading stays roll-free.
+    - The current tick starts at 0, and no free attack is owed.
+    - A version 2 save made between battles loads as it is.
+    - Pins to change with the version: `SaveFormatTests` and `GuildDungeonTests` assert
+      `CurrentVersion == 2`.
 
 ### Built tests this supersedes
 
-The tests that assert rounds, turn order or turn-based phases are retired or rewritten
-against the requirements above. They are `CombatTurnOrderTests`; the round-cap tests in
-`CombatResultTests`; the turn-counted effect tests in `CombatContractTests`,
-`CombatTypeContractReachTests`, `CombatTypesSharedTests` and `CombatMageTests`, including the
-field's "whoever stands in it that turn" test; the turn and phase and Attack/Special tests in
-`BattleControllerTests`; and the round and whose-turn assertions in `DiveResumeTests`.
+Order of work (technical decision, main loop): `forge-test-author` ports every file below
+onto the API in R3a–R3d **before** `forge-code-writer` removes the old one. Most ports are
+mechanical: a kit's `Turn()` becomes one single-action step, and `Round()` becomes "step
+until each living combatant has acted once".
+
+This list is complete as of this PRD. It was found by grepping `Assets/` for `StepTurn`,
+`PlayRound`, `NextActor`, `.Round`, `Round()`, `Turn()`, `Turns`, `LastTurn`,
+`TurnReport`, `BattlePhase`, `ChooseAttack`, `StepAuto`, `BattleRoundCap`, `EffectTurns`,
+`TurnsStarted`, `Run()` and `CurrentVersion`.
+
+**Retired, or rewritten against the new rules.** These assert rounds, turn order, turn
+phases, or turn-counted effects:
+
+- `CombatTurnOrderTests`
+- `CombatResultTests`: the round cap becomes the tick cap (R25, R26), and the placeholder
+  names change
+- `BattleControllerTests`: phases, Attack and Special, armed specials
+- `BattleTurnReportTests`, which becomes action-report tests (R3b)
+- `TurnPlaybackTests`
+- `BattleScreenTests`
+- the turn-counted effect tests in `CombatContractTests`, `CombatTypeContractReachTests`,
+  `CombatTypesSharedTests` and `CombatMageTests`, including the field's "whoever stands in
+  it that turn" test (R18)
+- `DiveResumeTests`: the round and whose-turn assertions, and save/load after each action
+
+**Ported mechanically.** These use the removed stepping but assert unchanged rules:
+
+- `CombatStrikeTests`, `CombatTargetingTests`, `CombatSpecialBarTests`, `CombatGearWearTests`
+- `CombatSupportRingTests`, `CombatTypeAdvantageTests`, `CombatCombatantTests`
+- `CombatTypeEngineHookTests`, `CombatSpecialistTypeTests`
+- `CombatArcherTests`, `CombatBruteTests`, `CombatFighterTests`, `CombatRogueTests`,
+  `CombatTankTests`
+- `DemoEncounterTests`, `BootScreenTests` (`battle.Turns.Count`), `DiveSaveTests`
+  (`Dive.StepTurn`)
+
+**Kits:** `CombatTypesTestKit` (`Turn`, `Round`, `TypeKit.Turns`), `BattleViewTestKit`,
+`DiveRunTestKit` (`dive.StepTurn`, and its `CurrentVersion == 2` note). Every Dive test
+that drives battles through `DiveRunTestKit` is covered by porting the kit.
+
+**Version pins:** `SaveFormatTests` and `GuildDungeonTests` (R35).
+
+**Scripted RNG.** Every battle now makes one extra draw per combatant added (R8) and one
+after every attack (R11). Any test that scripts rolls through `CombatTestKit`'s `RoutedRng`
+or a queued RNG must account for those draws. Their ranges can coincide with the ranges of
+other rolls.
+
+**Non-test code** that uses the removed API, for `forge-code-writer`:
+
+- `Battle.cs`, `BattleSnapshot.cs`, `TurnReport.cs`
+- `BattleController.cs`, `TurnPlayback.cs`, `BattleScreen.cs`
+- `Dive.cs`, `DiveSave.cs`, `Tuning.cs`
+- `Editor/MenuScreenshots.cs` and `Editor/BattleScreenshot.cs`, which press Attack on
+  `AwaitingPlayer` and call `StepTurn`
 
 ## Out of Scope
 
@@ -234,7 +372,8 @@ From the design docs, worded as they word them:
 
 - When a fight starts, where do the cooldowns stand — everyone's empty and waiting out a
   full first wait, everyone's ready at once, or staggered somehow? The opening of a fight
-  plays out completely differently depending on which. (`Combat.md`; R8 is the stand-in.)
+  plays out completely differently depending on which. (`Combat.md`; R8 is the stand-in.
+  Research item #63 asks the same thing as its first question.)
 - When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
   at once? (`Combat.md`; R10.)
 - Should help to a Rogue's or an Archer's Dexterity shorten its cooldown?
@@ -251,9 +390,6 @@ From the design docs, worded as they word them:
 
 Raised by this PRD. These are proposals of mine; none of them is in the docs:
 
-- When a wait comes out at exactly half a tick (every type at Dexterity 12, e.g. a Rogue's
-  62.5), does it round up or down? The build rounds half up. C#'s default rounding would
-  round to even and give 62.
 - When several cooldowns come up on the same tick, who goes first? (R9.)
 - Does a Luck-reset free attack count as one of the owner's three cycles for a lasting
   effect? (R16.)
