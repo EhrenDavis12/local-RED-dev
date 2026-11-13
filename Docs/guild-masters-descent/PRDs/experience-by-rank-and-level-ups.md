@@ -41,6 +41,12 @@ in this version, but levelling inside any rank follows that rank's own cost and 
    takes effect before the next combat starts. *(Guild Members.md → Levels and Experience:
    "added up at the end of a combat".)* This replaces the built per-floor award.
 
+   **A stand-off — a queue default for now, not the user's word.** A combat that ends in a
+   stand-off still pays the experience for the enemies killed in it before it ended, shared
+   by requirement 3, before the party turns back. *(The docs tie experience to kills and to
+   the end of a combat, not to winning it — Guild Members.md → Levels and Experience; the
+   stand-off itself is EhrensDocs/Combat.md's.)*
+
 3. **Who shares it — a default for now, not the user's word.** The total is divided equally
    between the party members still alive when that combat ends, specialists counted. A
    member who died in that combat, or earlier, gets no share of it. *(Guild Members.md →
@@ -90,8 +96,7 @@ in this version, but levelling inside any rank follows that rank's own cost and 
    Reaching the threshold and having earned the rank's whole cost happen at the same moment.
    *(EhrensDocs/Guild Members.md → "Experience is the bar, level is the number".)* How the
    cost is cut into single levels is a placeholder, cheap to change: it lives in the tuning
-   file, is marked as a placeholder there, and appears in the placeholder list. Changing it
-   must not need a change anywhere else.
+   file, is marked as a placeholder there, and appears in the placeholder list.
 
 9. **Every rank levels by its own row.** A member levels inside whatever rank or tier they
    hold by that rung's cost and threshold — an E-rank member climbs from level 1 to 32 on
@@ -104,8 +109,10 @@ in this version, but levelling inside any rank follows that rank's own cost and 
 
 11. **Capped at the threshold.** A member at their rank's threshold gains no more levels and
     no more experience: whatever they would have earned past the rank's cost is gone, not
-    banked. *(Guild Members.md → Promotion: "stops gaining levels … neglecting a promotion
-    wastes the experience".)*
+    banked. At the cap the stored experience is exactly the rank's full cost — 20 for an
+    F-rank member at level 16 — and stays there until promotion. *(Guild Members.md →
+    Promotion: "stops gaining levels … neglecting a promotion wastes the experience";
+    EhrensDocs/Guild Members.md → "Experience is the bar, level is the number".)*
 
 12. **Promotion.** The promotion check stays the level threshold and the gold, both required;
     there is no separate experience check, because the threshold and the cost are reached
@@ -119,8 +126,13 @@ in this version, but levelling inside any rank follows that rank's own cost and 
     by exactly one each — never the same stat twice in one level-up — chosen by the
     member's type's ordering in Stat Weighting by Type, most likely through least likely. The
     one point is the docs' rule, not a tuning figure. *(Guild Members.md → Levels and
-    Experience; Stat Weighting by Type.)* How the three are drawn is open; see Open
-    Questions.
+    Experience; Stat Weighting by Type.)*
+
+    **How the three are drawn — a queue default for now, not the user's word.** Three
+    weighted draws in a row, each from the stats not yet drawn in this level-up, weighted by
+    each stat's position in the type's ordering using the placeholder level-up weights
+    (requirement 17). The docs say only "chosen by the type's weighting, most likely through
+    least likely".
 
 14. **Specialists level the same way**, each by its own type's ordering — the Cook's and the
     Porter's in this version. *(Guild Members.md → Levels and Experience: "Specialists gain
@@ -146,6 +158,18 @@ in this version, but levelling inside any rank follows that rank's own cost and 
     worth by rank, the costs, the thresholds and the one point per stat are the docs'
     numbers and are not marked as placeholders. *(`queue/focus.md` → Goal, "Missing
     details".)*
+
+### Saves
+
+18. **Older saves — a queue default for now, not the user's word.** The save format version
+    goes from 6 to 7, since a member's stored experience now means experience earned in the
+    rank (requirement 6) rather than progress toward the next level. A save older than 7
+    loads each member with their level and stats kept and their experience set to where
+    that level starts under requirement 8 (an F-rank member at level 5 loads with 6; at
+    level 1, with nothing). In a version 6 save taken mid-floor, the battles already won on
+    that floor have unpaid experience — the old game paid only on clearing the floor — and
+    that experience is lost on load. *(No doc covers saves across this change; the game has
+    no players yet, so this is cheap.)*
 
 ## Out of Scope
 
@@ -181,20 +205,8 @@ From the design docs, worded as they word them:
   placeholder for now. *(EhrensDocs/Guild Members.md → "Experience is the bar, level is the
   number", Why.)*
 
-Raised by this PRD — the docs don't answer these; proposals are the author's, not the docs':
+Raised by this PRD — the docs don't answer it:
 
-- **A combat that ends in a stand-off.** A battle that runs out its time ends as a
-  stand-off and the party turns back. Do the enemies killed in it before then pay their
-  experience? *Blocks requirement 1's tests for that case.* Proposal: yes — the docs tie
-  experience to kills and to the end of a combat, not to winning it.
-- **How the three stats are drawn.** "Chosen by the type's weighting, most likely through
-  least likely" doesn't say how three different stats come out of five. *Blocks requirement
-  13's tests.* Proposal: three draws in a row, each by the placeholder weights among the
-  stats not yet drawn this level-up.
-- **An older save.** A save from before this change holds experience as progress toward the
-  next level, not as experience earned in the rank. What does a member from it load as?
-  *Needed to build; cheap, since the game has no players yet.* Proposal: keep their level
-  and stats, and set their experience to the amount at which that level is reached.
 - **What the bar shows.** The member sheet shows one bar. Does it fill toward the next
   level, or across the whole rank toward the threshold? *Doesn't block the rules; cheap to
   change.*
