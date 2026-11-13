@@ -106,7 +106,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   counted).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive loot is gold only, selling gear back, repair costs gold only for now,
-  open questions on stores and condition, a zero-damage hit still wears gear, a dead member's gear comes home for now).
+  open questions on stores and condition, a zero-damage hit still wears gear, a dead
+  member's gear comes home for now, the shop sells class F only for now, a span no wider
+  at SSS than at F for now, and a question on span width).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   levelling and promotion, who shares a combat's experience, help follows the board live,
   an open question on sharing experience, a specialist's K from its tier, a hit rounding

@@ -222,3 +222,99 @@ hit came from a special.
 **Why:** The combat engine is built this way. With no minimum damage, a hit can do nothing,
 and "each hit the weapon lands" didn't say whether such a hit still counts.
 A special spends none of the weapon's uses, as `## Durability` already says further down.
+
+## Change: For now the shop sells class F only
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Quality`, the paragraph beginning "The shop sells equipment of a baseline
+quality" (a new paragraph after it)
+
+**Now says:**
+
+```
+The shop sells equipment of a baseline quality, and that baseline rises with guild rank. A
+crafter in the guild produces better than the shop's baseline.
+```
+
+**Proposed:**
+
+```
+The shop sells equipment of a baseline quality, and that baseline rises with guild rank. A
+crafter in the guild produces better than the shop's baseline.
+
+For now, though, the shop's baseline stays at class F. A piece of any class can be made,
+but only class F has a price, so a guild at rank F buys class F gear and the shop has
+nothing for a guild above rank F.
+```
+
+**Why:** The game is built this way. What the baseline is above F, and what a piece costs
+there, isn't settled, so the shop doesn't rise with the guild yet. No guild rises above
+rank F yet, so the empty shop above F doesn't come up.
+
+## Change: For now a span is no wider at SSS than at F
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Quality`, second paragraph
+
+**Now says:**
+
+```
+A weapon carries two attributes: an Attack Damage range and a Durability. Each kind of
+weapon has its own Attack Damage range, and so does each class — the ranges differ per
+kind so the damage comes out balanced across the combat types. But a weapon's range is not
+a fixed figure for its kind and class: each kind at each class has a wider band, and an
+individual piece's own range is drawn from inside that band when the piece is made, so two
+pieces of the same kind and class are not the same. The span itself is rolled too, not
+just where it sits in the band — one piece's range can come out wider or narrower than
+another's, not only higher or lower within it.
+```
+
+**Proposed:**
+
+```
+A weapon carries two attributes: an Attack Damage range and a Durability. Each kind of
+weapon has its own Attack Damage range, and so does each class — the ranges differ per
+kind so the damage comes out balanced across the combat types. But a weapon's range is not
+a fixed figure for its kind and class: each kind at each class has a wider band, and an
+individual piece's own range is drawn from inside that band when the piece is made, so two
+pieces of the same kind and class are not the same. The span itself is rolled too, not
+just where it sits in the band — one piece's range can come out wider or narrower than
+another's, not only higher or lower within it.
+For now a span is rolled anywhere from a single figure to four points wide, and never
+wider than its band, at every class — so an SSS knife's span, inside 512–3072, is no wider
+than an F knife's inside 2–12. The same goes for armour's Defence.
+```
+
+**Why:** The game is built this way, with placeholder widths. How narrow or wide a span can
+be is asked in `## Open Questions` and stays open there. Because the bands double each
+class and the width doesn't, a top-class piece comes out as almost a single figure.
+Whether the widest span should grow with class is proposed as a question for
+`## Open Questions`.
+
+## Change: A question on span width
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, after the entry beginning "How narrow or wide can a rolled
+span be"
+
+**Now says:**
+
+```
+- How narrow or wide can a rolled span be — can a piece come out with a single figure
+  rather than a range, or with a span as wide as the whole band?
+```
+
+**Proposed:**
+
+```
+- How narrow or wide can a rolled span be — can a piece come out with a single figure
+  rather than a range, or with a span as wide as the whole band?
+- Should the widest a rolled span can be grow with class, doubling the way the bands do,
+  or stay the same at every class?
+```
+
+**Why:** None of the docs answers it. The span width above is a default for now. The other
+entries, and the pending changes to this list, are unchanged.
