@@ -130,8 +130,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
-  back anywhere and the carry limit, enemies are monsters and how they fight for now, a
-  floor's monsters the same every dive, re-entering and its fees for now, open questions on
+  back anywhere and the carry limit, how many monsters a battle has, enemies are monsters
+  with a rank and level and how they fight for now, a floor's monsters the same every dive
+  and where each stands, re-entering and its fees for now, open questions on
   turning back and the dive's defaults, how a heal in the dive lands for now, and open
   questions on healing in the dive).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice

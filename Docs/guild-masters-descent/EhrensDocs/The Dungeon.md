@@ -69,21 +69,25 @@ Each floor has 2–3 battles.
 
 ```
 Each floor is a series of battles, 2–3 of them. At the end of a battle the screen scrolls
-right into the next battle. The first dungeon has 3 battles a floor to win, against 1
-low-level monster each. After the last one comes victory, dropping loot: the floor's gold
-drops as one lump at the end of the floor, and only once every battle on that floor is
-won — if a floor has 3 battles, the party needs to beat all 3. How much gold a floor drops
-is a placeholder, to be balanced later.
+right into the next battle. The first dungeon has 3 battles a floor to win. After the last
+one comes victory, dropping loot: the floor's gold drops as one lump at the end of the
+floor, and only once every battle on that floor is won — if a floor has 3 battles, the
+party needs to beat all 3. How much gold a floor drops is a placeholder, to be balanced
+later. For now every battle on a floor has the same number of monsters, set by the floor:
+a deeper floor never has fewer, and the deepest floor with battles has more than the
+first. How many is a placeholder too, to be balanced later.
 ```
 
 **Why:** Answered: each floor is a series of battles, and at the end of a battle the
-screen scrolls right into the next one; the first dungeon has 3 battles to win against 1
-low-level monster each, then victory, dropping loot. Answered too: loot at the end of the
-floor — if 3 battles on that floor then they need to beat all 3. "Each floor has 2–3
-battles" gave the count but not how one battle leads into the next, or where the loot
-drops. The 3 battles are inside the existing 2–3 range, so the range stays for dungeons in
-general. What the board's floor layout shows, whether a party picks a route, and what
-makes a boss floor are not settled by this. The rest of the paragraph, on rest areas and
+screen scrolls right into the next one; the first dungeon has 3 battles to win, then
+victory, dropping loot. Answered too: loot at the end of the floor — if 3 battles on that
+floor then they need to beat all 3. "Each floor has 2–3 battles" gave the count but not
+how one battle leads into the next, or where the loot drops. The 3 battles are inside the
+existing 2–3 range, so the range stays for dungeons in general. How many monsters a battle
+has follows Combat's `## Enemies` — the deeper the floor, the more enemies turn up in each
+fight — and the dive is built with a set number for each floor, the same every battle on
+it. What the board's floor layout shows, whether a party picks a route, and what makes a
+boss floor are not settled by this. The rest of the paragraph, on rest areas and
 retreating, is the next change.
 
 ## Change: A party can turn back anywhere, and carries only so much gold out
@@ -204,8 +208,11 @@ Every monster is assigned one of the six combat types, just like the guild's mem
 and has the same characteristics of that type — a monster Tank or a monster Archer has
 that type's attacks, its special and its type advantages.
 
-A monster is given a level like a member is, and uses the same stat rules. What level the
-monsters on each floor are is a placeholder, to be balanced later.
+A monster is given a rank and a level like a member is, and uses the same stat rules. For
+now every monster in a dungeon is the dungeon's own rank — F, as the guild's starting
+dungeon is, and there's no grade below F — and level 1, with exactly its type's starting
+stats at that rank, on every floor. Depth changes how many monsters turn up in a battle,
+never what each one is.
 
 In a battle, for now, a monster's damage is its damage stat alone and its defence its
 Constitution alone — there's no weapon or armour in either. Monsters get the support ring
@@ -218,10 +225,13 @@ archer animations. Answered too: yes, monsters will be assigned one of the types
 like the characters and have those same characteristics of that type; and on gear, fixed
 numbers. Combat's `## Enemies` builds enemies from the six combat types and asks, in its
 open questions, whether a monster is something other than that; this says it isn't. The
-yellow-shape clause is the project's standing rule for missing art. The first paragraph
-is unchanged. How a monster fights is a default for now: the answer on gear was fixed
-numbers, read as the monster's own stats with nothing added for gear, while Combat's
-`## Enemies` gives an enemy a chance of a weapon and of armour set by the dungeon's rank.
+yellow-shape clause is the project's standing rule for missing art. A monster's rank and
+level follow Combat's `## Enemies` too: an enemy is the dungeon's rank or one grade below
+it, with exactly what its type and rank give, and depth decides how many turn up, not what
+each one is. The first paragraph is unchanged. How a monster fights is a default for now:
+the answer on gear was fixed numbers, read as the monster's own stats with nothing added
+for gear, while Combat's `## Enemies` gives an enemy a chance of a weapon and of armour
+set by the dungeon's rank.
 For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
 a monster Brute or Rogue carries none for now.
@@ -246,14 +256,17 @@ A newly claimed dungeon starts near-blank. The enemy types and the floor layout 
 as the party reaches each floor.
 
 For now a floor's monsters are the same on every dive: which monsters, their levels and
-where they stand are set once, when the dungeon is created. A floor counts as reached
-once the party starts its first battle there, or arrives there if it's a rest area.
+where they stand are set once, when the dungeon is created, and a dungeon from an older
+save keeps the monsters it was made with. Each monster stands on a node of its own, drawn
+at random. A floor counts as reached once the party starts its first battle there, or
+arrives there if it's a rest area.
 ```
 
 **Why:** The dive is built this way. "Appear as the party reaches each floor" reads as a
 floor's enemies being fixed, but nothing said so outright, or what counts as reaching a
 floor for the deepest floor reached. Both are proposed as questions for
-`## Open Questions`.
+`## Open Questions`. Nothing said where a monster stands on its grid either; Combat's
+`## Formation` says only that enemies use the same style of grid.
 
 ## Change: Where a party re-enters, and what it pays, for now
 
