@@ -137,12 +137,14 @@ and the defender's mitigation is applied to it separately.
 
 Each member has a special bar. When it's full, the player can use a special. An enemy's
 bar works the same way, and an enemy uses its special when its bar is full. Each hit a
-member lands charges that member's bar by 10 — that's the base, and it's the same for
-every type. The bar charges per hit, not per attack: a multi-strike attack charges once
+member lands charges that member's bar by 30 — that's the base, and it's the same for
+every type. At 30 a hit, a bar fills on about the third hit once a bonus condition has
+fired, which is what puts a special inside the fight that earns it rather than the one
+after. The bar charges per hit, not per attack: a multi-strike attack charges once
 for each of its strikes that lands, and an attack that reaches several targets charges
 once for each of them. Each combat type also has its own bonus condition, and each time
-it's met it adds 15 on top of that base — covered in the Individual Types doc. The bar is
-full at 100.
+it's met it adds 15 on top of that base — covered in the Individual Types doc. The bar
+is full at 100.
 
 Charge and weapon durability both count hits, so what wears a weapon down is what fills
 the bar.
