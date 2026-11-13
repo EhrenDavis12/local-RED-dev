@@ -215,8 +215,10 @@ gradual decline before that.
 Gear wears down as it is used — weapons degrade from attacking, armour from being hit. It
 works fully until it reaches zero, then breaks and contributes nothing — there is no
 gradual decline before that. A hit counts even when defence takes all of its damage: the
-weapon that landed it and the armour that took it each still spend a use.
+armour that took it still spends a use, and so does the weapon that landed it, unless the
+hit came from a special.
 ```
 
 **Why:** The combat engine is built this way. With no minimum damage, a hit can do nothing,
 and "each hit the weapon lands" didn't say whether such a hit still counts.
+A special spends none of the weapon's uses, as `## Durability` already says further down.

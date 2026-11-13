@@ -109,14 +109,15 @@ The dungeon board, finding and entering dungeons, and training missions.
   open questions on stores and condition, a zero-damage hit still wears gear, a dead member's gear comes home for now).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   levelling and promotion, who shares a combat's experience, help follows the board live,
-  an open question on sharing experience).
+  an open question on sharing experience, a specialist's K from its tier, a hit rounding
+  down once for now, the Mage's field as an area attack for now).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
-  flurry's leftover strikes stay within reach, a failed Vanish fails for one strike,
-  Volley and the Archer's streak for now, the Mage's column, field, the field's timing and
-  bonus for now, open questions on Vanish, taunts, the field and the types' defaults, and
-  on the field's timing).
+  flurry's checks and strikes for now and its leftover strikes staying within reach, a
+  failed Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's
+  column, field, the field's defence, timing and bonus for now, open questions on Vanish,
+  taunts, the field and the types' defaults, on the field's timing, and on the flurry).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too.
   - Orientation

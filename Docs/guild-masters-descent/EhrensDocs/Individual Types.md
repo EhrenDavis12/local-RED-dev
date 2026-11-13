@@ -122,7 +122,7 @@ the rest are lost — only the flurry carries on to another enemy.
 **Why:** The combat engine is built this way. Only the flurry is said to carry on when its
 target dies. Whether the ordinary strikes should too is proposed as a question below.
 
-## Change: The flurry's leftover strikes stay within reach
+## Change: The flurry's checks and strikes for now, and its leftover strikes stay within reach
 
 > Proposed 2026-11-12 · for review
 
@@ -150,10 +150,22 @@ enemy still standing that the Fighter's close range can reach, passing over a va
 Rogue unless that's all there is. If nothing is in reach, the remaining strikes are lost.
 If any enemy is killed during the flurry, the Fighter's charge bar refills to 90% — that
 refill is the Fighter's bonus charge condition.
+
+For now the two Luck checks are the flurry's own, not the check that can reset a
+cooldown: each succeeds with a chance of 50% × Luck ÷ (Luck + 20), using the Fighter's
+Luck, and both the 50% and the 20 are placeholders. The sixth strike is checked only if
+the fifth's check succeeded, whether that strike then hit or missed. For now, too,
+"always land" is read as always happening: every flurry strike rolls to hit like any
+other strike, and can miss. Each one carries the Fighter's damage the same way an
+ordinary strike does, with nothing added for hitting hard.
 ```
 
 **Why:** The combat engine is built this way. "The nearest enemy still standing" could
-have reached past the front row, which the Fighter's close range never can.
+have reached past the front row, which the Fighter's close range never can. Whether the
+Luck checks are the reset's is already asked in `## Open Questions`, and stays open there.
+Nothing said whether "always land" means the flurry can't miss, or whether "hit hard"
+means more than an ordinary strike; both are proposed as questions in "Questions on the
+flurry".
 
 ## Change: A Rogue's second strike is lost if the first kills, for now
 
@@ -352,8 +364,11 @@ the front row isn't moving into it, since the Brute's node never changes.
 
 For now the two columns are the target's and the one to its right, or the one to its left
 when the target is in the right-hand column. How much the field does each time it deals
-damage is set once, when it's cast: a share, a placeholder, of the Mage's Intelligence,
-with help, plus one roll of its staff.
+damage, before defence, is set once, when it's cast: a share, a placeholder, of the Mage's
+Intelligence, with help, plus one roll of its staff. That figure isn't rounded. For now
+each time the field deals damage it's an area attack: it pays two-thirds of the victim's
+defence, worked with the Mage's K, and the victim's armour is rolled afresh for it the
+way it is for a strike. Each of those hits rounds once, after defence.
 ```
 
 **Why:** The combat engine and the six combat types are built this way. With monsters
@@ -365,6 +380,8 @@ say whether the field's damage comes before the attack it is set off by, whether
 special counts as beginning an attack, whether the field hurts in the tick it's cast, or
 whether the Brute's push past the front row is a move into it; those are proposed as
 questions too, in "Questions on the field's timing".
+Nor did it say whether the field's damage pays defence the way an area attack does;
+`Guild Members.md` asks that in its open questions, and it stays open there.
 
 ## Change: The Mage's bonus pays per hit, for now
 
@@ -475,3 +492,32 @@ unchanged.
 Mage's field lies, and what it does, for now", and none of the docs settles them. The
 pending "Questions on Vanish, taunts and the field" change to this list is unchanged;
 these go after the entries it adds.
+
+## Change: Questions on the flurry
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
+```
+
+**Proposed:**
+
+```
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
+- "The first four strikes always land" — does that mean the flurry can't miss, or only
+  that four strikes always happen?
+- "The flurry's strikes hit hard" — do they carry more than an ordinary strike?
+```
+
+**Why:** The combat engine is built with a default for now on both, in "The flurry's
+checks and strikes for now, and its leftover strikes stay within reach", and none of the
+docs settles them. The pending "Questions on Vanish, taunts and the field" and "Questions
+on the field's timing" changes to this list are unchanged; these go after the entries
+they add.

@@ -113,3 +113,85 @@ the board as it changes.
 
 **Why:** The game is built with a default for now on this, in the change above. The
 pending "Three questions on levelling and promotion" change to this list is unchanged.
+
+## Change: A specialist's K comes from its tier
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Base Stats`, the paragraph after the list of K by rank
+
+**Now says:**
+
+```
+K doubles at each rank, the same way the damage and defence bands double.
+```
+
+**Proposed:**
+
+```
+K doubles at each rank, the same way the damage and defence bands double.
+
+A specialist climbs tiers, not ranks, so its K comes from its tier, rung for rung: a
+Novice's K is 20, an Apprentice's 40, and so on up to 5,120 at Grandmaster SSS.
+```
+
+**Why:** The combat engine is built this way. K comes from the attacker's rank, and a
+specialist has none. The Specialists doc's `## Tiers` has a tier stand in for a rank rung
+for rung wherever a rank is compared to something else, which this reads as covering K.
+
+## Change: A hit rounds down once, at the end, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Base Stats`, the line on minimum damage
+
+**Now says:**
+
+```
+There is no minimum damage — enough defence can reduce a hit to nothing.
+```
+
+**Proposed:**
+
+```
+There is no minimum damage — enough defence can reduce a hit to nothing. For now a hit's
+damage is worked out exactly and rounded down once, at the end of the hit, after
+everything that changes it: the fraction, the reduced damage Volley's neighbours take,
+and the Archer's streak. Nothing rounds along the way, and a hit that comes to less than
+one does nothing.
+```
+
+**Why:** The combat engine is built this way. Which way a fractional hit rounds is asked
+in `## Open Questions` and stays open there. Nothing said whether a hit rounds once or at
+each step, and rounding at each step loses a point every time.
+
+## Change: The Mage's field is an area attack, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Base Stats`, last paragraph
+
+**Now says:**
+
+```
+An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
+land on a space rather than on a person, so evasion does nothing against them. They do
+pay a reduced defence, though: an area attack uses two-thirds of the target's defence
+when working the fraction above.
+```
+
+**Proposed:**
+
+```
+An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
+land on a space rather than on a person, so evasion does nothing against them. They do
+pay a reduced defence, though: an area attack uses two-thirds of the target's defence
+when working the fraction above. For now the Mage's lingering field counts as an area
+attack each time it deals damage: it can't miss, and it uses two-thirds of the victim's
+defence, worked with the Mage's K.
+```
+
+**Why:** The combat engine is built this way. Whether the field's damage counts as an area
+attack is asked in `## Open Questions` and stays open there. What else the field does is
+in the `Individual Types.md` change "Where the Mage's field lies, and what it does, for
+now".
