@@ -93,6 +93,11 @@ built as marked placeholders, each easy to change.
     chance is *50% × Luck ÷ (Luck + 20)*, using the Fighter's Luck. The ceiling of 50% and
     the 20 are placeholders in the tuning file. The sixth strike's check is made only if the
     fifth strike's check succeeded, whether that strike then hit or missed. — Report 62 §3.
+    Each check is an exact integer comparison, in the same way the Luck reset's is
+    (`Battle.cs:376`, `NextInt(0, 4 × (Luck + 60)) < Luck`). With a ceiling of *p* percent
+    and a constant *k*, the check succeeds when `NextInt(0, 100 × (Luck + k)) < p × Luck`; at
+    the placeholders that is `NextInt(0, 100 × (Luck + 20)) < 50 × Luck`. Like the reset, the
+    check is drawn even at Luck 0. — Main loop, settling a note from `forge-prd-reviewer`.
 
 ### The Mage's field
 
@@ -100,9 +105,23 @@ built as marked placeholders, each easy to change.
     deals damage, the hit can't miss. It pays two-thirds of the victim's defence (R5), worked
     with the Mage's K. Today it ignores defence. — Report 62 §2.
 15. **When the field's damage is set and rounded.** The field's damage before defence is
-    still fixed once, at cast: a share of the Mage's Intelligence plus one staff roll. Under
-    R6 that figure is not rounded at cast. Each field hit rounds once, after defence. — The
-    EhrensDocs `Individual Types.md` change "Where the Mage's field lies"; R6.
+    still fixed once, at cast: the share times (the Mage's Intelligence, with help, plus one
+    staff roll), as the code works it out now. Under R6 that figure is not rounded at cast.
+    Each field hit rounds once, after defence. — The EhrensDocs `Individual Types.md` change
+    "Where the Mage's field lies"; R6.
+15a. **The field's amount is fractional, and saving keeps it exact.** The field's amount
+    before defence becomes a fractional number (a `double`). That covers the field's
+    effect (`AttackEffect.Amount`) and its saved form in the dive save
+    (`BattleEffectSave.Amount`), which `BattleSnapshot` writes and restores.
+    - `SaveFile.CurrentVersion` goes to **4**.
+    - A version-3 save still loads. Its stored whole number is read as the field's amount,
+      already rounded, since version 3 rounded the amount down at cast.
+    - A battle that is saved and reloaded deals exactly the same field damage, hit for hit,
+      as the same battle never saved.
+
+    Shields Up's amounts are still whole numbers. `DefenceBonus` still returns whole
+    defence, the sum of the Shields Up amounts held, exactly as today, so no defence figure
+    becomes fractional. — Main loop, settling a blocking finding from `forge-prd-reviewer`.
 16. **A field hit is still not a strike.** R14 changes only whether the field misses and
     what it does against defence. A field hit still adds no charge to any bar. It still
     leaves a Rogue's Vanish in place: whether the field should end Vanish is a separate open
@@ -125,7 +144,8 @@ built as marked placeholders, each easy to change.
 18. Existing tests that pin the rules this PRD replaces are replaced along with the rules:
     the advantage multiplier, the Brute ignoring a Tank's defence, the area factor of one
     half, the strike shares, the four-strike Fighter, the six-strike flurry, specials wearing
-    the weapon, and the field ignoring defence. The tuning file keeps only placeholders.
+    the weapon, the field ignoring defence, and the field's amount being rounded down at
+    cast. The tuning file keeps only placeholders.
     `TypeAdvantageMultiplier`, `AreaDefenceFactor`, `RogueStrikeShare`, `FlurryStrikeShare`
     and `FighterStrikeCount` either go or become settled constants. — `Tuning.cs` header (every
     placeholder lives there and is listed for the user).
