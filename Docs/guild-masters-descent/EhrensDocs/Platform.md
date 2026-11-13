@@ -47,6 +47,10 @@ judged against a placeholder number — a fighter left waiting longer than its o
 cooldown is accepted — so rebalancing a placeholder can't turn a good save into one the
 game can't read.
 
+Maximum health is never taken from a save: every member's and every monster's comes from
+the Constitution saved with them, so a save made before health followed Constitution
+loads under the rule as it is now. A member not on the saved dive loads at full.
+
 For now:
 
 - There are three save slots. The number is a placeholder.
@@ -60,9 +64,14 @@ For now:
 - A special bar saved below empty or past full is brought back inside the bar as it
   loads, and a dive saved between battles where every bar should be empty — at a rest
   area, or before a floor's first battle — loads with them empty.
+- A member on a saved dive keeps the health they had when the game saved, capped at
+  their maximum — so a member saved at 7 of 10 under the old rule loads at 7 of, say,
+  50, rather than keeping the damage they had taken.
 
 ## Open Questions
 
 - Is a save holding a special bar below empty or past full refused, or fixed as it loads?
 - When a save holds a special bar where every bar should be empty — at a rest area, or
   before a floor's first battle — is that bar emptied as it loads, or is the save refused?
+- A member on a dive saved before health followed Constitution loads with the health they
+  had, capped at their new maximum. Should they keep the damage they had taken instead?

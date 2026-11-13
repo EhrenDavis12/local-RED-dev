@@ -110,7 +110,8 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   levelling and promotion, who shares a combat's experience, help follows the board live,
   an open question on sharing experience, a specialist's K from its tier, a hit rounding
-  down once for now, the Mage's field as an area attack for now).
+  down once for now, the Mage's field as an area attack for now, health from a member's
+  own Constitution and what's taken staying taken for now, and questions on health).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
@@ -120,7 +121,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   taunts, the field and the types' defaults, on the field's timing, and on the flurry, the
   Fighter's bonus as the refill for now, and an open question on the Fighter's bonus).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
-  runs landscape only, and the game saves by itself, mid-battle too.
+  runs landscape only, and the game saves by itself, mid-battle too, working out maximum
+  health afresh as a save loads.
   - Orientation
   - Saving
   - Open Questions

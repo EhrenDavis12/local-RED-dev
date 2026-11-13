@@ -195,3 +195,78 @@ defence, worked with the Mage's K.
 attack is asked in `## Open Questions` and stays open there. What else the field does is
 in the `Individual Types.md` change "Where the Mage's field lies, and what it does, for
 now".
+
+## Change: Health counts a member's own Constitution, and what's taken stays taken, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Base Stats`, the paragraph on health
+
+**Now says:**
+
+```
+A member's health is their Constitution times ten — at F rank, where stats are
+single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
+through defence is taken off that pool. Because it comes from Constitution, it grows as
+Constitution grows, with no separate rule for levelling. Constitution already means
+toughness, so it is the pool and the base of defence both, and health needs no stat of its
+own.
+```
+
+**Proposed:**
+
+```
+A member's health is their Constitution times ten — at F rank, where stats are
+single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
+through defence is taken off that pool. Because it comes from Constitution, it grows as
+Constitution grows, with no separate rule for levelling. Constitution already means
+toughness, so it is the pool and the base of defence both, and health needs no stat of its
+own. A specialist's health and a monster's come the same way, from their own
+Constitution.
+
+For now health counts only a member's own Constitution, never what the support ring adds.
+The Tank's primary stat is Constitution, and help that reached its health would make its
+pool change with who stands next to it, and shrink when they move away or die. Help still
+counts toward the defence Constitution gives. For now, too, when a level-up raises
+Constitution mid-dive, current health rises by the same ten a point as the maximum does,
+so the damage already taken stays taken.
+```
+
+**Why:** The game is built this way. "A member's health" sits under "the fighting
+members", which leaves specialists unsaid; Levels and Experience has specialists gain base
+stats the same way divers do, and the Dungeon change notes give a monster the same stat
+rules. Help raises the receiver's primary stat, and nothing says whether that reaches
+health; nor does "it grows as Constitution grows" say what happens to the health a member
+has left. Both are proposed as questions in "Questions on health".
+
+## Change: Questions on health
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+```
+
+**Proposed:**
+
+```
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- Help raises the receiver's primary stat, and the Tank's is Constitution. Does that help
+  raise the Tank's health too, or only its defence?
+- When a level-up raises a member's Constitution mid-dive, does their current health rise
+  with the maximum, or stay where it was with only the ceiling moving?
+```
+
+**Why:** The game is built with a default for now on each of these, in "Health counts a
+member's own Constitution, and what's taken stays taken, for now", and none of the docs
+settles them. The pending "Three questions on levelling and promotion" and "A question on
+sharing experience" changes to this list are unchanged; these go after the entries they
+add.
