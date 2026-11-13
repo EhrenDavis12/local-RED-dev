@@ -135,7 +135,8 @@ and the defender's mitigation is applied to it separately.
 
 ## The Special Bar
 
-Each member has a special bar. When it's full, the player can use a special. Each hit a
+Each member has a special bar. When it's full, the player can use a special. An enemy's
+bar works the same way, and an enemy uses its special when its bar is full. Each hit a
 member lands charges that member's bar by 10 — that's the base, and it's the same for
 every type. The bar charges per hit, not per attack: a multi-strike attack charges once
 for each of its strikes that lands, and an attack that reaches several targets charges
@@ -228,3 +229,6 @@ the Equipment doc.
 - At F rank a member's Luck is single-digit, which puts the reset chance near one attack
   in forty — a member might see one reset in a whole dive. Is the reset meant to be that
   close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
