@@ -133,14 +133,17 @@ enemy does.
 
 The fight never pauses, and nothing waits for the player. It runs from start to finish,
 and the player acts while it's running — using a member's special once that bar is full,
-changing formation, and marking the focus target.
+changing formation, and marking the focus target. For now, though, a member's special
+can't be used from the battle screen: the bar fills and sits full.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
-set length of time, a placeholder, as a stand-off — and a stand-off kills no one further.
+set length of time, a placeholder, as a stand-off — 6,000 ticks, five minutes of fight —
+and a stand-off kills no one further.
 ```
 
 **Why:** The combat engine is built this way. No doc says what a member does with no
-target selected, or whether a battle can run forever. The original sentences are
+target selected, or whether a battle can run forever. Using members' specials waits on
+the battle screen being able to; the engine already lets them. The original sentences are
 unchanged; the new ones sit after them.
 
 ## Change: A special's own hits charge the bar, for now
@@ -166,11 +169,14 @@ While it sits full, charge is wasted: attacks the member makes while full charge
 and so does the type's bonus condition — that progress toward the next special is gone.
 Using the special empties the bar, and it charges again from there. For now the
 special's own hits charge it like any other attack's, unless its type says otherwise.
+For now, too, a special is used when the member's cooldown comes up, in place of the
+ordinary attack that cooldown brings round.
 ```
 
 **Why:** The combat engine is built this way. Nothing says whether a special's own hits
 charge the bar it has just emptied. Whether using a special also costs the member an
-ordinary attack is proposed as a question below.
+ordinary attack is proposed as a question below; for now it takes the place of the attack
+its cooldown brings round.
 
 ## Change: When an effect's count starts, and a second cast stacking
 
@@ -200,15 +206,19 @@ owner's own cooldown cycles, and a member who is dead completes no more of them,
 there's no clock left for the effect to run on.
 
 The cycle an effect is cast in doesn't count: it lasts three of the owner's cycles after
-that. For now a Shields Up or a field cast while the owner's last one is still running
-stacks with it: both run, each to its own end, so the two lots of defence add up and both
-fields do their damage.
+that. For now it ends once the third of those has played out, so the owner's next three
+attacks all happen under it — a vanished Rogue makes three that can't miss. For now, too,
+a free attack from the Luck reset isn't one of the three: only a cooldown that comes up
+after a wait counts. For now a Shields Up or a field cast while the owner's last one is
+still running stacks with it: both run, each to its own end, so the two lots of defence
+add up and both fields do their damage.
 ```
 
 **Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
-doesn't say whether the cycle it's cast in counts. Nothing says what happens when one is
-cast again while the last is still running; the six combat types are built to stack them,
-and that's proposed as a question below.
+doesn't say whether the cycle it's cast in counts, whether the effect ends once the third
+has played out or as the fourth begins, or whether a free attack from the Luck reset is a
+cycle. Nothing says what happens when one is cast again while the last is still running;
+the six combat types are built to stack them. Each is proposed as a question below.
 
 ## Change: What the targeting weights count, and how a taunt is spent
 
@@ -282,3 +292,191 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 the six types' specials are built, and the next two from the specials that strike no one.
 The last two come from the dive as it's built: each has a default for now in "Health is
 full at the guild hall, and where everyone stands carries over".
+
+## Change: How a cooldown rounds, and whose Dexterity counts
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Cooldowns`, third paragraph
+
+**Now says:**
+
+```
+A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
+and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
+100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
+simulation counts in whole ticks, as this section already says. It never goes below a
+floor of a tenth of the type's own base, however high Dexterity climbs: 18 ticks for a
+Brute or Tank, 14 for a Fighter or Mage, 10 for a Rogue or Archer. That floor is reached
+at Dexterity 180 whatever the type.
+```
+
+**Proposed:**
+
+```
+A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
+and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
+100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
+simulation counts in whole ticks, as this section already says. It never goes below a
+floor of a tenth of the type's own base, however high Dexterity climbs: 18 ticks for a
+Brute or Tank, 14 for a Fighter or Mage, 10 for a Rogue or Archer. That floor is reached
+at Dexterity 180 whatever the type. The rounding is to the nearest whole tick, and an
+exact half rounds up: a Rogue at Dexterity 12 waits 63 ticks, not 62. For now the
+Dexterity is the combatant's own; help from the support ring doesn't shorten a cooldown.
+```
+
+**Why:** The combat engine is built this way. "Rounded to whole ticks" didn't say which
+way, and rounding a half to the even tick, the way C# rounds by default, gives 62.
+Whether help should shorten a cooldown is already proposed as a question in "Questions on
+specials, taunts and the dive", and it stays open.
+
+## Change: The clock, how a fight opens, and who goes first, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Cooldowns`, last paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+That's what stops the rate being changed casually: at F rank it makes a slow type's wait
+deliberate without being tedious, and at the floor every type is acting about once a
+second, which is the pacing this doc already asks for — a low-level fight feeling a little
+slow and a higher-level one having more going on.
+```
+
+**Proposed:**
+
+```
+That's what stops the rate being changed casually: at F rank it makes a slow type's wait
+deliberate without being tedious, and at the floor every type is acting about once a
+second, which is the pacing this doc already asks for — a low-level fight feeling a little
+slow and a higher-level one having more going on.
+
+The fight moves on only as time is handed to it. It never reads the frame rate or the
+clock itself, so the same fight with the same rolls plays out the same however that time
+is split up — which is what lets a saved battle carry on exactly.
+
+For now a fight starts staggered: each combatant begins with a random share of its first
+wait already gone, somewhere between none of it and half of it. Both ends are
+placeholders; setting both to none gives everyone's empty, and both to all of it gives
+everyone's ready at once.
+
+For now, when several cooldowns come up in the same tick, they go one after another:
+higher Dexterity first, then members before enemies, then the front row first, then left
+to right. Nothing in that order is random, and a combatant killed earlier in the tick
+doesn't act. All the strikes of a multi-strike attack land in the tick its cooldown comes
+up, each still rolled on its own.
+```
+
+**Why:** The combat engine is built this way. Nothing said where cooldowns stand when a
+fight starts, who goes first when two come up together, or whether a multi-strike attack's
+strikes all land at once. The first and last stay open in `## Open Questions` as the
+original words them, and who goes first is proposed as a question below.
+
+## Change: The free attack comes first, and a special gets no check, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## The Luck Reset`, first paragraph
+
+**Now says:**
+
+```
+When a member finishes an attack, there's a Luck check for whether the cooldown resets
+instantly. On success, the member attacks again immediately, with no cooldown wait at all.
+That free attack gets no Luck check of its own — that's what "only once" means, so the
+effect can't chain into a second free attack. On failure, the cooldown charges normally.
+Apart from costing no wait, the free attack is an ordinary attack in every way: all its
+strikes land, it spends durability per hit the same as any other attack, and it charges
+the special bar the same as any other attack. The member is eligible for a check again on
+its very next attack, the one that charges its cooldown normally — the lockout runs no
+further than the one free attack itself. Enemies get the Luck reset too, on the same terms
+as guild members.
+```
+
+**Proposed:**
+
+```
+When a member finishes an attack, there's a Luck check for whether the cooldown resets
+instantly. On success, the member attacks again immediately, with no cooldown wait at all.
+That free attack gets no Luck check of its own — that's what "only once" means, so the
+effect can't chain into a second free attack. On failure, the cooldown charges normally.
+Apart from costing no wait, the free attack is an ordinary attack in every way: all its
+strikes land, it spends durability per hit the same as any other attack, and it charges
+the special bar the same as any other attack. The member is eligible for a check again on
+its very next attack, the one that charges its cooldown normally — the lockout runs no
+further than the one free attack itself. Enemies get the Luck reset too, on the same terms
+as guild members. The free attack comes in the same tick, before anyone else acts, and
+it's always the type's ordinary attack, never its special. For now a special gets no Luck
+check.
+```
+
+**Why:** The combat engine is built this way. "Immediately" didn't say whether anyone else
+could act first, and nothing said whether a special counts as an attack for the reset.
+That's proposed as a question below.
+
+## Change: A specialist's cooldown, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Specialists in Combat`, the paragraph
+
+**Now says:**
+
+```
+A specialist attacks on its own cooldown like anyone else. The specialist makes a basic
+attack against a single target — a close-range attack, so its reach is the first available
+row like any close attacker, the enemy front line. The attack is weak — the intent is that
+specialists help a little rather than being a full detriment to the battle. A specialist
+has no special bar at all, and their attack damage works the way it does for anyone else.
+```
+
+**Proposed:**
+
+```
+A specialist attacks on its own cooldown like anyone else. The specialist makes a basic
+attack against a single target — a close-range attack, so its reach is the first available
+row like any close attacker, the enemy front line. The attack is weak — the intent is that
+specialists help a little rather than being a full detriment to the battle. A specialist
+has no special bar at all, and their attack damage works the way it does for anyone else.
+For now a specialist's cooldown starts from the slowest base, 180 ticks, a placeholder;
+Dexterity shortens it, and the floor of a tenth applies, as for any type.
+```
+
+**Why:** The combat engine is built this way. The combat types each have a base wait, and
+nothing gives a specialist one. That's proposed as a question below.
+
+## Change: Questions on cooldown combat's defaults
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+```
+
+**Proposed:**
+
+```
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+- When several cooldowns come up in the same tick, who goes first?
+- Is a special an attack for the Luck reset — does it get a check?
+- Does a free attack from the Luck reset count as one of the owner's three cycles for a
+  lasting effect?
+- Does a lasting effect end once the owner's third cycle after the cast has played out,
+  or as its fourth begins? The second keeps Shields Up on the allies for one more of the
+  Tank's waits.
+- What base wait does a specialist's cooldown have?
+```
+
+**Why:** The combat engine is built with a default for now on each of these, in the
+changes above, and none of the docs settles them. The pending "Questions on specials,
+taunts and the dive" change to this list is unchanged; these go after the entries it adds.

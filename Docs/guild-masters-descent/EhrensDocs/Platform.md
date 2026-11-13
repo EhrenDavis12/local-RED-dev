@@ -24,16 +24,26 @@ opens again.
 That holds inside a battle too. For now the rest of a battle the game closed in plays out
 exactly as it would have if the game had never closed, the same rolls and all — closing
 and opening the game can't re-roll an attack or dodge a death. An attack already made
-counts as made, even if it hadn't finished showing on screen. Saving doesn't bank
-anything, either: the
-gold found on the dive is still the party's until the dive ends, and what was found since
-the last rest area can still be lost.
+counts as made, even if it hadn't finished showing on screen. The save holds where every
+cooldown stands — how long each fighter still has to wait, whether one is owed a free
+attack from the Luck reset, and how far each lasting effect has run — so nothing is drawn
+again as it loads. Saving doesn't bank anything, either: the gold found on the dive is
+still the party's until the dive ends, and what was found since the last rest area can
+still be lost.
+
+A battle doesn't move on while the game is closed or in the background: it picks up at
+the moment it stopped. A long gap between two frames is dropped rather than played fast —
+for now at most a quarter of a second of fight plays in one frame, a placeholder — so
+coming back from the background, or a long stall, never fast-forwards a fight.
 
 A save never costs the player the save before it. If saving fails, or the phone dies
 partway through, the slot still holds the last good save, whole.
 
 Loading never changes or deletes a save. A save the game can't read, or one made by a
-newer version of the game, is reported as such and left on the phone as it is.
+newer version of the game, is reported as such and left on the phone as it is. A save
+made by an older version still loads. A saved battle is never judged against a
+placeholder number — a fighter left waiting longer than its own cooldown is accepted — so
+rebalancing a placeholder can't turn a good save into one the game can't read.
 
 For now:
 

@@ -344,6 +344,12 @@ it. It stays for its whole length even when the enemy it was aimed at dies. For 
 field's damage doesn't roll to hit, and it hurts a vanished Rogue standing in it too,
 without ending its Vanish.
 
+For now the field's damage lands before the attack does, so a character it kills never
+makes that attack. A special counts as beginning an attack, even one that strikes no one,
+like Vanish or Shields Up. The field hurts from the moment it's cast: a character standing
+in it that begins an attack later in the same tick takes its damage. The Brute's push past
+the front row isn't moving into it, since the Brute's node never changes.
+
 For now the two columns are the target's and the one to its right, or the one to its left
 when the target is in the right-hand column. How much the field does each time it deals
 damage is set once, when it's cast: a share, a placeholder, of the Mage's Intelligence,
@@ -354,7 +360,11 @@ with help, plus one roll of its staff.
 having the six types, a monster Mage's field is on the party's grid, which "the player's
 own members" didn't foresee. Nothing said which two columns, how much the field does,
 whether it outlives the enemy it was aimed at, or whether it ends a vanished Rogue's
-Vanish. Which columns, how much, and Vanish are proposed as questions below.
+Vanish. Which columns, how much, and Vanish are proposed as questions below. Nor did it
+say whether the field's damage comes before the attack it is set off by, whether a
+special counts as beginning an attack, whether the field hurts in the tick it's cast, or
+whether the Brute's push past the front row is a move into it; those are proposed as
+questions too, in "Questions on the field's timing".
 
 ## Change: The Mage's bonus pays per hit, for now
 
@@ -433,3 +443,35 @@ proposed as a question below.
 **Why:** None of the docs answers these. The ones after the Tank's taunt over a vanished
 Rogue come from the defaults the six combat types are built with. The existing entries are
 unchanged.
+
+## Change: Questions on the field's timing
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
+```
+
+**Proposed:**
+
+```
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
+- If the field's damage kills a character as it begins its attack, does that attack
+  still happen?
+- Does a special count as beginning an attack for the field, including one that strikes
+  no one, like Vanish or Shields Up?
+- Does a character standing in the field take its damage when it begins an attack in the
+  same tick the field is cast?
+- Does the Brute's push past the front row count as moving into a field?
+```
+
+**Why:** The combat engine is built with a default for now on each of these, in "Where the
+Mage's field lies, and what it does, for now", and none of the docs settles them. The
+pending "Questions on Vanish, taunts and the field" change to this list is unchanged;
+these go after the entries it adds.

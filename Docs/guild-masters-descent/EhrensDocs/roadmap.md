@@ -95,9 +95,12 @@ The dungeon board, finding and entering dungeons, and training missions.
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line,
   open question, health full at the guild hall and positions carrying between battles,
-  picking a target and how a battle ends, a special's own hits charging the bar, an
-  effect's count and a second cast stacking, targeting weights and taunts, open questions
-  on specials, taunts and the dive).
+  how a cooldown rounds, the clock, how a fight opens and who goes first, the Luck
+  reset's free attack and specials, picking a target, members' specials and how a battle
+  ends, a special's own hits charging the bar and taking the attack's place, an effect's
+  count, its end and a second cast stacking, targeting weights and taunts, a specialist's
+  cooldown, open questions on specials, taunts and the dive, and on cooldown combat's
+  defaults).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted).
@@ -111,10 +114,11 @@ The dungeon board, finding and entering dungeons, and training missions.
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
   flurry's leftover strikes stay within reach, a failed Vanish fails for one strike,
-  Volley and the Archer's streak for now, the Mage's column, field and bonus for now, open
-  questions on Vanish, taunts, the field and the types' defaults).
+  Volley and the Archer's streak for now, the Mage's column, field, the field's timing and
+  bonus for now, open questions on Vanish, taunts, the field and the types' defaults, and
+  on the field's timing).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
-  runs landscape only, and the game saves by itself.
+  runs landscape only, and the game saves by itself, mid-battle too.
   - Orientation
   - Saving
   - Open Questions
