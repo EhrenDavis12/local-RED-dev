@@ -44,9 +44,7 @@ because its two-handed sword's damage band is smaller than that of a kind puttin
 everything into a single hit.
 
 Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
-type — its two strikes all belong to that single attack. Its special bar therefore
-charges more slowly than a faster type's; the flurry is what offsets that over the course
-of a longer fight.
+type — its two strikes all belong to that single attack.
 
 Its special is a flurry of between 4 and 6 strikes on a single target. The first four
 strikes always land; each of the two after that happens on a Luck check, so the flurry
@@ -110,6 +108,5 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 ## Open Questions
 
 - What are the stats, skills and abilities for each individual type?
-- How fast does a special charge?
 - The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
   same check that can reset a cooldown, or a separate roll of its own?

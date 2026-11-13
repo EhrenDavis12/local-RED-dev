@@ -135,18 +135,24 @@ and the defender's mitigation is applied to it separately.
 
 ## The Special Bar
 
-Each member has a special bar. When it's full, the player can use a special. Every attack
-a member makes charges that member's bar — that's the base, and it's the same for every
-type. The bar charges per attack, not per strike: a multi-strike attack charges it once,
-the same as a single-strike attack does. So a member that attacks more often charges
-faster, and the slower-attacking types charge more slowly. Each combat type also has its
-own bonus condition that charges its bar on top of that — covered in the Individual Types
-doc.
+Each member has a special bar. When it's full, the player can use a special. Each hit a
+member lands charges that member's bar by 10 — that's the base, and it's the same for
+every type. The bar charges per hit, not per attack: a multi-strike attack charges once
+for each of its strikes that lands, and an attack that reaches several targets charges
+once for each of them. Each combat type also has its own bonus condition, and each time
+it's met it adds 15 on top of that base — covered in the Individual Types doc. The bar is
+full at 100.
+
+Charge and weapon durability both count hits, so what wears a weapon down is what fills
+the bar.
 
 The bar caps at full — the special is never lost, and it waits until the player uses it.
 While it sits full, charge is wasted: attacks the member makes while full charge nothing,
 and so does the type's bonus condition — that progress toward the next special is gone.
 Using the special empties the bar, and it charges again from there.
+
+A part-filled bar carries from one battle to the next within a floor, and moving to the
+next floor resets it to empty.
 
 ## Lasting Effects
 
