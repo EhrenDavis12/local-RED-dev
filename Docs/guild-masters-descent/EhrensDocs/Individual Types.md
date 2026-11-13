@@ -39,14 +39,16 @@ six enemies in all. Each of them can evade it individually, like the ordinary cl
 When the Brute pushes past the front row, it moves there, cleaves, and returns to its own
 node, all in the same action. The Brute's bonus charge condition is hitting multiple
 enemies. For now it pays once an attack, when the attack's hits land on two or more
-different enemies; a miss doesn't count.
+different enemies; a miss doesn't count, and neither does the special, which puts
+nothing in the Brute's bar.
 ```
 
 **Why:** The combat types are built this way. A close attack's targeted enemy is in the
 front row, which the special skips, so the special needed a centre. Nothing said whether
 it hits three enemies in all or three in each row, whether the cleave's neighbours take
 reduced damage the way Volley's do, or how often hitting multiple enemies pays. Each is
-proposed as a question below.
+proposed as a question below. Nor did it say whether the special pays the bonus; that is
+proposed as a question in the Combat change notes, in "Questions on the special bar".
 
 ## Change: The Tank's taunt, Shields Up and bonus, for now
 
@@ -166,6 +168,29 @@ Luck checks are the reset's is already asked in `## Open Questions`, and stays o
 Nothing said whether "always land" means the flurry can't miss, or whether "hit hard"
 means more than an ordinary strike; both are proposed as questions in "Questions on the
 flurry".
+
+## Change: The Fighter's bonus is the refill, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## The Fighter`, fourth paragraph
+
+**Now says:**
+
+```
+The flurry's own strikes don't charge the bar.
+```
+
+**Proposed:**
+
+```
+The flurry's own strikes don't charge the bar. For now the refill to 90% is the whole of
+the Fighter's bonus: it never adds 15 the way the other types' bonus conditions do.
+```
+
+**Why:** The combat engine is built this way. `Combat.md` gives every type's bonus 15 each
+time it's met, and this doc makes the Fighter's the refill to 90%. Which holds is proposed
+as a question below.
 
 ## Change: A Rogue's second strike is lost if the first kills, for now
 
@@ -521,3 +546,30 @@ checks and strikes for now, and its leftover strikes stay within reach", and non
 docs settles them. The pending "Questions on Vanish, taunts and the field" and "Questions
 on the field's timing" changes to this list are unchanged; these go after the entries
 they add.
+
+## Change: A question on the Fighter's bonus
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
+```
+
+**Proposed:**
+
+```
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
+- `Combat.md` gives every type's bonus 15 each time it's met, and this doc makes the
+  Fighter's a refill to 90%. Is the Fighter's bonus the refill, 15, or both?
+```
+
+**Why:** The combat engine is built with a default for now on this, in "The Fighter's
+bonus is the refill, for now", and the two docs disagree. The pending "Questions on
+Vanish, taunts and the field", "Questions on the field's timing" and "Questions on the
+flurry" changes to this list are unchanged; this goes after the entries they add.

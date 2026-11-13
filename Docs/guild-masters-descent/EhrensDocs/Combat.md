@@ -146,9 +146,9 @@ target selected, or whether a battle can run forever. Using members' specials wa
 the battle screen being able to; the engine already lets them. The original sentences are
 unchanged; the new ones sit after them.
 
-## Change: A special's own hits charge the bar, for now
+## Change: A special puts nothing in its owner's bar, for now
 
-> Proposed 2026-11-12 · for review
+> Proposed 2026-11-13 · for review
 
 **Where:** `## The Special Bar`, third paragraph
 
@@ -167,16 +167,48 @@ Using the special empties the bar, and it charges again from there.
 The bar caps at full — the special is never lost, and it waits until the player uses it.
 While it sits full, charge is wasted: attacks the member makes while full charge nothing,
 and so does the type's bonus condition — that progress toward the next special is gone.
-Using the special empties the bar, and it charges again from there. For now the
-special's own hits charge it like any other attack's, unless its type says otherwise.
-For now, too, a special is used when the member's cooldown comes up, in place of the
-ordinary attack that cooldown brings round.
+Using the special empties the bar, and it charges again from there. For now a special
+puts nothing into its owner's bar: its own hits charge nothing, the Mage's field's damage
+included, and it earns no bonus either — a Brute's special landing on two or more
+enemies pays nothing. The one exception is the Fighter's flurry, whose kill refills the
+bar to 90%, as the Individual Types doc says. For now, too, a special is used when the
+member's cooldown comes up, in place of the ordinary attack that cooldown brings round.
 ```
 
-**Why:** The combat engine is built this way. Nothing says whether a special's own hits
-charge the bar it has just emptied. Whether using a special also costs the member an
-ordinary attack is proposed as a question below; for now it takes the place of the attack
-its cooldown brings round.
+**Why:** The combat engine is built this way. This doc says what wears a weapon down is
+what fills the bar, and the Equipment doc says a special wears the weapon not at all, so
+nothing a special does charges it; nothing says whether a special can earn its type's
+bonus. Both are proposed as questions in "Questions on the special bar". Whether using a
+special also costs the member an ordinary attack is proposed as a question below; for now
+it takes the place of the attack its cooldown brings round.
+
+## Change: Every bar empties on a new floor and starts each dive empty, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## The Special Bar`, fourth paragraph
+
+**Now says:**
+
+```
+A part-filled bar carries from one battle to the next within a floor, and moving to the
+next floor resets it to empty.
+```
+
+**Proposed:**
+
+```
+A part-filled bar carries from one battle to the next within a floor, and moving to the
+next floor resets it to empty. For now a full bar empties too: every bar starts a new
+floor empty, and a rest area is a floor, so arriving at one empties them. For now, too,
+every dive starts with every bar empty, a dive that re-enters at a rest area included —
+the bar belongs to the dive, not to the member.
+```
+
+**Why:** The dive is built this way. "The special is never lost" and "a part-filled bar
+… resets it" leave open whether moving to the next floor empties a full bar, and nothing
+says whether a bar outlives the dive. Both are proposed as questions in "Questions on the
+special bar".
 
 ## Change: When an effect's count starts, and a second cast stacking
 
@@ -480,3 +512,38 @@ nothing gives a specialist one. That's proposed as a question below.
 **Why:** The combat engine is built with a default for now on each of these, in the
 changes above, and none of the docs settles them. The pending "Questions on specials,
 taunts and the dive" change to this list is unchanged; these go after the entries it adds.
+
+## Change: Questions on the special bar
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+```
+
+**Proposed:**
+
+```
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+- Do a special's own hits — the Mage's field's damage among them — charge the bar it has
+  just emptied?
+- Can a special earn its owner's bonus condition — a Brute's special landing on two or
+  more enemies, say?
+- Does moving to the next floor empty a full bar too, or only a part-filled one?
+- Does a member's special bar carry from one dive to the next, or does every dive start
+  with it empty?
+```
+
+**Why:** The combat engine and the dive are built with a default for now on each of
+these, in "A special puts nothing in its owner's bar, for now" and "Every bar empties on a
+new floor and starts each dive empty, for now", and none of the docs settles them. The
+pending "Questions on specials, taunts and the dive" and "Questions on cooldown combat's
+defaults" changes to this list are unchanged; these go after the entries they add.

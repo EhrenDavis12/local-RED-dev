@@ -97,10 +97,10 @@ The dungeon board, finding and entering dungeons, and training missions.
   open question, health full at the guild hall and positions carrying between battles,
   how a cooldown rounds, the clock, how a fight opens and who goes first, the Luck
   reset's free attack and specials, picking a target, members' specials and how a battle
-  ends, a special's own hits charging the bar and taking the attack's place, an effect's
-  count, its end and a second cast stacking, targeting weights and taunts, a specialist's
-  cooldown, open questions on specials, taunts and the dive, and on cooldown combat's
-  defaults).
+  ends, a special putting nothing in its owner's bar and taking the attack's place, every
+  bar emptying on a new floor and each dive, an effect's count, its end and a second cast
+  stacking, targeting weights and taunts, a specialist's cooldown, open questions on
+  specials, taunts and the dive, on cooldown combat's defaults, and on the special bar).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted).
@@ -117,7 +117,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   flurry's checks and strikes for now and its leftover strikes staying within reach, a
   failed Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's
   column, field, the field's defence, timing and bonus for now, open questions on Vanish,
-  taunts, the field and the types' defaults, on the field's timing, and on the flurry).
+  taunts, the field and the types' defaults, on the field's timing, and on the flurry, the
+  Fighter's bonus as the refill for now, and an open question on the Fighter's bonus).
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too.
   - Orientation

@@ -41,9 +41,11 @@ partway through, the slot still holds the last good save, whole.
 
 Loading never changes or deletes a save. A save the game can't read, or one made by a
 newer version of the game, is reported as such and left on the phone as it is. A save
-made by an older version still loads. A saved battle is never judged against a
-placeholder number — a fighter left waiting longer than its own cooldown is accepted — so
-rebalancing a placeholder can't turn a good save into one the game can't read.
+made by an older version still loads; a dive one of those saved between battles, from
+before the save held special bars, loads with every bar empty. A saved battle is never
+judged against a placeholder number — a fighter left waiting longer than its own
+cooldown is accepted — so rebalancing a placeholder can't turn a good save into one the
+game can't read.
 
 For now:
 
@@ -55,6 +57,12 @@ For now:
   specialist, on two members at once, or gear that's no longer in the stores — is fixed
   as it loads: the gear comes off and goes back to the stores, and the save loads. Gear
   on two members stays with the one hired first.
+- A special bar saved below empty or past full is brought back inside the bar as it
+  loads, and a dive saved between battles where every bar should be empty — at a rest
+  area, or before a floor's first battle — loads with them empty.
 
 ## Open Questions
 
+- Is a save holding a special bar below empty or past full refused, or fixed as it loads?
+- When a save holds a special bar where every bar should be empty — at a rest area, or
+  before a floor's first battle — is that bar emptied as it loads, or is the save refused?
