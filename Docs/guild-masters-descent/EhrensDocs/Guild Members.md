@@ -3,7 +3,7 @@
 > **Status:** Change notes against `Guild Members.md`, for its owner to review. The original
 > is not edited.
 
-## Change: Three questions on levelling and promotion
+## Change: Two questions on recruits and promotion
 
 > Proposed 2026-11-11 · for review
 
@@ -23,7 +23,6 @@
 - A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
   takes two-thirds of the defence into it. Which way does that round? It decides whether
   a hit from far below a member's rank is chip damage forever or genuinely nothing.
-- When a level-up uses up experience, does the leftover carry toward the next level?
 - Do two recruits of the same type and the same rank or tier start with exactly the same
   stats? Starting Stats says they're set by type and rank or tier, but the recruiting
   board's rough impression of a candidate's strengths — promising, unremarkable — suggests
@@ -51,12 +50,17 @@ members, counting specialists.
 ```
 The total is added up at the end of a combat and divided equally between all party
 members, counting specialists. For now the members counted are the ones still alive when
-the combat ends, and only they get a share.
+the combat ends, and only they get a share. Each share is exact, never rounded, so the
+shares always add back up to the total. For now, too, a combat that ends in a stand-off
+still pays for the enemies killed in it before the party turns back.
 ```
 
 **Why:** The dive is built this way. "All party members" doesn't say whether that's the
 ones who started the combat or the ones still alive. That's proposed as a question for
-`## Open Questions`.
+`## Open Questions`. Nor did anything say whether a share rounds, or whether a stand-off,
+which nobody wins, pays for its kills; experience comes from kills and is added up at the
+end of a combat, and a stand-off still ends one. The stand-off is proposed as a question
+in "Questions on experience".
 
 ## Change: Help counts where everyone stands right now
 
@@ -112,7 +116,7 @@ the board as it changes.
 ```
 
 **Why:** The game is built with a default for now on this, in the change above. The
-pending "Three questions on levelling and promotion" change to this list is unchanged.
+pending "Two questions on recruits and promotion" change to this list is unchanged.
 
 ## Change: A specialist's K comes from its tier
 
@@ -238,6 +242,10 @@ stats the same way divers do, and the Dungeon change notes give a monster the sa
 rules. Help raises the receiver's primary stat, and nothing says whether that reaches
 health; nor does "it grows as Constitution grows" say what happens to the health a member
 has left. Both are proposed as questions in "Questions on health".
+For the owner to reconcile: experience is shared at the end of every combat, so a
+level-up that raises Constitution after a battle partway through a floor raises current
+health before the next battle, while The Dungeon.md says nothing comes back between the
+battles on a single floor.
 
 ## Change: Questions on health
 
@@ -267,7 +275,7 @@ has left. Both are proposed as questions in "Questions on health".
 
 **Why:** The game is built with a default for now on each of these, in "Health counts a
 member's own Constitution, and what's taken stays taken, for now", and none of the docs
-settles them. The pending "Three questions on levelling and promotion" and "A question on
+settles them. The pending "Two questions on recruits and promotion" and "A question on
 sharing experience" changes to this list are unchanged; these go after the entries they
 add.
 
@@ -316,11 +324,23 @@ For now the steps are uneven by at most a point, so a rank's total stays exact: 
 a rank is reached once ceil(cost × (N−1) ÷ (threshold−1)) experience has been earned in
 that rank. For F to E that puts level 2 at 2, level 3 at 3, level 4 at 4, level 5 at 6,
 and level 16 at 20.
+
+Promotion needs the level threshold and the gold and nothing more — the experience is
+never checked or spent on its own — and starts the member in the new rank at level 1
+with the bar empty. For now the bar on the member sheet fills across the whole rank,
+toward the threshold, rather than toward the next level. For now, too, a member at the
+top of the ladder — SSS, or a specialist at Grandmaster SSS — has no rank left to cross,
+so earns no experience and gains no levels.
 ```
 
 **Why:** Answered 2026-11-13: "level is a number experience as a bar". How the cost is cut
 into single levels isn't settled; the even spread, rounded up, is a placeholder for now
-and cheap to change.
+and cheap to change. The one bar also settles whether leftover experience carries toward
+the next level: the bar is never spent, only read, so nothing is left over, and that
+question is no longer proposed. Promotion's "only the level counter resets" is about the
+stats being kept; the bar empties with the level, since it holds what was earned in the
+old rank. What the member sheet's bar fills toward, and the top of the ladder, are
+defaults for now, each proposed as a question in "Questions on experience".
 
 ## Change: Experience-and-levels question answered
 
@@ -341,3 +361,35 @@ and cheap to change.
 
 **Why:** Answered: one bar, written into Promotion (see "Experience is the bar, level is
 the number").
+
+## Change: Questions on experience
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+```
+
+**Proposed:**
+
+```
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- Does a combat that ends in a stand-off still pay for the enemies killed in it?
+- The member sheet shows one experience bar. Does it fill toward the next level, or across
+  the whole rank toward the threshold?
+- A member at SSS, or a specialist at Grandmaster SSS, has no rank left to cross. Do they
+  still earn experience and gain levels?
+```
+
+**Why:** The game is built with a default for now on each of these, in "Who shares a
+combat's experience, for now" and "Experience is the bar, level is the number", and none
+of the docs settles them. The pending changes to this list above are unchanged; these go
+after the entries they add.

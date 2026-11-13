@@ -67,6 +67,11 @@ For now:
 - A member on a saved dive keeps the health they had when the game saved, capped at
   their maximum — so a member saved at 7 of 10 under the old rule loads at 7 of, say,
   50, rather than keeping the damage they had taken.
+- A save made before experience became one bar per rank loads each member with their
+  level and stats kept and their experience at the point where that level starts — an
+  F-rank member at level 5 loads with 6, one at level 1 with none. On a dive one of those
+  saved partway through a floor, the battles already won on that floor never pay their
+  experience.
 
 ## Open Questions
 

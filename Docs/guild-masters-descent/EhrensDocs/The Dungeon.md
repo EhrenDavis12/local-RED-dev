@@ -165,11 +165,11 @@ comes back between the battles on a single floor. For now a rest area's fifteen 
 is in place of the five, not on top of it: clearing the floor before a rest area gives
 the fifteen alone, and pushing on from the rest area to the next floor gives nothing, so
 floors 4 → 5 → 6 give one fifteen per cent and no five. For now, too, a heal is a share
-of the maximum health a member has once the floor's experience is shared, so a level-up
-on that floor counts. Everything that lands on a member at once — the party's share and
-every Cook's — is added up first and turned into health once, and a fraction of a point
-rounds up, so every living member gets at least one point back. A heal never takes
-anyone past their maximum.
+of the maximum health a member has once the floor's last battle has shared its
+experience, so a level-up on that floor counts. Everything that lands on a member at
+once — the party's share and every Cook's — is added up first and turned into health
+once, and a fraction of a point rounds up, so every living member gets at least one point
+back. A heal never takes anyone past their maximum.
 ```
 
 **Why:** The dive is built this way. Whether a rest floor gives the fifteen per cent only

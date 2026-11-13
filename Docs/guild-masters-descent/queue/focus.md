@@ -37,6 +37,10 @@ injuries heal while the player is away.
 - **The original docs win.** User (2026-11-12): "if there is a contradiction, the main documents
   win we need to convert any changes that those main documents decided over what we had in the
   EhrenDocs." Where the other dev's docs and our change notes disagree, the change note gives way.
+- **Approved look is binding.** User (2026-11-13): "a lot of our design choices have been ignored
+  in the building of the game ... We need to find them and make sure the game has these design
+  choices." Every look-and-feel choice the user approved on the animation side is how the game
+  looks: bars, battle scene layers, menus, fonts, icons, effects.
 - **Standing yes.** User chose "Build on its own": the mastermind's proposals toward this Goal
   go straight into the queue and are built without waiting. Each finished piece still waits for
   the user's approval before it is merged.
