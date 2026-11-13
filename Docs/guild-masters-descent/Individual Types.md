@@ -111,3 +111,7 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 - What are the stats, skills and abilities for each individual type?
 - The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
   same check that can reset a cooldown, or a separate roll of its own?
+- The Archer's Volley hits the target in full and its neighbours take reduced damage. How
+  much less? Nothing sets it, so a Volley can't be worked out.
+- The Fighter's flurry strikes hit hard, but nothing says how hard. How much more than
+  one of its ordinary strikes does a flurry strike do?

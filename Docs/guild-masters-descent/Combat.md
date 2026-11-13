@@ -233,3 +233,10 @@ the Equipment doc.
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
+- When two combatants come up on the same tick, what resolves first? A test run had a
+  member attack and then die on the same tick, and the other order would have killed it
+  before its attack landed.
+- The Mage's field damages a character as that character begins its own attack. Does the
+  field's damage resolve before the attack or after it? A test run had a member at 2
+  health begin a special with a full bar, take 6 from the field, and die — so one order
+  spends the special and the other erases it.
