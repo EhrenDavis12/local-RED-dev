@@ -139,6 +139,42 @@ The dive is built with a default for now on the first and the last of those, in 
 third paragraph, and with defaults on rest areas, turning back mid-battle and stand-offs
 in the first; each is proposed as a question for `## Open Questions`.
 
+## Change: How a heal in the dive lands, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## The Dungeon`, second paragraph, its second sentence (beginning "Between
+floors"), with new sentences after it
+
+**Now says:**
+
+```
+Between floors, every member gets back five per cent of their maximum health, and nothing
+comes back between the battles on a single floor.
+```
+
+**Proposed:**
+
+```
+Between floors, every member gets back five per cent of their maximum health, and nothing
+comes back between the battles on a single floor. For now a rest area's fifteen per cent
+is in place of the five, not on top of it: clearing the floor before a rest area gives
+the fifteen alone, and pushing on from the rest area to the next floor gives nothing, so
+floors 4 → 5 → 6 give one fifteen per cent and no five. For now, too, a heal is a share
+of the maximum health a member has once the floor's experience is shared, so a level-up
+on that floor counts. Everything that lands on a member at once — the party's share and
+every Cook's — is added up first and turned into health once, and a fraction of a point
+rounds up, so every living member gets at least one point back. A heal never takes
+anyone past their maximum.
+```
+
+**Why:** The dive is built this way. Whether a rest floor gives the fifteen per cent only
+or the five as well is asked in Guild Members.md's `## Open Questions` and stays open
+there; the dive gives the fifteen only. Nothing said which maximum a heal is a share of
+when a member levels up on the floor just cleared, whether the party's share and a Cook's
+are rounded together or one at a time, or which way a fraction of a point rounds. Those
+three are proposed as questions for `## Open Questions`.
+
 ## Change: The dungeon's enemies are monsters
 
 > Proposed 2026-11-11 · for review
@@ -320,3 +356,30 @@ of a battle.
 changes above, and none of the docs settles them. The last is open because nothing says;
 the starting dungeon's depth is set to end on a rest area, so it doesn't come up yet. The
 pending "A question on turning back mid-battle" change to this list is unchanged.
+
+## Change: Questions on healing in the dive
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- When a member levels up on the floor just cleared, is the heal between floors a share of
+  their maximum health before the level-up or after it?
+- When the party's heal and a Cook's land on a member at the same moment, are they added
+  up and rounded once, or rounded one at a time?
+- Which way does a heal's fraction of a point round?
+```
+
+**Why:** The dive is built with a default for now on each of these, in "How a heal in the
+dive lands, for now", and none of the docs settles them. The pending changes to this list
+above are unchanged.

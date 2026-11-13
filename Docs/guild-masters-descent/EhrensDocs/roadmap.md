@@ -130,8 +130,10 @@ The dungeon board, finding and entering dungeons, and training missions.
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
   back anywhere and the carry limit, enemies are monsters and how they fight for now, a
   floor's monsters the same every dive, re-entering and its fees for now, open questions on
-  turning back and the dive's defaults).
+  turning back and the dive's defaults, how a heal in the dive lands for now, and open
+  questions on healing in the dive).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
-  as much for now, open question on the Cook).
+  as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
+  questions on the Cook).
 
 The design docs themselves are the source of truth; consult them, not this map, for content.
