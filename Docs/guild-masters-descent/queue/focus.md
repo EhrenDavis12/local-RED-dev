@@ -34,6 +34,9 @@ injuries heal while the player is away.
 - **Art.** Only final, approved assets from the animation work in the other checkout, copied
   in. Anything missing is a bright yellow shape with its name written on it, and goes on a list
   for the animation side.
+- **The original docs win.** User (2026-11-12): "if there is a contradiction, the main documents
+  win we need to convert any changes that those main documents decided over what we had in the
+  EhrenDocs." Where the other dev's docs and our change notes disagree, the change note gives way.
 - **Standing yes.** User chose "Build on its own": the mastermind's proposals toward this Goal
   go straight into the queue and are built without waiting. Each finished piece still waits for
   the user's approval before it is merged.

@@ -37,18 +37,22 @@ stays free for now.
 **Now says:**
 
 ```
-> **Status:** Early design. Nothing is built yet — the grid, the turn order and how gear
-> breaks are settled, but what changing formation mid-battle costs isn't.
+> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
+> reset's chance, and the never-pausing simulation are settled; whether a fight can be
+> sped up, how multi-strike cases resolve, what formation costs, how the bars read at a
+> glance, and whether the enemy grid keeps filling are not.
 ```
 
 **Proposed:**
 
 ```
-> **Status:** Early design. Nothing is built yet — the grid, the turn order, how gear
-> breaks and what changing formation mid-battle costs are settled.
+> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
+> reset's chance, the never-pausing simulation and what formation costs are settled;
+> whether a fight can be sped up, how multi-strike cases resolve, how the bars read at a
+> glance, and whether the enemy grid keeps filling are not.
 ```
 
-**Why:** The one open item it named is now settled (see the change on Formation).
+**Why:** What formation costs is now settled (see the change on Formation).
 
 ## Change: Formation-cost question answered
 
@@ -62,160 +66,149 @@ stays free for now.
 - What does changing formation mid-battle cost the player, if anything?
 ```
 
-**Proposed:** delete. The `## Open Questions` heading stays, with the entries proposed in
-"Questions on turn order and taunts" below.
+**Proposed:** delete. The other entries in `## Open Questions` stay as they are.
 
 **Why:** Answered: free for now, written into Formation.
 
-## Change: Members stay hurt from battle to battle, and 0 health is death
+## Change: Health is full at the guild hall, and where everyone stands carries over
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## Combat`, last paragraph (new paragraphs after it)
+**Where:** `## Attacks and Reach`, last paragraph (new paragraphs after it)
 
 **Now says:**
 
 ```
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
-and defence is subtracted from it separately.
+and the defender's mitigation is applied to it separately.
 ```
 
 **Proposed:**
 
 ```
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
-and defence is subtracted from it separately.
-
-A member stays hurt from battle to battle: damage taken in one battle is still there at
-the start of the next, all the way through a dive. Health comes back only from the Cook,
-from a rest area, and from going home.
-
-When a member's health reaches 0 in a battle on a dive, they die on the spot, for good.
+and the defender's mitigation is applied to it separately.
 
 Health only matters inside a dive. Back at the guild hall a member's health is back to
 full; injury is what carries from one dive to the next.
 
 For now a dive never leaves a member injured: a member comes home fine, or doesn't come
 home. Where everyone stands at the end of a battle is where they start the next one, and
-the dead leave their places empty. A special bar doesn't carry over — every bar starts
-each battle empty.
+the dead leave their places empty.
 ```
 
-**Why:** Answered: health — stay hurt from battle to battle. Answered too: a member whose
-health hits 0 in a dungeon battle dies on the spot, for good; and back at the guild hall
-health is back to full — health only matters inside a dive, and injury is what carries
-between dives. No doc said what happens to health after a battle, at 0, or after a dive,
-though The Dungeon's rest area "where the party heals" and Specialists' Cook, who "heals a
-little after every battle", only make sense if damage outlives a battle. The existing
-paragraph is unchanged, and The Dungeon's "Death in the dungeon is permanent" already
-agrees. Not settled by this: what reaching 0 health does on a training run, which "can
-injure a member, but can never kill one"; whether a dive can leave a member injured; and
-how much health the Cook and a rest area give back.
-The dive is built with a default for now on whether a dive can leave a member injured,
-and on two things nothing raised — whether the formation and the special bars carry from
-one battle to the next — in the last paragraph; each is proposed as a question for
+**Why:** Answered: back at the guild hall health is back to full — health only matters
+inside a dive, and injury is what carries between dives. No doc says what happens to
+health after a dive. The existing paragraph is unchanged. Not settled by this: what
+reaching 0 health does on a training run, which "can injure a member, but can never kill
+one", and whether a dive can leave a member injured. The dive is built with a default for
+now on that, and on one thing nothing raised — whether the formation carries from one
+battle to the next — in the last paragraph; each is proposed as a question for
 `## Open Questions`.
 
-## Change: Turn order within a round, and how a battle ends
+## Change: How a member with no target picks one, and how a battle ends
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Combat`, first paragraph (a new paragraph after it)
+**Where:** `## Player Input`, first and second paragraphs (a new paragraph after the second)
 
 **Now says:**
 
 ```
-Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
-enemies'. On a guild member's turn, that member is highlighted. Default attacks are
-auto-selected. The player can select one enemy to be specifically targeted by the entire
-party — this cuts down on clicks during gameplay.
+Default attacks are auto-selected. The player can select one enemy to be specifically
+targeted by the entire party — this cuts down on clicks during gameplay.
+
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — using a member's special once that bar is full,
+changing formation, and marking the focus target.
 ```
 
 **Proposed:**
 
 ```
-Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
-enemies'. For now everyone acts once a round, members and enemies in one shared order,
-highest Dexterity first. The order is set at the start of each round from each one's own
-Dexterity, so help from the support ring never moves anyone in it. Ties go to members
-before enemies, then front row first, left to right. On a guild member's turn, that
-member is highlighted. Default attacks are auto-selected. The player can select one enemy
-to be specifically targeted by the entire party — this cuts down on clicks during
-gameplay. A member with no enemy selected, or who can't reach the one selected, picks
-its target the way an enemy does.
+Default attacks are auto-selected. The player can select one enemy to be specifically
+targeted by the entire party — this cuts down on clicks during gameplay. A member with
+no enemy selected, or who can't reach the one selected, picks its target the way an
+enemy does.
+
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — using a member's special once that bar is full,
+changing formation, and marking the focus target.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
-set number of rounds, a placeholder, as a stand-off — and a stand-off kills no one
-further.
+set length of time, a placeholder, as a stand-off — and a stand-off kills no one further.
 ```
 
-**Why:** The combat engine is built this way, and no doc said how many times a combatant
-acts, whether help changes the order, how ties break, what a member does with no target
-selected, or whether a battle can run forever. The original sentences are unchanged;
-the new ones sit between them. Whether higher Dexterity should mean acting more often, and
-whether help to Dexterity should move anyone in the order, stay open — see the questions
-proposed for `## Open Questions`.
+**Why:** The combat engine is built this way. No doc says what a member does with no
+target selected, or whether a battle can run forever. The original sentences are
+unchanged; the new ones sit after them.
 
-## Change: The base charge is once per attack, and a special empties the bar
+## Change: A special's own hits charge the bar, for now
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Combat`, second paragraph
+**Where:** `## The Special Bar`, third paragraph
 
 **Now says:**
 
 ```
-Each member has a special bar. When it's full, the player can use a special. Every
-attack a member makes charges that member's bar — that's the base, and it's the same
-for every type. Each combat type also has its own bonus condition that charges its bar
-on top of that.
+The bar caps at full — the special is never lost, and it waits until the player uses it.
+While it sits full, charge is wasted: attacks the member makes while full charge nothing,
+and so does the type's bonus condition — that progress toward the next special is gone.
+Using the special empties the bar, and it charges again from there.
 ```
 
 **Proposed:**
 
 ```
-Each member has a special bar. When it's full, the player can use a special. Every
-attack a member makes charges that member's bar — that's the base, and it's the same
-for every type. Each combat type also has its own bonus condition that charges its bar
-on top of that. The base charge comes once per attack, whether the attack hits or not.
-Using a special empties the bar, and the special then charges it like any other attack,
-unless its type says otherwise — the Fighter's flurry doesn't. A special takes the
-turn in place of the ordinary attack. For now that holds for Vanish, Shields Up and the
-field too, which strike no one: on the turn one of them is cast, its caster makes no
-ordinary attack.
+The bar caps at full — the special is never lost, and it waits until the player uses it.
+While it sits full, charge is wasted: attacks the member makes while full charge nothing,
+and so does the type's bonus condition — that progress toward the next special is gone.
+Using the special empties the bar, and it charges again from there. For now the
+special's own hits charge it like any other attack's, unless its type says otherwise.
 ```
 
-**Why:** The combat engine is built this way. "Every attack" didn't say whether a miss
-charges, or whether a multi-strike attack charges once or per strike, and nothing said
-what using a special does to the bar. Nothing said whether a special that strikes no one leaves the caster its ordinary attack as well; the six combat types are built with the special as the whole turn, and that's proposed as a question below.
+**Why:** The combat engine is built this way. Nothing says whether a special's own hits
+charge the bar it has just emptied. Whether using a special also costs the member an
+ordinary attack is proposed as a question below.
 
-## Change: Whose turns an effect's length counts
+## Change: When an effect's count starts, and a second cast stacking
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Combat`, third paragraph
+**Where:** `## Lasting Effects`, last paragraph (a new paragraph after it)
 
 **Now says:**
 
 ```
-Vanish, Shields Up and the Mage's lingering field all last the same length — the same
-fixed number of turns. Each of the three is covered in the Individual Types doc.
+A lasting effect ends when the member whose effect it is dies. That isn't obvious for
+the two of the three that sit somewhere other than on their owner: the Mage's lingering
+field sits on the battlefield rather than on the Mage, and Shields Up's defence sits on
+the allies behind the Tank rather than on the Tank. The duration is a count of the
+owner's own cooldown cycles, and a member who is dead completes no more of them, so
+there's no clock left for the effect to run on.
 ```
 
 **Proposed:**
 
 ```
-Vanish, Shields Up and the Mage's lingering field all last the same length — the same
-fixed number of turns, a placeholder. The turns counted are the caster's own: the turn it
-was cast on doesn't count, and it lasts that many of the caster's turns after. If the
-caster dies, the effect ends with it — a Tank's Shields Up goes when the Tank does. For
-now a Shields Up or a field cast while the caster's last one is still running stacks
-with it: both run, each to its own end, so the two lots of defence add up and both fields
-do their damage. Each of the three is covered in the Individual Types doc.
+A lasting effect ends when the member whose effect it is dies. That isn't obvious for
+the two of the three that sit somewhere other than on their owner: the Mage's lingering
+field sits on the battlefield rather than on the Mage, and Shields Up's defence sits on
+the allies behind the Tank rather than on the Tank. The duration is a count of the
+owner's own cooldown cycles, and a member who is dead completes no more of them, so
+there's no clock left for the effect to run on.
+
+The cycle an effect is cast in doesn't count: it lasts three of the owner's cycles after
+that. For now a Shields Up or a field cast while the owner's last one is still running
+stacks with it: both run, each to its own end, so the two lots of defence add up and both
+fields do their damage.
 ```
 
-**Why:** The combat engine is built this way. "A fixed number of turns" didn't say whose
-turns, whether the cast turn counts, or what happens to an effect when its caster dies. Nothing said what happens when one is cast again while the last is still running; the six combat types are built to stack them, and that's proposed as a question below.
+**Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
+doesn't say whether the cycle it's cast in counts. Nothing says what happens when one is
+cast again while the last is still running; the six combat types are built to stack them,
+and that's proposed as a question below.
 
 ## Change: What the targeting weights count, and how a taunt is spent
 
@@ -254,35 +247,38 @@ takes it as one attack, hit or miss. Nothing said what a taunt does while the ta
 out of reach, when two taunts overlap, when the taunter dies, or against the party's
 selected enemy — and with monsters having the six types, a monster Tank taunts members.
 
-## Change: Questions on turn order and taunts
+## Change: Questions on specials, taunts and the dive
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Open Questions`, in place of the formation-cost entry deleted above
+**Where:** `## Open Questions`, at the end of the list
 
 **Now says:**
 
 ```
-- What does changing formation mid-battle cost the player, if anything?
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
 ```
 
 **Proposed:**
 
 ```
-- Should higher Dexterity mean acting more often, rather than only acting earlier?
-- Should help to a Rogue's or an Archer's Dexterity move them in the turn order?
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+- Should help to a Rogue's or an Archer's Dexterity shorten its cooldown?
 - When a taunted member or enemy uses a special that hits its own choice of targets
   rather than one it aims at, is the taunt spent?
-- On the turn a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field,
-  does it also make its ordinary attack?
+- When a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field, does that
+  cost it an ordinary attack, or does its cooldown run on untouched?
 - If a Tank uses Shields Up, or a Mage casts its field, while its last one is still
   running, do the two stack, or does the new one replace the old?
 - Can a dive leave a member injured?
 - Does the formation carry from one battle to the next?
-- Does a special bar carry over from one battle of a dive to the next?
 ```
 
-**Why:** None of the docs answers these. The turn order above is a default for now. The
-third question comes from how a taunt is spent once the six types' specials are built. The last two come from the specials that strike no one, as the six combat types are built.
-The last three come from the dive as it's built: each has a default for now in "Members
-stay hurt from battle to battle, and 0 health is death".
+**Why:** None of the docs answers these. The third comes from how a taunt is spent once
+the six types' specials are built, and the next two from the specials that strike no one.
+The last two come from the dive as it's built: each has a default for now in "Health is
+full at the guild hall, and where everyone stands carries over".

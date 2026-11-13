@@ -21,11 +21,11 @@ dive on where it stopped — partway through a floor, if that's where it was. Cl
 game never undoes a death: a member who died on the dive is still dead when the game
 opens again.
 
-For now that holds inside a battle too. A battle the game closed in carries on from the
-turn it closed on, never from the battle's start, and the rest of it plays out exactly as
-it would have if the game had never closed, the same rolls and all — closing and opening
-the game can't re-roll a turn or dodge a death. A turn already played counts as played,
-even if it hadn't finished showing on screen. Saving doesn't bank anything, either: the
+That holds inside a battle too. For now the rest of a battle the game closed in plays out
+exactly as it would have if the game had never closed, the same rolls and all — closing
+and opening the game can't re-roll an attack or dodge a death. An attack already made
+counts as made, even if it hadn't finished showing on screen. Saving doesn't bank
+anything, either: the
 gold found on the dive is still the party's until the dive ends, and what was found since
 the last rest area can still be lost.
 
@@ -48,5 +48,3 @@ For now:
 
 ## Open Questions
 
-- If the game reopens in the middle of a battle, does the battle carry on from the turn it
-  closed on, or start again?

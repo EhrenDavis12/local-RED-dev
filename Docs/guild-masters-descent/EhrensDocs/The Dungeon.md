@@ -36,20 +36,21 @@ through the mission board" said every dungeon is found, and the starting one isn
 **Now says:**
 
 ```
-Dungeon diving yields materials or items, and sometimes small amounts of gold.
+Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
+also drop a weapon or a piece of armour.
 ```
 
 **Proposed:**
 
 ```
-Dungeon diving yields materials or items, and sometimes small amounts of gold. For now,
-though, loot is just gold: in the first version a dive yields gold and nothing else — no
-materials, no items, and no dropped gear.
+Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
+also drop a weapon or a piece of armour. For now, though, loot is just gold: in the first
+version a dive yields gold and nothing else — no materials, no items, and no dropped gear.
 ```
 
-**Why:** Answered: for now loot will just be gold. The paragraph names materials and items
-as what a dive yields, which the first version doesn't do; the new sentence scopes the
-first version and leaves the longer-term design standing.
+**Why:** Answered: for now loot will just be gold. The paragraph names materials, items and
+dropped gear as what a dive yields, which the first version doesn't do; the new sentence
+scopes the first version and leaves the longer-term design standing.
 
 ## Change: A floor is a series of battles that scrolls right into the next
 
@@ -89,14 +90,15 @@ retreating, is the next change.
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## The Dungeon`, second paragraph, the sentences after the first ("Every 5th
-floor is a safe rest area" to the end of the paragraph)
+**Where:** `## The Dungeon`, second paragraph, from "Every 5th floor is a safe rest area" to
+the end of the paragraph
 
 **Now says:**
 
 ```
-Every 5th floor is a safe rest area, where the party heals and the player may choose to
-return to the top and exit the dungeon. Retreating always costs the loot gathered since
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent, and
+the player may choose to return to the top and exit the dungeon. The Cook adds to both
+figures, covered in the Specialists doc. Retreating always costs the loot gathered since
 the last safe floor — any party member can carry some of it, so how much is lost depends
 on who came along.
 ```
@@ -104,8 +106,9 @@ on who came along.
 **Proposed:**
 
 ```
-Every 5th floor is a safe rest area, where the party heals and the player may choose to
-return to the top and exit the dungeon. For now a rest area is a safe floor with no
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent, and
+the player may choose to return to the top and exit the dungeon. The Cook adds to both
+figures, covered in the Specialists doc. For now a rest area is a safe floor with no
 battles on it, so it drops no gold and gives no experience. The party can turn back
 anywhere, not only at a rest area — but leaving between rest areas loses the gold found
 since the last rest area. For now "anywhere" means between two battles, not in the middle
@@ -163,35 +166,29 @@ name written on it.
 
 Every monster is assigned one of the six combat types, just like the guild's members,
 and has the same characteristics of that type — a monster Tank or a monster Archer has
-that type's attacks, its special and its type advantages. Monsters carry no gear.
+that type's attacks, its special and its type advantages.
 
-A monster is given a level like a member is, and uses the same stat rules. Deeper floors
-have higher-level monsters. What level the monsters on each floor are is a placeholder,
-to be balanced later.
+A monster is given a level like a member is, and uses the same stat rules. What level the
+monsters on each floor are is a placeholder, to be balanced later.
 
 In a battle, for now, a monster's damage is its damage stat alone and its defence its
-Constitution alone — there's no weapon or armour in either. Its health follows a
-member's: for now that's the 10 a new F-rank member starts with, whatever the monster's
-level. Monsters get the support ring among themselves, a special bar and the Tank's taunt
-the same as members do, and a monster uses its special as soon as its bar is full.
+Constitution alone — there's no weapon or armour in either. Monsters get the support ring
+among themselves, a special bar and the Tank's taunt the same as members do, and a
+monster uses its special as soon as its bar is full.
 ```
 
 **Why:** Answered: the enemies are monsters, but for now we might be limited to just the
 archer animations. Answered too: yes, monsters will be assigned one of the types just
-like the characters and have those same characteristics of that type; on gear, fixed
-numbers; and on where a monster's strength comes from, levels, with deeper floors having
-higher-level monsters. The docs gave enemies a grid, targeting and repositioning but
-never said what they are. The yellow-shape clause is the project's standing rule for
-missing art. The first paragraph is unchanged. With monsters carrying combat types,
-`Guild Members.md`'s example of "an enemy force of, say, nine Brutes" fits as written.
-How a monster fights is a default for now: the answer on gear was fixed numbers, read as
-the monster's own stats with nothing added for gear — while a member's damage is its stat
-plus its weapon and its defence is Constitution plus its armour — and its health, the
-support ring, the bar and the taunt follow a member's.
+like the characters and have those same characteristics of that type; and on gear, fixed
+numbers. Combat's `## Enemies` builds enemies from the six combat types and asks, in its
+open questions, whether a monster is something other than that; this says it isn't. The
+yellow-shape clause is the project's standing rule for missing art. The first paragraph
+is unchanged. How a monster fights is a default for now: the answer on gear was fixed
+numbers, read as the monster's own stats with nothing added for gear, while Combat's
+`## Enemies` gives an enemy a chance of a weapon and of armour set by the dungeon's rank.
 For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
-a monster Brute or Rogue carries none. `## The Dungeon Board`'s "the types of monster and
-enemy found in each of the dungeons" is left as it is.
+a monster Brute or Rogue carries none for now.
 
 ## Change: A floor's monsters are the same every dive, for now
 

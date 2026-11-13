@@ -3,40 +3,6 @@
 > **Status:** Change notes against `Individual Types.md`, for its owner to review. The
 > original is not edited.
 
-## Change: A Brute's hit on a Tank skips all of its defence
-
-> Proposed 2026-11-12 · for review
-
-**Where:** `## The Brute`, first paragraph
-
-**Now says:**
-
-```
-The Brute attacks at close range. It has advantage over the Tank — it can push the Tank's
-shield aside and bash the weak points in the armour underneath, bypassing the defence
-subtraction entirely. It's weak to the Fighter: the Brute wears tanned hide, which adds a
-little defence on top of its Constitution, so there's less to subtract than against a
-properly armoured type, and a Fighter's many strikes keep most of their damage.
-```
-
-**Proposed:**
-
-```
-The Brute attacks at close range. It has advantage over the Tank — it can push the Tank's
-shield aside and bash the weak points in the armour underneath, bypassing the defence
-subtraction entirely. Nothing of the Tank's defence is subtracted: not its Constitution,
-not its armour and not Shields Up. For now the Brute's hit still gets the type advantage
-multiplier on top, and it still wears the Tank's armour like any other hit. It's weak to
-the Fighter: the Brute wears tanned hide, which adds a little defence on top of its
-Constitution, so there's less to subtract than against a properly armoured type, and a
-Fighter's many strikes keep most of their damage.
-```
-
-**Why:** The combat types are built this way. "Bypassing the defence subtraction
-entirely" didn't say whether Shields Up is part of what's bypassed. Whether the Brute also
-gets the multiplier is already proposed as a question in the Guild Members change notes.
-Whether its hit still wears the Tank's armour is proposed as a question below.
-
 ## Change: Where the Brute's cleaves land, for now
 
 > Proposed 2026-11-12 · for review
@@ -126,7 +92,7 @@ whether "that defence" is the increase or the Tank's whole defence, whether the 
 follows the column as allies move, or how often being attacked pays. Each is proposed as a
 question below.
 
-## Change: The Fighter's damage is split before defence
+## Change: The Fighter's ordinary strikes stop when the target dies, for now
 
 > Proposed 2026-11-12 · for review
 
@@ -135,61 +101,61 @@ question below.
 **Now says:**
 
 ```
-The Fighter attacks at close range, with many smaller strikes — the property both of its
+The Fighter attacks at close range, with two smaller strikes — the property both of its
 matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
-hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
-its damage is spread across them.
+hit harder rather than adding more strikes. The Fighter's ordinary strikes are light,
+because its two-handed sword's damage band is smaller than that of a kind putting
+everything into a single hit.
 ```
 
 **Proposed:**
 
 ```
-The Fighter attacks at close range, with many smaller strikes — the property both of its
+The Fighter attacks at close range, with two smaller strikes — the property both of its
 matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
-hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
-its damage is spread across them. The damage is split before defence is subtracted, so
-every light strike pays the whole of the target's defence; that is what the Tank's
-advantage over the Fighter rests on, and splitting it after defence would make many light
-strikes add up to one big hit. For now, if the target dies before the strikes run out,
+hit harder rather than adding more strikes. The Fighter's ordinary strikes are light,
+because its two-handed sword's damage band is smaller than that of a kind putting
+everything into a single hit. For now, if the target dies before the strikes run out,
 the rest are lost — only the flurry carries on to another enemy.
 ```
 
-**Why:** The combat types are built this way. "Spread across them" didn't say whether the
-split comes before defence or after. The Tank's sheet only holds if it comes before: "every
-one of them pays that subtraction and loses most of its damage". Only the flurry is said to
-carry on when its target dies. Whether the ordinary strikes should too is proposed as a
-question below.
+**Why:** The combat engine is built this way. Only the flurry is said to carry on when its
+target dies. Whether the ordinary strikes should too is proposed as a question below.
 
 ## Change: The flurry's leftover strikes stay within reach
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## The Fighter`, second paragraph
+**Where:** `## The Fighter`, third paragraph
 
 **Now says:**
 
 ```
-Its special is a flurry of up to 6 strikes on a single target. The flurry's strikes hit
-hard. If the target dies before the strikes run out, the remaining strikes carry to the
-nearest enemy still standing. If any enemy is killed during the flurry, the Fighter's
-charge bar refills to 90% — that refill is the Fighter's bonus charge condition.
+Its special is a flurry of between 4 and 6 strikes on a single target. The first four
+strikes always land; each of the two after that happens on a Luck check, so the flurry
+only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
+If the target dies before the strikes run out, the remaining strikes carry to the nearest
+enemy still standing. If any enemy is killed during the flurry, the Fighter's charge bar
+refills to 90% — that refill is the Fighter's bonus charge condition.
 ```
 
 **Proposed:**
 
 ```
-Its special is a flurry of up to 6 strikes on a single target. The flurry's strikes hit
-hard. If the target dies before the strikes run out, the remaining strikes carry to the
-nearest enemy still standing that the Fighter's close range can reach, passing over a
-vanished Rogue unless that's all there is. If nothing is in reach, the remaining strikes
-are lost. If any enemy is killed during the flurry, the Fighter's charge bar refills to
-90% — that refill is the Fighter's bonus charge condition.
+Its special is a flurry of between 4 and 6 strikes on a single target. The first four
+strikes always land; each of the two after that happens on a Luck check, so the flurry
+only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
+If the target dies before the strikes run out, the remaining strikes carry to the nearest
+enemy still standing that the Fighter's close range can reach, passing over a vanished
+Rogue unless that's all there is. If nothing is in reach, the remaining strikes are lost.
+If any enemy is killed during the flurry, the Fighter's charge bar refills to 90% — that
+refill is the Fighter's bonus charge condition.
 ```
 
 **Why:** The combat engine is built this way. "The nearest enemy still standing" could
 have reached past the front row, which the Fighter's close range never can.
 
-## Change: The Rogue's two strikes are shaped like the Fighter's, for now
+## Change: A Rogue's second strike is lost if the first kills, for now
 
 > Proposed 2026-11-12 · for review
 
@@ -206,14 +172,12 @@ Fighter's, because the weapon it carries adds less damage.
 
 ```
 The Rogue's ordinary attack is two quick strikes. Its strikes don't hit as hard as a
-Fighter's, because the weapon it carries adds less damage. For now its damage is spread
-across the two the way a Fighter's is — an equal share each, split before defence is
-subtracted — and if the target dies after the first, the second is lost.
+Fighter's, because the weapon it carries adds less damage. For now, if the target dies
+after the first, the second is lost.
 ```
 
-**Why:** The combat types are built this way. "Don't hit as hard as a Fighter's, because
-the weapon it carries adds less damage" only holds if the two attacks are shaped alike.
-Both points are proposed as questions below.
+**Why:** The combat types are built this way. Nothing says what a Rogue's second strike
+does when the first kills; that's proposed as a question below.
 
 ## Change: A failed Vanish fails for that strike only
 
@@ -347,7 +311,7 @@ because the Mage can neither dodge nor absorb, so a precise single shot is what 
 reduced damage. Whether the rest of the column should is proposed as a question below,
 alongside the Brute's cleave.
 
-## Change: The Mage's field goes straight through, for now
+## Change: Where the Mage's field lies, and what it does, for now
 
 > Proposed 2026-11-12 · for review
 
@@ -356,38 +320,41 @@ alongside the Brute's cleave.
 **Now says:**
 
 ```
-Its special is a lingering field: it covers two columns of the enemy's grid and keeps
-damaging enemies standing in it. The field affects enemies only — it never damages the
-player's own members.
+Its special is a lingering field: it covers two columns of the enemy's grid. The field
+affects enemies only — it never damages the player's own members. The field deals damage
+through two separate events: a character standing in the field takes damage from it when
+that character begins its own attack, and a character that moves into the field, changing
+its position, takes damage for entering. Reaching in to attack from outside the field
+doesn't count as entering — an attacker reaching in to attack a character standing in the
+field takes no damage from it.
 ```
 
 **Proposed:**
 
 ```
-Its special is a lingering field: it covers two columns of the enemy's grid and keeps
-damaging enemies standing in it. The field affects enemies only — it never damages the
-player's own members. A monster Mage's field lies on the party's grid, so it is the party
-it hurts: a field never damages the side that cast it. It does its damage at the start of
-each of the Mage's turns while it lasts, to whoever is standing in it then. It stays for
-its whole length even when the enemy it was aimed at dies. For now the field's damage
-goes straight through: it doesn't roll to hit, no defence is subtracted from it, and it
-wears no armour. It hurts a vanished Rogue standing in it too, without ending its Vanish.
-The Mage's ordinary column attack is different — its magic damage meets defence the way
-any area attack does.
+Its special is a lingering field: it covers two columns of the enemy's grid. The field
+affects enemies only — it never damages the player's own members. A monster Mage's
+field lies on the party's grid, so it is the party it hurts: a field never damages the
+side that cast it. The field deals damage through two separate events: a character
+standing in the field takes damage from it when that character begins its own attack,
+and a character that moves into the field, changing its position, takes damage for
+entering. Reaching in to attack from outside the field doesn't count as entering — an
+attacker reaching in to attack a character standing in the field takes no damage from
+it. It stays for its whole length even when the enemy it was aimed at dies. For now the
+field's damage doesn't roll to hit, and it hurts a vanished Rogue standing in it too,
+without ending its Vanish.
 
 For now the two columns are the target's and the one to its right, or the one to its left
-when the target is in the right-hand column. How much the field does each turn is set
-once, when it's cast: a share, a placeholder, of the Mage's Intelligence, with help, plus
-one roll of its staff. Casting it spends no use of the staff.
+when the target is in the right-hand column. How much the field does each time it deals
+damage is set once, when it's cast: a share, a placeholder, of the Mage's Intelligence,
+with help, plus one roll of its staff.
 ```
 
-**Why:** The combat engine and the six combat types are built this way. "Keeps damaging"
-didn't say when, and nothing said whether magic damage meets defence. With monsters having
-the six types, a monster Mage's field is on the party's grid, which "the player's own
-members" didn't foresee. Nothing said which two columns, how much the field does, whether
-it spends a use of the staff, whether it outlives the enemy it was aimed at, or whether it
-ends a vanished Rogue's Vanish. Whether the field should meet defence, which columns, how
-much, and Vanish are proposed as questions below.
+**Why:** The combat engine and the six combat types are built this way. With monsters
+having the six types, a monster Mage's field is on the party's grid, which "the player's
+own members" didn't foresee. Nothing said which two columns, how much the field does,
+whether it outlives the enemy it was aimed at, or whether it ends a vanished Rogue's
+Vanish. Which columns, how much, and Vanish are proposed as questions below.
 
 ## Change: The Mage's bonus pays per hit, for now
 
@@ -423,26 +390,26 @@ proposed as a question below.
 
 ```
 - What are the stats, skills and abilities for each individual type?
-- How fast does a special charge?
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
 ```
 
 **Proposed:**
 
 ```
 - What are the stats, skills and abilities for each individual type?
-- How fast does a special charge?
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?
 - When Vanish fails because the Rogue is the only thing an enemy can reach, is that
   judged once for the whole attack, or again for each strike?
 - When an attack reaches further than its range usually would — the Brute's special,
   cleaving past the front row — is "the only thing an enemy can reach" judged by the
   attack's usual reach, or by what that attack actually reaches?
 - If the Tank's attack passes over a vanished Rogue, is the Rogue still taunted?
-- Should the Mage's field meet the defence of the enemies standing in it?
 - Which enemy does the Brute's special centre on? A close attack's targeted enemy is
   in the front row, which the special skips.
 - Does the Brute's special cleave three wide in each of the two rows behind — up to six
   enemies — or hit three enemies in all?
-- When a Brute's hit skips a Tank's defence, does it still wear the Tank's armour?
 - Do the enemies next to the Brute's target, and every enemy in the Mage's column,
   take the full damage? Only Volley's neighbours are said to take reduced damage.
 - Is the Tank's target taunted when his attack misses?
@@ -450,22 +417,19 @@ proposed as a question below.
   increase, or the Tank's whole defence?
 - If an ally moves into or out of the Tank's column while Shields Up lasts, does the bonus
   follow them?
-- Is a Rogue's damage spread across its two strikes the way a Fighter's is? "Its strikes
-  don't hit as hard as a Fighter's, because the weapon it carries adds less damage" only
-  holds if the two are shaped alike.
 - If the target of a Fighter's or a Rogue's ordinary attack dies mid-attack, do the
   rest of the strikes carry on to another enemy? Only the flurry is said to.
 - Is the Archer's streak raise measured in points off the miss chance, or a share of it,
   and does it start with the second hit or the third?
 - Does Volley spill forward only from the back row, or whenever the node behind is empty?
 - Which two columns does the Mage's field cover?
-- How much does the field do each turn — set from the Mage's damage when it's cast, or
-  read again each turn? Does casting it spend a use of the staff?
+- How much does the field do each time it deals damage — set from the Mage's damage when
+  it's cast, or read again each time?
 - Does the field's damage end a Rogue's Vanish, the way an area attack does?
 - How often does each type's bonus condition pay? The sheets name the condition, not how
   many times it pays in one attack.
 ```
 
-**Why:** None of the docs answers these. The ones after the field's defence come from the
-defaults the six combat types are built with. The existing entries are unchanged, and
-"How fast does a special charge?" stays open.
+**Why:** None of the docs answers these. The ones after the Tank's taunt over a vanished
+Rogue come from the defaults the six combat types are built with. The existing entries are
+unchanged.

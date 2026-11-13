@@ -163,10 +163,9 @@ fixed for gold and no materials.
 ```
 
 **Why:** Answered: for now, repair costs gold only. Nothing in the first version gives the
-guild materials, so a broken piece could not otherwise be fixed. The paragraph, the third
-paragraph's "for gold and materials" and the status line's "repair costs gold and
-materials if broken" stay as the longer-term design; the new sentence scopes the first
-version. The open question on which materials a broken piece needs stays open for that
+guild materials, so a broken piece could not otherwise be fixed. The paragraph and the
+third paragraph's "for gold and materials" stay as the longer-term design; the new
+sentence scopes the first version. The open question on which materials a broken piece needs stays open for that
 longer-term design.
 
 ## Change: Two questions on stores and condition

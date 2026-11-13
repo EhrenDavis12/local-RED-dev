@@ -56,7 +56,7 @@ state all need an answer. The existing entry is unchanged.
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## Time` (new paragraphs after the existing one)
+**Where:** `## Time`, first paragraph (new paragraphs after it)
 
 **Now says:**
 
