@@ -5,10 +5,10 @@
 ## The Brute
 
 The Brute attacks at close range. It has advantage over the Tank — it can push the Tank's
-shield aside and bash the weak points in the armour underneath, bypassing the defence
-subtraction entirely. It's weak to the Fighter: the Brute wears tanned hide, which adds a
-little defence on top of its Constitution, so there's less to subtract than against a
-properly armoured type, and a Fighter's many strikes keep most of their damage.
+shield aside and bash the weak points in the armour underneath, halving the Tank's
+defence in the calculation. It's weak to the Fighter: the Fighter halves the Brute's
+defence in the calculation. The Brute wears tanned hide, which adds a little defence on
+top of its Constitution.
 
 The Brute's ordinary attack cleaves too: it hits the targeted enemy and the two directly
 next to it, on whichever row its close range can reach, and each of them can evade it
@@ -22,9 +22,8 @@ hitting multiple enemies.
 
 ## The Tank
 
-The Tank attacks at close range. It has advantage over the Fighter: the Tank's defence is
-subtracted from each incoming hit, and a Fighter lands many smaller strikes, so every one
-of them pays that subtraction and loses most of its damage.
+The Tank attacks at close range. It has advantage over the Fighter: the Tank's defence
+counts double in the calculation against a Fighter.
 
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
 
@@ -38,15 +37,21 @@ attacked.
 
 ## The Fighter
 
-The Fighter attacks at close range, with many smaller strikes — the property both of its
+The Fighter attacks at close range, with two smaller strikes — the property both of its
 matchups turn on. The number of strikes is fixed by its type; levelling makes each strike
-hit harder rather than adding more strikes. The Fighter's ordinary strikes are light —
-its damage is spread across them.
+hit harder rather than adding more strikes. The Fighter's ordinary strikes are light,
+because its two-handed sword's damage band is smaller than that of a kind putting
+everything into a single hit.
 
-Its special is a flurry of up to 6 strikes on a single target. The flurry's strikes hit
-hard. If the target dies before the strikes run out, the remaining strikes carry to the
-nearest enemy still standing. If any enemy is killed during the flurry, the Fighter's
-charge bar refills to 90% — that refill is the Fighter's bonus charge condition.
+Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
+type — its two strikes all belong to that single attack.
+
+Its special is a flurry of between 4 and 6 strikes on a single target. The first four
+strikes always land; each of the two after that happens on a Luck check, so the flurry
+only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
+If the target dies before the strikes run out, the remaining strikes carry to the nearest
+enemy still standing. If any enemy is killed during the flurry, the Fighter's charge bar
+refills to 90% — that refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 
@@ -90,13 +95,18 @@ ordinary attack is an area attack covering a whole column of the enemy's grid �
 rows. It's weak to the Archer because the Mage can neither dodge nor absorb, so a
 precise single shot is what kills it.
 
-Its special is a lingering field: it covers two columns of the enemy's grid and keeps
-damaging enemies standing in it. The field affects enemies only — it never damages the
-player's own members.
+Its special is a lingering field: it covers two columns of the enemy's grid. The field
+affects enemies only — it never damages the player's own members. The field deals damage
+through two separate events: a character standing in the field takes damage from it when
+that character begins its own attack, and a character that moves into the field, changing
+its position, takes damage for entering. Reaching in to attack from outside the field
+doesn't count as entering — an attacker reaching in to attack a character standing in the
+field takes no damage from it.
 
 The Mage's bonus charge condition is allies in front of it in its own column taking hits.
 
 ## Open Questions
 
 - What are the stats, skills and abilities for each individual type?
-- How fast does a special charge?
+- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
+  same check that can reset a cooldown, or a separate roll of its own?

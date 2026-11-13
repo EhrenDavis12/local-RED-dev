@@ -13,6 +13,9 @@ not a character in it. The main screen is the inside of a guild hall.
 Time passes in real time, and it keeps passing while the game is closed — missions
 complete and injuries heal while the player is away.
 
+A dive in progress is the exception: it doesn't advance while the game is closed. It
+pauses, and picks up again right where it left off.
+
 ## Guild Rank
 
 The game starts at an F-rank guild. Grade is raised by clearing milestone quests — named,
@@ -25,6 +28,15 @@ F → E → D → C → B → A → S → SS → SSS
 ## The Three Boards
 
 The hall has three boards — a mission board, a recruiting board, and a dungeon board.
+
+## The Dorms and the Smithy
+
+The Dorms are where the player sees members' stats and assigns their weapons and armour.
+
+The smithy is where a Blacksmith is assigned. When the guild holds more than one
+Blacksmith, it is the one assigned to the smithy whose work counts.
+
+How gear and quality actually work is covered in the Equipment doc.
 
 ## The Party
 
@@ -54,16 +66,17 @@ included, not just routine work. How many members a mission needs varies by the 
 — some want one, some want several. How long a mission takes varies by its rank: low-rank
 missions take minutes, high-rank ones take hours.
 
-Mission failure normally results in an injured status, not death. An injured member is out
-of action until healed — they can't be sent on a mission or taken on a dive. They recover
-on their own for free, though slowly — or the player can pay gold to speed it up. Gold
-only reaches the injury: a mission timer runs its full length whatever the player pays.
-The exception: sending an individual member whose own rank or tier is below the mission's
-rank, even one the guild as a whole is otherwise suited for, carries a chance that member
-is killed.
+Mission failure normally results in an injured status, not death — members abandon a
+mission before dying. An injured member is out of action until healed — they can't be sent
+on a mission or taken on a dive. They recover on their own for free, though slowly — or
+the player can pay gold to speed it up. Gold only reaches the injury: a mission timer runs
+its full length whatever the player pays. The exception: sending an individual member
+whose own rank or tier is below the mission's rank, even one the guild as a whole is
+otherwise suited for, carries a chance that member is killed.
 
 Missions pay, and they also collect items and materials the guild can sell; some mission
-rewards can themselves be items.
+rewards can themselves be items. A mission can also bring back gear — a weapon or a piece
+of armour.
 
 The intent is that mission rewards keep the guild going but don't advance it — the climb
 comes from milestone quests and from what the dungeon yields.
@@ -97,11 +110,12 @@ Which specialist types the guild can recruit is covered in the Specialists doc.
 Gold is the money in the game.
 
 At rank F the guild has access to a shop. The guild sells items and materials there, and
-the shop sells to the guild too — the player can buy items and equipment. The equipment
-the shop sells is of a baseline quality, and that baseline rises with guild rank.
+the shop sells to the guild too — the player can buy items and equipment.
 
-Having a blacksmith, armourer or alchemist in the guild gives it that kind of crafting. A
-crafter in the guild produces better than the shop's baseline.
+Having a blacksmith, armourer or alchemist in the guild gives it that kind of crafting.
+
+The quality of the equipment the shop sells, and how a crafter's work compares, are
+covered in the Equipment doc.
 
 ## Open Questions
 

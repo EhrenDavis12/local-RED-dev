@@ -1,8 +1,9 @@
 # Guild Members
 
 > **Status:** Early design. Nothing is built yet — the help percentages and what they
-> apply to, both member ladders — ranks and tiers — and each type's stat weighting are
-> settled, but what a type advantage is worth isn't.
+> apply to, both member ladders — ranks and tiers — each type's stat weighting, and how
+> a type advantage works are settled, but whether the six advantages are worth the same
+> isn't.
 
 ## Combat Types
 
@@ -22,9 +23,10 @@ The second triangle:
 - Archer has advantage on Mage
 - Mage has advantage on Rogue
 
-A type advantage is a damage multiplier: an advantaged attack deals proportionally more
-damage than the same attack without the advantage. Each matchup's own mechanism is
-covered in the Individual Types doc.
+A type advantage isn't a multiplier added on top of an attack. Each matchup comes out of
+rules already in play — evasion against a single shot, area attacks that can't be dodged,
+and how much defence each kind of armour adds. Each matchup's own mechanism is covered in
+the Individual Types doc.
 
 ## The Support Ring
 
@@ -71,12 +73,40 @@ The power of the fighting members is based on five base stats:
 - Intelligence
 - Luck
 
-Dexterity is also the speed attribute: it's what determines turn order in combat.
+Dexterity is also the speed attribute: it's what determines how fast a member's cooldown
+is met in combat.
 
 A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
-ranks highest, plus their weapon.
+ranks highest, plus their weapon's rolled range. That total is multiplied by a fraction,
+K ÷ (K + Defence), where Defence is the target's own defence and K comes from the
+attacker's rank. K is the defence at which half the damage gets through — against a
+target whose defence equals K, the fraction comes out to exactly one half.
+
+K by rank:
+
+- F — 20
+- E — 40
+- D — 80
+- C — 160
+- B — 320
+- A — 640
+- S — 1,280
+- SS — 2,560
+- SSS — 5,120
+
+K doubles at each rank, the same way the damage and defence bands double.
 
 A member's defence comes from Constitution plus their equipment.
+
+A member's health is their Constitution times ten — at F rank, where stats are
+single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
+through defence is taken off that pool. Because it comes from Constitution, it grows as
+Constitution grows, with no separate rule for levelling. Constitution already means
+toughness, so it is the pool and the base of defence both, and health needs no stat of its
+own.
+
+When a member's health reaches zero, they are dead. What that means in the dungeon is
+covered in the Dungeon doc.
 
 Damage is the stat plus what you carry, defence is the stat plus what you wear.
 
@@ -86,25 +116,13 @@ A member's evasion comes from Luck.
 
 An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
 land on a space rather than on a person, so evasion does nothing against them. They do
-pay a reduced defence, though: defence still applies to them, but at less than its usual
-value.
+pay a reduced defence, though: an area attack uses two-thirds of the target's defence
+when working the fraction above.
 
 ## Weapons and Armour
 
-Each combat type carries one kind of weapon and wears one kind of armour, and both kinds
-are fixed by the type — neither changes over a member's life. What changes is their
-quality.
-
-How much damage a weapon adds depends on its kind, so the kinds differ from each other.
-
-Quality is the axis gear improves along, for armour as well as weapons.
-
-Gear sits in the guild's stores rather than belonging to any one member; the player
-assigns pieces to members from there.
-
-Where gear quality comes from — the crafters — is covered in the Specialists doc. The shop
-it's bought from is covered in the Core Concept doc, and gear wearing out and breaking is
-covered in the Combat doc.
+What each combat type carries and wears, gear's quality, where it comes from, and how it
+wears out are all covered in the Equipment doc.
 
 ## Starting Stats
 
@@ -116,19 +134,32 @@ A newly recruited level-1 F-rank member starts with single-digit stats.
 
 ## Levels and Experience
 
-Each level a member gains increases one base stat. Which stat goes up is weighted
-random — a member's type makes certain stats more likely but not guaranteed, so members
-of the same type turn out slightly different from each other. Specialists gain base
-stats the same way divers do, and their specialty improves alongside.
+A level-up raises three of a member's base stats by one each — three different stats,
+chosen by the type's weighting, most likely through least likely. A member's type makes
+certain stats more likely but not guaranteed, which is what makes members of the same type
+turn out slightly different from each other.
+Specialists gain base stats the same way divers do, and their specialty improves
+alongside.
 
-Experience is awarded per floor: once a floor's battles resolve, experience is the number
-of enemies defeated by the party divided by the number of party members, counting
-specialists.
+Experience comes from kills, and what a kill is worth is set by the defeated enemy's rank:
+
+- F — 1
+- E — 3
+- D — 6
+- C — 12
+- B — 24
+- A — 48
+- S — 96
+- SS — 192
+- SSS — 384
+
+The total is added up at the end of a combat and divided equally between all party
+members, counting specialists.
 
 ## Stat Weighting by Type
 
-Each type has an ordering of all five base stats, from most likely to gain on a
-level-up through least likely.
+Each type has an ordering of all five base stats. The ordering decides which three
+stats go up on a level-up, from most likely through least likely.
 
 - Brute — Strength, Constitution, Dexterity, Luck, Intelligence
 - Tank — Constitution, Strength, Dexterity, Luck, Intelligence
@@ -164,6 +195,17 @@ The level a member needs doubles at each promotion: the first is level 16, the s
 32, and so on — 16, 32, 64, 128, 256, 512, 1024, 2048. The same eight thresholds serve
 both ladders — nine tiers means eight promotions, exactly as many as nine ranks.
 
+Crossing a rank also costs a set amount of experience, multiplying by five at each step:
+
+- F to E — 20
+- E to D — 100
+- D to C — 500
+- C to B — 2,500
+- B to A — 12,500
+- A to S — 62,500
+- S to SS — 312,500
+- SS to SSS — 1,562,500
+
 ## Specialists
 
 Specialist types include Porter, Cook, Scout, Herbalist, Miner, Blacksmith, Armourer, and
@@ -177,5 +219,23 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
 
 ## Open Questions
 
-- What is having a type advantage actually worth in a fight?
-- Does the experience a defeated enemy is worth scale with dungeon depth?
+- With each matchup working through its own mechanism rather than a shared multiplier, the
+  six advantages aren't necessarily worth the same amount. Should they be, or is it fine
+  for some matchups to bite harder than others?
+- Crossing a rank costs a set amount of experience, and reaching the next rank also needs
+  a level threshold — 16 levels for the first, doubling after. Does the experience buy
+  those levels at an even rate, or do the two run on separate counters with whichever is
+  slower deciding?
+- The experience a rank costs multiplies by five each step while what a kill is worth
+  doubles, so every rank takes about two and a half times the fights of the one before —
+  at around six enemies a fight and a party of six, F to E is about twenty fights and SS
+  to SSS about eight thousand, roughly thirteen and a half thousand for the whole climb.
+  Which side gets tuned, the cost of a rank or what a stronger enemy is worth?
+- A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
+  the five per cent for the floor as well?
+- The Mage's lingering field damages what stands in it. Does that damage count as an area
+  attack too, paying two-thirds defence, or is the reduction only for an attack that is
+  aimed?
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.

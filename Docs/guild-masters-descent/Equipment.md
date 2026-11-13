@@ -1,10 +1,9 @@
 # Equipment
 
-> **Status:** Early design. Nothing is built yet — the weapon and armour kinds, quality
-> ladder, each piece's two attributes, that figures are rolled once and fixed for life,
-> condition, wear and breakage, that gear drops, crafter's Luck as its baseline edge, and
-> that repair costs gold and materials if broken, are settled — but the bands aren't: no
-> kind has a damage or defence band set at any class, apart from the one example here.
+> **Status:** Early design. Nothing is built yet — the kinds, the quality ladder, the
+> bands for damage, defence and durability, wear and breaking, and repair are settled,
+> but how crafting and repair are costed, how a roll is made, and what the player is
+> shown of a piece isn't.
 
 ## What a Member Carries
 
@@ -34,10 +33,8 @@ The six armour kinds, one per combat type:
 
 How much defence armour adds depends on its kind too. The Tank's full armour adds more
 defence than the Brute's tanned hide, and the Fighter's light armour sits between the two.
-The Rogue's hooded armour, the Archer's leather and the Mage's robe aren't placed
-against those three or against each other: each kind of armour can only be worn by its
-own combat type, so the player never chooses between kinds, and the rest don't need
-ranking.
+Each kind of armour can only be worn by its own combat type, so the player never chooses
+between kinds.
 
 A member's damage comes from whichever of Strength, Dexterity or Intelligence its type
 ranks highest, plus their weapon. A member's defence comes from Constitution plus their
@@ -60,21 +57,60 @@ a fixed figure for its kind and class: each kind at each class has a wider band,
 individual piece's own range is drawn from inside that band when the piece is made, so two
 pieces of the same kind and class are not the same. The span itself is rolled too, not
 just where it sits in the band — one piece's range can come out wider or narrower than
-another's, not only higher or lower within it. The bands for neighbouring classes overlap,
-so a well-rolled piece of a lower class can be better than a poorly-rolled piece
-of a higher one. An F-class knife, for instance, draws from a band of 2–12, so one F-class
-knife might come out 10–12 while another comes out 2–4. One individual weapon's rolled
-range might come out 4–6, and when that member attacks, 4–6 is what the weapon adds to the
-damage calculation.
+another's, not only higher or lower within it.
+
+Each kind's F-class Attack Damage band, in ascending order:
+
+- Knife, the Rogue's — 2–12
+- Staff, the Mage's — 3–15
+- Two-handed sword, the Fighter's — 4–16
+- Club, the Brute's — 4–18
+- Short sword, the Tank's — 5–21
+- Bow, the Archer's — 6–26
+
+A band is set by how much work one strike has to do: a kind that strikes more than once in
+an attack, or lands on more than one enemy, carries a smaller band than one putting
+everything into a single hit on a single target.
+
+Each class doubles the band below it — E is double F, D double E, and so on up the nine
+rungs to SSS. The knife's F-class band of 2–12 doubles to an E-class band of 4–24, and by
+the time it reaches SSS it has doubled all the way to 512–3072. That doubling is also why
+the bands for neighbouring classes overlap: an E-class band starts inside the F-class band
+it sits above, so a well-rolled piece of a lower class can be better than a poorly-rolled
+piece of a higher one. An F-class knife, for instance, might come out 10–12 while another
+comes out 2–4, and whatever range a piece rolls is what that weapon adds when the member
+attacks.
 
 Durability works the same way: a piece's Durability is drawn from a band for its kind and
 class rather than being a fixed figure, and the individual piece's figure is rolled from
 that band when the piece is made. Once rolled, it counts down by hits, not by attacks:
 each hit the weapon lands spends one use, and an attack that misses spends none. Because
 the kinds land different numbers of hits per attack, durability is balanced per weapon
-kind to make the kinds come out even — a kind that strikes many times per attack needs
-a higher durability figure than a kind that strikes once. The weapon breaks when it
+kind to make the kinds come out even — a kind that lands more hits in an attack needs a
+higher durability figure than a kind that lands fewer, and what's counted is hits landed,
+not strikes made: the Brute's cleave and the Mage's column land three hits from one
+strike, the same as a kind that strikes three separate times. The weapon breaks when it
 reaches zero.
+
+Each kind's F-class Durability band, grouped by how many hits it lands in one attack:
+
+- Bow, the Archer's, and short sword, the Tank's — 40–80. One strike on one target, so
+  one hit an attack.
+- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
+  hits an attack.
+- Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
+  so three hits an attack.
+
+A kind's band scales with the hits it lands in an attack, so every kind lasts about the
+same number of attacks — somewhere around sixty at the middle of its band.
+
+Unlike the damage bands, a kind's Durability band is the same at every class — an SSS
+weapon is no more durable than an F one; what it has is a far bigger damage band. Higher
+floors mean tougher enemies and longer fights, so durability that grew with class would
+simply cancel out, and gear breaking is meant to go on mattering at every rank rather
+than only early. It also means losing a weapon hurts more the better it is, which agrees
+with the rule above: a broken weapon costs little early and a great deal once damage is
+in the hundreds or thousands.
 
 Armour carries two attributes as well, the same shape as a weapon's pair: a Defence range
 and a Durability. Defence is a range, the way Attack Damage is a range, and not a single
@@ -82,13 +118,41 @@ figure — how much damage reduction the armour gives, and it's drawn from a ban
 way a weapon's range is. Armour's durability works the same way a weapon's does: it
 counts down by hits taken, not by attacks faced, and a missed attack spends none of it.
 
+Each kind's F-class Defence band, in ascending order:
+
+- Robe, the Mage's — 1–6
+- Hooded armour, the Rogue's — 2–8
+- Tanned hide, the Brute's — 2–9
+- Leather, the Archer's — 3–10
+- Light armour, the Fighter's — 4–13
+- Full armour, the Tank's — 6–18
+
+Armour covers roughly a third of a typical strike at the same class, with Constitution
+on top of it — that keeps defence meaningful against every incoming strike without
+zeroing hits out as a matter of course. The ladder is the same as the weapons': each
+class doubles the band below it, up all nine rungs, so defence keeps pace with damage.
+
+Armour's Durability band is the same for every kind: 60–120. Unlike the weapons, armour
+isn't grouped by kind — there's nothing to group by. A weapon's band follows the hits it
+lands in an attack, which runs from one to three depending on the kind, but every kind of
+armour takes hits the same way, so the thing that organised the weapon bands has nothing
+to organise here.
+
+Where it sits follows how much more slowly armour wears than a weapon does: a member lands
+one to three hits an attack but only takes hits when an enemy chooses them, spread across
+a party of up to fifteen. 60–120 sits between the one-hit weapon band at 40–80 and the
+two-hit band at 80–160, putting a typical member's armour at roughly a weapon's lifetime.
+Like weapon durability, it doesn't change with class — the same band at F as at SSS.
+
 A piece's Attack Damage, its Defence and its Durability are each rolled once, at
 creation, and fixed for the life of that piece.
 
-Both ranges roll separately for every strike of a multi-strike attack: the attacker's
-Attack Damage range is rolled afresh for each strike, and because each strike already
-resolves on its own — rolling to hit separately and subtracting defence separately —
-the defender's Defence range is rolled per strike as well.
+Each strike also carries the member's own damage stat in full, the same as its weapon roll
+— the stat isn't split between the strikes of an attack. Both ranges roll separately for
+every strike of a multi-strike attack: the attacker's Attack Damage range is rolled afresh
+for each strike, and because each strike already resolves on its own — rolling to hit
+separately and applying the defender's mitigation separately — the defender's Defence
+range is rolled per strike as well.
 
 The shop sells equipment of a baseline quality, and that baseline rises with guild rank. A
 crafter in the guild produces better than the shop's baseline.
@@ -164,6 +228,12 @@ damage is in the hundreds or thousands, what the weapon was adding means a lot.
 Both a weapon and an armour can break partway through a multi-strike sequence, so later
 strikes in the same attack can deal or face different damage than earlier ones.
 
+A special spends none of the attacker's own weapon durability, however many hits it
+lands — the Fighter's flurry, the Archer's Volley, the Brute's two-row cleave and the
+Mage's field cost the weapon nothing. Armour spends durability for every hit it takes
+regardless, whoever lands it and whether it came from an ordinary attack or a special: a
+weapon only wears from ordinary attacks, armour wears from everything.
+
 ## Repair
 
 Repairs happen in the guild hall between dives. Repairing a piece that still has
@@ -182,8 +252,6 @@ materials.
 
 ## Open Questions
 
-- How much does a step of quality add to armour's defence?
-- Are the six kinds of weapon in a fixed order of damage?
 - What does crafting consume, and how long does it take? Can a crafter work while out on a
   mission or a dive?
 - How narrow or wide can a rolled span be — can a piece come out with a single figure
