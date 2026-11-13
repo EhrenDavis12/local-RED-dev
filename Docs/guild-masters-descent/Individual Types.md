@@ -17,8 +17,9 @@ individually.
 The Brute's special skips the nearest occupied row and cleaves the two rows behind it, or
 whatever rows remain if there are fewer. The cleave hits the targeted enemy and the two
 directly next to it. When the Brute pushes past the front row, it moves there, cleaves,
-and returns to its own node, all in the same action. The Brute's bonus charge condition is
-hitting multiple enemies.
+and returns to its own node, all in the same action. The Brute's bonus charge condition
+is hitting more than one enemy: each enemy beyond the first charges 5, rather than the
+flat 15 every other type's bonus condition gives.
 
 ## The Tank
 
