@@ -124,6 +124,22 @@ The dungeon board, finding and entering dungeons, and training missions.
   column, field, the field's defence, timing and bonus for now, open questions on Vanish,
   taunts, the field and the types' defaults, on the field's timing, and on the flurry, the
   Fighter's bonus as the refill for now, and an open question on the Fighter's bonus).
+- `EhrensDocs/Look and Feel.md` — new doc proposed for the originals (Look and Feel): the
+  user's approved look for the game, gathered from the animation work.
+  - Battle scene (meadow)
+  - Battle scene (cave)
+  - Shadows and depth
+  - Health and mana bars
+  - Characters and animations
+  - Effects
+  - Damage text
+  - Menus and the scroll
+  - Map
+  - Font
+  - Icons
+  - Palette
+  - Sound and music
+  - Open Questions
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
   health afresh as a save loads.
