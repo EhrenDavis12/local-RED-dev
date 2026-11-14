@@ -161,20 +161,23 @@ comes back between the battles on a single floor.
 
 ```
 Between floors, every member gets back five per cent of their maximum health, and nothing
-comes back between the battles on a single floor. For now a rest area's fifteen per cent
-is in place of the five, not on top of it: clearing the floor before a rest area gives
-the fifteen alone, and pushing on from the rest area to the next floor gives nothing, so
-floors 4 → 5 → 6 give one fifteen per cent and no five. For now, too, a heal is a share
-of the maximum health a member has once the floor's last battle has shared its
-experience, so a level-up on that floor counts. Everything that lands on a member at
+comes back between the battles on a single floor. A rest area's fifteen per cent is in
+place of the five, not on top of it, and a Cook's is the same — its fifteen there, not
+its five as well. Clearing the floor before a rest area gives the fifteen alone, and
+pushing on from the rest area to the next floor gives nothing, so floors 4 → 5 → 6 give
+one fifteen per cent and no five. For now a heal is a share of the maximum health a
+member has once the floor's last battle has shared its experience, so a level-up on that
+floor counts. Everything that lands on a member at
 once — the party's share and every Cook's — is added up first and turned into health
 once, and a fraction of a point rounds up, so every living member gets at least one point
 back. A heal never takes anyone past their maximum.
 ```
 
-**Why:** The dive is built this way. Whether a rest floor gives the fifteen per cent only
-or the five as well is asked in Guild Members.md's `## Open Questions` and stays open
-there; the dive gives the fifteen only. Nothing said which maximum a heal is a share of
+**Why:** Answered 2026-11-13: "OK, then just the 15%" — arriving at a rest floor gives the
+fifteen per cent only, never the five as well, and a Cook adds its fifteen only, not its
+five too. The question goes from Guild Members.md's `## Open Questions` (see "Rest-floor
+heal question answered" in its change notes). The rest of the paragraph is how the dive is
+built. Nothing said which maximum a heal is a share of
 when a member levels up on the floor just cleared, whether the party's share and a Cook's
 are rounded together or one at a time, or which way a fraction of a point rounds. Those
 three are proposed as questions for `## Open Questions`.

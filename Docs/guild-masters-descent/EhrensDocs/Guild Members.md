@@ -393,3 +393,22 @@ the number").
 combat's experience, for now" and "Experience is the bar, level is the number", and none
 of the docs settles them. The pending changes to this list above are unchanged; these go
 after the entries they add.
+
+## Change: Rest-floor heal question answered
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## Open Questions`, the entry beginning "A rest floor is still a floor"
+
+**Now says:**
+
+```
+- A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
+  the five per cent for the floor as well?
+```
+
+**Proposed:** delete. The other entries in `## Open Questions` stay as they are.
+
+**Why:** Answered 2026-11-13: "OK, then just the 15%" — the fifteen per cent only, and a
+Cook's fifteen only too. Written into The Dungeon.md's change notes (see "How a heal in
+the dive lands, for now").

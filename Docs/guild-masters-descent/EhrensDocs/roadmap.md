@@ -115,7 +115,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   its tier, a hit rounding down once for now, the Mage's field as an area attack for now,
   health from a member's own Constitution and what's taken staying taken for now,
   questions on health, experience as the bar and level as the number for now, the
-  experience-and-levels question answered, and questions on experience).
+  experience-and-levels question answered, questions on experience, and the
+  rest-floor heal question answered).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
@@ -151,8 +152,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   back anywhere and the carry limit, how many monsters a battle has, enemies are monsters
   with a rank and level and how they fight for now, a floor's monsters the same every dive
   and where each stands, re-entering and its fees for now, open questions on
-  turning back and the dive's defaults, how a heal in the dive lands for now, and open
-  questions on healing in the dive).
+  turning back and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
+  and open questions on healing in the dive).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).
