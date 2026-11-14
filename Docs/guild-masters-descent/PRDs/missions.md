@@ -67,23 +67,47 @@ still load.
     its members, by the time the guild is next settled. Its members are back. An injury
     from a mission that ended partway through the time away has already healed by
     exactly the time since that mission ended: no less, and no credit for time before
-    the end. This depends on the order in which the parts settle: today `InjuryPart` runs
-    first. — EhrensDocs/Core Concept "How time away is counted" ("an injury heals by
-    exactly the time that has passed since it happened"); Core Concept `## Time` ¶1.
+    the end. The contract a test pins: suppose one settle of `E` seconds reaches a
+    mission with `T` seconds left, where `T ≤ E`. Each member it injures then has
+    `InjuryDurationSeconds − (E − T)` left, floored at 0. That figure is the same whether
+    the `E` seconds are settled at once or in any number of pieces. — EhrensDocs/Core
+    Concept "How time away is counted" ("an injury heals by exactly the time that has
+    passed since it happened"); Core Concept `## Time` ¶1.
+11a. A mission ends when its time left reaches 0 or less. A settle that brings it exactly
+    to 0 ends it in that settle.
 12. A mission's outcome can't be changed by saving and loading, or by how often the game
     was opened while it ran. Settling in pieces gives the same result as settling once.
     The recruiting board already works this way. — EhrensDocs/Platform `## Saving` ¶3
     (saving and loading "can't re-roll"; stated there for battles, and extended here
     to missions); EhrensDocs/Core Concept "How time away is counted" (each second counts
-    once).
+    once). The outcome is drawn when the mission is sent, from an `IRng` the caller passes
+    in, and it is stored on the running mission. Settling draws nothing, so a test can
+    drive the outcome through the `IRng`.
+12a. Sending settles first, the way `TryHire` does. A refusal changes nothing beyond that
+    settle.
+12b. Wherever the rules ask whether a member is on the held dive, the caller passes the
+    held dive in (`GameSession.HeldDive`). `Guild` doesn't hold the dive. (This applies
+    if Open Question 8's default is taken.)
+12c. Each way of refusing a member who is out on a mission gets its own outcome value: the
+    Dungeon Board pick (`PickOutcome`, `PartyOutcome`), and equip, promote and dismiss if
+    Open Question 6's default is taken. `TryDismiss` may change from `bool` to an outcome
+    type to carry it.
 
 ### Outcome
 
-13. A mission that succeeds adds its gold to the guild. — Core Concept `## Missions` ¶5
-    ("Missions pay"); user request 2026-11-14.
-14. A mission that fails sends its members home injured, not dead. The injury goes
-    through `Guild.InjureMember`, at the length set by the existing
-    `InjuryDurationSeconds` placeholder. — Core Concept `## Missions` ¶4. *Which
+13. A mission that succeeds adds its gold to the guild. The total is capped at
+    `int.MaxValue`, the way `TrySell` and the dive cap theirs. — Core Concept
+    `## Missions` ¶5 ("Missions pay"); user request 2026-11-14.
+14. A mission that fails sends its members home injured, not dead. Each one gets the same
+    injury `Guild.InjureMember` gives: the existing `InjuryDurationSeconds`, with the
+    longer of the old and new time kept (`Member.Injure`). Inside the settle it is
+    applied directly through `Member.Injure`, never through `Guild.InjureMember`. That
+    method settles first, so calling it from inside `Settle` would count elapsed time
+    twice or recurse. The mission's part then takes the rest of the settle's elapsed time
+    (elapsed − the mission's time left) off that new injury itself. For that to be right,
+    the mission part runs after `InjuryPart` in `TimeDrivenParts`. The injury part then
+    never sees, in the same settle, an injury the mission part has just made, so no
+    second is taken off twice (req 11). — Core Concept `## Missions` ¶4. *Which
     members, and whether any gold is paid: see Open Questions.*
 15. No member dies on a mission in this version. The death risk applies only to a member
     whose rank or tier is below the mission's rank, and no member is below F. —
@@ -103,6 +127,10 @@ still load.
     injuries and the board's restock store theirs: as seconds counted down by settling,
     not as a wall-clock end time. — Code pattern: `Member.InjurySecondsRemaining`,
     `RecruitingBoard.SecondsTowardRestock`.
+18a. The save also holds the results of finished missions until the hall notice
+    (Open Question 9) has shown them. A mission that ends during a settle on load or
+    resume never loses its result. A save without that field loads with no results
+    waiting.
 19. A save of version 7 or older has no missions. It loads with an empty board that is
     first stocked when opened, the way the recruiting board is (`SaveManager.Check`),
     with no missions running and every member at home. This isn't a repair and isn't
@@ -115,7 +143,8 @@ still load.
     the game can't read. Examples: negative time left, an undefined rank, a number of
     members below 1. This matches the existing `IsMeaningful` checks. — EhrensDocs/
     Platform `## Saving` ¶5. *A mission naming a member who isn't on the roster, or
-    shared between two missions, or also on the saved dive: see Open Questions.*
+    shared between two missions, or also on the saved dive: see Open Questions 10. The
+    build takes its default.*
 
 ### Hall
 
@@ -200,6 +229,9 @@ this PRD's proposal and not the docs' word. The build can go ahead on the defaul
    the existing repair notice. Cheap; it is UI.
 10. **A save whose mission names a member not on the roster, a member on two missions, or
     a member also on the saved dive: refused, or fixed as it loads?** *Proposed default:*
-    fixed. The bad member is taken off the mission and the fix is logged as a repair. A
-    mission left with nobody is removed and pays nothing. This matches how bad gear slots
-    are fixed now (EhrensDocs/Platform `## Saving`, "For now"). Cheap.
+    fixed, and logged as a repair. The bad member is taken off the mission. The mission
+    keeps running with the members it has left and still pays in full. A mission left
+    with no valid member is dropped. A mission whose member count doesn't match its
+    stated need, with every ID valid, is also treated as a repair under the same rule.
+    This matches how bad gear slots are fixed now (EhrensDocs/Platform `## Saving`, "For
+    now"). Cheap.
