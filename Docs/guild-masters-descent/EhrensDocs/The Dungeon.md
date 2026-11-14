@@ -305,8 +305,12 @@ back up, from floor 10 to floor 5, and a dive that reaches no rest area leaves n
 party can re-enter, not only the one that got there, and its first battle is on the floor
 after the rest area. There's no re-entering at a rest area with no floor past it.
 
-For now the entry fee is so much for each member of the party, and the teleportation fee
-is one flat amount whatever the party's size. Both amounts are placeholders.
+For now the entry fee is so much for each member of the party, and how much depends on
+the dungeon's rank — the lower the rank, the cheaper the fee, and the less gold its floors
+drop. An F-rank dungeon costs 2 gold a member, so a party of three pays 6 and the first
+floor's 8 gold more than pays it back. Each rank up costs more per member and drops more
+gold a floor. The teleportation fee stays one flat amount whatever the party's size. All
+the amounts are placeholders.
 
 For now, once a party is in, the guild hall can't be reached until the dive ends — no
 hiring, shopping or changing gear partway through a dive and then carrying on with it.
@@ -316,7 +320,12 @@ hiring, shopping or changing gear partway through a dive and then carrying on wi
 deepest one ever reached, or the one the most recent dive reached — and nothing said
 whether the teleportation fee grows with the party the way the entry fee does, or whether
 the player can leave a dive for the guild hall and come back to it. All three are
-proposed as questions for `## Open Questions`.
+proposed as questions for `## Open Questions`. Answered 2026-11-14, too, on the entry
+fee: "it takes 10 gold per person to send them into the dungeon after completing three
+fights. I only get eight gold. ... That's financially bankrupt me instantly in the game.
+... We need to make the entrance fee a lot cheaper for these dungeons. The cheaper, the
+dungeon, the cheaper the entrance fee that might be a necessary thing. Then the lesser
+the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
 
 ## Change: A question on what gold a retreat keeps
 
