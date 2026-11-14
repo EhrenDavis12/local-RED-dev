@@ -69,13 +69,14 @@ Each floor has 2–3 battles.
 
 ```
 Each floor is a series of battles, 2–3 of them. At the end of a battle the screen scrolls
-right into the next battle. The first dungeon has 3 battles a floor to win. After the last
-one comes victory, dropping loot: the floor's gold drops as one lump at the end of the
-floor, and only once every battle on that floor is won — if a floor has 3 battles, the
-party needs to beat all 3. How much gold a floor drops is a placeholder, to be balanced
-later. For now every battle on a floor has the same number of monsters, set by the floor:
-a deeper floor never has fewer, and the deepest floor with battles has more than the
-first. How many is a placeholder too, to be balanced later.
+right into the next battle, with no result screen and nothing to click in between: a
+floor's battles play straight through, back to back. The first dungeon has 3 battles a
+floor to win. After the last one comes victory, dropping loot: the floor's gold drops as
+one lump at the end of the floor, and only once every battle on that floor is won — if a
+floor has 3 battles, the party needs to beat all 3. How much gold a floor drops is a
+placeholder, to be balanced later. For now every battle on a floor has the same number of
+monsters, set by the floor: a deeper floor never has fewer, and the deepest floor with
+battles has more than the first. How many is a placeholder too, to be balanced later.
 ```
 
 **Why:** Answered: each floor is a series of battles, and at the end of a battle the
@@ -88,7 +89,9 @@ has follows Combat's `## Enemies` — the deeper the floor, the more enemies tur
 fight — and the dive is built with a set number for each floor, the same every battle on
 it. What the board's floor layout shows, whether a party picks a route, and what makes a
 boss floor are not settled by this. The rest of the paragraph, on rest areas and
-retreating, is the next change.
+retreating, is the next change. Answered 2026-11-14, too: "you enter a level and the
+level should go through" — a floor's battles play back to back, with no screen after
+each one showing what was gained and waiting for a click on Continue.
 
 ## Change: A party can turn back anywhere, and carries only so much gold out
 
@@ -115,8 +118,9 @@ the player may choose to return to the top and exit the dungeon. The Cook adds t
 figures, covered in the Specialists doc. For now a rest area is a safe floor with no
 battles on it, so it drops no gold and gives no experience. The party can turn back
 anywhere, not only at a rest area — but leaving between rest areas loses the gold found
-since the last rest area. For now "anywhere" means between two battles, not in the middle
-of one, and a battle that ends in a stand-off counts as the party turning back there.
+since the last rest area. "Anywhere" includes the middle of a battle: a Retreat button
+is there all through a floor's battles, and the party can leave with it at any moment.
+For now a battle that ends in a stand-off counts as the party turning back there.
 
 There is a carry limit for each person. Each member can carry up to 10 gold coming out,
 and each Porter up to 100. Gold beyond what the party can carry is left behind. Both
@@ -140,8 +144,11 @@ decides instead how much gold comes out at all. Not settled by this: whether a P
 100 is on top of the 10 every member carries, how much more the Herbalist and the Miner
 carry, and how a dead member's gear counts against a limit measured in gold.
 The dive is built with a default for now on the first and the last of those, in the
-third paragraph, and with defaults on rest areas, turning back mid-battle and stand-offs
-in the first; each is proposed as a question for `## Open Questions`.
+third paragraph, and with defaults on rest areas and stand-offs in the first; each is
+proposed as a question for `## Open Questions`. Answered 2026-11-14: the party can
+retreat at any time, the middle of a battle included — "you can holler a retreat sign
+that will take them out". Which gold a retreat keeps is proposed as a question in
+"A question on what gold a retreat keeps".
 
 ## Change: How a heal in the dive lands, for now
 
@@ -311,9 +318,9 @@ whether the teleportation fee grows with the party the way the entry fee does, o
 the player can leave a dive for the guild hall and come back to it. All three are
 proposed as questions for `## Open Questions`.
 
-## Change: A question on turning back mid-battle
+## Change: A question on what gold a retreat keeps
 
-> Proposed 2026-11-12 · for review
+> Proposed 2026-11-14 · for review
 
 **Where:** `## Open Questions`, at the end of the list
 
@@ -327,11 +334,15 @@ proposed as questions for `## Open Questions`.
 
 ```
 - How far can a training mission level a member?
-- Can a party turn back in the middle of a battle, or only between battles?
+- When a party retreats partway through a floor, does it lose only that floor's gold and
+  carry on with the gold it had before the floor, or all the gold found since the last
+  rest area?
 ```
 
-**Why:** "The party can turn back anywhere" doesn't say whether that includes the middle
-of a battle.
+**Why:** The user, 2026-11-14: "they won't gain any of that gold for that level. You
+should still continue with the gold they had. Before the level." The change "A party can
+turn back anywhere, and carries only so much gold out" has a retreat between rest areas
+lose all the gold found since the last rest area, and the two may not agree.
 
 ## Change: Questions on the dive's defaults
 
@@ -371,7 +382,7 @@ of a battle.
 **Why:** The dive is built with a default for now on each of these but the last, in the
 changes above, and none of the docs settles them. The last is open because nothing says;
 the starting dungeon's depth is set to end on a rest area, so it doesn't come up yet. The
-pending "A question on turning back mid-battle" change to this list is unchanged.
+pending "A question on what gold a retreat keeps" change to this list is unchanged.
 
 ## Change: Questions on healing in the dive
 

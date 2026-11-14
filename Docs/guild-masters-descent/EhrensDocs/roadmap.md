@@ -152,7 +152,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   back anywhere and the carry limit, how many monsters a battle has, enemies are monsters
   with a rank and level and how they fight for now, a floor's monsters the same every dive
   and where each stands, re-entering and its fees for now, open questions on
-  turning back and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
+  what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
   and open questions on healing in the dive).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open

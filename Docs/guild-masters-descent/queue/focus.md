@@ -33,7 +33,9 @@ injuries heal while the player is away.
   blocks that work.
 - **Art.** Only final, approved assets from the animation work in the other checkout, copied
   in. Anything missing is a bright yellow shape with its name written on it, and goes on a list
-  for the animation side.
+  for the animation side. One exception, user (2026-11-13): "the only thing that won't actually be
+  a final art, which is just the at the ready pose for the characters" — each character's static
+  ready pose (and rest pose in menus) is used as a stand-in until its idle animation exists.
 - **The original docs win.** User (2026-11-12): "if there is a contradiction, the main documents
   win we need to convert any changes that those main documents decided over what we had in the
   EhrenDocs." Where the other dev's docs and our change notes disagree, the change note gives way.
@@ -41,6 +43,7 @@ injuries heal while the player is away.
   in the building of the game ... We need to find them and make sure the game has these design
   choices." Every look-and-feel choice the user approved on the animation side is how the game
   looks: bars, battle scene layers, menus, fonts, icons, effects.
+- **Copy annie's Unity work, don't re-create it.** User (2026-11-13): "Yes, try forge just copy first do trust what Annie did. It's all been approved. It all looks good."
 - **Standing yes.** User chose "Build on its own": the mastermind's proposals toward this Goal
   go straight into the queue and are built without waiting. Each finished piece still waits for
   the user's approval before it is merged.
@@ -65,6 +68,7 @@ for experience, sent from the dungeon board) are out of the first version.
 
 - Timed missions — out of the MVP for now (user, 2026-11-11).
 - Training missions — "will reintroduce that later" (user, 2026-11-11).
+- Battle framing with more ground and less sky — "hold off on making more ground and less sky just for now" (user, 2026-11-13).
 
 <!-- Ideas to keep, not to build yet. The mastermind never queues these; the user moves one
 to the queue by saying so. -->
