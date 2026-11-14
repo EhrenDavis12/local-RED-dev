@@ -72,13 +72,16 @@ alongside the materials and items they yield.
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
 
-For now, though, loot is just gold. In the first version a dive yields gold and nothing
+For now, though, loot is just gold. In the first version a dive or a mission yields gold and nothing
 else — no materials, no items, and no dropped gear.
 ```
 
 **Why:** Answered: for now loot will just be gold. Both paragraphs have the dungeon
 dropping gear and yielding materials or items, which the first version doesn't do; they
-stay as the longer-term design, and the new paragraph scopes the first version.
+stay as the longer-term design, and the new paragraph scopes the first version. Missions
+are held to gold too, for now: that's a default the build chose, not yet the user's word,
+and it's proposed as a question in Core Concept's change "Questions on missions'
+defaults".
 
 ## Change: A dead member's gear comes home, for now
 
