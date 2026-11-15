@@ -218,6 +218,14 @@ Archer. The user, 2026-11-02: "let's enforce that". (animation items #98 and #10
 Reference:
 `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/auto/style_guide/families.png`.
 
+**Gear and the art.** A character's art never changes with its gear. The Brute swings its
+axe, the Tank holds its warhammer and its shield, and the Archer wears its Forest Robes,
+whatever they have equipped: the Tank shows the shield it is drawn with whichever shield
+it carries, or none, and the Archer's leather armour is gear, not a change of costume.
+The user, 2026-11-14: "nothing about the animations character changes so the shield he
+has the shield he'll always have" and "let them have what the design says, but in the
+end, the art is not gonna change".
+
 ## Effects
 
 **Particle sprites.** Twelve kinds. The user: "yes apporved so we can move on". (animation
@@ -336,6 +344,13 @@ Assets:
 `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/scenes/ui_parchment/icons_currency/gold/`
 and
 `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/scenes/ui_parchment/icons_currency/crystal/`.
+
+**What the game carries.** Only the pictures the game draws: the gear icons, the shields
+for the Tank's shields, and the red round flask, which is the health potion. The rest are
+left out of the game and out of the shop — the food and the jug, the ring, the amulet,
+the key, the chest, the scroll, the boot, the curved sword, the arrows, the crystal and
+the other two flasks. The user, 2026-11-14: "remove the 21 pictures that nobody uses we
+don't need them them from the shop too".
 
 ## Palette
 

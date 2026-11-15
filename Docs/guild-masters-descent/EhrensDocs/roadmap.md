@@ -109,7 +109,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
   member's gear comes home for now, the shop sells class F only for now, a span no wider
-  at SSS than at F for now, and a question on span width).
+  at SSS than at F for now, a question on span width, the Brute's axe and the Tank's
+  warhammer, the Tank's swappable shield, a member's one healing potion, and questions
+  on shields and potions).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   recruits and promotion, who shares a combat's experience and a stand-off's for now, help
   follows the board live, an open question on sharing experience, a specialist's K from

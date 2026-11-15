@@ -321,3 +321,205 @@ span be"
 
 **Why:** None of the docs answers it. The span width above is a default for now. The other
 entries, and the pending changes to this list, are unchanged.
+
+## Change: The Brute carries axes and the Tank warhammers
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## What a Member Carries`, the list of the six weapon kinds
+
+**Now says:**
+
+```
+- Fighter — two-handed swords, and only two-handed swords
+- Brute — clubs
+- Tank — short swords
+- Archer — bows
+- Mage — staffs
+- Rogue — knives
+```
+
+**Proposed:**
+
+```
+- Fighter — two-handed swords, and only two-handed swords
+- Brute — axes
+- Tank — warhammers
+- Archer — bows
+- Mage — staffs
+- Rogue — knives
+```
+
+**Why:** Answered 2026-11-14: the weapons follow the character art that's already drawn —
+the Brute swings an axe and the Tank holds a warhammer. The user: "the tank now has a
+Warhammer just just make it so cause the animations to redo is painful". Only the names
+change. Each band in `## Quality` stays as it is, because a band is set by how a kind's
+strikes land, and the axe cleaves the way the club did. The next two changes rename the
+kinds in Quality's band lists.
+
+## Change: The Attack Damage bands name the axe and the warhammer
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## Quality`, the list after "Each kind's F-class Attack Damage band, in
+ascending order:"
+
+**Now says:**
+
+```
+- Knife, the Rogue's — 2–12
+- Staff, the Mage's — 3–15
+- Two-handed sword, the Fighter's — 4–16
+- Club, the Brute's — 4–18
+- Short sword, the Tank's — 5–21
+- Bow, the Archer's — 6–26
+```
+
+**Proposed:**
+
+```
+- Knife, the Rogue's — 2–12
+- Staff, the Mage's — 3–15
+- Two-handed sword, the Fighter's — 4–16
+- Axe, the Brute's — 4–18
+- Warhammer, the Tank's — 5–21
+- Bow, the Archer's — 6–26
+```
+
+**Why:** Follows "The Brute carries axes and the Tank warhammers". The bands are
+unchanged.
+
+## Change: The Durability bands name the axe and the warhammer
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## Quality`, the list after "Each kind's F-class Durability band, grouped by
+how many hits it lands in one attack:"
+
+**Now says:**
+
+```
+- Bow, the Archer's, and short sword, the Tank's — 40–80. One strike on one target, so
+  one hit an attack.
+- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
+  hits an attack.
+- Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
+  so three hits an attack.
+```
+
+**Proposed:**
+
+```
+- Bow, the Archer's, and warhammer, the Tank's — 40–80. One strike on one target, so one
+  hit an attack.
+- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
+  hits an attack.
+- Axe, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
+  so three hits an attack.
+```
+
+**Why:** Follows "The Brute carries axes and the Tank warhammers". The bands are
+unchanged.
+
+## Change: The Tank carries a shield, and shields can be swapped
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## What a Member Carries`, the paragraph beginning "How much defence armour
+adds depends on its kind too" (a new paragraph after it)
+
+**Now says:**
+
+```
+How much defence armour adds depends on its kind too. The Tank's full armour adds more
+defence than the Brute's tanned hide, and the Fighter's light armour sits between the two.
+Each kind of armour can only be worn by its own combat type, so the player never chooses
+between kinds.
+```
+
+**Proposed:**
+
+```
+How much defence armour adds depends on its kind too. The Tank's full armour adds more
+defence than the Brute's tanned hide, and the Fighter's light armour sits between the two.
+Each kind of armour can only be worn by its own combat type, so the player never chooses
+between kinds.
+
+The Tank carries a shield as well as its weapon and its armour. A shield is a piece of
+gear: there is more than one shield, and the player can equip a Tank with a shield, take
+it off, or swap it for another.
+```
+
+**Why:** Answered 2026-11-14: "we should keep the shield swappable" — "item wise will
+have other shields that can be equipped and equipped". The docs already gave the Tank a
+shield (the Brute pushes "the Tank's shield aside" in `Individual Types.md`, and the
+Tank's special is Shields Up) but never said it was gear. Whatever shield is equipped, the
+Tank's art keeps the shield it's drawn with; that's in `Look and Feel.md`, "Gear and the
+art". What a shield adds, and the rest the answer doesn't settle, is proposed as questions
+in "Questions on shields and potions".
+
+## Change: A member carries one healing potion and drinks it by themselves
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## What a Member Carries`, last paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+The weapon the Rogue carries adds less damage than the Fighter's. The Brute wears tanned
+hide, which adds a little defence on top of its Constitution — less than a properly
+armoured type has.
+```
+
+**Proposed:**
+
+```
+The weapon the Rogue carries adds less damage than the Fighter's. The Brute wears tanned
+hide, which adds a little defence on top of its Constitution — less than a properly
+armoured type has.
+
+A member can also carry one potion into a dive, bought at the shop and handed over in the
+Dorms. For now the only potion is a healing potion. The member drinks it by themselves
+when they drop low in a battle — the player never taps anything. How low that is, how much
+the potion heals and what it costs at the shop are placeholders, to be balanced later.
+```
+
+**Why:** Answered 2026-11-14: "as of right now let the characters drink them when they
+need them, only healing potions for now" — one potion each, drunk by the member itself,
+with no tapping, and heal-only for now. No doc had a potion a member carries. The
+Alchemist's potions in `Specialists.md` are a separate thing and are left as they are. The
+user didn't give the figures, so they're placeholders. What the answer doesn't settle is
+proposed as questions in "Questions on shields and potions".
+
+## Change: Questions on shields and potions
+
+> Proposed 2026-11-14 · for review
+
+**Where:** `## Open Questions`, at the end of the list, after the two entries that "Two
+questions on stores and condition" adds
+
+**Now says:**
+
+```
+- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
+  deciding which of two Armourers sets armour quality?
+```
+
+**Proposed:**
+
+```
+- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
+  deciding which of two Armourers sets armour quality?
+- What does a shield add to the Tank, and does it wear down and break the way a weapon or
+  armour does?
+- Can a type other than the Tank carry a shield?
+- When a Tank has no shield equipped, can it still use Shields Up?
+- Can a specialist carry a potion into a dive too, or only the six combat types?
+- Does drinking the potion cost a member anything in the battle — its next attack, or a
+  wait — or is it free?
+- If a member comes home without drinking their potion, does it go back to the stores?
+```
+
+**Why:** None of the docs answers these, and the answers on shields and potions leave them
+open. The existing entries, and the pending changes to this list above, are unchanged.
