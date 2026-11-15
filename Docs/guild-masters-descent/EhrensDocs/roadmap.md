@@ -103,8 +103,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   specials, taunts and the dive, on cooldown combat's defaults, and on the special bar).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
-  counted, missions in the first version as F-rank jobs that pay gold, and open
-  questions on missions' defaults).
+  counted, missions in the first version as F-rank jobs that pay gold, open
+  questions on missions' defaults, a member on a dive can't be dismissed for now, and a
+  question on dismissing a member on a dive).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead

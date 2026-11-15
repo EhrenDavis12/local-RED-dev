@@ -19,7 +19,7 @@ A dive in progress is saved too. If the game is sent to the background or killed
 through a dive, the save holds the dive itself, and opening the game again carries the
 dive on where it stopped — partway through a floor, if that's where it was. Closing the
 game never undoes a death: a member who died on the dive is still dead when the game
-opens again.
+opens again. Nor does it give back a potion: one drunk on the dive is still gone.
 
 That holds inside a battle too. For now the rest of a battle the game closed in plays out
 exactly as it would have if the game had never closed, the same rolls and all — closing
@@ -42,10 +42,12 @@ partway through, the slot still holds the last good save, whole.
 Loading never changes or deletes a save. A save the game can't read, or one made by a
 newer version of the game, is reported as such and left on the phone as it is. A save
 made by an older version still loads; a dive one of those saved between battles, from
-before the save held special bars, loads with every bar empty. A saved battle is never
+before the save held special bars, loads with every bar empty, and a save from before
+potions loads with none in the stores and none on any member. A saved battle is never
 judged against a placeholder number — a fighter left waiting longer than its own
-cooldown is accepted — so rebalancing a placeholder can't turn a good save into one the
-game can't read.
+cooldown is accepted, and so is a member holding a potion while under the drink
+threshold — so rebalancing a placeholder can't turn a good save into one the game can't
+read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
@@ -61,6 +63,9 @@ For now:
   specialist, on two members at once, or gear that's no longer in the stores — is fixed
   as it loads: the gear comes off and goes back to the stores, and the save loads. Gear
   on two members stays with the one hired first.
+- A save holding fewer than no potions in the stores, or a potion slot holding anything
+  but one potion or none, is fixed as it loads: the stores go to none or the slot is
+  emptied, and the save loads.
 - A special bar saved below empty or past full is brought back inside the bar as it
   loads, and a dive saved between battles where every bar should be empty — at a rest
   area, or before a floor's first battle — loads with them empty.

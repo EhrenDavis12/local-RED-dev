@@ -483,14 +483,45 @@ A member can also carry one potion into a dive, bought at the shop and handed ov
 Dorms. For now the only potion is a healing potion. The member drinks it by themselves
 when they drop low in a battle — the player never taps anything. How low that is, how much
 the potion heals and what it costs at the shop are placeholders, to be balanced later.
+
+For now a potion works like this:
+
+- Every member can carry one — the six combat types, the Cook and the Porter. It sits in a
+  slot of its own beside the weapon and the armour, which holds one potion or none.
+- A potion costs 20 gold at the shop and goes into the guild's stores. In the Dorms the
+  player hands one from the stores to a member with an empty slot, or takes a member's
+  potion back to the stores. A potion can't be sold back to the shop.
+- A member drinks only in a battle, the moment a hit leaves them alive and under 30% of
+  their maximum health — at a maximum of 50, a member left on 15 doesn't drink and one
+  left on 14 does. Any hit that lands counts, whatever it comes from — a strike, a
+  special, an area hit or a lingering field, even one that defence takes to nothing — and
+  a miss never does. A hit that kills them leaves no time to drink.
+- The potion gives back 30% of the member's maximum health, rounded up, and never takes
+  them past their maximum. It lands straight after the hit that set it off, before
+  anything else happens in the battle.
+- Drinking is free: it isn't an action, and it leaves the member's wait, any free attack
+  they're owed and their special bar as they were.
+- A member who comes home without drinking keeps the potion in their slot for the next
+  dive. A member who dies still holding theirs sends it home to the stores when the dive
+  ends, the same as their gear; if a battle leaves no one in the party alive, every
+  potion the party carried is lost.
+- A potion can't be handed over or taken back while its member is away on a mission, or
+  from the moment the party goes into a dive until that dive ends — even while the player
+  has stepped back out to the guild hall. Otherwise a member who has drunk theirs could be
+  handed a second between battles, and a fallen member's potion could be saved before the
+  party falls. Dismissing a member puts their potion back in the stores.
 ```
 
 **Why:** Answered 2026-11-14: "as of right now let the characters drink them when they
 need them, only healing potions for now" — one potion each, drunk by the member itself,
 with no tapping, and heal-only for now. No doc had a potion a member carries. The
 Alchemist's potions in `Specialists.md` are a separate thing and are left as they are. The
-user didn't give the figures, so they're placeholders. What the answer doesn't settle is
-proposed as questions in "Questions on shields and potions".
+user didn't give the figures, so they're placeholders, kept in the game's tuning file with
+the others. The game is built this way. Every "for now" in the new list is a default the
+build chose, recorded as cheap to change and not yet the user's word, and each one is
+proposed as a question in "Questions on shields and potions". A member on a dive that
+hasn't ended can't be dismissed either; that's in Core Concept's change "A member on a
+dive can't be dismissed, for now".
 
 ## Change: Questions on shields and potions
 
@@ -519,7 +550,16 @@ questions on stores and condition" adds
 - Does drinking the potion cost a member anything in the battle — its next attack, or a
   wait — or is it free?
 - If a member comes home without drinking their potion, does it go back to the stores?
+- In the guild hall, does a member's potion behave like their gear — taken back in the
+  Dorms, left as it is while they're away on a mission, and back to the stores when
+  they're dismissed?
+- When a member dies in the dungeon still holding their potion, does it come home the
+  way their gear does, and is it lost if the whole party falls?
+- Can a potion be sold back to the shop?
+- While a dive hasn't ended, can the player give a potion to, or take one from, a member
+  who is on it?
 ```
 
 **Why:** None of the docs answers these, and the answers on shields and potions leave them
-open. The existing entries, and the pending changes to this list above, are unchanged.
+open. The game is built with a default for now on each potion question, in "A member
+carries one healing potion and drinks it by themselves". The existing entries, and the pending changes to this list above, are unchanged.

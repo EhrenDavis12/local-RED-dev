@@ -187,3 +187,57 @@ claim missions, milestone quests and the Herbalist's and Miner's yield.
 the first version, as F-rank jobs that pay gold", and none of the docs settles them. The
 pending "Three questions on the roster, injury and a new guild" change to this list is
 unchanged.
+
+## Change: A member on a dive can't be dismissed, for now
+
+> Proposed 2026-11-15 · for review
+
+**Where:** `## The Recruiting Board`, the paragraph beginning "A member can be dismissed"
+
+**Now says:**
+
+```
+A member can be dismissed to make room on the roster. The gold spent recruiting and
+promoting that member is lost.
+```
+
+**Proposed:**
+
+```
+A member can be dismissed to make room on the roster. The gold spent recruiting and
+promoting that member is lost.
+
+For now a member who is in a dive that hasn't ended can't be dismissed, even while the
+player has stepped back out to the guild hall — not until the dive ends, the same as a
+member away on a mission.
+```
+
+**Why:** The game is built this way. Dismissing a member partway through a dive would put
+the potion they carry back in the stores while the dive still counts them, handing out a
+free potion, and it can break the save. It's a default the build chose, recorded as cheap
+to change and not yet the user's word, and it's proposed as a question in "A question on
+dismissing a member on a dive".
+
+## Change: A question on dismissing a member on a dive
+
+> Proposed 2026-11-15 · for review
+
+**Where:** `## Open Questions`, at the end of the list, after the entries that "Questions on
+missions' defaults" adds
+
+**Now says:**
+
+```
+- What changes at each rank from F to SSS?
+```
+
+**Proposed:**
+
+```
+- What changes at each rank from F to SSS?
+- Can a member who is in a dive that hasn't ended be dismissed?
+```
+
+**Why:** The game is built with a default for now, in "A member on a dive can't be
+dismissed, for now", and none of the docs settles it. The pending changes to this list
+above are unchanged.
