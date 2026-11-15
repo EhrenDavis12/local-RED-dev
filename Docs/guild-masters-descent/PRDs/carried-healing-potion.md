@@ -69,6 +69,15 @@ the user for this build, recorded as cheap to change, and are not yet in a desig
     (`Guild.CheckEquip`, `TryAssign`, `Unassign`), so the potion paths need it too. This
     matches `EhrensDocs/Core Concept.md`, "Missions are in the first version": an away
     member can't "have their gear changed".
+5e. **User default:** a member on the held dive can neither be handed a potion nor have
+    theirs taken back. This runs from the moment the party goes in until the dive ends,
+    including while the player has backed out of the dive screen into the Dorms. Without
+    it, requirement 6 (one drink per dive) and requirement 12a (lost on a wipe) could be
+    got round. The Dorms shows the refusal "Away on a dive" in the potion slot, worded like
+    the mission one (`DormsText.AwayOnMission`, "Away on a mission"). The guild tells a
+    member on the held dive the same way the mission send does (`heldDive.Holds`,
+    `Guild.Missions.cs:85`). Gear has no dive lock of its own today; that is out of scope
+    here.
 5c. **User default:** dismissing a member puts their potion back in the stores. A held
     potion isn't counted in the stores (requirement 5), so `Guild.TryDismiss`
     (`Guild.cs:456-464`) would lose it unless it is returned there.
