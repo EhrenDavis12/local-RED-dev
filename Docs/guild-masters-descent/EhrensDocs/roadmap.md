@@ -105,7 +105,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
   questions on missions' defaults, a member on a dive can't be dismissed for now, and a
-  question on dismissing a member on a dive).
+  question on dismissing a member on a dive, a mission can be played as a battle for
+  now, and questions on played missions).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
