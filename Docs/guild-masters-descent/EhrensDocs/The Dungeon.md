@@ -419,3 +419,35 @@ pending "A question on what gold a retreat keeps" change to this list is unchang
 **Why:** The dive is built with a default for now on each of these, in "How a heal in the
 dive lands, for now", and none of the docs settles them. The pending changes to this list
 above are unchanged.
+
+## Change: Party planning is one screen
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## The Dungeon Board`, the paragraph beginning "Planning happens in two steps"
+
+**Now says:**
+
+```
+Planning happens in two steps: the player selects the members first, then arranges them
+on the grid. That second step is a zoomed-in view of the battle map rather than a
+separate screen. The system does the initial placement, putting combat types in front and
+making support links where it can — the player can edit it from there.
+```
+
+**Proposed:**
+
+```
+Party planning is one screen. The guild's characters are listed on the left, each showing
+who it is — picture, type, name and level — and the placement grid is on the right. The
+player picks, places and rearranges at the same time, and can see everyone they are
+taking, up to 15. As each member is added, the game still places them first, putting
+combat types in front and making support links where it can, and the player edits from
+there. Taking a member off the grid puts them back in the list.
+```
+
+**Why:** The user, 2026-11-16: "If we choose our members we can choose up to 15 members
+but I won't be able to see them all. So let's design the select your characters, place
+your characters on the same screen where we have the list of the characters on the left
+and the placement on the right side. This way they can place and rearrange at the same
+time, knowing who they are getting."

@@ -158,7 +158,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   with a rank and level and how they fight for now, a floor's monsters the same every dive
   and where each stands, re-entering and its fees for now, open questions on
   what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
-  and open questions on healing in the dive).
+  open questions on healing in the dive, and party planning as one screen).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).
