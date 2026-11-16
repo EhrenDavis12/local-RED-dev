@@ -454,6 +454,17 @@ damage from every hit. It wears down and breaks just like all other gear: it los
 durability as it's used, it can break partway through a battle and then adds nothing, and
 it's repaired the way a weapon or armour is. How much defence a shield adds and how much
 durability it has are placeholders, to be balanced later.
+
+For now a shield is built the way armour is. It sits in a slot of its own beside the
+Tank's weapon and armour, and never goes in either of theirs. It has a class, a Defence
+range and a Durability, each rolled once when it's made; its Defence band doubles with
+each class above F, and its Durability band is the same at every class. There are four
+shields, each its own item with its own shop entry, and the shop sells all four at class
+F. In a battle the shield's range is rolled afresh on every strike, the same as the
+armour's, and it counts as part of the Tank's defence wherever defence is used — a
+Brute's hit halves the whole of it, shield and armour together. It spends one use on
+every hit that lands on the Tank, wherever the armour spends one, and Shields Up spends
+none of it.
 ```
 
 **Why:** Answered 2026-11-14: "we should keep the shield swappable" — "item wise will
@@ -464,9 +475,12 @@ shield adds — "in incresses armor stats" — and whether it wears down and bre
 weapon or armour does — "A just like all other gear". The user didn't give the figures,
 so they're placeholders, kept in the game's tuning file with the others. Whatever shield
 is equipped, the Tank's art keeps the shield it's drawn with; that's in `Look and Feel.md`,
-"Gear and the art". Whether a type other than the Tank can carry a shield, and whether a
-Tank with no shield can still use Shields Up, are proposed as questions in "Questions on
-shields and potions".
+"Gear and the art". The game is built as the "For now" paragraph says, and each part of
+it is a default the build chose, not yet the user's word. Whether a type other than the
+Tank can carry a shield, whether a Tank with no shield can still use Shields Up, what
+wears a shield down, whether shields have classes, how a Brute's hit treats a shield, who
+repairs one on a dive, and whether the four share one picture are proposed as questions
+in "Questions on shields and potions".
 
 ## Change: A broken shield adds nothing, and a working one outlasts broken armour
 
@@ -581,6 +595,16 @@ questions on stores and condition" adds
   deciding which of two Armourers sets armour quality?
 - Can a type other than the Tank carry a shield?
 - When a Tank has no shield equipped, can it still use Shields Up?
+- What wears a Tank's shield down — every time the Tank is hit, the same as armour; only
+  when the Tank uses Shields Up; or both?
+- Do shields come in quality classes with rolled numbers, the way weapons and armour do,
+  or is every shield the same apart from its picture?
+- When a Brute hits the Tank, should it halve the Tank's whole defence, armour and shield
+  together, or ignore the shield's part completely and leave the armour's part whole?
+- On a dive, who fixes a Tank's shield in the field — the Armourer, the Blacksmith, or
+  nobody, so shields are only repaired back at the guild hall?
+- Should all four shields share the one shield picture the game carries, or does each get
+  its own — and if so, where do the other three come from?
 - Can a specialist carry a potion into a dive too, or only the six combat types?
 - Does drinking the potion cost a member anything in the battle — its next attack, or a
   wait — or is it free?
@@ -598,5 +622,10 @@ questions on stores and condition" adds
 **Why:** None of the docs answers these, and the answers on shields and potions leave them
 open. The game is built with a default for now on each potion question, in "A member
 carries one healing potion and drinks it by themselves", and on each shield question: only
-the Tank carries a shield, and a Tank with no shield equipped can still use Shields Up. The
+the Tank carries a shield; a Tank with no shield equipped can still use Shields Up; a
+shield spends a use on every hit the Tank takes, wherever armour spends one, and Shields
+Up spends none of it; shields have classes and rolled numbers, built the way armour is; a
+Brute's hit halves the Tank's whole defence, shield included; nobody repairs a shield on a
+dive, because field repair isn't built yet; and all four shields wear the one shield
+picture the game carries, with the other three named on the game's missing-art list. The
 existing entries, and the pending changes to this list above, are unchanged.
