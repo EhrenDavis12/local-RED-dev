@@ -448,15 +448,52 @@ between kinds.
 The Tank carries a shield as well as its weapon and its armour. A shield is a piece of
 gear: there is more than one shield, and the player can equip a Tank with a shield, take
 it off, or swap it for another.
+
+A shield adds defence on top of the Tank's armour, so a Tank with a shield takes less
+damage from every hit. It wears down and breaks just like all other gear: it loses
+durability as it's used, it can break partway through a battle and then adds nothing, and
+it's repaired the way a weapon or armour is. How much defence a shield adds and how much
+durability it has are placeholders, to be balanced later.
 ```
 
 **Why:** Answered 2026-11-14: "we should keep the shield swappable" — "item wise will
 have other shields that can be equipped and equipped". The docs already gave the Tank a
 shield (the Brute pushes "the Tank's shield aside" in `Individual Types.md`, and the
-Tank's special is Shields Up) but never said it was gear. Whatever shield is equipped, the
-Tank's art keeps the shield it's drawn with; that's in `Look and Feel.md`, "Gear and the
-art". What a shield adds, and the rest the answer doesn't settle, is proposed as questions
-in "Questions on shields and potions".
+Tank's special is Shields Up) but never said it was gear. Answered 2026-11-15: what a
+shield adds — "in incresses armor stats" — and whether it wears down and breaks the way a
+weapon or armour does — "A just like all other gear". The user didn't give the figures,
+so they're placeholders, kept in the game's tuning file with the others. Whatever shield
+is equipped, the Tank's art keeps the shield it's drawn with; that's in `Look and Feel.md`,
+"Gear and the art". Whether a type other than the Tank can carry a shield, and whether a
+Tank with no shield can still use Shields Up, are proposed as questions in "Questions on
+shields and potions".
+
+## Change: A broken shield adds nothing, and a working one outlasts broken armour
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Durability`, the paragraph "Broken armour means the member's defence falls
+back to Constitution alone."
+
+**Now says:**
+
+```
+Broken armour means the member's defence falls back to Constitution alone.
+```
+
+**Proposed:**
+
+```
+Broken armour means the member's defence falls back to Constitution alone, plus a Tank's
+shield if it carries one that hasn't broken. A broken shield adds nothing either, so a
+Tank whose armour and shield have both broken is down to Constitution alone.
+```
+
+**Why:** Follows "The Tank carries a shield, and shields can be swapped": answered
+2026-11-15, a shield adds defence on top of the Tank's armour and wears down and breaks
+just like all other gear, and `## Durability` already says broken gear contributes
+nothing. As written, a Tank whose armour breaks would lose its working shield's defence
+too.
 
 ## Change: A member carries one healing potion and drinks it by themselves
 
@@ -542,8 +579,6 @@ questions on stores and condition" adds
 ```
 - Does the Armourer have a station of its own the way the Blacksmith has the smithy,
   deciding which of two Armourers sets armour quality?
-- What does a shield add to the Tank, and does it wear down and break the way a weapon or
-  armour does?
 - Can a type other than the Tank carry a shield?
 - When a Tank has no shield equipped, can it still use Shields Up?
 - Can a specialist carry a potion into a dive too, or only the six combat types?
@@ -562,4 +597,6 @@ questions on stores and condition" adds
 
 **Why:** None of the docs answers these, and the answers on shields and potions leave them
 open. The game is built with a default for now on each potion question, in "A member
-carries one healing potion and drinks it by themselves". The existing entries, and the pending changes to this list above, are unchanged.
+carries one healing potion and drinks it by themselves", and on each shield question: only
+the Tank carries a shield, and a Tank with no shield equipped can still use Shields Up. The
+existing entries, and the pending changes to this list above, are unchanged.
