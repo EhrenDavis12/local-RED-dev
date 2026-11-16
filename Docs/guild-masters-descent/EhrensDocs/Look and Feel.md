@@ -310,6 +310,26 @@ in normal, pressed and selected states (animation item #223). Still in review, n
 approved:
 `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/scenes/ui_parchment/game_ready_v1/`.
 
+**Readable text and spacing.** One global minimum text size that every text in the game
+obeys, no exceptions: cap height 32 px on a 2340x1080 phone for any text, 36 for button and
+tab labels, 44 for titles (provisional; not yet checked on a device). Text never shrinks to
+fit below it: a label that doesn't fit gets a wider scroll or shorter words. There is no
+faded or 0.6-alpha ink, and disabled words keep at least 3:1 contrast. A scroll holds only a
+page, a title, a one-action button (two words at most) or an icon pick. Status, stats,
+prices, reasons and long text go on the page paper: Buy, Hire and Send say only the action,
+the price sits on the paper above, and a red "Need 80 gold" line sits on the paper when
+gold is short. Inner margins are a share of the paper between rod and curl: buttons, tabs
+and chips 11% each side and 15% top and bottom; headers 15% and 5%; pick tiles and cards
+8%; pages and pop-ups 4% left, 6% right, 10% top and 8% bottom. Stacked lines keep a clear
+gap between their ink, and nothing is drawn over a portrait. The font has no "#" and no
+middle dot, so menu text uses neither ("F-rank Fighter 2", "-" as the separator). Shop
+tiles show the icon and price only; the name is in the detail panel. The user approved the
+mocks 2026-11-15: "The mocks do look cleaner. Lets implament them." and "We should have a
+global min text value so we stop displaying unreadable text." (animation item #242, queue
+item #104). Measurements and the mock sheet:
+`/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/ui_review/242/`
+(REPORT.md, sheet.png).
+
 ## Map
 
 A parchment inked map, style 4, on one fixed screen with no labels for now. The user,
