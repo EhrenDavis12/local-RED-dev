@@ -7,7 +7,9 @@
 > `DiveScreen.cs`, `Dive.cs`, `Battle.cs`, `DemoEncounter.cs`, `GameSession.cs`, `SaveFile.cs`.
 
 Requirements marked **Default** are a cheap, reversible choice made for this build, not yet the
-user's word. Each one is asked again under Open Questions.
+user's word. Each one is asked again under Open Questions. Where an original design doc and
+an EhrensDocs change note disagree, the original wins and the change note gives way; a change
+note that only fills a gap still stands (the user's rule, `queue/focus.md`).
 
 ## Problem
 
@@ -55,13 +57,18 @@ mission costs. Nothing about a dive changes, and the save format does not change
    them during the fight as in any battle. Source: The Dungeon `## The Dungeon Board` ("The
    system does the initial placement"); Combat change "Changing formation mid-battle is free".
 6. **Default: what a played mission fields.** Monsters built the way the dungeon's are: each one
-   of the six combat types, drawn at random, rank F, level 1, its type's starting stats, no
-   gear, each on a node of its own drawn at random. How many depends on the mission's hidden
+   of the six combat types, drawn at random, rank F, level 1, its type's starting stats, each on
+   a node of its own drawn at random. Whether a monster carries a weapon or wears armour is a
+   chance set by the mission's rank, as for a dungeon's enemies; at F both chances are 0 for
+   now, placeholders in the tuning file, so an F mission's monsters carry no gear. How many
+   depends on the mission's hidden
    variance, so "easier or harder than its stated rank" shows in the fight itself: one fewer
    than the members needed (never fewer than one) for an easier mission, the same number for
    one as stated, one more for a harder one. The three counts are placeholders in the tuning
    file. The enemies are not shown before the fight; the variance stays secret. Source: The
-   Dungeon change "The dungeon's enemies are monsters"; Core Concept `## Missions` ("backend
+   Dungeon change "The dungeon's enemies are monsters"; Combat `## Enemies` ("The dungeon's rank
+   also determines the chance that an enemy carries a weapon and the chance that it wears
+   armour"); Core Concept `## Missions` ("backend
    variance… easier or harder than its stated rank suggests… a sense of mystery").
 7. **Default: the meadow backdrop.** A mission is above ground, so it is fought in the meadow
    scene, not the cave. Source: Specialists `## The Herbalist and the Miner` ("above-ground missions");
@@ -74,26 +81,34 @@ mission costs. Nothing about a dive changes, and the save format does not change
    screen. The battle plays by every rule any battle has (cooldowns, the Luck reset, specials
    from the skill buttons, focus, free formation changes, the stand-off at the tick cap). Its
    Retreat button and its pause Quit are today tied to a dive, and must work for a mission
-   battle too. Source: Combat (whole doc and change notes); code: `DiveScreen.PlayBattle`,
+   battle too. A pause Quit the player confirms is a retreat, in every way a press of Retreat
+   is, and so a loss under requirement 14. Source: Combat (whole doc and change notes); code: `DiveScreen.PlayBattle`,
    `BattleScreen.Build`.
 9. **Special bars start empty** and nothing of them outlasts the battle: a bar belongs to a
    dive, never to the member. Source: Combat change "Every bar empties on a new floor and starts
    each dive empty, for now".
-10. **Default: gear and potions work as in any battle.** Weapons and armour wear as they are
-    used, and a member carrying a potion drinks it under the usual threshold; both stay spent
-    after the mission. This departs from the auto mission, which wears no gear. Source:
-    Equipment `## Durability` ("Gear wears down as it is used"); Equipment change "A member
-    carries one healing potion and drinks it by themselves".
-11. **No timer.** A played mission ignores the mission's length. It resolves the moment the
-    battle's result is decided, never appears among the missions out, and holds no slot once
-    the battle is over. Source: the user, 2026-11-15 ("run through it"). Departs from Core
-    Concept `## Missions` ("Missions are timed").
+10. **Gear wears as in any battle.** Weapons wear from attacking and armour from being hit, and
+    the wear stays after the mission. Source: Equipment `## Durability` ("Gear wears down as it
+    is used"). The Core Concept change note's "it doesn't… wear gear" gives way to it.
+    **Default:** a member carrying a potion drinks it under the usual threshold, as in any
+    battle, and it stays drunk. Source: Equipment change "A member carries one healing potion
+    and drinks it by themselves".
+11. **Default: no timer.** A played mission ignores the mission's length. It resolves the
+    moment the battle's result is decided, never appears among the missions out, and holds no
+    slot once the battle is over. Its outcome (gold, injuries, experience) is recorded on the
+    guild at that moment, before the battle screen's finished callback runs; the callback only
+    carries the player's Exit or Retry. Source: the user, 2026-11-15 ("run through it"). Departs
+    from Core Concept `## Missions` ("Missions are timed"), so it stays a question.
 
 ### How it ends
 
-12. **A win pays the mission's gold**, at once, capped the way a sale is, and nothing else: no
-    items, materials or gear. Source: Core Concept change "Missions are in the first version…"
-    (paragraph 4: "A mission that succeeds pays gold and nothing else").
+12. **A win pays the mission's gold**, at once, capped the way a sale is. **Default:** nothing
+    else, no items, materials or gear. Core Concept `## Missions` and Equipment `## Where Gear
+    Comes From` say missions also bring back items, materials and gear, but neither gives a
+    rule for what or how much, so those are deferred. Source: Equipment change "For now a dive
+    yields only gold" ("For now, though, loot is just gold… a dive or a mission yields gold and
+    nothing else"); Core Concept change
+    "Missions are in the first version…" (paragraph 4).
 13. **A loss pays nothing, and every member sent comes home injured**, exactly as a failed auto
     mission does: a fresh injury counted from the battle's end, where an older, longer injury
     already on a member stands. Source: Core Concept change "Missions are in the first
@@ -112,17 +127,24 @@ mission costs. Nothing about a dive changes, and the save format does not change
     a member who fell during it; a lost one injures every member sent, even one still standing.
     This mirrors the auto mission. Source: Core Concept change "Missions are in the first
     version…" (paragraph 4).
-17. **No experience.** Kills in a played mission pay no experience. Source: Core Concept change
-    "Missions are in the first version…" (paragraph 4: "A mission gives no experience"); Core
-    Concept `## Missions` ("mission rewards keep the guild going but don't advance it"). See
-    Open Questions: Guild Members' kill rule reads the other way.
+17. **Kills pay experience**, as in any combat: each kill is worth what its enemy's rank is
+    worth, added up when the battle ends and divided equally. Source: Guild Members `## Levels
+    and Experience`. The Core Concept change note's "A mission gives no experience" gives way
+    to it. **Default:** only members still standing when the battle ends share it, exactly as
+    in a dive, so a loss pays none; a stand-off pays for the kills made in it; a retreat,
+    a confirmed pause Quit included, pays nothing, as a dive's retreat drops its battle
+    unsettled. Source: Guild Members change "Who shares a combat's experience, for now"; code:
+    `Dive.ShareExperience`, `Dive.TurnBack`. Experience is already saved, so this needs no
+    save change.
 18. **A win is never undone.** Once the battle's result is decided, Retreat and Quit do
     nothing, as on a dive. Source: The Dungeon change "A party can turn back anywhere…"; code:
     `Dive.TurnBack`.
 19. **Default: where the player lands.** The result scroll shows as for any battle. Exit goes to
     the guild hall and Retry to the Mission Board, mirroring a dive, whose Retry goes to the
     Dungeon Board. A played mission adds nothing to the hall notice, because the result scroll
-    has already told the player. Source: code, `DiveScreen.PlayBattle`.
+    has already told the player. On a won played mission the scroll's Gold row shows the
+    mission's pay; today that row is measured from a dive's gold, which a mission battle has
+    none of. Source: code, `DiveScreen.PlayBattle`, `BattleScreen.ShowBanner`.
 
 ### Saving
 
@@ -152,12 +174,16 @@ mission costs. Nothing about a dive changes, and the save format does not change
 
 ## Open Questions
 
-- Should a played mission give its members experience for the kills? The default is none.
-  Guild Members `## Levels and Experience` says experience comes from kills at the end of a
-  combat, and Core Concept's change note says a mission gives none.
-- Should a played mission wear gear and use up a member's potion? The default is yes, as in any
-  battle. Core Concept's change note says a mission doesn't wear gear, but that was written for
-  missions nobody fights.
+- Who shares a played mission's kill experience? The default is the members still standing
+  when it ends, as in a dive, so a loss pays none, a stand-off pays for its kills, and a
+  retreat pays nothing.
+- The original says missions are timed. Should a played mission resolve the moment its battle
+  ends, or still run out the mission's timer before it pays? The default is the moment the
+  battle ends.
+- Should a played mission bring back items, materials or gear as well as gold, as the original
+  docs say missions do? The default is gold only, until there is a rule for what and how much.
+- Should a member drink their potion in a played mission, using it up? The default is yes, as
+  in any battle.
 - When the player retreats from a played mission, or it ends in a stand-off, are the members
   injured as on a loss, or do they come home fine with no pay? The default is injured.
 - In a played mission, is injury per member (whoever fell is injured, win or lose) or per
