@@ -2,8 +2,12 @@
 
 > **Status:** Draft · Source docs read: Equipment.md, Combat.md, Individual Types.md, Guild
 > Members.md, Specialists.md, Core Concept.md, The Dungeon.md, and in EhrensDocs/ the change
-> notes against each of those plus Look and Feel.md and Platform.md. Where an original and a
-> change note disagree, the original wins. Items marked **build default** are the user's
+> notes against each of those plus Look and Feel.md and Platform.md. A change note that
+> revises a passage of an original is what gets built. The one exception: where the other dev
+> has edited the original after our change note and the two now disagree, the original wins
+> (user, 2026-11-12, in the queue Focus: "the main documents win we need to convert any
+> changes that those main documents decided over what we had in the EhrenDocs"). No
+> requirement below rests on such a case. Items marked **build default** are the user's
 > open questions that this build answers with a cheap-to-change choice; they are not settled
 > design and stay listed under Open Questions.
 
@@ -40,9 +44,12 @@ is. Every save made before this change still loads, with no shields anywhere.
    carries a shield…": "as well as its weapon and its armour".)*
 4. **Build default:** a shield is built like armour. It has a class, a Defence range and a
    Durability, each rolled once when the piece is made and fixed after that. Each shield has
-   its own Defence band and Durability band. The Defence band doubles with each class above F.
-   The Durability band is the same at every class. The span is rolled under armour's span-width
-   rule. *(Equipment.md, Quality; EhrensDocs/Equipment.md, "For now a span is no wider at SSS
+   its own Defence band and Durability band. The Defence band doubles with each class above F
+   (both ends double). The Durability band is the same at every class. The range is rolled
+   the way armour's is: its span is anywhere from a single figure to four points wide, never
+   wider than the band, at every class, and the range sits anywhere inside the band that span
+   allows. The Durability is a whole number drawn from the band, and a new piece starts at
+   full. *(Equipment.md, Quality; EhrensDocs/Equipment.md, "For now a span is no wider at SSS
    than at F".)*
 5. Every shield figure is a placeholder kept in Tuning: each F-class Defence band, each
    Durability band and each shop price. Each one shows up on the game's placeholder list with
@@ -55,7 +62,10 @@ is. Every save made before this change still loads, with no shields anywhere.
 6. A Tank's sheet in the Dorms has a shield slot beside the weapon and armour slots. The
    player can equip a shield from the stores, which swaps out any shield already in the slot,
    can unequip it back to the stores, and can repair it. The slot gives the same refusals the
-   other slots give: a member away on a mission, a piece someone else holds. Other combat types
+   other slots give. Equipping is refused for an unknown member or piece, for a member away on
+   a mission, for a member who isn't a Tank, and for a shield another member holds, and a
+   refusal changes nothing. A shield the Tank already holds equips as no change. Unequipping
+   changes nothing while the holder is away on a mission. Other combat types
    and specialists get no shield slot. *(EhrensDocs/Equipment.md, "The Tank carries a
    shield…"; Equipment.md, Assignment; EhrensDocs/Core Concept.md, "Missions are in the first
    version, as F-rank jobs that pay gold".)*
@@ -81,6 +91,20 @@ is. Every save made before this change still loads, with no shields anywhere.
     is rolled afresh for each strike, the same way armour's is. *(EhrensDocs/Equipment.md, "The
     Tank carries a shield…": "adds defence on top of the Tank's armour"; Equipment.md,
     Quality, last paragraphs.)*
+    - **Order within one strike:** the hit roll, then the attacker's weapon roll, then the
+      armour roll, then the shield roll. A roll that doesn't apply is skipped and not drawn: no
+      hit roll for an area strike, no weapon roll for a broken or empty weapon slot, no armour
+      roll for broken or empty armour, and no shield roll for a broken or empty shield slot.
+      On a miss, nothing after the hit roll is drawn. *(Extends the order the engine already
+      draws in, hit, weapon, defence; see requirement 15.)*
+    - **A strike that ignores defence** draws no armour roll and no shield roll, and its
+      defence is zero. Wear still follows requirement 13: armour spends a use on such a strike
+      today (`Battle.cs:637-645` rolls nothing but still wears the armour), so the shield does
+      too. No attack in the game ignores defence yet.
+    - **A Mage field hit** on a Tank standing in the field rolls the shield along with the
+      armour, armour first, and the field uses two-thirds of that defence (requirement 12). It
+      wears neither: a field hit spends no use of the armour today (`Battle.cs:451-457`), and
+      it spends none of the shield's.
 11. A broken shield, or an empty slot, adds nothing. If the armour has broken and the shield
     still works, defence is Constitution plus the shield. If both have broken, defence is
     Constitution alone. *(EhrensDocs/Equipment.md, "A broken shield adds nothing, and a working
@@ -91,10 +115,14 @@ is. Every save made before this change still loads, with no shields anywhere.
     shield included. *(Guild Members.md, Base Stats; Individual Types.md, The Tank, The Brute;
     EhrensDocs/Guild Members.md, "The Mage's field is an area attack, for now".)*
 13. **Build default:** the shield spends one use every time the Tank is hit, in exactly the
-    cases where the Tank's armour spends one. That includes hits from specials and hits that
-    defence reduces to nothing. A miss spends nothing. Shields Up spends nothing from the
-    shield. A shield can break partway through a multi-strike attack, and the later strikes
-    then face the Tank's defence without it. *(Equipment.md, Durability;
+    cases where the Tank's armour spends one. Spelled out: one use for each strike that lands
+    on the Tank, whoever makes it. That covers ordinary attacks and specials, single strikes
+    and area strikes, strikes that ignore defence, and strikes that defence reduces to
+    nothing. A miss spends nothing, and so does a Mage field hit (requirement 10). Shields Up
+    spends nothing from the shield. The use is spent after the strike's damage is worked out,
+    so the strike that spends the last use still gets the shield's full roll. Durability never
+    goes below zero, and at zero the shield is broken. A shield can break partway through a
+    multi-strike attack, and the later strikes then face the Tank's defence without it. *(Equipment.md, Durability;
     EhrensDocs/Equipment.md, "A hit that does nothing still wears gear".)*
 14. Shields Up works as it does now. **Build default:** it works with or without a shield. The
     allies behind the Tank get the Shields Up increase only and never any of the shield's
@@ -112,7 +140,12 @@ is. Every save made before this change still loads, with no shields anywhere.
 ### Repair and the dive
 
 17. A shield is repaired in the guild hall for gold only, broken or not, at the same price
-    rule as any other piece. *(EhrensDocs/Equipment.md, "For now repair costs gold only", and
+    rule as any other piece. That rule is one flat price for the piece's condition: Good but
+    below full, Worn, Ragged, or Broken. Each price is the existing repair placeholder in
+    Tuning, and the shield gets no prices of its own. A shield at full durability can't be
+    repaired and costs nothing. A repair restores the shield to full durability and is refused,
+    changing nothing, when the guild's gold is short. A held shield stays with its holder, and a
+    stored one can be repaired too. *(EhrensDocs/Equipment.md, "For now repair costs gold only", and
     "The Tank carries a shield…": "it's repaired the way a weapon or armour is".)*
 18. When a dive ends, a dead Tank's shield goes back to the stores and nobody holds it. If a
     battle leaves no one in the party alive, the shields the party took in are lost along with
