@@ -68,23 +68,29 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
 
 ### Order
 
-6. A held attack's place in the order is a key fixed the moment it is held: ready tick
+6. Every due or held attack's place in the order is a key, fixed when it falls due: ready tick
    ascending, then the holder's own Dexterity descending (as for its cooldown, EhrensDocs/
    Combat.md › How a cooldown rounds), then its tie draw ascending. *User 2026-11-17: "let
    time stamps of attacks deside what comes first … On ties the player with the higher dex
    goes first, if still a tie pick randomly."*
-7. Each tick, the cooldowns that come up are taken in today's same-tick order (EhrensDocs/
-   Combat.md › The clock, how a fight opens, and who goes first); a mover's is held or
-   resolved there and then. After them, the held attacks are walked in key order. Each first
-   picks again if its target is dead, out of its reach or untargetable (R14), then resolves if
-   R1 to R3 and R5 no longer hold it, else stays held. A release that sends a mover out makes
-   it away for the rest of the walk, so Char2 going out keeps Char3, aimed at Char2, waiting.
-   An attack held during the walk is first walked on the next tick.
-8. The tie draw is one draw from the battle's `IRng`, made when an attack is held and another
-   held attack already has the same ready tick and Dexterity: each attack in that group that
-   has no draw yet gets one, in the order they were held. It is drawn once and kept. Equal
-   draws fall back to the order held. No draw is made otherwise, so a battle in which no
-   attack is ever held makes no tie draw (Contract: `Battle.cs` draws only what it needs).
+7. Each tick is one ordered walk, in key order, over every attack due that tick, of any type:
+   the attacks already held and the cooldowns coming up this tick together. An earlier stamp
+   always goes first, so attacks already held go before this tick's fresh cooldowns. A
+   mover's attack first picks its target if it has none, or picks again if its target is dead,
+   out of its reach or untargetable (R14); it then resolves unless R1 to R3 or R5 hold it, in
+   which case it is held. An Archer's or Mage's attack resolves when walked (R4). A release
+   that sends a mover out makes it away for the rest of the walk, so Char2 going out keeps
+   Char3, aimed at Char2, waiting. A free attack earned in the walk resolves straight after
+   the attack that earned it unless held (R5, R9); an attack held that way is first walked on
+   the next tick. *User 2026-11-17: "let time stamps of attacks deside what comes first."*
+8. The tie draw is one `IRng.NextInt(0, 1_000_000)`. Before the walk, every group of due or
+   held attacks sharing a ready tick and a Dexterity gets one draw each, in today's fixed tie
+   order (members before monsters, front row first, left to right; EhrensDocs/Combat.md › The
+   clock, how a fight opens, and who goes first). It is drawn once and kept. Whether anyone in
+   the group will be aimed at an away target cannot be known before the walk picks targets, so
+   such groups always draw (R23). An attack held during the walk that ties with one already
+   keyed gets its draw when it is held. Equal draws fall back to that fixed tie order. No other
+   tie draw is made.
 9. A free attack is held like any other, with the tick it was earned as its ready tick, and
    its owed flag stays set while held. Held, it no longer comes before everyone else in that
    tick. **Default for now (Open Question 6)**, against EhrensDocs/Combat.md › The free attack
@@ -121,7 +127,10 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
     resolves and sized from the resolved action itself: its type, special or ordinary, how many
     strikes, the field and drink events before or between them, and the hops between targets.
     The sizing is one pure function in Core that `MeleeMotion`'s planner also uses, or that
-    reads the same constants and clip timings the screen does, so the two cannot drift. *Why in
+    reads the same constants and clip timings the screen does, so the two cannot drift. It
+    looks clips up through `CharacterArt.Has` / `TryClip`, never `Find`. Retiming a clip or a
+    melee constant changes window lengths, and so changes a fight's outcome from the same seed.
+    *Why in
     the engine: it resolves an action in one tick while the screen plays it over seconds
     (`BattleScreen.StartPlaying`), and the rule has to hold in a headless `Battle.Run` too
     (R21).*
@@ -148,25 +157,25 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
     Combat.md › The clock: "the same fight with the same rolls plays out the same however that
     time is split up"; › The fight can be sped up).
 22. A battle saved mid-fight and loaded plays the rest exactly as the uninterrupted battle
-    would (Contract: `BattleSnapshot.cs`). The save holds, for each held attack, its target,
-    ready tick and tie draw (if any); for every combatant, its away-window end; and for each
+    would (Contract: `BattleSnapshot.cs`). The save holds the held attacks in the order they
+    were held, each with its target, ready tick and tie draw (if any); for every combatant, its away-window end; and for each
     away mover, the first pick of its lunge (R3). The owed free attack is saved already and
     stays set while held. Nothing about the special is saved: it is decided at release, and the
     armed set is the controller's, as today. The save version goes to 11; a battle from version
     10 or older loads with no one held or away. A held attack by or at a dead combatant, or a
     negative window, is a corrupt save, as `Restore`'s existing checks are.
-23. A battle in which no attack is ever held plays as today, with one difference in the order of
-    rolls: a mover now draws its target before a lingering field it stands on rolls the
-    victim's armour, because the pick decides whether it holds (R1) and nothing may resolve
-    before that (R11). If that field hit kills it, the target draw has still been made, and a
-    taunt the pick used is still spent. The existing engine tests stay green, apart from any
-    that pin that order and the one in R20.
+23. A battle in which no attack is ever held plays as today, with two differences. First, a
+    mover now draws its target before a lingering field it stands on rolls the victim's armour,
+    because the pick decides whether it holds (R1) and nothing may resolve before that (R11).
+    If that field hit kills it, the target draw has still been made, and a taunt the pick used
+    is still spent. Second, cooldowns that come up on the same tick with equal Dexterity always
+    make tie draws (R8) and go in the drawn order, no longer members before monsters, front row
+    first, left to right. The existing engine tests stay green, apart from any that pin either
+    order and the one in R20.
 
 ## Out of Scope
 
 - Ranged attackers waiting, unless Open Question 2 is answered otherwise.
-- The same-tick order for cooldowns that come up together (Combat.md › Open Questions, "who
-  goes first?" stays open); only held attacks get the Dexterity-then-random order.
 - The hop targets of a lunge that moves on when its target dies (the Fighter's flurry
   `Nearest`), and a Brute special's other targets: only the first pick is checked against R1
   to R3.
@@ -192,7 +201,9 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
 5. The user's tie rule ("higher dex goes first, if still a tie pick randomly"): does it replace
    the current order for every set of cooldowns that come up on the same tick — which is
    members before monsters, front row first, left to right, and never random — or only order
-   attacks that are waiting? Going ahead with: only waiting attacks (R6, Out of Scope).
+   attacks that are waiting? Going ahead with: it replaces it for every attack that falls due,
+   waiting or not (R7, R8, R23). Combat.md's own open question, "who goes first?", stays
+   open in the doc.
 6. A free attack from the Luck reset comes "in the same tick, before anyone else acts". When
    its target is out on a lunge, does it wait like any other attack? Going ahead with: yes
    (R9).
