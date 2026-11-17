@@ -49,10 +49,12 @@ type — its two strikes all belong to that single attack.
 
 Its special is a flurry of between 4 and 6 strikes on a single target. The first four
 strikes always land; each of the two after that happens on a Luck check, so the flurry
-only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
-If the target dies before the strikes run out, the remaining strikes carry to the nearest
-enemy still standing. If any enemy is killed during the flurry, the Fighter's charge bar
-refills to 90% — that refill is the Fighter's bonus charge condition.
+only runs to five or six strikes if those checks succeed. Each flurry strike does what one
+of the Fighter's ordinary strikes does. The flurry hits hard because there are four to six
+strikes in it rather than two — not because any one of them is heavier. If the target dies
+before the strikes run out, the remaining strikes carry to the nearest enemy still
+standing. If any enemy is killed during the flurry, the Fighter's charge bar refills to
+90% — that refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 
@@ -81,7 +83,7 @@ carries the type's whole damage at once. Its special is called Volley: it hits t
 the enemies one to each side of it, and the one directly behind it. If the target is in
 the enemy's back row, with nothing behind it, the extra hit spills forward instead — onto
 the position in front of the target. The target takes the full hit; its neighbours take
-reduced damage. Volley is an area attack, so it can't be dodged — evasion does nothing
+half that damage. Volley is an area attack, so it can't be dodged — evasion does nothing
 against it.
 
 The Archer's bonus charge condition is hitting the same target twice running. Specials
@@ -111,7 +113,3 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 - What are the stats, skills and abilities for each individual type?
 - The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
   same check that can reset a cooldown, or a separate roll of its own?
-- The Archer's Volley hits the target in full and its neighbours take reduced damage. How
-  much less? Nothing sets it, so a Volley can't be worked out.
-- The Fighter's flurry strikes hit hard, but nothing says how hard. How much more than
-  one of its ordinary strikes does a flurry strike do?
