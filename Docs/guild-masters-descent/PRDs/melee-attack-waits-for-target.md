@@ -31,8 +31,9 @@ battle screen at x1, x2 or x3 play the same fight from the same seed.
 - **Lunge**: an action in which a mover lands or misses at least one strike of its own. A special
   that strikes no one (Vanish, Shields Up) is not a lunge (`BattleScreen.PlanMelee`).
 - **Away**: a mover from the tick its lunge resolves until that lunge's away window ends.
-- **Held attack**: an attack whose cooldown has come up, or whose free attack is owed, but which
-  has not been made yet because of R1 to R3.
+- **Held attack**: a mover's action whose cooldown has come up, or whose free attack is owed,
+  but which has not resolved yet because of R1 to R3 or R5. Nothing of it has resolved: no
+  report, no field hit, no special decision, no roll but its target pick and any tie draw.
 - **Ready tick**: the tick a held attack's cooldown came up, or its free attack was earned.
 
 ## Requirements
@@ -45,62 +46,71 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
 1. When a mover's attack is due, its target is picked as it is today: focus, taunt, weighted
    draw (EhrensDocs/Combat.md › What the targeting weights count; How a member with no target
    picks one). An away combatant stays pickable. If the picked target is away, the attack is
-   held. *User 2026-11-17: "My vote is to wait," over making an attacker untargetable.*
+   held. *User 2026-11-17: "My vote is to wait," over making an attacker untargetable.* The
+   pick uses the type's attack range, which is the same for its ordinary attack and its special
+   (Contract: each `*Type.cs`), so it does not need the special decision (R11).
 2. If the picked target is holding an attack of its own with an earlier place in the order
    (R6), the attack is held too. *User 2026-11-17: Char3, ready to attack Char2, waits while
    Char2 waits for Char1, and goes after Char2.*
 3. **Default for now (Open Question 1).** A mover that is the target of a lunge still out
-   (its attacker is away and lunging at it) holds its own attack until that attacker is home,
-   whoever it was going to attack. *Proposed by the PRD author from the user's complaint: the
+   (its attacker is away, and it was that lunge's first pick) holds its own attack until that
+   attacker is home, whoever it was going to attack. *Proposed by the PRD author from the user's complaint: the
    attacker otherwise swings at an empty node.*
 4. **Default for now (Open Question 2).** Only movers' attacks are held. An Archer's or a
    Mage's attack is made when due, also at an away target, and its shot follows the target
    as it does today (`BattleStageLungingTargetTests`, `BattleStageFireArrowTargetTests`). A
    ranged attack never holds anyone under R3.
-5. A mover that is away may still act when its next cooldown comes up or its free attack is
-   owed, as today (`MeleeMotion.PlanAction` chains it); that action is subject to R1 to R3 like
-   any other.
+5. **Default for now (Open Question 7).** A mover whose own cooldown comes up, or whose free
+   attack is owed, while it is still away is held until it is home, through the same walk
+   (R7). No mover lunges again from out of place, and a fast mover cannot stay away for good
+   and keep the attackers waiting on it. This replaces today's chaining at the stop point
+   (`MeleeMotion.PlanAction`, the "chained" case).
 
 ### Order
 
-6. Held attacks go in order of ready tick, earliest first. On the same ready tick, higher
-   Dexterity goes first, the combatant's own Dexterity as for its cooldown (EhrensDocs/Combat.md
-   › How a cooldown rounds). Still tied, the order is drawn from the battle's `IRng`. *User
-   2026-11-17.*
-7. At the start of each tick, before that tick's cooldowns, the held attacks are checked one at
-   a time in R6's order, and each one that R1 to R3 no longer hold is made. A release can hold a
-   later one on the same tick: Char2 goes out, so Char3, aimed at Char2, keeps waiting. Then
-   the tick's cooldowns come up in today's same-tick order (EhrensDocs/Combat.md › The clock,
-   how a fight opens, and who goes first).
-8. The tie draw is made only when two held attacks that can both go at the same check are
-   tied on ready tick and Dexterity. A battle in which no attack is ever held draws exactly the
-   rolls it draws today (Contract: `Battle.cs` draws only what it needs, "so the rolls never
-   depend on it").
-9. A free attack is held like any other, with the tick it was earned as its ready tick. Held,
-   it no longer comes before everyone else in that tick. **Default for now (Open Question
-   6)**, against EhrensDocs/Combat.md › The free attack comes first.
+6. A held attack's place in the order is a key fixed the moment it is held: ready tick
+   ascending, then the holder's own Dexterity descending (as for its cooldown, EhrensDocs/
+   Combat.md › How a cooldown rounds), then its tie draw ascending. *User 2026-11-17: "let
+   time stamps of attacks deside what comes first … On ties the player with the higher dex
+   goes first, if still a tie pick randomly."*
+7. Each tick, the cooldowns that come up are taken in today's same-tick order (EhrensDocs/
+   Combat.md › The clock, how a fight opens, and who goes first); a mover's is held or
+   resolved there and then. After them, the held attacks are walked in key order. Each first
+   picks again if its target is dead, out of its reach or untargetable (R14), then resolves if
+   R1 to R3 and R5 no longer hold it, else stays held. A release that sends a mover out makes
+   it away for the rest of the walk, so Char2 going out keeps Char3, aimed at Char2, waiting.
+   An attack held during the walk is first walked on the next tick.
+8. The tie draw is one draw from the battle's `IRng`, made when an attack is held and another
+   held attack already has the same ready tick and Dexterity: each attack in that group that
+   has no draw yet gets one, in the order they were held. It is drawn once and kept. Equal
+   draws fall back to the order held. No draw is made otherwise, so a battle in which no
+   attack is ever held makes no tie draw (Contract: `Battle.cs` draws only what it needs).
+9. A free attack is held like any other, with the tick it was earned as its ready tick, and
+   its owed flag stays set while held. Held, it no longer comes before everyone else in that
+   tick. **Default for now (Open Question 6)**, against EhrensDocs/Combat.md › The free attack
+   comes first.
 
 ### While an attack is held
 
 10. Its cooldown stays come up and its cooldown bar shows full (`CooldownProgress` is 1). On
     screen the holder idles at its node. **Default for now (Open Question 3):** its next wait
     starts when the held attack is made, not when its cooldown came up.
-11. Whether it is the special was settled when its cooldown came up, as today (EhrensDocs/
-    Combat.md › A special puts nothing in its owner's bar: "a special is used when the
-    member's cooldown comes up"). Arming or disarming a special during the hold applies to the
-    next cooldown.
-12. A lingering field it stands on hurts it once, when its cooldown comes up, before the pick,
-    as today; making the held attack later deals no second field hit. A field hit that kills it
-    means the attack is never made (EhrensDocs/Individual Types.md › Mage: "the field's damage
-    lands before the attack does"). The screen shows the field hit when it lands. *This keeps
-    every unheld action's rolls in today's order (R8).*
+11. The whole action resolves at release, as one report, exactly as a normal action does
+    today: the field hit, the use-the-special question, the strikes and their weapon rolls,
+    clearing the owed free attack. Arming or disarming a special during the hold counts at
+    release. One report per action stays true (Contract: `Battle.Resolve`, `ActionReport`).
+12. A lingering field it stands on hurts it at release, before the strikes, and a field hit
+    that kills it means the attack is never made (EhrensDocs/Individual Types.md › Mage: "a
+    character standing in the field takes damage from it when that character begins its own
+    attack"; "the field's damage lands before the attack does").
 13. The cycle count of its lasting effects, its Luck check and its new wait all happen when the
     held attack is made, not when it was held (EhrensDocs/Combat.md › When an effect's count
     starts: "the owner's next three attacks all happen under it").
-14. The picked target stands while the attack is held. It is picked again, by the normal rule,
-    only when the held target dies, is no longer in that attack's reach, or becomes
-    untargetable (Vanish). The new pick is subject to R1 to R3, and the attack keeps its ready
-    tick. **Default for now (Open Question 4):** marking a new focus during the hold does not
+14. The picked target stands while the attack is held. It is picked again, by the normal rule
+    (`Battle.ChooseTarget`), only when the held target is dead (`Combatant.IsAlive`), is no
+    longer in that attack's reach (`Battle.Reachable`), or is untargetable
+    (`Battle.IsUntargetable`, Vanish). The new pick is subject to R1 to R3, and the attack
+    keeps its key. **Default for now (Open Question 4):** marking a new focus during the hold does not
     change the held target. If the new pick finds no one, the action ends with no attack, as
     today when `ChooseTarget` finds no one.
 15. A held attack is dropped when its holder dies or the battle ends.
@@ -108,15 +118,19 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
 ### The away window
 
 16. The engine keeps, for each combatant, the tick its away window ends, set when its lunge
-    resolves and sized in ticks from that lunge: its type, how many strikes, special or
-    ordinary. The sizes are `Tuning` placeholders. *Why in the engine: it resolves an action
-    in one tick while the screen plays it over seconds (`BattleScreen.StartPlaying`), and the
-    rule has to hold in a headless `Battle.Run` too (R21).*
-17. The window covers the walk the battle screen draws: for every mover type, ordinary and
-    special, one strike and several, the screen draws the mover home (`Motion.IsAway` false)
-    on or before the window's end, and no more than a `Tuning` slack placeholder before it.
-18. A lunge made while its mover is still away (R5) moves the window's end so it still covers
-    the screen's chained walk (`MeleeMotion.PlanAction`, the "chained" case).
+    resolves and sized from the resolved action itself: its type, special or ordinary, how many
+    strikes, the field and drink events before or between them, and the hops between targets.
+    The sizing is one pure function in Core that `MeleeMotion`'s planner also uses, or that
+    reads the same constants and clip timings the screen does, so the two cannot drift. *Why in
+    the engine: it resolves an action in one tick while the screen plays it over seconds
+    (`BattleScreen.StartPlaying`), and the rule has to hold in a headless `Battle.Run` too
+    (R21).*
+17. A mover counts as home on its window-end tick. The window covers the walk the battle screen
+    draws: for every mover type, ordinary and special, one strike and several, with hops and
+    with field hits, the screen draws the mover home (`Motion.IsAway` false) on or before the
+    window's end at x1, x2 and x3, and no more than a `Tuning` slack placeholder before it. The
+    slack covers the screen starting an action up to a frame after the engine's tick, at x3.
+18. Because of R5 no mover lunges while it is away, so a window is never extended.
 19. A mover killed while away is no longer away; the screen leaves it where it fell, as today
     (`BattleScreen.FreezeMotion`).
 20. On the battle screen at x1, x2 and x3, a held attacker released by its target coming home
@@ -129,17 +143,24 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
 
 21. `Battle.Run`, `StepAction` and `AdvanceTicks` split any way, and the battle screen at any
     speed, give the same reports on the same ticks from the same seed and the same input.
-    `StepAction` stops on a tick where a held attack is made, as it does on a cooldown
-    (EhrensDocs/Combat.md › The clock: "the same fight with the same rolls plays out the same
-    however that time is split up"; › The fight can be sped up).
+    `StepAction` steps over a cooldown that is held and returns the next action that resolves;
+    it stops on a window-end tick only when the walk there releases something (EhrensDocs/
+    Combat.md › The clock: "the same fight with the same rolls plays out the same however that
+    time is split up"; › The fight can be sped up).
 22. A battle saved mid-fight and loaded plays the rest exactly as the uninterrupted battle
-    would (Contract: `BattleSnapshot.cs`). The save holds each held attack (holder, target,
-    ready tick), each combatant's away-window end, and whom each away mover is lunging at. The
-    save version goes to 11; a battle from version 10 or older loads with no one held or away.
-    A held attack by or at a dead combatant, or a negative window, is a corrupt save, as
-    `Restore`'s existing checks are.
-23. A battle in which no attack is ever held plays exactly as today: the existing engine tests
-    stay green, the one in R20 excepted.
+    would (Contract: `BattleSnapshot.cs`). The save holds, for each held attack, its target,
+    ready tick and tie draw (if any); for every combatant, its away-window end; and for each
+    away mover, the first pick of its lunge (R3). The owed free attack is saved already and
+    stays set while held. Nothing about the special is saved: it is decided at release, and the
+    armed set is the controller's, as today. The save version goes to 11; a battle from version
+    10 or older loads with no one held or away. A held attack by or at a dead combatant, or a
+    negative window, is a corrupt save, as `Restore`'s existing checks are.
+23. A battle in which no attack is ever held plays as today, with one difference in the order of
+    rolls: a mover now draws its target before a lingering field it stands on rolls the
+    victim's armour, because the pick decides whether it holds (R1) and nothing may resolve
+    before that (R11). If that field hit kills it, the target draw has still been made, and a
+    taunt the pick used is still spent. The existing engine tests stay green, apart from any
+    that pin that order and the one in R20.
 
 ## Out of Scope
 
@@ -150,6 +171,8 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
   `Nearest`), and a Brute special's other targets: only the first pick is checked against R1
   to R3.
 - Two movers lunging at the same target at once; they already stop at the same point.
+- A held attack that turns out at release to be a special striking no one (Vanish, Shields
+  Up) has still waited; the special is not known until release (R11).
 - Any on-screen cue that an attack is waiting.
 - What the screen draws right after a load: everyone home, as today, while the engine's
   windows run out.
@@ -173,3 +196,8 @@ yet (see the report). "Contract" means what the code does today and keeps doing.
 6. A free attack from the Luck reset comes "in the same tick, before anyone else acts". When
    its target is out on a lunge, does it wait like any other attack? Going ahead with: yes
    (R9).
+7. A fast fighter can be ready to attack again before it has walked home from its last attack,
+   and a lucky one gets a free attack straight away. Today it attacks again from where it
+   stands. Should it walk home first and then go out again? Going ahead with: yes, it goes home
+   first, the free attack included, so no one is left waiting on a fighter that never comes
+   back (R5).
