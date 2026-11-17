@@ -113,21 +113,31 @@ its very next attack, the one that charges its cooldown normally — the lockout
 further than the one free attack itself. Enemies get the Luck reset too, on the same terms
 as guild members.
 
-The chance is a quarter at most: 25% × Luck ÷ (Luck + 60). It approaches that quarter
-without ever reaching it, so there's no cap rule and no point where Luck stops doing
-anything — it just gets steadily less worth chasing.
+A Luck check pulls one token out of a bag of 25, each token either True or False. A False
+does nothing; a True means the character is lucky. Once every token has been pulled, the
+bag fills back up. The bag exists because drawing without replacement guarantees the
+lucky event arrives — at the floor of one token in twenty-five it cannot be missed for
+long — where a roll against a small percentage can go cold for a very long time.
+
+How many of the 25 tokens are True comes from the chance: 25% × Luck ÷ (Luck + 60),
+rounded up, and never fewer than 1. That chance approaches a quarter without ever
+reaching it, so there's no cap rule and no point where Luck stops doing anything — it
+just gets steadily less worth chasing.
 
 A worked list:
 
-- Luck 5, a newly recruited F-rank member — 2%
-- Luck 20 — 6%
-- Luck 60 — 12.5%, half the ceiling
-- Luck 180 — 19%
-- Higher still — closer and closer to 25%, never past it
+- Luck 5, a newly recruited F-rank member — 1 True in 25
+- Luck 20 — 2
+- Luck 60 — 4
+- Luck 180 — 5
+- Higher still — approaching 7, as the chance approaches a quarter
 
 The ceiling is there because a reset is a free attack, so the chance *is* the percentage
 by which that member's attack rate goes up. A quarter is strong and clearly felt without
 ever approaching the doubling that an uncapped chance would allow.
+
+Every Luck check a character makes draws from the same bag, so the checks compete with
+each other for the same tokens.
 
 Dexterity sets the rhythm; Luck occasionally skips the wait.
 
@@ -241,9 +251,12 @@ the Equipment doc.
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- A member's evasion comes from Luck, but nothing says what chance that is, so evasion
+  can't be worked out at all. And if an evasion check draws from the same bag, it would
+  use most of the tokens — a member is attacked far more often than it attacks.
+- The bag fills again once every token has been pulled. Does anything else refill it —
+  the start of a fight, or a floor — or does a part-used bag carry on from one battle to
+  the next?
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
