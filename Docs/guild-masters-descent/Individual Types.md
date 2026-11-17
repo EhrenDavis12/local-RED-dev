@@ -101,10 +101,11 @@ precise single shot is what kills it.
 Its special is a lingering field: it covers two columns of the enemy's grid. The field
 affects enemies only — it never damages the player's own members. The field deals damage
 through two separate events: a character standing in the field takes damage from it when
-that character begins its own attack, and a character that moves into the field, changing
-its position, takes damage for entering. Reaching in to attack from outside the field
-doesn't count as entering — an attacker reaching in to attack a character standing in the
-field takes no damage from it.
+that character begins its own attack — that damage lands before the attack does, so if it
+kills the character the attack never happens — and a character that moves into the field,
+changing its position, takes damage for entering. Reaching in to attack from outside the
+field doesn't count as entering — an attacker reaching in to attack a character standing
+in the field takes no damage from it.
 
 The Mage's bonus charge condition is allies in front of it in its own column taking hits.
 

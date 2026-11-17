@@ -31,6 +31,17 @@ reasoned about and balanced — a fight with fifteen guild members and a facing 
 enemies run on a continuous clock would be far harder to balance, and far harder to
 chase a bug through.
 
+When more than one combatant's cooldown comes up on the same tick, their attacks all
+happen at the same time — there's no order between them, and nothing resolves first.
+Damage is worked out against where things stood at the start of that tick, so a combatant
+that dies on that tick still lands the attack it made on it, and two combatants can kill
+each other on the same tick.
+
+That simultaneity is between combatants, not inside one combatant's own attack: within a
+single attack the strikes still resolve one after another, which is what lets the
+Fighter's flurry carry its remaining strikes to the nearest enemy still standing when its
+target dies partway through.
+
 A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
 and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
 100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
@@ -233,10 +244,3 @@ the Equipment doc.
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
-- When two combatants come up on the same tick, what resolves first? A test run had a
-  member attack and then die on the same tick, and the other order would have killed it
-  before its attack landed.
-- The Mage's field damages a character as that character begins its own attack. Does the
-  field's damage resolve before the attack or after it? A test run had a member at 2
-  health begin a special with a full bar, take 6 from the field, and die — so one order
-  spends the special and the other erases it.
