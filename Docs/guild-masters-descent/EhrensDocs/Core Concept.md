@@ -353,3 +353,35 @@ on dismissing a member on a dive" adds
 **Why:** The game is built with a default for now on each of these, in "A mission can be
 played as a battle, for now", and none of the docs settles them. The pending changes to
 this list above are unchanged.
+
+## Change: A guild with no members and no way to hire gets nothing, for now
+
+> Proposed 2026-11-17 · for review
+
+**Where:** `## The Economy`, after the paragraph that "The guild can't go into debt" adds
+
+**Now says:**
+
+```
+Gold is the money in the game.
+```
+
+**Proposed:**
+
+```
+Gold is the money in the game. The guild can't go into debt: its gold never drops below
+zero, and a payment the guild can't cover doesn't happen — nothing changes.
+
+For now nothing happens when the guild is stuck. If every member has died, the gold is
+under the cheapest hire, and nothing in the stores sells for enough to make up the
+difference, the game gives no help — no free recruit, no gold trickling in, and no screen
+saying the guild has fallen. The player is better off starting a new game. This will
+change later.
+```
+
+**Why:** The user, 2026-11-17: "For now nothing at this point a user is better off starting
+a new game. This will be changed later." No doc said what happens to a guild with no
+members and no money. Death is permanent and the guild can't go into debt, so a guild in
+this state can never move again. A guild with even one living member is never stuck,
+because missions cost nothing to send and pay gold. Starting a new game over the stuck
+save already asks the player first, as the Platform doc's save slots say.
