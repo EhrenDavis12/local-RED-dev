@@ -44,7 +44,7 @@ target dies partway through.
 
 Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
 enemy alike — makes one Luck check of its own as the fight begins, using the same chance
-as the mid-fight reset below in The Luck Reset. It's a separate roll, not tied to that
+as the mid-fight reset below in Luck Checks. It's a separate roll, not tied to that
 one. On success, the combatant starts the fight ready instead of empty, attacking on the
 first tick rather than waiting out its first cooldown. On failure, it waits out that first
 cooldown like normal. A success is a full jumpstart, not a partial charge — the combatant
@@ -100,7 +100,7 @@ deliberate without being tedious, and at the floor every type is acting about on
 second, which is the pacing this doc already asks for — a low-level fight feeling a little
 slow and a higher-level one having more going on.
 
-## The Luck Reset
+## Luck Checks
 
 When a member finishes an attack, there's a Luck check for whether the cooldown resets
 instantly. On success, the member attacks again immediately, with no cooldown wait at all.
@@ -138,6 +138,11 @@ ever approaching the doubling that an uncapped chance would allow.
 
 Every Luck check a character makes draws from the same bag, so the checks compete with
 each other for the same tokens.
+
+Evasion draws from that same bag: when a member is attacked, it pulls one token, and a
+True means the attack misses. That's where a member's evasion comes from, and it needs no
+chance of its own — it's the bag's own density of Trues, same as the reset above. An area
+attack pulls no token at all; evasion still does nothing against one.
 
 Dexterity sets the rhythm; Luck occasionally skips the wait.
 
@@ -251,9 +256,11 @@ the Equipment doc.
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- A member's evasion comes from Luck, but nothing says what chance that is, so evasion
-  can't be worked out at all. And if an evasion check draws from the same bag, it would
-  use most of the tokens — a member is attacked far more often than it attacks.
+- The count of Trues rounds up from a floor of one, so every Luck from 1 to 11 fills a bag
+  the same way — one True in 25. At F rank every type sits in that range, so Luck tells
+  none of them apart until it passes twelve. Should the bag hold more than 25 so the stat
+  separates the types from the start, at the cost of the round-up being less generous
+  early?
 - The bag fills again once every token has been pulled. Does anything else refill it —
   the start of a fight, or a floor — or does a part-used bag carry on from one battle to
   the next?
