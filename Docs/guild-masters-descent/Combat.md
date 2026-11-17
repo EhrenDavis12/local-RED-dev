@@ -42,6 +42,14 @@ single attack the strikes still resolve one after another, which is what lets th
 Fighter's flurry carry its remaining strikes to the nearest enemy still standing when its
 target dies partway through.
 
+Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
+enemy alike — makes one Luck check of its own as the fight begins, using the same chance
+as the mid-fight reset below in The Luck Reset. It's a separate roll, not tied to that
+one. On success, the combatant starts the fight ready instead of empty, attacking on the
+first tick rather than waiting out its first cooldown. On failure, it waits out that first
+cooldown like normal. A success is a full jumpstart, not a partial charge — the combatant
+is either ready or it isn't.
+
 A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
 and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
 100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
@@ -229,15 +237,10 @@ the Equipment doc.
   simulation or only how fast it's drawn?
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
-- When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
-  at once?
 - The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- When a fight starts, where do the cooldowns stand — everyone's empty and waiting out a
-  full first wait, everyone's ready at once, or staggered somehow? The opening of a fight
-  plays out completely differently depending on which.
 - At F rank a member's Luck is single-digit, which puts the reset chance near one attack
   in forty — a member might see one reset in a whole dive. Is the reset meant to be that
   close to absent early on, or should the curve start higher?
