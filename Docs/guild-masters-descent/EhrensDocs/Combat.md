@@ -28,7 +28,7 @@ Some enemy types can reposition mid-battle too, but not all of them can.
 **Why:** The original lets the player change formation mid-battle and names no cost, so it
 stays free for now.
 
-## Change: Status line no longer lists formation cost as open
+## Change: Status line on formation cost, speed and pausing
 
 > Proposed 2026-11-11 · for review
 
@@ -47,12 +47,12 @@ stays free for now.
 
 ```
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
-> reset's chance, the never-pausing simulation and what formation costs are settled;
-> whether a fight can be sped up, how multi-strike cases resolve, how the bars read at a
-> glance, and whether the enemy grid keeps filling are not.
+> reset's chance, what formation costs and the fight's speed are settled, and for now the
+> fight can be paused; how multi-strike cases resolve, how the bars read at a glance, and
+> whether the enemy grid keeps filling are not.
 ```
 
-**Why:** What formation costs is now settled (see the change on Formation).
+**Why:** What formation costs and the fight's speed are now settled, and the fight can be paused for now (see the changes on Formation and Player Input).
 
 ## Change: Formation-cost question answered
 
@@ -131,10 +131,12 @@ targeted by the entire party — this cuts down on clicks during gameplay. A mem
 no enemy selected, or who can't reach the one selected, picks its target the way an
 enemy does.
 
-The fight never pauses, and nothing waits for the player. It runs from start to finish,
-and the player acts while it's running — using a member's special once that bar is full,
-changing formation, and marking the focus target. For now, though, a member's special
-can't be used from the battle screen: the bar fills and sits full.
+Nothing waits for the player. The fight runs from start to finish, and the player acts
+while it's running — using a member's special once that bar is full, changing formation,
+and marking the focus target. For now there's a pause button: it stops the fight and
+opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
+the player can't use a special, mark the focus target or retreat. For now, though, a
+member's special can't be used from the battle screen: the bar fills and sits full.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
 set length of time, a placeholder, as a stand-off — 6,000 ticks, five minutes of fight —
@@ -144,7 +146,8 @@ and a stand-off kills no one further.
 **Why:** The combat engine is built this way. No doc says what a member does with no
 target selected, or whether a battle can run forever. Using members' specials waits on
 the battle screen being able to; the engine already lets them. The original sentences are
-unchanged; the new ones sit after them.
+unchanged, apart from the pause proposed in "The fight can be paused, for now"; the new
+ones sit after them.
 
 ## Change: A special puts nothing in its owner's bar, for now
 
@@ -547,3 +550,84 @@ these, in "A special puts nothing in its owner's bar, for now" and "Every bar em
 new floor and starts each dive empty, for now", and none of the docs settles them. The
 pending "Questions on specials, taunts and the dive" and "Questions on cooldown combat's
 defaults" changes to this list are unchanged; these go after the entries they add.
+
+## Change: The fight can be paused, for now
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Player Input`, second paragraph
+
+**Now says:**
+
+```
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — using a member's special once that bar is full,
+changing formation, and marking the focus target.
+```
+
+**Proposed:**
+
+```
+Nothing waits for the player. The fight runs from start to finish, and the player acts
+while it's running — using a member's special once that bar is full, changing formation,
+and marking the focus target. For now there's a pause button: it stops the fight and
+opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
+the player can't use a special, mark the focus target or retreat.
+```
+
+**Why:** The user, 2026-11-16: "Leave the pause button for now we can take it out later."
+The battle screen is built with it. This departs from the original's "The fight never
+pauses", so it stands for now. The pending "How a member with no target picks one, and how
+a battle ends" change to this paragraph carries this wording too; its sentence on specials
+goes after these.
+
+## Change: The fight can be sped up, and only shows sooner
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Player Input`, last paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+The fight doesn't wait for the player, so the moment to use a special goes by while the
+fight carries on around it.
+```
+
+**Proposed:**
+
+```
+The fight doesn't wait for the player, so the moment to use a special goes by while the
+fight carries on around it.
+
+The player can speed the fight up — x1, x2 or x3 — but can't slow it below x1. Faster
+only shows the same fight sooner: the same ticks and the same rolls, so the same taps at
+the same moments of the fight give the same result. What it changes is the player's real
+time to react: at x3 a special's window is a third as long.
+```
+
+**Why:** The user, 2026-11-16: "yes its fine." — to keeping the x1/x2/x3 speed button the
+battle screen is built with. This answers the original's open question "Can the player
+speed a fight up or slow it down, and does that change anything in the simulation or only
+how fast it's drawn?": only how fast it's drawn. The fight moves on only as time is handed
+to it, as the pending "The clock, how a fight opens, and who goes first, for now" change
+says, so speed can't change what happens in it.
+
+## Change: Speed question answered
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Open Questions`
+
+**Now says:**
+
+```
+- Can the player speed a fight up or slow it down, and does that change anything in the
+  simulation or only how fast it's drawn?
+```
+
+**Proposed:** delete. The other entries in `## Open Questions`, and the pending changes to
+this list above, stay as they are.
+
+**Why:** Answered: x1, x2 or x3, and it changes only how soon the fight is shown, written
+into Player Input.

@@ -100,7 +100,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   ends, a special putting nothing in its owner's bar and taking the attack's place, every
   bar emptying on a new floor and each dive, an effect's count, its end and a second cast
   stacking, targeting weights and taunts, a specialist's cooldown, open questions on
-  specials, taunts and the dive, on cooldown combat's defaults, and on the special bar).
+  specials, taunts and the dive, on cooldown combat's defaults, and on the special bar,
+  the fight pausing for now, the fight's speed, and the speed question answered).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
