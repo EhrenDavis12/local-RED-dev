@@ -121,6 +121,12 @@ The bag exists because drawing without replacement guarantees the lucky event ar
 the floor of one token in fifty it cannot be missed for long — where a roll against a
 small percentage can go cold for a very long time.
 
+A level-up is not an exception to that: a member that levels up while holding a
+part-used bag keeps it exactly as it is, and a refill uses the member's Luck as it stands
+at that moment, so a rise in Luck reaches the bag at its next refill rather than being
+lost. The bag exists to guarantee the lucky event arrives, and rebuilding a nearly-empty
+bag on a level-up would throw away a token that was almost certain to come up.
+
 How many of the 50 tokens are True comes from the chance: 25% × Luck ÷ (Luck + 60),
 rounded up, and never fewer than 1. That chance approaches a quarter without ever
 reaching it, so there's no cap rule and no point where Luck stops doing anything — it
@@ -259,10 +265,6 @@ the Equipment doc.
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- How many Trues a bag holds comes from Luck, and Luck goes up on a level-up, but a bag
-  only re-forms once it has been emptied. So a member that levels mid-dive carries its old
-  bag until the last token is pulled. Does the bag re-form on a level-up instead, or does
-  the new Luck only take effect at the next refill?
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
