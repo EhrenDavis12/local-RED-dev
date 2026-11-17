@@ -115,9 +115,11 @@ as guild members.
 
 A Luck check pulls one token out of a bag of 50, each token either True or False. A False
 does nothing; a True means the character is lucky. Once every token has been pulled, the
-bag fills back up. The bag exists because drawing without replacement guarantees the
-lucky event arrives — at the floor of one token in fifty it cannot be missed for
-long — where a roll against a small percentage can go cold for a very long time.
+bag fills back up — and that's the only thing that refills it. A part-used bag carries
+over rather than resetting, from one battle to the next and from one floor to the next.
+The bag exists because drawing without replacement guarantees the lucky event arrives — at
+the floor of one token in fifty it cannot be missed for long — where a roll against a
+small percentage can go cold for a very long time.
 
 How many of the 50 tokens are True comes from the chance: 25% × Luck ÷ (Luck + 60),
 rounded up, and never fewer than 1. That chance approaches a quarter without ever
@@ -257,9 +259,10 @@ the Equipment doc.
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- The bag fills again once every token has been pulled. Does anything else refill it —
-  the start of a fight, or a floor — or does a part-used bag carry on from one battle to
-  the next?
+- How many Trues a bag holds comes from Luck, and Luck goes up on a level-up, but a bag
+  only re-forms once it has been emptied. So a member that levels mid-dive carries its old
+  bag until the last token is pulled. Does the bag re-form on a level-up instead, or does
+  the new Luck only take effect at the next refill?
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
