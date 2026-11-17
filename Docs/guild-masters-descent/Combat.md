@@ -113,24 +113,25 @@ its very next attack, the one that charges its cooldown normally — the lockout
 further than the one free attack itself. Enemies get the Luck reset too, on the same terms
 as guild members.
 
-A Luck check pulls one token out of a bag of 25, each token either True or False. A False
+A Luck check pulls one token out of a bag of 50, each token either True or False. A False
 does nothing; a True means the character is lucky. Once every token has been pulled, the
 bag fills back up. The bag exists because drawing without replacement guarantees the
-lucky event arrives — at the floor of one token in twenty-five it cannot be missed for
+lucky event arrives — at the floor of one token in fifty it cannot be missed for
 long — where a roll against a small percentage can go cold for a very long time.
 
-How many of the 25 tokens are True comes from the chance: 25% × Luck ÷ (Luck + 60),
+How many of the 50 tokens are True comes from the chance: 25% × Luck ÷ (Luck + 60),
 rounded up, and never fewer than 1. That chance approaches a quarter without ever
 reaching it, so there's no cap rule and no point where Luck stops doing anything — it
 just gets steadily less worth chasing.
 
 A worked list:
 
-- Luck 5, a newly recruited F-rank member — 1 True in 25
-- Luck 20 — 2
-- Luck 60 — 4
-- Luck 180 — 5
-- Higher still — approaching 7, as the chance approaches a quarter
+- Luck 5, a newly recruited F-rank member — 1 True in 50
+- Luck 7 — 2
+- Luck 20 — 4
+- Luck 60 — 7
+- Luck 180 — 10
+- Higher still — approaching 13, as the chance approaches a quarter
 
 The ceiling is there because a reset is a free attack, so the chance *is* the percentage
 by which that member's attack rate goes up. A quarter is strong and clearly felt without
@@ -256,11 +257,6 @@ the Equipment doc.
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- The count of Trues rounds up from a floor of one, so every Luck from 1 to 11 fills a bag
-  the same way — one True in 25. At F rank every type sits in that range, so Luck tells
-  none of them apart until it passes twelve. Should the bag hold more than 25 so the stat
-  separates the types from the start, at the cost of the round-up being less generous
-  early?
 - The bag fills again once every token has been pulled. Does anything else refill it —
   the start of a fight, or a floor — or does a part-used bag carry on from one battle to
   the next?
