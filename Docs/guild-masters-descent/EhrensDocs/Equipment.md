@@ -556,11 +556,14 @@ For now a potion works like this:
   dive. A member who dies still holding theirs sends it home to the stores when the dive
   ends, the same as their gear; if a battle leaves no one in the party alive, every
   potion the party carried is lost.
-- A potion can't be handed over or taken back while its member is away on a mission, or
-  from the moment the party goes into a dive until that dive ends — even while the player
-  has stepped back out to the guild hall. Otherwise a member who has drunk theirs could be
-  handed a second between battles, and a fallen member's potion could be saved before the
-  party falls. Dismissing a member puts their potion back in the stores.
+- A potion can't be handed over or taken back from the moment the party goes into a dive
+  until that dive ends — even while the player has stepped back out to the guild hall.
+  Otherwise a member who has drunk theirs could be handed a second between battles, and a
+  fallen member's potion could be saved before the party falls. The same lock holds a
+  member's gear — weapon, armour and shield — so none of it can be put on or taken off
+  until the dive ends. A member away on a mission can still have their gear and potion put
+  on and taken off, since a mission's outcome is fixed when it's sent and never reads gear.
+  Dismissing a member puts their potion back in the stores.
 ```
 
 **Why:** Answered 2026-11-14: "as of right now let the characters drink them when they
