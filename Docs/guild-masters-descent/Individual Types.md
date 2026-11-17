@@ -47,14 +47,14 @@ everything into a single hit.
 Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
 type — its two strikes all belong to that single attack.
 
-Its special is a flurry of between 4 and 6 strikes on a single target. The first four
-strikes always land; each of the two after that happens on a Luck check, so the flurry
-only runs to five or six strikes if those checks succeed. Each flurry strike does what one
-of the Fighter's ordinary strikes does. The flurry hits hard because there are four to six
-strikes in it rather than two — not because any one of them is heavier. If the target dies
-before the strikes run out, the remaining strikes carry to the nearest enemy still
-standing. If any enemy is killed during the flurry, the Fighter's charge bar refills to
-90% — that refill is the Fighter's bonus charge condition.
+Its special is a flurry of 4 or 6 strikes on a single target. The first four strikes
+always land; one Luck check — a pull from the Fighter's Luck bag — then decides the last
+two together: a True adds both, a False ends the flurry at four. Each flurry strike does
+what one of the Fighter's ordinary strikes does. The flurry hits hard because there are
+four or six strikes in it rather than two — not because any one of them is heavier. If the
+target dies before the strikes run out, the remaining strikes carry to the nearest enemy
+still standing. If any enemy is killed during the flurry, the Fighter's charge bar refills
+to 90% — that refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 
@@ -112,5 +112,3 @@ The Mage's bonus charge condition is allies in front of it in its own column tak
 ## Open Questions
 
 - What are the stats, skills and abilities for each individual type?
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
