@@ -1,7 +1,7 @@
 # Battle Test
 
-> **Status:** Settled: the two teams, their gear, and the field they fight on. Not
-> settled: whether the narrower test field stands in for the game's own grid.
+> **Status:** Settled: the two teams, their levels, their gear, and the field they fight
+> on. Not settled: whether the narrower test field stands in for the game's own grid.
 
 ## What This Is For
 
@@ -33,14 +33,14 @@ for testing.
 
 Every piece of gear has **20 durability**.
 
-| Member | Position | Stats (Str/Dex/Con/Int/Luck) | Health | Cooldown | Weapon | Armour | Attack power | Defence |
-|---|---|---|---|---|---|---|---|---|
-| Brute | row 1 left | 9 / 6 / 7 / 4 / 5 | 70 | 138 ticks | club, 9–13 | tanned hide, 4–6 | 18–22, cleaves 3 | 11–13 |
-| Tank | row 1 centre | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | short sword, 11–15 | full armour, 11–15 | 18–22, taunts | 20–24 |
-| Fighter | row 1 right | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 6–9 | 17–20 per strike, 2 strikes | 12–15 |
-| Rogue | row 2 left | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | knife, 4–7 | hooded armour, 3–5 | 13–16 per strike, 2 strikes | 8–10 |
-| Mage | row 2 centre | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | staff, 6–10 | robe, 2–4 | 15–19, column | 8–10 |
-| Archer | row 2 right | 7 / 9 / 5 / 4 / 6 | 50 | 69 ticks | bow, 14–19 | leather, 5–8 | 23–28 | 10–13 |
+| Member | Position | Level | Stats (Str/Dex/Con/Int/Luck) | Health | Cooldown | Weapon | Armour | Attack power | Defence |
+|---|---|---|---|---|---|---|---|---|---|
+| Brute | row 1 left | 1 | 9 / 6 / 7 / 4 / 5 | 70 | 138 ticks | club, 9–13 | tanned hide, 4–6 | 18–22, cleaves 3 | 11–13 |
+| Tank | row 1 centre | 1 | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | short sword, 11–15 | full armour, 11–15 | 18–22, taunts | 20–24 |
+| Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 6–9 | 17–20 per strike, 2 strikes | 12–15 |
+| Rogue | row 2 left | 1 | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | knife, 4–7 | hooded armour, 3–5 | 13–16 per strike, 2 strikes | 8–10 |
+| Mage | row 2 centre | 1 | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | staff, 6–10 | robe, 2–4 | 15–19, column | 8–10 |
+| Archer | row 2 right | 1 | 7 / 9 / 5 / 4 / 6 | 50 | 69 ticks | bow, 14–19 | leather, 5–8 | 23–28 | 10–13 |
 
 ## The Enemy Team
 
@@ -49,14 +49,29 @@ each at **10 durability**, matching the player team's own rolls. **Only the Figh
 carries a weapon**, also at **10 durability**, so the other five attack for their stat
 alone.
 
-| Member | Position | Stats (Str/Dex/Con/Int/Luck) | Health | Cooldown | Weapon | Armour | Attack power | Defence |
-|---|---|---|---|---|---|---|---|---|
-| Brute | row 1 left | 9 / 6 / 7 / 4 / 5 | 70 | 138 ticks | none | tanned hide, 4–6 | 9, cleaves 3 | 11–13 |
-| Tank | row 1 centre | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | none | full armour, 11–15 | 7, taunts | 20–24 |
-| Fighter | row 1 right | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 6–9 | 17–20 per strike, 2 strikes | 12–15 |
-| Rogue | row 2 left | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | none | hooded armour, 3–5 | 9 per strike, 2 strikes | 8–10 |
-| Mage | row 2 centre | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | none | robe, 2–4 | 9, column | 8–10 |
-| Archer | row 2 right | 7 / 9 / 5 / 4 / 6 | 50 | 69 ticks | none | leather, 5–8 | 9 | 10–13 |
+| Member | Position | Level | Stats (Str/Dex/Con/Int/Luck) | Health | Cooldown | Weapon | Armour | Attack power | Defence |
+|---|---|---|---|---|---|---|---|---|---|
+| Brute | row 1 left | 1 | 9 / 6 / 7 / 4 / 5 | 70 | 138 ticks | none | tanned hide, 4–6 | 9, cleaves 3 | 11–13 |
+| Tank | row 1 centre | 1 | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | none | full armour, 11–15 | 7, taunts | 20–24 |
+| Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 6–9 | 17–20 per strike, 2 strikes | 12–15 |
+| Rogue | row 2 left | 1 | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | none | hooded armour, 3–5 | 9 per strike, 2 strikes | 8–10 |
+| Mage | row 2 centre | 1 | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | none | robe, 2–4 | 9, column | 8–10 |
+| Archer | row 2 right | 1 | 7 / 9 / 5 / 4 / 6 | 50 | 69 ticks | none | leather, 5–8 | 9 | 10–13 |
+
+## Levels and Experience
+
+Both teams start at level 1. At F rank, crossing to E rank takes 20 experience and 16
+levels, so an even rate across the rank puts a level at a quarter past one — 1.25
+experience each.
+
+Every enemy here is F rank, and an F-rank kill is worth 1 experience, so clearing all six
+pays 6, divided equally between the six party members — 1 each a battle. So a member gains
+a level roughly every battle and a quarter, and reaches the 16 levels that make it
+eligible for E rank after about 20 battles.
+
+The fixture itself stays at level 1. It is a fixed starting state, so a run never leaves
+the teams levelled up — the accumulation above is what a sequence of battles would
+produce, not a change to the teams recorded here.
 
 ## Open Questions
 
@@ -66,3 +81,7 @@ alone.
   Tank that primary is Constitution, and health is Constitution times ten — so does the
   help raise its health from 80 to 90, as the table assumes, or does help reach defence
   only?
+- A level costs 1.25 experience here because crossing F rank takes 20 experience and 16
+  levels, split evenly. Whether experience really buys levels at an even rate is an open
+  question in the Guild Members doc — if the two run on separate counters instead, this
+  figure is wrong.
