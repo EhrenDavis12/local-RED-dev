@@ -318,9 +318,21 @@ faded or 0.6-alpha ink, and disabled words keep at least 3:1 contrast. A scroll 
 page, a title, a one-action button (two words at most) or an icon pick. Status, stats,
 prices, reasons and long text go on the page paper: Buy, Hire and Send say only the action,
 the price sits on the paper above, and a red "Need 80 gold" line sits on the paper when
-gold is short. Inner margins are a share of the paper between rod and curl: buttons, tabs
+gold is short. Every text and every image on a scroll is padded on all four sides inside
+that scroll's paper, and nothing runs off or touches the scroll's edge; the user: "give
+padding on TRBL of the image on the scroll dont let the any text or image bleed off the
+scroll its ment to be on." (queue item #116, 2026-11-16). The paper is measured
+from the art itself, between the rod and the start of the orange curl and inside the torn
+top and bottom edges, never the art box, whose right edge is drop shadow; each scroll
+piece has its own measured ends. Inner margins are a share of that paper: buttons, tabs
 and chips 11% each side and 15% top and bottom; headers 15% and 5%; pick tiles and cards
-8%; pages and pop-ups 4% left, 6% right, 10% top and 8% bottom. Stacked lines keep a clear
+8% on all four sides; pages and pop-ups 4% left, 6% right, 10% top and 8% bottom. The
+vertical shares are a share of the paper's height. Pictures (icons, stills) are fitted
+inside the paper with one picture margin of 8%; when annie's icons arrive with their own
+even transparent margin, that margin is lowered rather than added to. When words don't
+fit, the scroll grows, wider or taller, and words never shrink below the floor; the one
+exception is a shop item name whose single word is too wide for its title size, which
+drops to body size. Stacked lines keep a clear
 gap between their ink, and nothing is drawn over a portrait. The font has no "#" and no
 middle dot, so menu text uses neither ("F-rank Fighter 2", "-" as the separator). Shop
 tiles show the icon and price only; the name is in the detail panel. The user approved the
