@@ -4,10 +4,27 @@ An index of locations, not a summary. Headings only; the docs are the source of 
 
 ## Design docs (originals, read-only)
 
+### Battle Test.md — Battle Test
+A fixed pair of teams, their levels, gear and test field, so test battles can be compared.
+- What This Is For
+- The Field
+- The Player's Team
+- The Enemy Team
+- Levels and Experience
+- Open Questions
+
 ### Combat.md — Combat
-Formation, combat turns, targeting and gear durability in battle.
+Formation, cooldowns and Luck checks, player input, reach, the special bar, lasting
+effects, specialists and enemies in combat, targeting and gear durability.
 - Formation
-- Combat
+- Cooldowns
+- Luck Checks
+- Player Input
+- Attacks and Reach
+- The Special Bar
+- Lasting Effects
+- Specialists in Combat
+- Enemies
 - Enemy Targeting
 - Equipment Durability
 - Open Questions
@@ -18,6 +35,7 @@ The overall premise and top-level systems.
 - Time
 - Guild Rank
 - The Three Boards
+- The Dorms and the Smithy
 - The Party
 - Missions
 - The Recruiting Board
@@ -84,40 +102,90 @@ The dungeon board, finding and entering dungeons, and training missions.
 
 ## Files with pending changes
 
-- `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line, open question,
-  members stay hurt between battles and 0 health is death, turn order within a round and
-  how a battle ends, base charge, using a special and a special taking the turn, effect length and a second cast stacking, targeting weights and
-  taunts, open questions on turn order, taunts and specials, the dive's defaults on injury,
-  formation and bars carrying between battles).
+- `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line,
+  open question, health full at the guild hall and positions carrying between battles,
+  how a cooldown rounds, the clock and a multi-strike attack landing in one tick, the Luck
+  reset's free attack and specials, picking a target, members' specials and how a battle
+  ends, a special putting nothing in its owner's bar and taking the attack's place, every
+  bar emptying on a new floor and each dive, an effect's count, its end and a second cast
+  stacking, targeting weights and taunts, a specialist's cooldown, open questions on
+  specials, taunts and the dive, on cooldown combat's defaults, and on the special bar,
+  the fight pausing for now, the fight's speed, the speed question answered, a
+  close-range attack waiting for its target to be home, close-range fighters taking
+  turns on the same tick for now, questions on that wait, every
+  character's own Luck bag and when no token is pulled for now, the opening check as a
+  pull from the combatant's own bag for now, and questions on the Luck bag's defaults).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
-  counted).
+  counted, missions in the first version as F-rank jobs that pay gold, open
+  questions on missions' defaults, a member on a dive can't be dismissed for now, and a
+  question on dismissing a member on a dive, a mission can be played as a battle for
+  now, questions on played missions, and a guild with no members and no way to hire gets
+  nothing, for now).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
-  question, dive loot is gold only, selling gear back, repair costs gold only for now,
-  open questions on stores and condition, a zero-damage hit still wears gear, a dead member's gear comes home for now).
-- `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (starting health is
-  set by rank and F rank starts at 10, open questions on levelling and promotion, help
-  follows the board live, type advantage after defence for now, open questions on type
-  advantage and defence, health from rank or tier alone for now, who shares a floor's
-  experience, open questions on health and experience).
-- `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (a Brute's
-  hit on a Tank skips all its defence, where the Brute's cleaves land, the Tank's taunt,
-  Shields Up and bonus for now, the Fighter's damage split before defence, the Rogue's
-  strikes and bonus for now, the flurry's leftover strikes stay within reach, a failed
-  Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's column,
-  field and bonus for now, open questions on Vanish, taunts, the field and the types'
-  defaults).
+  question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
+  open questions on stores and condition, a zero-damage hit still wears gear, a dead
+  member's gear comes home for now, the shop sells class F only for now, a span no wider
+  at SSS than at F for now, a question on span width, the Brute's axe and the Tank's
+  warhammer, the Tank's swappable shield, a member's one healing potion, a broken
+  shield adding nothing, and questions on shields and potions).
+- `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
+  recruits and promotion, who shares a combat's experience and a stand-off's for now, help
+  follows the board live, an open question on sharing experience, a specialist's K from
+  its tier, a hit rounding down once for now, the Mage's field as an area attack for now,
+  health from a member's own Constitution and what's taken staying taken for now,
+  questions on health, experience as the bar and level as the number for now, the
+  experience-and-levels question answered, questions on experience, and the
+  rest-floor heal question answered, and help coming back to whole points once).
+- `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
+  Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
+  the Rogue's ordinary strikes when the target dies, the Rogue's evasion against a capped
+  Archer streak for now, the Rogue's bonus for now, the flurry's leftover strikes staying
+  within reach and its strikes able to miss for now, a failed Vanish fails for one strike,
+  Volley and the Archer's streak for now, the Mage's column, field, the field's defence and
+  wear, timing and bonus for now, open questions on Vanish, taunts, the field and the
+  types' defaults, on the field's timing, and on the flurry, the Fighter's bonus as the
+  refill for now, an open question on the Fighter's bonus, the flurry's Luck pull coming as
+  it begins for now, and a question on the flurry's pull).
+- `EhrensDocs/Look and Feel.md` — new doc proposed for the originals (Look and Feel): the
+  user's approved look for the game, gathered from the animation work.
+  - Battle scene (meadow)
+  - Battle scene (cave)
+  - Shadows and depth
+  - Health and mana bars
+  - Characters and animations
+  - Effects
+  - Damage text
+  - Menus and the scroll
+  - Map
+  - Font
+  - Icons
+  - Palette
+  - Sound and music
+  - Open Questions
+- `EhrensDocs/Open Questions.md` — new doc proposed for the originals (Open Questions —
+  for the design docs' owner): the questions the build is waiting on.
+  - How to answer
+  - Open Questions
+    - Loot and carrying gold
+    - Enemies
+    - Health
+    - Battle
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
-  runs landscape only, and the game saves by itself.
+  runs landscape only, and the game saves by itself, mid-battle too, working out maximum
+  health afresh as a save loads and keeping every Luck bag.
   - Orientation
   - Saving
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
-  back anywhere and the carry limit, enemies are monsters and how they fight for now, a
-  floor's monsters the same every dive, re-entering and its fees for now, open questions on
-  turning back and the dive's defaults).
-- `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (whom the Cook heals for
-  now, open question on the Cook).
+  back anywhere and the carry limit, how many monsters a battle has, enemies are monsters
+  with a rank and level and how they fight for now, a floor's monsters the same every dive
+  and where each stands, re-entering and its fees for now, open questions on
+  what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
+  open questions on healing in the dive, and party planning as one screen).
+- `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
+  as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
+  questions on the Cook).
 
 The design docs themselves are the source of truth; consult them, not this map, for content.

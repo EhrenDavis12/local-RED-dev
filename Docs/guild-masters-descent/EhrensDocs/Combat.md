@@ -28,7 +28,7 @@ Some enemy types can reposition mid-battle too, but not all of them can.
 **Why:** The original lets the player change formation mid-battle and names no cost, so it
 stays free for now.
 
-## Change: Status line no longer lists formation cost as open
+## Change: Status line on formation cost, speed and pausing
 
 > Proposed 2026-11-11 · for review
 
@@ -37,18 +37,22 @@ stays free for now.
 **Now says:**
 
 ```
-> **Status:** Early design. Nothing is built yet — the grid, the turn order and how gear
-> breaks are settled, but what changing formation mid-battle costs isn't.
+> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
+> reset's chance, and the never-pausing simulation are settled; whether a fight can be
+> sped up, how multi-strike cases resolve, what formation costs, how the bars read at a
+> glance, and whether the enemy grid keeps filling are not.
 ```
 
 **Proposed:**
 
 ```
-> **Status:** Early design. Nothing is built yet — the grid, the turn order, how gear
-> breaks and what changing formation mid-battle costs are settled.
+> **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
+> reset's chance, what formation costs and the fight's speed are settled, and for now the
+> fight can be paused; how multi-strike cases resolve, how the bars read at a glance, and
+> whether the enemy grid keeps filling are not.
 ```
 
-**Why:** The one open item it named is now settled (see the change on Formation).
+**Why:** What formation costs and the fight's speed are now settled, and the fight can be paused for now (see the changes on Formation and Player Input).
 
 ## Change: Formation-cost question answered
 
@@ -62,160 +66,194 @@ stays free for now.
 - What does changing formation mid-battle cost the player, if anything?
 ```
 
-**Proposed:** delete. The `## Open Questions` heading stays, with the entries proposed in
-"Questions on turn order and taunts" below.
+**Proposed:** delete. The other entries in `## Open Questions` stay as they are.
 
 **Why:** Answered: free for now, written into Formation.
 
-## Change: Members stay hurt from battle to battle, and 0 health is death
+## Change: Health is full at the guild hall, and where everyone stands carries over
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## Combat`, last paragraph (new paragraphs after it)
+**Where:** `## Attacks and Reach`, last paragraph (new paragraphs after it)
 
 **Now says:**
 
 ```
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
-and defence is subtracted from it separately.
+and the defender's mitigation is applied to it separately.
 ```
 
 **Proposed:**
 
 ```
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
-and defence is subtracted from it separately.
-
-A member stays hurt from battle to battle: damage taken in one battle is still there at
-the start of the next, all the way through a dive. Health comes back only from the Cook,
-from a rest area, and from going home.
-
-When a member's health reaches 0 in a battle on a dive, they die on the spot, for good.
+and the defender's mitigation is applied to it separately.
 
 Health only matters inside a dive. Back at the guild hall a member's health is back to
 full; injury is what carries from one dive to the next.
 
 For now a dive never leaves a member injured: a member comes home fine, or doesn't come
 home. Where everyone stands at the end of a battle is where they start the next one, and
-the dead leave their places empty. A special bar doesn't carry over — every bar starts
-each battle empty.
+the dead leave their places empty.
 ```
 
-**Why:** Answered: health — stay hurt from battle to battle. Answered too: a member whose
-health hits 0 in a dungeon battle dies on the spot, for good; and back at the guild hall
-health is back to full — health only matters inside a dive, and injury is what carries
-between dives. No doc said what happens to health after a battle, at 0, or after a dive,
-though The Dungeon's rest area "where the party heals" and Specialists' Cook, who "heals a
-little after every battle", only make sense if damage outlives a battle. The existing
-paragraph is unchanged, and The Dungeon's "Death in the dungeon is permanent" already
-agrees. Not settled by this: what reaching 0 health does on a training run, which "can
-injure a member, but can never kill one"; whether a dive can leave a member injured; and
-how much health the Cook and a rest area give back.
-The dive is built with a default for now on whether a dive can leave a member injured,
-and on two things nothing raised — whether the formation and the special bars carry from
-one battle to the next — in the last paragraph; each is proposed as a question for
+**Why:** Answered: back at the guild hall health is back to full — health only matters
+inside a dive, and injury is what carries between dives. No doc says what happens to
+health after a dive. The existing paragraph is unchanged. Not settled by this: what
+reaching 0 health does on a training run, which "can injure a member, but can never kill
+one", and whether a dive can leave a member injured. The dive is built with a default for
+now on that, and on one thing nothing raised — whether the formation carries from one
+battle to the next — in the last paragraph; each is proposed as a question for
 `## Open Questions`.
 
-## Change: Turn order within a round, and how a battle ends
+## Change: How a member with no target picks one, and how a battle ends
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Combat`, first paragraph (a new paragraph after it)
+**Where:** `## Player Input`, first and second paragraphs (a new paragraph after the second)
 
 **Now says:**
 
 ```
-Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
-enemies'. On a guild member's turn, that member is highlighted. Default attacks are
-auto-selected. The player can select one enemy to be specifically targeted by the entire
-party — this cuts down on clicks during gameplay.
+Default attacks are auto-selected. The player can select one enemy to be specifically
+targeted by the entire party — this cuts down on clicks during gameplay.
+
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — using a member's special once that bar is full,
+changing formation, and marking the focus target.
 ```
 
 **Proposed:**
 
 ```
-Combat is turn-based tactics. Turn order is determined by Dexterity — the members' and the
-enemies'. For now everyone acts once a round, members and enemies in one shared order,
-highest Dexterity first. The order is set at the start of each round from each one's own
-Dexterity, so help from the support ring never moves anyone in it. Ties go to members
-before enemies, then front row first, left to right. On a guild member's turn, that
-member is highlighted. Default attacks are auto-selected. The player can select one enemy
-to be specifically targeted by the entire party — this cuts down on clicks during
-gameplay. A member with no enemy selected, or who can't reach the one selected, picks
-its target the way an enemy does.
+Default attacks are auto-selected. The player can select one enemy to be specifically
+targeted by the entire party — this cuts down on clicks during gameplay. A member with
+no enemy selected, or who can't reach the one selected, picks its target the way an
+enemy does.
+
+Nothing waits for the player. The fight runs from start to finish, and the player acts
+while it's running — using a member's special once that bar is full, changing formation,
+and marking the focus target. For now there's a pause button: it stops the fight and
+opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
+the player can't use a special, mark the focus target or retreat. For now, though, a
+member's special can't be used from the battle screen: the bar fills and sits full.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
-set number of rounds, a placeholder, as a stand-off — and a stand-off kills no one
-further.
+set length of time, a placeholder, as a stand-off — 6,000 ticks, five minutes of fight —
+and a stand-off kills no one further.
 ```
 
-**Why:** The combat engine is built this way, and no doc said how many times a combatant
-acts, whether help changes the order, how ties break, what a member does with no target
-selected, or whether a battle can run forever. The original sentences are unchanged;
-the new ones sit between them. Whether higher Dexterity should mean acting more often, and
-whether help to Dexterity should move anyone in the order, stay open — see the questions
-proposed for `## Open Questions`.
+**Why:** The combat engine is built this way. No doc says what a member does with no
+target selected, or whether a battle can run forever. Using members' specials waits on
+the battle screen being able to; the engine already lets them. The original sentences are
+unchanged, apart from the pause proposed in "The fight can be paused, for now"; the new
+ones sit after them.
 
-## Change: The base charge is once per attack, and a special empties the bar
+## Change: A special puts nothing in its owner's bar, for now
 
-> Proposed 2026-11-12 · for review
+> Proposed 2026-11-13 · for review
 
-**Where:** `## Combat`, second paragraph
+**Where:** `## The Special Bar`, third paragraph
 
 **Now says:**
 
 ```
-Each member has a special bar. When it's full, the player can use a special. Every
-attack a member makes charges that member's bar — that's the base, and it's the same
-for every type. Each combat type also has its own bonus condition that charges its bar
-on top of that.
+The bar caps at full — the special is never lost, and it waits until the player uses it.
+While it sits full, charge is wasted: attacks the member makes while full charge nothing,
+and so does the type's bonus condition — that progress toward the next special is gone.
+Using the special empties the bar, and it charges again from there.
 ```
 
 **Proposed:**
 
 ```
-Each member has a special bar. When it's full, the player can use a special. Every
-attack a member makes charges that member's bar — that's the base, and it's the same
-for every type. Each combat type also has its own bonus condition that charges its bar
-on top of that. The base charge comes once per attack, whether the attack hits or not.
-Using a special empties the bar, and the special then charges it like any other attack,
-unless its type says otherwise — the Fighter's flurry doesn't. A special takes the
-turn in place of the ordinary attack. For now that holds for Vanish, Shields Up and the
-field too, which strike no one: on the turn one of them is cast, its caster makes no
-ordinary attack.
+The bar caps at full — the special is never lost, and it waits until the player uses it.
+While it sits full, charge is wasted: attacks the member makes while full charge nothing,
+and so does the type's bonus condition — that progress toward the next special is gone.
+Using the special empties the bar, and it charges again from there. For now a special
+puts nothing into its owner's bar: its own hits charge nothing, the Mage's field's damage
+included, and it earns no bonus either — a Brute's special landing on two or more
+enemies pays nothing. The one exception is the Fighter's flurry, whose kill refills the
+bar to 90%, as the Individual Types doc says. For now, too, a special is used when the
+member's cooldown comes up, in place of the ordinary attack that cooldown brings round.
 ```
 
-**Why:** The combat engine is built this way. "Every attack" didn't say whether a miss
-charges, or whether a multi-strike attack charges once or per strike, and nothing said
-what using a special does to the bar. Nothing said whether a special that strikes no one leaves the caster its ordinary attack as well; the six combat types are built with the special as the whole turn, and that's proposed as a question below.
+**Why:** The combat engine is built this way. This doc says what wears a weapon down is
+what fills the bar, and the Equipment doc says a special wears the weapon not at all, so
+nothing a special does charges it; nothing says whether a special can earn its type's
+bonus. Both are proposed as questions in "Questions on the special bar". Whether using a
+special also costs the member an ordinary attack is proposed as a question below; for now
+it takes the place of the attack its cooldown brings round.
 
-## Change: Whose turns an effect's length counts
+## Change: Every bar empties on a new floor and starts each dive empty, for now
 
-> Proposed 2026-11-12 · for review
+> Proposed 2026-11-13 · for review
 
-**Where:** `## Combat`, third paragraph
+**Where:** `## The Special Bar`, fourth paragraph
 
 **Now says:**
 
 ```
-Vanish, Shields Up and the Mage's lingering field all last the same length — the same
-fixed number of turns. Each of the three is covered in the Individual Types doc.
+A part-filled bar carries from one battle to the next within a floor, and moving to the
+next floor resets it to empty.
 ```
 
 **Proposed:**
 
 ```
-Vanish, Shields Up and the Mage's lingering field all last the same length — the same
-fixed number of turns, a placeholder. The turns counted are the caster's own: the turn it
-was cast on doesn't count, and it lasts that many of the caster's turns after. If the
-caster dies, the effect ends with it — a Tank's Shields Up goes when the Tank does. For
-now a Shields Up or a field cast while the caster's last one is still running stacks
-with it: both run, each to its own end, so the two lots of defence add up and both fields
-do their damage. Each of the three is covered in the Individual Types doc.
+A part-filled bar carries from one battle to the next within a floor, and moving to the
+next floor resets it to empty. For now a full bar empties too: every bar starts a new
+floor empty, and a rest area is a floor, so arriving at one empties them. For now, too,
+every dive starts with every bar empty, a dive that re-enters at a rest area included —
+the bar belongs to the dive, not to the member.
 ```
 
-**Why:** The combat engine is built this way. "A fixed number of turns" didn't say whose
-turns, whether the cast turn counts, or what happens to an effect when its caster dies. Nothing said what happens when one is cast again while the last is still running; the six combat types are built to stack them, and that's proposed as a question below.
+**Why:** The dive is built this way. "The special is never lost" and "a part-filled bar
+… resets it" leave open whether moving to the next floor empties a full bar, and nothing
+says whether a bar outlives the dive. Both are proposed as questions in "Questions on the
+special bar".
+
+## Change: When an effect's count starts, and a second cast stacking
+
+> Proposed 2026-11-12 · for review
+
+**Where:** `## Lasting Effects`, last paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+A lasting effect ends when the member whose effect it is dies. That isn't obvious for
+the two of the three that sit somewhere other than on their owner: the Mage's lingering
+field sits on the battlefield rather than on the Mage, and Shields Up's defence sits on
+the allies behind the Tank rather than on the Tank. The duration is a count of the
+owner's own cooldown cycles, and a member who is dead completes no more of them, so
+there's no clock left for the effect to run on.
+```
+
+**Proposed:**
+
+```
+A lasting effect ends when the member whose effect it is dies. That isn't obvious for
+the two of the three that sit somewhere other than on their owner: the Mage's lingering
+field sits on the battlefield rather than on the Mage, and Shields Up's defence sits on
+the allies behind the Tank rather than on the Tank. The duration is a count of the
+owner's own cooldown cycles, and a member who is dead completes no more of them, so
+there's no clock left for the effect to run on.
+
+The cycle an effect is cast in doesn't count: it lasts three of the owner's cycles after
+that. For now it ends once the third of those has played out, so the owner's next three
+attacks all happen under it — a vanished Rogue makes three that can't miss. For now, too,
+a free attack from the Luck reset isn't one of the three: only a cooldown that comes up
+after a wait counts. For now a Shields Up or a field cast while the owner's last one is
+still running stacks with it: both run, each to its own end, so the two lots of defence
+add up and both fields do their damage.
+```
+
+**Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
+doesn't say whether the cycle it's cast in counts, whether the effect ends once the third
+has played out or as the fourth begins, or whether a free attack from the Luck reset is a
+cycle. Nothing says what happens when one is cast again while the last is still running;
+the six combat types are built to stack them. Each is proposed as a question below.
 
 ## Change: What the targeting weights count, and how a taunt is spent
 
@@ -254,35 +292,630 @@ takes it as one attack, hit or miss. Nothing said what a taunt does while the ta
 out of reach, when two taunts overlap, when the taunter dies, or against the party's
 selected enemy — and with monsters having the six types, a monster Tank taunts members.
 
-## Change: Questions on turn order and taunts
+## Change: Questions on specials, taunts and the dive
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Open Questions`, in place of the formation-cost entry deleted above
+**Where:** `## Open Questions`, at the end of the list
 
 **Now says:**
 
 ```
-- What does changing formation mid-battle cost the player, if anything?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 ```
 
 **Proposed:**
 
 ```
-- Should higher Dexterity mean acting more often, rather than only acting earlier?
-- Should help to a Rogue's or an Archer's Dexterity move them in the turn order?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 - When a taunted member or enemy uses a special that hits its own choice of targets
   rather than one it aims at, is the taunt spent?
-- On the turn a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field,
-  does it also make its ordinary attack?
+- When a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field, does that
+  cost it an ordinary attack, or does its cooldown run on untouched?
 - If a Tank uses Shields Up, or a Mage casts its field, while its last one is still
   running, do the two stack, or does the new one replace the old?
 - Can a dive leave a member injured?
 - Does the formation carry from one battle to the next?
-- Does a special bar carry over from one battle of a dive to the next?
 ```
 
-**Why:** None of the docs answers these. The turn order above is a default for now. The
-third question comes from how a taunt is spent once the six types' specials are built. The last two come from the specials that strike no one, as the six combat types are built.
-The last three come from the dive as it's built: each has a default for now in "Members
-stay hurt from battle to battle, and 0 health is death".
+**Why:** None of the docs answers these. The second comes from how a taunt is spent once
+the six types' specials are built, and the next two from the specials that strike no one.
+The last two come from the dive as it's built: each has a default for now in "Health is
+full at the guild hall, and where everyone stands carries over".
+
+## Change: How a cooldown rounds, and whose Dexterity counts
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Cooldowns`, the paragraph beginning "A cooldown is a number of ticks"
+
+**Now says:**
+
+```
+A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
+and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
+100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
+simulation counts in whole ticks, as this section already says. It never goes below a
+floor of a tenth of the type's own base, however high Dexterity climbs: 18 ticks for a
+Brute or Tank, 14 for a Fighter or Mage, 10 for a Rogue or Archer. That floor is reached
+at Dexterity 180 whatever the type.
+```
+
+**Proposed:**
+
+```
+A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
+and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
+100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
+simulation counts in whole ticks, as this section already says. It never goes below a
+floor of a tenth of the type's own base, however high Dexterity climbs: 18 ticks for a
+Brute or Tank, 14 for a Fighter or Mage, 10 for a Rogue or Archer. That floor is reached
+at Dexterity 180 whatever the type. The rounding is to the nearest whole tick, and an
+exact half rounds up: a Rogue at Dexterity 12 waits 63 ticks, not 62. The Dexterity is
+the helped one where help reaches it: a Rogue's or an Archer's primary stat is Dexterity,
+so help from the support ring shortens its cooldown, on either side, and a Rogue at
+Dexterity 8 with one help waits 69 ticks, not 71. Every other type waits on its own
+Dexterity. The rounding and the floor both apply to the helped Dexterity, and a fight's
+first wait counts help too, from the formation the fight starts with. For now a wait is
+worked out as it begins, and help that comes or goes partway through doesn't change a
+wait already running; it shows from the next one.
+```
+
+**Why:** The combat engine is built this way. "Rounded to whole ticks" didn't say which
+way, and rounding a half to the even tick, the way C# rounds by default, gives 62. Help
+counting is what the originals say between them: Cooldowns has Dexterity set the wait,
+Guild Members has help raise the primary stat, and Battle Test's tables, which already
+include the help, give its Rogue and Archer a wait of 69 on both teams. The first wait
+is worked out once everyone stands in place, so the order members were put on the field
+can't change it. Nothing said whether a running wait changes with the help; that's
+proposed as a question in "Questions on cooldown combat's defaults".
+
+## Change: The clock, and a multi-strike attack landing in one tick
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Cooldowns`, last paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+That's what stops the rate being changed casually: at F rank it makes a slow type's wait
+deliberate without being tedious, and at the floor every type is acting about once a
+second, which is the pacing this doc already asks for — a low-level fight feeling a little
+slow and a higher-level one having more going on.
+```
+
+**Proposed:**
+
+```
+That's what stops the rate being changed casually: at F rank it makes a slow type's wait
+deliberate without being tedious, and at the floor every type is acting about once a
+second, which is the pacing this doc already asks for — a low-level fight feeling a little
+slow and a higher-level one having more going on.
+
+The fight moves on only as time is handed to it. It never reads the frame rate or the
+clock itself, so the same fight with the same rolls plays out the same however that time
+is split up — which is what lets a saved battle carry on exactly.
+
+All the strikes of a multi-strike attack land in the tick the attack is made, each still
+rolled on its own.
+```
+
+**Why:** The combat engine is built this way. Nothing said whether a multi-strike
+attack's strikes all land in the tick the attack is made; `Combat.md` has them resolve
+one after another within the attack, and this keeps them in the one tick.
+
+## Change: The free attack comes first, and a special gets no check, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Luck Checks`, first paragraph
+
+**Now says:**
+
+```
+When a member finishes an attack, there's a Luck check for whether the cooldown resets
+instantly. On success, the member attacks again immediately, with no cooldown wait at all.
+That free attack gets no Luck check of its own — that's what "only once" means, so the
+effect can't chain into a second free attack. On failure, the cooldown charges normally.
+Apart from costing no wait, the free attack is an ordinary attack in every way: all its
+strikes land, it spends durability per hit the same as any other attack, and it charges
+the special bar the same as any other attack. The member is eligible for a check again on
+its very next attack, the one that charges its cooldown normally — the lockout runs no
+further than the one free attack itself. Enemies get the Luck reset too, on the same terms
+as guild members.
+```
+
+**Proposed:**
+
+```
+When a member finishes an attack, there's a Luck check for whether the cooldown resets
+instantly. On success, the member attacks again immediately, with no cooldown wait at all.
+That free attack gets no Luck check of its own — that's what "only once" means, so the
+effect can't chain into a second free attack. On failure, the cooldown charges normally.
+Apart from costing no wait, the free attack is an ordinary attack in every way: all its
+strikes land, it spends durability per hit the same as any other attack, and it charges
+the special bar the same as any other attack. The member is eligible for a check again on
+its very next attack, the one that charges its cooldown normally — the lockout runs no
+further than the one free attack itself. Enemies get the Luck reset too, on the same terms
+as guild members. The free attack comes in the same tick, straight after the attack that
+earned it, and it's always the type's ordinary attack, never its special. For now a
+close-range fighter's free attack waits for its target like any other attack does. For
+now a special gets no Luck check.
+```
+
+**Why:** The combat engine is built this way. "Immediately" didn't say whether anyone else
+could act first, and nothing said whether a special counts as an attack for the reset.
+That's proposed as a question below, and so is whether a free attack waits.
+
+## Change: A specialist's cooldown, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Specialists in Combat`, the paragraph
+
+**Now says:**
+
+```
+A specialist attacks on its own cooldown like anyone else. The specialist makes a basic
+attack against a single target — a close-range attack, so its reach is the first available
+row like any close attacker, the enemy front line. The attack is weak — the intent is that
+specialists help a little rather than being a full detriment to the battle. A specialist
+has no special bar at all, and their attack damage works the way it does for anyone else.
+```
+
+**Proposed:**
+
+```
+A specialist attacks on its own cooldown like anyone else. The specialist makes a basic
+attack against a single target — a close-range attack, so its reach is the first available
+row like any close attacker, the enemy front line. The attack is weak — the intent is that
+specialists help a little rather than being a full detriment to the battle. A specialist
+has no special bar at all, and their attack damage works the way it does for anyone else.
+For now a specialist's cooldown starts from the slowest base, 180 ticks, a placeholder;
+Dexterity shortens it, and the floor of a tenth applies, as for any type.
+```
+
+**Why:** The combat engine is built this way. The combat types each have a base wait, and
+nothing gives a specialist one. That's proposed as a question below.
+
+## Change: Questions on cooldown combat's defaults
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+```
+
+**Proposed:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+- Is a special an attack for the Luck reset — does it get a check?
+- Does a free attack from the Luck reset count as one of the owner's three cycles for a
+  lasting effect?
+- Does a lasting effect end once the owner's third cycle after the cast has played out,
+  or as its fourth begins? The second keeps Shields Up on the allies for one more of the
+  Tank's waits.
+- What base wait does a specialist's cooldown have?
+- When a helper moves away, dies or arrives while a Rogue's or an Archer's wait is already
+  running, does that running wait change, or does the change only show from its next wait?
+```
+
+**Why:** The combat engine is built with a default for now on each of these, in the
+changes above, and none of the docs settles them. The pending "Questions on specials,
+taunts and the dive" change to this list is unchanged; these go after the entries it adds.
+
+## Change: Questions on the special bar
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+```
+
+**Proposed:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+- Do a special's own hits — the Mage's field's damage among them — charge the bar it has
+  just emptied?
+- Can a special earn its owner's bonus condition — a Brute's special landing on two or
+  more enemies, say?
+- Does moving to the next floor empty a full bar too, or only a part-filled one?
+- Does a member's special bar carry from one dive to the next, or does every dive start
+  with it empty?
+```
+
+**Why:** The combat engine and the dive are built with a default for now on each of
+these, in "A special puts nothing in its owner's bar, for now" and "Every bar empties on a
+new floor and starts each dive empty, for now", and none of the docs settles them. The
+pending "Questions on specials, taunts and the dive" and "Questions on cooldown combat's
+defaults" changes to this list are unchanged; these go after the entries they add.
+
+## Change: Every character's own Luck bag, and when no token is pulled, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Luck Checks`, second paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+A Luck check pulls one token out of a bag of 50, each token either True or False. A False
+does nothing; a True means the character is lucky. Once every token has been pulled, the
+bag fills back up — and that's the only thing that refills it. A part-used bag carries
+over rather than resetting, from one battle to the next and from one floor to the next.
+The bag exists because drawing without replacement guarantees the lucky event arrives — at
+the floor of one token in fifty it cannot be missed for long — where a roll against a
+small percentage can go cold for a very long time.
+```
+
+**Proposed:**
+
+```
+A Luck check pulls one token out of a bag of 50, each token either True or False. A False
+does nothing; a True means the character is lucky. Once every token has been pulled, the
+bag fills back up — and that's the only thing that refills it. A part-used bag carries
+over rather than resetting, from one battle to the next and from one floor to the next.
+The bag exists because drawing without replacement guarantees the lucky event arrives — at
+the floor of one token in fifty it cannot be missed for long — where a roll against a
+small percentage can go cold for a very long time.
+
+Every character that fights has a bag of its own — every guild member, specialists too,
+and every enemy — and no bag is shared; an enemy that's attacked evades from its own bag
+the same way a member does. A member's first bag is filled when they join the guild, and
+from then on it's theirs, carried part-used from one dive to the next as well, and into a
+mission played as a battle. The Luck a bag fills from is the character's own: help from
+the support ring doesn't add to it. For now:
+
+- An enemy's bag is new and full when it joins a battle, and lasts only for that battle.
+- No token is pulled for the Luck reset after an attack that ends the battle, or one its
+  attacker doesn't live through. No free attack can follow, and a True pulled then would
+  be thrown away.
+```
+
+**Why:** The combat engine is built this way. Nothing said whether an enemy's bag works
+like a member's — "Enemies get the Luck reset too, on the same terms as guild members" can
+be read either way — or whether a token is pulled when no free attack can follow. Both are
+proposed as questions in "Questions on the Luck bag's defaults". Help from the support ring
+stays off Luck because help reaches only a type's primary stat, and none of the six combat
+types leads on Luck.
+
+## Change: The opening check is a pull from the combatant's own bag, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Cooldowns`, the paragraph beginning "Cooldowns start empty at the beginning
+of a fight"
+
+**Now says:**
+
+```
+Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
+enemy alike — makes one Luck check of its own as the fight begins, using the same chance
+as the mid-fight reset below in Luck Checks. It's a separate roll, not tied to that
+one. On success, the combatant starts the fight ready instead of empty, attacking on the
+first tick rather than waiting out its first cooldown. On failure, it waits out that first
+cooldown like normal. A success is a full jumpstart, not a partial charge — the combatant
+is either ready or it isn't.
+```
+
+**Proposed:**
+
+```
+Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
+enemy alike — makes one Luck check of its own as the fight begins, using the same chance
+as the mid-fight reset below in Luck Checks. For now that check is one pull from the
+combatant's own bag, the way every Luck check it makes is, so a member's opening pull uses
+up a token from the bag they carry between battles. On success, the combatant starts the
+fight ready instead of empty, attacking on the first tick — the tick the fight starts on,
+before any wait has passed — rather than waiting out its first cooldown. On failure, it
+waits out that first cooldown like normal. A success is a full jumpstart, not a partial
+charge — the combatant is either ready or it isn't. For now that first attack is an
+ordinary attack, not a free one: it gets the Luck reset check after it, counts as one of
+its owner's cycles for a lasting effect, and can be a special if the bar is full. The
+check is made only when a fight really begins, never when a battle is set up just to show
+who's in it, the way party planning does.
+```
+
+**Why:** The combat engine is built this way. The original calls the opening check a
+separate roll at the reset's chance, and Luck Checks has every Luck check a character
+makes draw from the same bag; the engine pulls from the bag for now. Nothing said whether
+an attack on the first tick is an ordinary attack or a free one. Both are proposed as
+questions in "Questions on the Luck bag's defaults". A battle set up only to show its
+fighters pulls nothing because a pull from a member's bag can't be handed back.
+
+## Change: Questions on the Luck bag's defaults
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+```
+
+**Proposed:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+- Does an enemy's Luck bag last only for its own battle, new and full each time, or carry
+  on from battle to battle the way a member's does?
+- When an attack ends the battle, or its attacker doesn't live through it, is a token
+  still pulled for the Luck reset?
+- The Luck check each combatant makes as a fight begins is called "a separate roll", using
+  "the same chance" as the reset. Now that every Luck check a character makes draws from
+  its own bag, is the opening check a pull from that bag too, or a roll of its own?
+- A combatant that starts the fight ready attacks on the first tick. Is that an ordinary
+  attack — with the Luck reset check after it, counting as one of its owner's cycles for a
+  lasting effect, and a special if its bar is full — or a free attack that gets none of
+  that?
+```
+
+**Why:** The combat engine is built with a default for now on all four: the first two in
+"Every character's own Luck bag, and when no token is pulled, for now", the last two in
+"The opening check is a pull from the combatant's own bag, for now". The third is the
+original's own: Cooldowns calls the opening check a separate roll at the reset's chance,
+and Luck Checks has every Luck check a character makes draw from the same bag. The pending
+changes to this list above are unchanged; these go after the entries they add.
+
+## Change: The fight can be paused, for now
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Player Input`, second paragraph
+
+**Now says:**
+
+```
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — using a member's special once that bar is full,
+changing formation, and marking the focus target.
+```
+
+**Proposed:**
+
+```
+Nothing waits for the player. The fight runs from start to finish, and the player acts
+while it's running — using a member's special once that bar is full, changing formation,
+and marking the focus target. For now there's a pause button: it stops the fight and
+opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
+the player can't use a special, mark the focus target or retreat.
+```
+
+**Why:** The user, 2026-11-16: "Leave the pause button for now we can take it out later."
+The battle screen is built with it. This departs from the original's "The fight never
+pauses", so it stands for now. The pending "How a member with no target picks one, and how
+a battle ends" change to this paragraph carries this wording too; its sentence on specials
+goes after these.
+
+## Change: The fight can be sped up, and only shows sooner
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Player Input`, last paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+The fight doesn't wait for the player, so the moment to use a special goes by while the
+fight carries on around it.
+```
+
+**Proposed:**
+
+```
+The fight doesn't wait for the player, so the moment to use a special goes by while the
+fight carries on around it.
+
+The player can speed the fight up — x1, x2 or x3 — but can't slow it below x1. Faster
+only shows the same fight sooner: the same ticks and the same rolls, so the same taps at
+the same moments of the fight give the same result. What it changes is the player's real
+time to react: at x3 a special's window is a third as long.
+```
+
+**Why:** The user, 2026-11-16: "yes its fine." — to keeping the x1/x2/x3 speed button the
+battle screen is built with. This answers the original's open question "Can the player
+speed a fight up or slow it down, and does that change anything in the simulation or only
+how fast it's drawn?": only how fast it's drawn. The fight moves on only as time is handed
+to it, as the pending "The clock, and a multi-strike attack landing in one tick" change
+says, so speed can't change what happens in it.
+
+## Change: Speed question answered
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Open Questions`
+
+**Now says:**
+
+```
+- Can the player speed a fight up or slow it down, and does that change anything in the
+  simulation or only how fast it's drawn?
+```
+
+**Proposed:** delete. The other entries in `## Open Questions`, and the pending changes to
+this list above, stay as they are.
+
+**Why:** Answered: x1, x2 or x3, and it changes only how soon the fight is shown, written
+into Player Input.
+
+## Change: A close-range attack waits for its target to be home
+
+> Proposed 2026-11-17 · for review
+
+**Where:** `## Attacks and Reach`, last paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
+and the defender's mitigation is applied to it separately.
+```
+
+**Proposed:**
+
+```
+Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
+and the defender's mitigation is applied to it separately.
+
+A close-range fighter walks out to its target, strikes, and walks back to its own spot,
+and it never walks to a spot its target has left. When its attack comes up and the target
+it picks is out on an attack of its own, it waits until that target is back in its spot,
+then attacks. For now that holds on the same tick too: when a fighter's attack comes up
+on the tick its target heads off to hit someone else, it waits until the target is back
+in its own spot and then hits it, so its attack lands after the target's. It also waits
+while its target is waiting to attack ahead of it, and goes after it. A waiting fighter
+keeps the target it picked, and picks again only if that target dies, goes out of its
+reach, or vanishes.
+
+For now, two close-range fighters who pick each other on the same tick take turns rather
+than attacking at the same time. The attack that became ready first goes first; between
+two that became ready on the same tick, the one with the higher Dexterity of its own goes
+first, help from the support ring left out, and between equal Dexterity it's a random
+draw. The first walks out, hits and walks home, and only then does the other go. If the
+first hit kills the other fighter, it never swings.
+
+Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
+attack is: a field it stands in hurts it first, whether it uses its special is decided
+then, and its strikes roll then. That's also when its next cooldown starts, when its Luck
+check is made, and when it counts as one of its attacks for a lasting effect.
+
+How long a fighter is out is worked out by the fight itself, from the same walk the battle
+screen draws, so the fight holds the same waits at any speed and when nothing is drawn at
+all. Retiming an attack's animation changes how long a fighter is out, and so how a fight
+with the same rolls plays out.
+
+For now:
+
+- A fighter someone is on the way to hit stays put until that attacker is home, whoever it
+  was going to attack.
+- Only close-range fighters wait. An Archer or a Mage shoots its target where it is, out
+  on an attack or not, and the shot follows it.
+- A fighter whose cooldown comes up, or who earns a free attack, before it's home walks
+  home first and then goes out again.
+- A waiting fighter's next cooldown starts when it finally attacks, not from when it
+  became ready.
+- Marking a new focus target doesn't change the target a waiting member has already
+  picked.
+```
+
+**Why:** The user, 2026-11-17: "the attacker needs to wait for the attacked to be in the
+spot and not on the attack" — two fighters going for each other at once each jumped to
+the other's empty spot and swung at thin air. Asked then whether two close-range fighters
+who pick each other on the same tick should hit at once or take turns, and whether a
+fighter whose target heads off on that tick should wait for it to come home, the user
+said: "B my rules for now. as it looks bad otherwise." That departs from the original's
+same-tick attacks all happening at the same time, so it stands for now; see "Close-range
+fighters take turns on the same tick, for now". The combat engine and the battle screen
+are built this way. Each "for now" in the list is proposed as a question below.
+
+## Change: Close-range fighters take turns on the same tick, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Cooldowns`, the paragraph beginning "When more than one combatant's cooldown
+comes up on the same tick"
+
+**Now says:**
+
+```
+When more than one combatant's cooldown comes up on the same tick, their attacks all
+happen at the same time — there's no order between them, and nothing resolves first.
+Damage is worked out against where things stood at the start of that tick, so a combatant
+that dies on that tick still lands the attack it made on it, and two combatants can kill
+each other on the same tick.
+```
+
+**Proposed:**
+
+```
+When more than one combatant's cooldown comes up on the same tick, their attacks all
+happen at the same time — there's no order between them, and nothing resolves first.
+Damage is worked out against where things stood at the start of that tick, so a combatant
+that dies on that tick still lands the attack it made on it, and two combatants can kill
+each other on the same tick. For now two close-range fighters are the exception, as
+Attacks and Reach says: when they pick each other on the same tick they take turns, and
+the first hit can kill the other before it swings; and when a fighter's target heads off
+on that tick to hit someone else, the fighter waits until it's home, so its attack lands
+after its target's.
+```
+
+**Why:** The user, 2026-11-17: "B my rules for now. as it looks bad otherwise." — on
+whether two close-range fighters who pick each other on the same tick should hit at once
+or take turns, and whether a fighter whose target heads off on that tick should wait for
+it to come home. Hitting at once would show each fighter walking to the other's empty
+spot, which "A close-range attack waits for its target to be home" rules out, so for now
+that rule wins over same-tick attacks happening together. The combat engine is built
+this way.
+
+## Change: Questions on a close-range attack waiting
+
+> Proposed 2026-11-17 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+```
+
+**Proposed:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+- When a fighter is already on its way to hit someone, and that someone's own turn comes
+  up to attack a third character, should it stay put until the hit lands and the attacker
+  is back?
+- Should an Archer or a Mage also wait to shoot someone who is out on an attack, or shoot
+  them where they are, the shot following them?
+- A waiting fighter's next cooldown: does it start when it finally attacks, so waiting
+  costs it time, or from when it became ready, so it catches up?
+- If the player marks a new focus target while a member is waiting to attack, does it
+  switch to the new target?
+- When a free attack from the Luck reset has a target that's out on an attack, does it
+  wait like any other attack?
+- A fast fighter can be ready to attack again before it has walked home from its last
+  attack, and a lucky one gets a free attack straight away. Should it walk home first and
+  then go out again, or attack again from where it stands?
+- When two close-range fighters who pick each other became ready on the same tick, the
+  one with the higher Dexterity goes first. Does help from the support ring count in that
+  Dexterity, the way it counts in a Rogue's or an Archer's cooldown?
+```
+
+**Why:** The combat engine is built with a default for now on each of these, in "A
+close-range attack waits for its target to be home" and "The free attack comes first, and
+a special gets no check, for now". The pending changes to this list above are unchanged;
+these go after the entries they add.

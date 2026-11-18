@@ -36,20 +36,21 @@ through the mission board" said every dungeon is found, and the starting one isn
 **Now says:**
 
 ```
-Dungeon diving yields materials or items, and sometimes small amounts of gold.
+Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
+also drop a weapon or a piece of armour.
 ```
 
 **Proposed:**
 
 ```
-Dungeon diving yields materials or items, and sometimes small amounts of gold. For now,
-though, loot is just gold: in the first version a dive yields gold and nothing else — no
-materials, no items, and no dropped gear.
+Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
+also drop a weapon or a piece of armour. For now, though, loot is just gold: in the first
+version a dive yields gold and nothing else — no materials, no items, and no dropped gear.
 ```
 
-**Why:** Answered: for now loot will just be gold. The paragraph names materials and items
-as what a dive yields, which the first version doesn't do; the new sentence scopes the
-first version and leaves the longer-term design standing.
+**Why:** Answered: for now loot will just be gold. The paragraph names materials, items and
+dropped gear as what a dive yields, which the first version doesn't do; the new sentence
+scopes the first version and leaves the longer-term design standing.
 
 ## Change: A floor is a series of battles that scrolls right into the next
 
@@ -68,35 +69,43 @@ Each floor has 2–3 battles.
 
 ```
 Each floor is a series of battles, 2–3 of them. At the end of a battle the screen scrolls
-right into the next battle. The first dungeon has 3 battles a floor to win, against 1
-low-level monster each. After the last one comes victory, dropping loot: the floor's gold
-drops as one lump at the end of the floor, and only once every battle on that floor is
-won — if a floor has 3 battles, the party needs to beat all 3. How much gold a floor drops
-is a placeholder, to be balanced later.
+right into the next battle, with no result screen and nothing to click in between: a
+floor's battles play straight through, back to back. The first dungeon has 3 battles a
+floor to win. After the last one comes victory, dropping loot: the floor's gold drops as
+one lump at the end of the floor, and only once every battle on that floor is won — if a
+floor has 3 battles, the party needs to beat all 3. How much gold a floor drops is a
+placeholder, to be balanced later. For now every battle on a floor has the same number of
+monsters, set by the floor: a deeper floor never has fewer, and the deepest floor with
+battles has more than the first. How many is a placeholder too, to be balanced later.
 ```
 
 **Why:** Answered: each floor is a series of battles, and at the end of a battle the
-screen scrolls right into the next one; the first dungeon has 3 battles to win against 1
-low-level monster each, then victory, dropping loot. Answered too: loot at the end of the
-floor — if 3 battles on that floor then they need to beat all 3. "Each floor has 2–3
-battles" gave the count but not how one battle leads into the next, or where the loot
-drops. The 3 battles are inside the existing 2–3 range, so the range stays for dungeons in
-general. What the board's floor layout shows, whether a party picks a route, and what
-makes a boss floor are not settled by this. The rest of the paragraph, on rest areas and
-retreating, is the next change.
+screen scrolls right into the next one; the first dungeon has 3 battles to win, then
+victory, dropping loot. Answered too: loot at the end of the floor — if 3 battles on that
+floor then they need to beat all 3. "Each floor has 2–3 battles" gave the count but not
+how one battle leads into the next, or where the loot drops. The 3 battles are inside the
+existing 2–3 range, so the range stays for dungeons in general. How many monsters a battle
+has follows Combat's `## Enemies` — the deeper the floor, the more enemies turn up in each
+fight — and the dive is built with a set number for each floor, the same every battle on
+it. What the board's floor layout shows, whether a party picks a route, and what makes a
+boss floor are not settled by this. The rest of the paragraph, on rest areas and
+retreating, is the next change. Answered 2026-11-14, too: "you enter a level and the
+level should go through" — a floor's battles play back to back, with no screen after
+each one showing what was gained and waiting for a click on Continue.
 
 ## Change: A party can turn back anywhere, and carries only so much gold out
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## The Dungeon`, second paragraph, the sentences after the first ("Every 5th
-floor is a safe rest area" to the end of the paragraph)
+**Where:** `## The Dungeon`, second paragraph, from "Every 5th floor is a safe rest area" to
+the end of the paragraph
 
 **Now says:**
 
 ```
-Every 5th floor is a safe rest area, where the party heals and the player may choose to
-return to the top and exit the dungeon. Retreating always costs the loot gathered since
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent, and
+the player may choose to return to the top and exit the dungeon. The Cook adds to both
+figures, covered in the Specialists doc. Retreating always costs the loot gathered since
 the last safe floor — any party member can carry some of it, so how much is lost depends
 on who came along.
 ```
@@ -104,12 +113,14 @@ on who came along.
 **Proposed:**
 
 ```
-Every 5th floor is a safe rest area, where the party heals and the player may choose to
-return to the top and exit the dungeon. For now a rest area is a safe floor with no
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent, and
+the player may choose to return to the top and exit the dungeon. The Cook adds to both
+figures, covered in the Specialists doc. For now a rest area is a safe floor with no
 battles on it, so it drops no gold and gives no experience. The party can turn back
 anywhere, not only at a rest area — but leaving between rest areas loses the gold found
-since the last rest area. For now "anywhere" means between two battles, not in the middle
-of one, and a battle that ends in a stand-off counts as the party turning back there.
+since the last rest area. "Anywhere" includes the middle of a battle: a Retreat button
+is there all through a floor's battles, and the party can leave with it at any moment.
+For now a battle that ends in a stand-off counts as the party turning back there.
 
 There is a carry limit for each person. Each member can carry up to 10 gold coming out,
 and each Porter up to 100. Gold beyond what the party can carry is left behind. Both
@@ -133,8 +144,50 @@ decides instead how much gold comes out at all. Not settled by this: whether a P
 100 is on top of the 10 every member carries, how much more the Herbalist and the Miner
 carry, and how a dead member's gear counts against a limit measured in gold.
 The dive is built with a default for now on the first and the last of those, in the
-third paragraph, and with defaults on rest areas, turning back mid-battle and stand-offs
-in the first; each is proposed as a question for `## Open Questions`.
+third paragraph, and with defaults on rest areas and stand-offs in the first; each is
+proposed as a question for `## Open Questions`. Answered 2026-11-14: the party can
+retreat at any time, the middle of a battle included — "you can holler a retreat sign
+that will take them out". Which gold a retreat keeps is proposed as a question in
+"A question on what gold a retreat keeps".
+
+## Change: How a heal in the dive lands, for now
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## The Dungeon`, second paragraph, its second sentence (beginning "Between
+floors"), with new sentences after it
+
+**Now says:**
+
+```
+Between floors, every member gets back five per cent of their maximum health, and nothing
+comes back between the battles on a single floor.
+```
+
+**Proposed:**
+
+```
+Between floors, every member gets back five per cent of their maximum health, and nothing
+comes back between the battles on a single floor. A rest area's fifteen per cent is in
+place of the five, not on top of it, and a Cook's is the same — its fifteen there, not
+its five as well. Clearing the floor before a rest area gives the fifteen alone, and
+pushing on from the rest area to the next floor gives nothing, so floors 4 → 5 → 6 give
+one fifteen per cent and no five. For now a heal is a share of the maximum health a
+member has once the floor's last battle has shared its experience, so a level-up on that
+floor counts. Everything that lands on a member at
+once — the party's share and every Cook's — is added up first and turned into health
+once, and a fraction of a point rounds up, so every living member gets at least one point
+back. A heal never takes anyone past their maximum.
+```
+
+**Why:** Answered 2026-11-13: "OK, then just the 15%" — arriving at a rest floor gives the
+fifteen per cent only, never the five as well, and a Cook adds its fifteen only, not its
+five too. The question goes from Guild Members.md's `## Open Questions` (see "Rest-floor
+heal question answered" in its change notes). The rest of the paragraph is how the dive is
+built. Nothing said which maximum a heal is a share of
+when a member levels up on the floor just cleared, whether the party's share and a Cook's
+are rounded together or one at a time, or which way a fraction of a point rounds. Those
+three are proposed as questions for `## Open Questions`.
 
 ## Change: The dungeon's enemies are monsters
 
@@ -163,35 +216,35 @@ name written on it.
 
 Every monster is assigned one of the six combat types, just like the guild's members,
 and has the same characteristics of that type — a monster Tank or a monster Archer has
-that type's attacks, its special and its type advantages. Monsters carry no gear.
+that type's attacks, its special and its type advantages.
 
-A monster is given a level like a member is, and uses the same stat rules. Deeper floors
-have higher-level monsters. What level the monsters on each floor are is a placeholder,
-to be balanced later.
+A monster is given a rank and a level like a member is, and uses the same stat rules. For
+now every monster in a dungeon is the dungeon's own rank — F, as the guild's starting
+dungeon is, and there's no grade below F — and level 1, with exactly its type's starting
+stats at that rank, on every floor. Depth changes how many monsters turn up in a battle,
+never what each one is.
 
 In a battle, for now, a monster's damage is its damage stat alone and its defence its
-Constitution alone — there's no weapon or armour in either. Its health follows a
-member's: for now that's the 10 a new F-rank member starts with, whatever the monster's
-level. Monsters get the support ring among themselves, a special bar and the Tank's taunt
-the same as members do, and a monster uses its special as soon as its bar is full.
+Constitution alone — there's no weapon or armour in either. Monsters get the support ring
+among themselves, a special bar and the Tank's taunt the same as members do, and a
+monster uses its special as soon as its bar is full.
 ```
 
 **Why:** Answered: the enemies are monsters, but for now we might be limited to just the
 archer animations. Answered too: yes, monsters will be assigned one of the types just
-like the characters and have those same characteristics of that type; on gear, fixed
-numbers; and on where a monster's strength comes from, levels, with deeper floors having
-higher-level monsters. The docs gave enemies a grid, targeting and repositioning but
-never said what they are. The yellow-shape clause is the project's standing rule for
-missing art. The first paragraph is unchanged. With monsters carrying combat types,
-`Guild Members.md`'s example of "an enemy force of, say, nine Brutes" fits as written.
-How a monster fights is a default for now: the answer on gear was fixed numbers, read as
-the monster's own stats with nothing added for gear — while a member's damage is its stat
-plus its weapon and its defence is Constitution plus its armour — and its health, the
-support ring, the bar and the taunt follow a member's.
+like the characters and have those same characteristics of that type; and on gear, fixed
+numbers. Combat's `## Enemies` builds enemies from the six combat types and asks, in its
+open questions, whether a monster is something other than that; this says it isn't. The
+yellow-shape clause is the project's standing rule for missing art. A monster's rank and
+level follow Combat's `## Enemies` too: an enemy is the dungeon's rank or one grade below
+it, with exactly what its type and rank give, and depth decides how many turn up, not what
+each one is. The first paragraph is unchanged. How a monster fights is a default for now:
+the answer on gear was fixed numbers, read as the monster's own stats with nothing added
+for gear, while Combat's `## Enemies` gives an enemy a chance of a weapon and of armour
+set by the dungeon's rank.
 For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
-a monster Brute or Rogue carries none. `## The Dungeon Board`'s "the types of monster and
-enemy found in each of the dungeons" is left as it is.
+a monster Brute or Rogue carries none for now.
 
 ## Change: A floor's monsters are the same every dive, for now
 
@@ -213,14 +266,17 @@ A newly claimed dungeon starts near-blank. The enemy types and the floor layout 
 as the party reaches each floor.
 
 For now a floor's monsters are the same on every dive: which monsters, their levels and
-where they stand are set once, when the dungeon is created. A floor counts as reached
-once the party starts its first battle there, or arrives there if it's a rest area.
+where they stand are set once, when the dungeon is created, and a dungeon from an older
+save keeps the monsters it was made with. Each monster stands on a node of its own, drawn
+at random. A floor counts as reached once the party starts its first battle there, or
+arrives there if it's a rest area.
 ```
 
 **Why:** The dive is built this way. "Appear as the party reaches each floor" reads as a
 floor's enemies being fixed, but nothing said so outright, or what counts as reaching a
 floor for the deepest floor reached. Both are proposed as questions for
-`## Open Questions`.
+`## Open Questions`. Nothing said where a monster stands on its grid either; Combat's
+`## Formation` says only that enemies use the same style of grid.
 
 ## Change: Where a party re-enters, and what it pays, for now
 
@@ -249,8 +305,12 @@ back up, from floor 10 to floor 5, and a dive that reaches no rest area leaves n
 party can re-enter, not only the one that got there, and its first battle is on the floor
 after the rest area. There's no re-entering at a rest area with no floor past it.
 
-For now the entry fee is so much for each member of the party, and the teleportation fee
-is one flat amount whatever the party's size. Both amounts are placeholders.
+For now the entry fee is so much for each member of the party, and how much depends on
+the dungeon's rank — the lower the rank, the cheaper the fee, and the less gold its floors
+drop. An F-rank dungeon costs 2 gold a member, so a party of three pays 6 and the first
+floor's 8 gold more than pays it back. Each rank up costs more per member and drops more
+gold a floor. The teleportation fee stays one flat amount whatever the party's size. All
+the amounts are placeholders.
 
 For now, once a party is in, the guild hall can't be reached until the dive ends — no
 hiring, shopping or changing gear partway through a dive and then carrying on with it.
@@ -260,11 +320,16 @@ hiring, shopping or changing gear partway through a dive and then carrying on wi
 deepest one ever reached, or the one the most recent dive reached — and nothing said
 whether the teleportation fee grows with the party the way the entry fee does, or whether
 the player can leave a dive for the guild hall and come back to it. All three are
-proposed as questions for `## Open Questions`.
+proposed as questions for `## Open Questions`. Answered 2026-11-14, too, on the entry
+fee: "it takes 10 gold per person to send them into the dungeon after completing three
+fights. I only get eight gold. ... That's financially bankrupt me instantly in the game.
+... We need to make the entrance fee a lot cheaper for these dungeons. The cheaper, the
+dungeon, the cheaper the entrance fee that might be a necessary thing. Then the lesser
+the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
 
-## Change: A question on turning back mid-battle
+## Change: A question on what gold a retreat keeps
 
-> Proposed 2026-11-12 · for review
+> Proposed 2026-11-14 · for review
 
 **Where:** `## Open Questions`, at the end of the list
 
@@ -278,11 +343,15 @@ proposed as questions for `## Open Questions`.
 
 ```
 - How far can a training mission level a member?
-- Can a party turn back in the middle of a battle, or only between battles?
+- When a party retreats partway through a floor, does it lose only that floor's gold and
+  carry on with the gold it had before the floor, or all the gold found since the last
+  rest area?
 ```
 
-**Why:** "The party can turn back anywhere" doesn't say whether that includes the middle
-of a battle.
+**Why:** The user, 2026-11-14: "they won't gain any of that gold for that level. You
+should still continue with the gold they had. Before the level." The change "A party can
+turn back anywhere, and carries only so much gold out" has a retreat between rest areas
+lose all the gold found since the last rest area, and the two may not agree.
 
 ## Change: Questions on the dive's defaults
 
@@ -322,4 +391,63 @@ of a battle.
 **Why:** The dive is built with a default for now on each of these but the last, in the
 changes above, and none of the docs settles them. The last is open because nothing says;
 the starting dungeon's depth is set to end on a rest area, so it doesn't come up yet. The
-pending "A question on turning back mid-battle" change to this list is unchanged.
+pending "A question on what gold a retreat keeps" change to this list is unchanged.
+
+## Change: Questions on healing in the dive
+
+> Proposed 2026-11-13 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- When a member levels up on the floor just cleared, is the heal between floors a share of
+  their maximum health before the level-up or after it?
+- When the party's heal and a Cook's land on a member at the same moment, are they added
+  up and rounded once, or rounded one at a time?
+- Which way does a heal's fraction of a point round?
+```
+
+**Why:** The dive is built with a default for now on each of these, in "How a heal in the
+dive lands, for now", and none of the docs settles them. The pending changes to this list
+above are unchanged.
+
+## Change: Party planning is one screen
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## The Dungeon Board`, the paragraph beginning "Planning happens in two steps"
+
+**Now says:**
+
+```
+Planning happens in two steps: the player selects the members first, then arranges them
+on the grid. That second step is a zoomed-in view of the battle map rather than a
+separate screen. The system does the initial placement, putting combat types in front and
+making support links where it can — the player can edit it from there.
+```
+
+**Proposed:**
+
+```
+Party planning is one screen. The guild's characters are listed on the left, each showing
+who it is — picture, type, name and level — and the placement grid is on the right. The
+player picks, places and rearranges at the same time, and can see everyone they are
+taking, up to 15. As each member is added, the game still places them first, putting
+combat types in front and making support links where it can, and the player edits from
+there. Taking a member off the grid puts them back in the list.
+```
+
+**Why:** The user, 2026-11-16: "If we choose our members we can choose up to 15 members
+but I won't be able to see them all. So let's design the select your characters, place
+your characters on the same screen where we have the list of the characters on the left
+and the placement on the right side. This way they can place and rearrange at the same
+time, knowing who they are getting."
