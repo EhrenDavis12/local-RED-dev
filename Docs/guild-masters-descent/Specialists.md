@@ -67,9 +67,19 @@ It is not a guarantee. The Scout can Search at rest areas.
 
 The Herbalist and the Miner both increase yield, on above-ground missions and on dives
 alike — the Herbalist yields herbs, the Miner minerals. Each carries the base 5 slots
-any member carries, plus 5 extra slots restricted to its own yield — herbs only for the
-Herbalist, minerals only for the Miner. The slot system itself is covered in the Dungeon
-doc.
+any member carries, plus extra slots restricted to its own yield — herbs only for the
+Herbalist, minerals only for the Miner — that grow by 5 a tier. The slot system itself is
+covered in the Dungeon doc.
+
+- Novice — 5 regular and 5 restricted
+- Apprentice — 5 and 10
+- Journeyman — 5 and 15
+- Adept — 5 and 20
+- Master — 5 and 25
+- Grandmaster — 5 and 30
+- Grandmaster S — 5 and 35
+- Grandmaster SS — 5 and 40
+- Grandmaster SSS — 5 and 45
 
 ## The Blacksmith
 

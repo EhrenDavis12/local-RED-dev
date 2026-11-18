@@ -106,6 +106,3 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
-- A Porter's capacity grows by five slots a tier, but the Herbalist's and Miner's extra
-  five is a flat figure — a Grandmaster of either carries no more than a Novice does.
-  Should their extra slots grow with tier too?
