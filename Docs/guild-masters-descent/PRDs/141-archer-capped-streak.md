@@ -24,7 +24,8 @@ Today, in `src/guildmasters-descent`:
 - `Tuning.ArcherStreakStepPercent`'s label reads "Percent of damage and accuracy the
   Archer's streak adds per consecutive hit."
 - Comments in `CombatArcherTests.cs` and `CombatTypesSharedTests.cs` say the accuracy raise
-  is open under #127. It is no longer open.
+  is open under #127. It is no longer open. The section header in `CombatContractTests.cs`
+  ("The Archer's streak: attacker-side accuracy and damage") still names accuracy too.
 
 ## Goal
 
@@ -50,8 +51,10 @@ label says so.
 3. **A capped shot is still an ordinary single shot, not an area attack.** The only thing it
    takes from Volley is skipping the pull. It pays the target's full defence, not
    two-thirds. It passes over a vanished Rogue the way any single-target attack does, and it
-   doesn't end Vanish. It still carries the 10% damage raise, applied after defence.
-   *(EhrensDocs `Individual Types.md`, same section: "Its ordinary
+   doesn't end Vanish. It still carries the 10% damage raise, applied after defence. One
+   edge case follows from this and is worth a test. When a vanished Rogue is the only enemy
+   the Archer can reach, Vanish fails and the capped shot hits it. No token is pulled, and
+   the Rogue stays vanished. *(EhrensDocs `Individual Types.md`, same section: "Its ordinary
    attack is a single shot" and "Damage is raised in percent more after defence";
    `Guild Members.md`, Base Stats, which makes the two-thirds defence a property of area
    attacks; `Individual Types.md`, The Rogue, where an area attack is what ends Vanish.)*
@@ -61,9 +64,9 @@ label says so.
    `Individual Types.md`, same section: the bonus is "hitting the same target twice
    running", "until the streak breaks", and "each hit that continues the streak pays the
    bonus charge".)*
-5. **The streak breaks as today.** A capped shot can't miss, so once capped the streak
-   breaks only when that Archer lands an ordinary shot on a different enemy. A Volley
-   neither continues it nor breaks it. After a break the count starts over, and shots are
+5. **The streak breaks as today.** Any ordinary shot by that Archer at a different enemy
+   breaks it, hit or miss. A capped shot can't miss, so once capped, a shot at another
+   enemy is the only thing that breaks it. A Volley neither continues it nor breaks it. After a break the count starts over, and shots are
    dodgeable again until the new streak reaches the cap. *(Same section: "Specials are
    outside the streak entirely — a Volley neither continues nor breaks it.")*
 6. **There is no accuracy raise.** The streak raises damage only. The shot sets no
