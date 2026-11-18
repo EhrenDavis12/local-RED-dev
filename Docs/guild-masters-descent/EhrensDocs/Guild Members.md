@@ -412,3 +412,31 @@ after the entries they add.
 **Why:** Answered 2026-11-13: "OK, then just the 15%" — the fifteen per cent only, and a
 Cook's fifteen only too. Written into The Dungeon.md's change notes (see "How a heal in
 the dive lands, for now").
+
+## Change: Help comes back to whole points once
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Diminishing Returns on Help`, second paragraph
+
+**Now says:**
+
+```
+The bonus applies to the receiving member's primary stat — the stat its type's ordering
+leads on. The first help rounds up to at least one point; every later help is exact, so
+at low stats a later help can come to nothing.
+```
+
+**Proposed:**
+
+```
+The bonus applies to the receiving member's primary stat — the stat its type's ordering
+leads on. The first help rounds up to at least one point; every later help is exact, so
+at low stats a later help can come to nothing. The helps are added up and the total is
+rounded down once, to whole points: on a primary stat of 30, one help adds 2, two add 2,
+and three add 3.
+```
+
+**Why:** The combat engine is built this way. "Every later help is exact" didn't say how
+the exact helps come back to the whole points a stat counts in, and rounding the total
+down is what lets a later help come to nothing.

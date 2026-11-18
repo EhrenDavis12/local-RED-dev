@@ -312,7 +312,6 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
-- Should help to a Rogue's or an Archer's Dexterity shorten its cooldown?
 - When a taunted member or enemy uses a special that hits its own choice of targets
   rather than one it aims at, is the taunt spent?
 - When a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field, does that
@@ -323,7 +322,7 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 - Does the formation carry from one battle to the next?
 ```
 
-**Why:** None of the docs answers these. The third comes from how a taunt is spent once
+**Why:** None of the docs answers these. The second comes from how a taunt is spent once
 the six types' specials are built, and the next two from the specials that strike no one.
 The last two come from the dive as it's built: each has a default for now in "Health is
 full at the guild hall, and where everyone stands carries over".
@@ -356,14 +355,24 @@ simulation counts in whole ticks, as this section already says. It never goes be
 floor of a tenth of the type's own base, however high Dexterity climbs: 18 ticks for a
 Brute or Tank, 14 for a Fighter or Mage, 10 for a Rogue or Archer. That floor is reached
 at Dexterity 180 whatever the type. The rounding is to the nearest whole tick, and an
-exact half rounds up: a Rogue at Dexterity 12 waits 63 ticks, not 62. For now the
-Dexterity is the combatant's own; help from the support ring doesn't shorten a cooldown.
+exact half rounds up: a Rogue at Dexterity 12 waits 63 ticks, not 62. The Dexterity is
+the helped one where help reaches it: a Rogue's or an Archer's primary stat is Dexterity,
+so help from the support ring shortens its cooldown, on either side, and a Rogue at
+Dexterity 8 with one help waits 69 ticks, not 71. Every other type waits on its own
+Dexterity. The rounding and the floor both apply to the helped Dexterity, and a fight's
+first wait counts help too, from the formation the fight starts with. For now a wait is
+worked out as it begins, and help that comes or goes partway through doesn't change a
+wait already running; it shows from the next one.
 ```
 
 **Why:** The combat engine is built this way. "Rounded to whole ticks" didn't say which
-way, and rounding a half to the even tick, the way C# rounds by default, gives 62.
-Whether help should shorten a cooldown is already proposed as a question in "Questions on
-specials, taunts and the dive", and it stays open.
+way, and rounding a half to the even tick, the way C# rounds by default, gives 62. Help
+counting is what the originals say between them: Cooldowns has Dexterity set the wait,
+Guild Members has help raise the primary stat, and Battle Test's tables, which already
+include the help, give its Rogue and Archer a wait of 69 on both teams. The first wait
+is worked out once everyone stands in place, so the order members were put on the field
+can't change it. Nothing said whether a running wait changes with the help; that's
+proposed as a question in "Questions on cooldown combat's defaults".
 
 ## Change: The clock, and a multi-strike attack landing in one tick
 
@@ -501,6 +510,8 @@ nothing gives a specialist one. That's proposed as a question below.
   or as its fourth begins? The second keeps Shields Up on the allies for one more of the
   Tank's waits.
 - What base wait does a specialist's cooldown have?
+- When a helper moves away, dies or arrives while a Rogue's or an Archer's wait is already
+  running, does that running wait change, or does the change only show from its next wait?
 ```
 
 **Why:** The combat engine is built with a default for now on each of these, in the
@@ -588,8 +599,8 @@ the support ring doesn't add to it. For now:
 like a member's — "Enemies get the Luck reset too, on the same terms as guild members" can
 be read either way — or whether a token is pulled when no free attack can follow. Both are
 proposed as questions in "Questions on the Luck bag's defaults". Help from the support ring
-stays off Luck the way "How a cooldown rounds, and whose Dexterity counts" keeps it off
-Dexterity.
+stays off Luck because help reaches only a type's primary stat, and none of the six combat
+types leads on Luck.
 
 ## Change: The opening check is a pull from the combatant's own bag, for now
 
@@ -787,9 +798,10 @@ reach, or vanishes.
 
 For now, two close-range fighters who pick each other on the same tick take turns rather
 than attacking at the same time. The attack that became ready first goes first; between
-two that became ready on the same tick, the one with the higher Dexterity goes first, and
-between equal Dexterity it's a random draw. The first walks out, hits and walks home, and
-only then does the other go. If the first hit kills the other fighter, it never swings.
+two that became ready on the same tick, the one with the higher Dexterity of its own goes
+first, help from the support ring left out, and between equal Dexterity it's a random
+draw. The first walks out, hits and walks home, and only then does the other go. If the
+first hit kills the other fighter, it never swings.
 
 Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
 attack is: a field it stands in hurts it first, whether it uses its special is decided
@@ -898,6 +910,9 @@ this way.
 - A fast fighter can be ready to attack again before it has walked home from its last
   attack, and a lucky one gets a free attack straight away. Should it walk home first and
   then go out again, or attack again from where it stands?
+- When two close-range fighters who pick each other became ready on the same tick, the
+  one with the higher Dexterity goes first. Does help from the support ring count in that
+  Dexterity, the way it counts in a Rogue's or an Archer's cooldown?
 ```
 
 **Why:** The combat engine is built with a default for now on each of these, in "A

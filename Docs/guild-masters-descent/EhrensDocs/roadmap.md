@@ -136,7 +136,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   health from a member's own Constitution and what's taken staying taken for now,
   questions on health, experience as the bar and level as the number for now, the
   experience-and-levels question answered, questions on experience, and the
-  rest-floor heal question answered).
+  rest-floor heal question answered, and help coming back to whole points once).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's evasion against a capped
