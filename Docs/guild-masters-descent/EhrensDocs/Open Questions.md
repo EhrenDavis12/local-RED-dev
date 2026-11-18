@@ -51,11 +51,9 @@ Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
 
    **Answer:**
 
-7. **Enemy types.** For now monsters can only use the Archer's animations. (Cheap to
-   change.)
-   - A: Every early monster is an Archer type. Simpler, but every fight looks the same.
-   - B: Monsters can be any of the six fighter types, all playing Archer animations. This
-     tests type advantages from day one.
+7. **Enemy types.** Going ahead with: monsters can be any of the six fighter types,
+   picked at random, and each is drawn as a mirrored guild member of that type. Fine?
+   (Cheap to change.)
 
    **Answer:**
 
@@ -72,15 +70,16 @@ Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
 
 ### Health
 
-10. **Cook and Porter health.** Fighters get more health at higher ranks. Cooks and
-    Porters climb their own nine tiers instead. Should their health go up with tier, or
-    stay at 10? (Cheap to change.)
+10. **Cook and Porter health.** Health comes from Constitution alone (Constitution times
+    10), for fighters, Cooks and Porters alike. A Cook's or Porter's tier doesn't change
+    it. Going ahead with that. Fine, or should their tier raise their health? (Cheap to
+    change.)
 
     **Answer:**
 
-11. **Promotion.** When a member is promoted, say from F rank to E rank, does their health
-    rise to match an E-rank hire? Or does only a fresh E-rank hire start with more? (Cheap
-    to change.)
+11. **Promotion.** Promotion, say from F rank to E rank, doesn't change a member's health
+    directly. Health is Constitution times 10, so it only rises if their Constitution
+    does. Going ahead with that. Fine? (Cheap to change.)
 
     **Answer:**
 
@@ -109,8 +108,9 @@ Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
 
     **Answer:**
 
-16. **Special bar refilling.** After a special is used, its bar empties. Do the special's
-    own hits start refilling it? Going ahead with: yes, they do. (Easy to change.)
+16. **Special bar refilling.** After a special is used, its bar empties. Going ahead
+    with: no, the special's own hits don't refill it; only ordinary attacks do. Fine?
+    (Easy to change.)
 
     **Answer:**
 
@@ -124,9 +124,9 @@ Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
     **Answer:**
 
 19. **Mage's field.** The Mage's special leaves a damaging field on two enemy columns.
-    Right now it ignores defence. Should it work like the Mage's other area attacks —
-    can't be dodged, enemies use two-thirds of their defence (recommended)? Or should full
-    defence apply? (Cheap to change.)
+    Going ahead with: the field works like the Mage's other area attacks — it can't be
+    dodged, and enemies use two-thirds of their defence. Fine, or should full defence
+    apply? (Cheap to change.)
 
     **Answer:**
 
