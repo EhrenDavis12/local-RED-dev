@@ -66,8 +66,10 @@ It is not a guarantee. The Scout can Search at rest areas.
 ## The Herbalist and the Miner
 
 The Herbalist and the Miner both increase yield, on above-ground missions and on dives
-alike — the Herbalist yields herbs, the Miner minerals. They also carry slightly more
-than an ordinary member, though not as much as a Porter.
+alike — the Herbalist yields herbs, the Miner minerals. Each carries the base 5 slots
+any member carries, plus 5 extra slots restricted to its own yield — herbs only for the
+Herbalist, minerals only for the Miner. The slot system itself is covered in the Dungeon
+doc.
 
 ## The Blacksmith
 

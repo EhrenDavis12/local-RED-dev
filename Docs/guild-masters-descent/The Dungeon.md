@@ -62,10 +62,11 @@ covered in the Specialists doc. Retreating always costs the loot gathered since 
 safe floor — any party member can carry some of it, so how much is lost depends on who
 came along.
 
-Capacity is counted in slots, and every member carries 5 slots. A healing potion takes 1
-slot, and so does an item of loot — they cost the same, because if loot were free a party
-would simply fill every slot with potions. At one slot each, the choice is how much
-healing to pay for in treasure.
+Capacity is counted in slots, and every member carries 5 slots. Some members carry extra
+slots restricted to a particular kind of thing — the Specialists doc covers which ones. A
+healing potion takes 1 slot, and so does an item of loot — they cost the same, because if
+loot were free a party would simply fill every slot with potions. At one slot each, the
+choice is how much healing to pay for in treasure.
 
 Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
 also drop a weapon or a piece of armour.
@@ -105,5 +106,6 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
-- The Herbalist and the Miner carry slightly more than an ordinary member and less than
-  a Porter, with no figure for either. How many slots does each of them carry?
+- A Porter's capacity grows by five slots a tier, but the Herbalist's and Miner's extra
+  five is a flat figure — a Grandmaster of either carries no more than a Novice does.
+  Should their extra slots grow with tier too?
