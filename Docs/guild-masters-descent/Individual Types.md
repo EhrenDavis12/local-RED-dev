@@ -17,8 +17,9 @@ individually.
 The Brute's special skips the nearest occupied row and cleaves the two rows behind it, or
 whatever rows remain if there are fewer. The cleave hits the targeted enemy and the two
 directly next to it. When the Brute pushes past the front row, it moves there, cleaves,
-and returns to its own node, all in the same action. The Brute's bonus charge condition is
-hitting multiple enemies.
+and returns to its own node, all in the same action. The Brute's bonus charge condition
+is hitting more than one enemy: each enemy beyond the first charges 5, rather than the
+flat 15 every other type's bonus condition gives.
 
 ## The Tank
 
@@ -46,12 +47,14 @@ everything into a single hit.
 Each time the Fighter's cooldown comes up, it makes one ordinary attack, like any other
 type — its two strikes all belong to that single attack.
 
-Its special is a flurry of between 4 and 6 strikes on a single target. The first four
-strikes always land; each of the two after that happens on a Luck check, so the flurry
-only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
-If the target dies before the strikes run out, the remaining strikes carry to the nearest
-enemy still standing. If any enemy is killed during the flurry, the Fighter's charge bar
-refills to 90% — that refill is the Fighter's bonus charge condition.
+Its special is a flurry of 4 or 6 strikes on a single target. The first four strikes
+always land; one Luck check — a pull from the Fighter's Luck bag — then decides the last
+two together: a True adds both, a False ends the flurry at four. Each flurry strike does
+what one of the Fighter's ordinary strikes does. The flurry hits hard because there are
+four or six strikes in it rather than two — not because any one of them is heavier. If the
+target dies before the strikes run out, the remaining strikes carry to the nearest enemy
+still standing. If any enemy is killed during the flurry, the Fighter's charge bar refills
+to 90% — that refill is the Fighter's bonus charge condition.
 
 The flurry's own strikes don't charge the bar.
 
@@ -80,7 +83,7 @@ carries the type's whole damage at once. Its special is called Volley: it hits t
 the enemies one to each side of it, and the one directly behind it. If the target is in
 the enemy's back row, with nothing behind it, the extra hit spills forward instead — onto
 the position in front of the target. The target takes the full hit; its neighbours take
-reduced damage. Volley is an area attack, so it can't be dodged — evasion does nothing
+half that damage. Volley is an area attack, so it can't be dodged — evasion does nothing
 against it.
 
 The Archer's bonus charge condition is hitting the same target twice running. Specials
@@ -98,15 +101,14 @@ precise single shot is what kills it.
 Its special is a lingering field: it covers two columns of the enemy's grid. The field
 affects enemies only — it never damages the player's own members. The field deals damage
 through two separate events: a character standing in the field takes damage from it when
-that character begins its own attack, and a character that moves into the field, changing
-its position, takes damage for entering. Reaching in to attack from outside the field
-doesn't count as entering — an attacker reaching in to attack a character standing in the
-field takes no damage from it.
+that character begins its own attack — that damage lands before the attack does, so if it
+kills the character the attack never happens — and a character that moves into the field,
+changing its position, takes damage for entering. Reaching in to attack from outside the
+field doesn't count as entering — an attacker reaching in to attack a character standing
+in the field takes no damage from it.
 
 The Mage's bonus charge condition is allies in front of it in its own column taking hits.
 
 ## Open Questions
 
 - What are the stats, skills and abilities for each individual type?
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?

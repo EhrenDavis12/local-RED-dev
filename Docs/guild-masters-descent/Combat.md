@@ -31,6 +31,25 @@ reasoned about and balanced — a fight with fifteen guild members and a facing 
 enemies run on a continuous clock would be far harder to balance, and far harder to
 chase a bug through.
 
+When more than one combatant's cooldown comes up on the same tick, their attacks all
+happen at the same time — there's no order between them, and nothing resolves first.
+Damage is worked out against where things stood at the start of that tick, so a combatant
+that dies on that tick still lands the attack it made on it, and two combatants can kill
+each other on the same tick.
+
+That simultaneity is between combatants, not inside one combatant's own attack: within a
+single attack the strikes still resolve one after another, which is what lets the
+Fighter's flurry carry its remaining strikes to the nearest enemy still standing when its
+target dies partway through.
+
+Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
+enemy alike — makes one Luck check of its own as the fight begins, using the same chance
+as the mid-fight reset below in Luck Checks. It's a separate roll, not tied to that
+one. On success, the combatant starts the fight ready instead of empty, attacking on the
+first tick rather than waiting out its first cooldown. On failure, it waits out that first
+cooldown like normal. A success is a full jumpstart, not a partial charge — the combatant
+is either ready or it isn't.
+
 A cooldown is a number of ticks, and each combat type has its own base wait: the Brute
 and the Tank wait 180 ticks, the Fighter and the Mage 140, and the Rogue and the Archer
 100. The wait is that base divided by (1 + Dexterity ÷ 20), rounded to whole ticks — the
@@ -81,7 +100,7 @@ deliberate without being tedious, and at the floor every type is acting about on
 second, which is the pacing this doc already asks for — a low-level fight feeling a little
 slow and a higher-level one having more going on.
 
-## The Luck Reset
+## Luck Checks
 
 When a member finishes an attack, there's a Luck check for whether the cooldown resets
 instantly. On success, the member attacks again immediately, with no cooldown wait at all.
@@ -94,21 +113,45 @@ its very next attack, the one that charges its cooldown normally — the lockout
 further than the one free attack itself. Enemies get the Luck reset too, on the same terms
 as guild members.
 
-The chance is a quarter at most: 25% × Luck ÷ (Luck + 60). It approaches that quarter
-without ever reaching it, so there's no cap rule and no point where Luck stops doing
-anything — it just gets steadily less worth chasing.
+A Luck check pulls one token out of a bag of 50, each token either True or False. A False
+does nothing; a True means the character is lucky. Once every token has been pulled, the
+bag fills back up — and that's the only thing that refills it. A part-used bag carries
+over rather than resetting, from one battle to the next and from one floor to the next.
+The bag exists because drawing without replacement guarantees the lucky event arrives — at
+the floor of one token in fifty it cannot be missed for long — where a roll against a
+small percentage can go cold for a very long time.
+
+A level-up is not an exception to that: a member that levels up while holding a
+part-used bag keeps it exactly as it is, and a refill uses the member's Luck as it stands
+at that moment, so a rise in Luck reaches the bag at its next refill rather than being
+lost. The bag exists to guarantee the lucky event arrives, and rebuilding a nearly-empty
+bag on a level-up would throw away a token that was almost certain to come up.
+
+How many of the 50 tokens are True comes from the chance: 25% × Luck ÷ (Luck + 60),
+rounded up, and never fewer than 1. That chance approaches a quarter without ever
+reaching it, so there's no cap rule and no point where Luck stops doing anything — it
+just gets steadily less worth chasing.
 
 A worked list:
 
-- Luck 5, a newly recruited F-rank member — 2%
-- Luck 20 — 6%
-- Luck 60 — 12.5%, half the ceiling
-- Luck 180 — 19%
-- Higher still — closer and closer to 25%, never past it
+- Luck 5, a newly recruited F-rank member — 1 True in 50
+- Luck 7 — 2
+- Luck 20 — 4
+- Luck 60 — 7
+- Luck 180 — 10
+- Higher still — approaching 13, as the chance approaches a quarter
 
 The ceiling is there because a reset is a free attack, so the chance *is* the percentage
 by which that member's attack rate goes up. A quarter is strong and clearly felt without
 ever approaching the doubling that an uncapped chance would allow.
+
+Every Luck check a character makes draws from the same bag, so the checks compete with
+each other for the same tokens.
+
+Evasion draws from that same bag: when a member is attacked, it pulls one token, and a
+True means the attack misses. That's where a member's evasion comes from, and it needs no
+chance of its own — it's the bag's own density of Trues, same as the reset above. An area
+attack pulls no token at all; evasion still does nothing against one.
 
 Dexterity sets the rhythm; Luck occasionally skips the wait.
 
@@ -135,13 +178,15 @@ and the defender's mitigation is applied to it separately.
 
 ## The Special Bar
 
-Each member has a special bar. When it's full, the player can use a special. Each hit a
-member lands charges that member's bar by 10 — that's the base, and it's the same for
-every type. The bar charges per hit, not per attack: a multi-strike attack charges once
-for each of its strikes that lands, and an attack that reaches several targets charges
-once for each of them. Each combat type also has its own bonus condition, and each time
-it's met it adds 15 on top of that base — covered in the Individual Types doc. The bar is
-full at 100.
+Each member has a special bar. When it's full, the player can use a special. An enemy's
+bar works the same way, and an enemy uses its special when its bar is full. Each hit a
+member lands charges that member's bar: the first hit of an attack charges it by 30,
+and each additional hit — another strike of a multi-strike attack, or another
+target the attack reaches — charges it by 5. That's the base, and it's the same for
+every type. A bar fills on about the third hit once a bonus condition has fired, which
+is what puts a special inside the fight that earns it rather than the one after. Each
+combat type also has its own bonus condition, and each time it's met it adds 15 on top
+of that base — covered in the Individual Types doc. The bar is full at 100.
 
 Charge and weapon durability both count hits, so what wears a weapon down is what fills
 the bar.
@@ -216,15 +261,10 @@ the Equipment doc.
   simulation or only how fast it's drawn?
 - With a party of fifteen filling bars while the fight runs, how does the player see
   which specials are ready at a glance?
-- When a member's cooldown comes up, do all the strikes of a multi-strike attack resolve
-  at once?
 - The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
   stop there, or do they keep coming?
 - The dungeon board shows the types of monster and enemy found in a dungeon. Is a
   monster something other than an enemy built from the six combat types?
-- When a fight starts, where do the cooldowns stand — everyone's empty and waiting out a
-  full first wait, everyone's ready at once, or staggered somehow? The opening of a fight
-  plays out completely differently depending on which.
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
