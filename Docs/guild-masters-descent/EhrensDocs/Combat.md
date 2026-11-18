@@ -730,9 +730,18 @@ and the defender's mitigation is applied to it separately.
 A close-range fighter walks out to its target, strikes, and walks back to its own spot,
 and it never walks to a spot its target has left. When its attack comes up and the target
 it picks is out on an attack of its own, it waits until that target is back in its spot,
-then attacks. It also waits while its target is waiting to attack ahead of it, and goes
-after it. A waiting fighter keeps the target it picked, and picks again only if that
-target dies, goes out of its reach, or vanishes.
+then attacks. For now that holds on the same tick too: when a fighter's attack comes up
+on the tick its target heads off to hit someone else, it waits until the target is back
+in its own spot and then hits it, so its attack lands after the target's. It also waits
+while its target is waiting to attack ahead of it, and goes after it. A waiting fighter
+keeps the target it picked, and picks again only if that target dies, goes out of its
+reach, or vanishes.
+
+For now, two close-range fighters who pick each other on the same tick take turns rather
+than attacking at the same time. The attack that became ready first goes first; between
+two that became ready on the same tick, the one with the higher Dexterity goes first, and
+between equal Dexterity it's a random draw. The first walks out, hits and walks home, and
+only then does the other go. If the first hit kills the other fighter, it never swings.
 
 Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
 attack is: a field it stands in hurts it first, whether it uses its special is decided
@@ -760,8 +769,52 @@ For now:
 
 **Why:** The user, 2026-11-17: "the attacker needs to wait for the attacked to be in the
 spot and not on the attack" — two fighters going for each other at once each jumped to
-the other's empty spot and swung at thin air. The combat engine and the battle screen are
-built this way. Each "for now" is proposed as a question below.
+the other's empty spot and swung at thin air. Asked then whether two close-range fighters
+who pick each other on the same tick should hit at once or take turns, and whether a
+fighter whose target heads off on that tick should wait for it to come home, the user
+said: "B my rules for now. as it looks bad otherwise." That departs from the original's
+same-tick attacks all happening at the same time, so it stands for now; see "Close-range
+fighters take turns on the same tick, for now". The combat engine and the battle screen
+are built this way. Each "for now" in the list is proposed as a question below.
+
+## Change: Close-range fighters take turns on the same tick, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Cooldowns`, the paragraph beginning "When more than one combatant's cooldown
+comes up on the same tick"
+
+**Now says:**
+
+```
+When more than one combatant's cooldown comes up on the same tick, their attacks all
+happen at the same time — there's no order between them, and nothing resolves first.
+Damage is worked out against where things stood at the start of that tick, so a combatant
+that dies on that tick still lands the attack it made on it, and two combatants can kill
+each other on the same tick.
+```
+
+**Proposed:**
+
+```
+When more than one combatant's cooldown comes up on the same tick, their attacks all
+happen at the same time — there's no order between them, and nothing resolves first.
+Damage is worked out against where things stood at the start of that tick, so a combatant
+that dies on that tick still lands the attack it made on it, and two combatants can kill
+each other on the same tick. For now two close-range fighters are the exception, as
+Attacks and Reach says: when they pick each other on the same tick they take turns, and
+the first hit can kill the other before it swings; and when a fighter's target heads off
+on that tick to hit someone else, the fighter waits until it's home, so its attack lands
+after its target's.
+```
+
+**Why:** The user, 2026-11-17: "B my rules for now. as it looks bad otherwise." — on
+whether two close-range fighters who pick each other on the same tick should hit at once
+or take turns, and whether a fighter whose target heads off on that tick should wait for
+it to come home. Hitting at once would show each fighter walking to the other's empty
+spot, which "A close-range attack waits for its target to be home" rules out, so for now
+that rule wins over same-tick attacks happening together. The combat engine is built
+this way.
 
 ## Change: Questions on a close-range attack waiting
 
