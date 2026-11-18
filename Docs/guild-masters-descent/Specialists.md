@@ -76,17 +76,35 @@ The quality of the armour the Armourer makes follows its tier.
 
 ## The Alchemist
 
-The Alchemist makes potions. Potions are temporary buffs: they raise stats for a fight. At
-a rest area, the Alchemist can brew from what the party has gathered.
+The Alchemist makes potions. Potions come in two kinds: temporary buffs, which raise
+stats for a fight, and healing potions, which restore health. At a rest area, the
+Alchemist can brew from what the party has gathered.
+
+A healing potion restores a number of health points, from a band set by its rank:
+
+- F — 10 to 25
+- E — 25 to 60
+- D — 60 to 115
+- C — 115 to 190
+- B — 190 to 285
+- A — 285 to 400
+- S — 400 to 535
+- SS — 535 to 690
+- SSS — 690 to 865
+
+Each band starts where the one below it ends, and each is 20 points wider than the one
+below.
 
 A potion's strength scales with the Alchemist's Intelligence, so a cleverer Alchemist
-brews stronger buffs.
+brews stronger potions.
 
 The Alchemist's Luck gets a check of its own, the same bag-pull check a crafted weapon
 or piece of armour gets — see the Equipment doc for how a True and a second True raise
-what gets brewed.
+what gets brewed. Together with Intelligence, that's what places a potion inside its
+band and raises it — the same shape as a crafter's main stat and Luck for gear.
 
 ## Open Questions
 
 - A weapon and a piece of armour each roll from a band for their kind and class — what
-  does a potion roll at all?
+  does a buff potion roll: how much it raises a stat by, and whether it has bands of
+  its own?

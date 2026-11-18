@@ -85,6 +85,9 @@ The player re-enters at the last rest area reached, and must pay the entry fee a
 a teleportation fee. This stops the player exploring five floors, returning, and
 rearranging the party with no penalty.
 
+Healing potions take up the party's carrying capacity, and they're added to it at the
+start of the raid.
+
 ## Training Missions
 
 The player can send automated "training" missions into a dungeon, down to the deepest
@@ -97,3 +100,5 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
+- Healing potions take up carrying capacity, but nothing says how much of it one potion
+  is. That figure is what decides whether a party can carry two or twenty.

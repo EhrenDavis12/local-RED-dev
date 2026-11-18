@@ -167,6 +167,9 @@ changing formation, and marking the focus target.
 The fight doesn't wait for the player, so the moment to use a special goes by while the
 fight carries on around it.
 
+When a member's cooldown comes up, the player can have it drink a healing potion
+instead of attacking — drinking costs that attack.
+
 ## Attacks and Reach
 
 Characters and enemies have either close-range or far-range attacks, with possible AoE
@@ -268,3 +271,6 @@ the Equipment doc.
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
+- The Mage's field damages a character as it begins its own attack. A member can drink a
+  potion instead of attacking — does a member standing in a field take the field's
+  damage when it drinks?
