@@ -111,7 +111,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   stacking, targeting weights and taunts, a specialist's cooldown, open questions on
   specials, taunts and the dive, on cooldown combat's defaults, and on the special bar,
   the fight pausing for now, the fight's speed, the speed question answered, a
-  close-range attack waiting for its target to be home, and questions on that wait).
+  close-range attack waiting for its target to be home, questions on that wait, every
+  character's own Luck bag and when no token is pulled for now, and questions on the Luck
+  bag's defaults).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -141,7 +143,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   failed Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's
   column, field, the field's defence, timing and bonus for now, open questions on Vanish,
   taunts, the field and the types' defaults, on the field's timing, and on the flurry, the
-  Fighter's bonus as the refill for now, and an open question on the Fighter's bonus).
+  Fighter's bonus as the refill for now, an open question on the Fighter's bonus, the
+  flurry's Luck pull coming as it begins for now, and a question on the flurry's pull).
 - `EhrensDocs/Look and Feel.md` — new doc proposed for the originals (Look and Feel): the
   user's approved look for the game, gathered from the animation work.
   - Battle scene (meadow)
@@ -168,7 +171,7 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Battle
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
-  health afresh as a save loads.
+  health afresh as a save loads and keeping every Luck bag.
   - Orientation
   - Saving
   - Open Questions

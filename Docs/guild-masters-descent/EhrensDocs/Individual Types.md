@@ -308,15 +308,19 @@ are outside the streak entirely — a Volley neither continues nor breaks it. Hi
 same target twice running also raises the Archer's accuracy and its damage — a continuous
 percentage increase that caps at 10%. A miss resets the streak. For now the second hit in
 a row starts the raise, so the first shot it lifts is the third, and each hit after adds
-another step, a placeholder, up to the cap. Accuracy is raised in points off the target's
-chance to miss, and damage in percent more after defence. For now, too, each hit that
-continues the streak pays the bonus charge.
+another step, a placeholder, up to the cap. Damage is raised in percent more after
+defence. For now the accuracy raise does nothing: a dodge is a pull from the target's Luck
+bag, which has no chance to miss for it to take points off, so a streak shot is dodged
+like any other shot. For now, too, each hit that continues the streak pays the bonus
+charge.
 ```
 
 **Why:** The combat types are built this way. Nothing said whether Volley spills forward
 whenever the node behind is empty or only from the back row. Nor did it say whether the
-streak's raise is points off the miss chance or a share of it, whether it applies from the
-second hit or the third, or how often the bonus pays. Each is proposed as a question below.
+streak's raise applies from the second hit or the third, or how often the bonus pays. With
+every dodge now a pull from the target's bag there's no miss chance left for the accuracy
+raise to lower, and what it should do instead is open. Each is proposed as a question
+below.
 
 ## Change: Every enemy in the Mage's column takes full damage, for now
 
@@ -464,8 +468,12 @@ proposed as a question below.
   follow them?
 - If the target of a Fighter's or a Rogue's ordinary attack dies mid-attack, do the
   rest of the strikes carry on to another enemy? Only the flurry is said to.
-- Is the Archer's streak raise measured in points off the miss chance, or a share of it,
-  and does it start with the second hit or the third?
+- Does the Archer's streak raise start with the second hit or the third?
+- When the Archer hits the same enemy twice in a row, its later shots already get up to
+  10% more damage. Now that a dodge is a lucky draw from the target's bag rather than a
+  percentage, should the streak (A) only raise damage, (B) also give each streak shot a
+  2–10% chance to hit anyway when the target draws a dodge, or (C) make the shot impossible
+  to dodge once the streak reaches its cap?
 - Does Volley spill forward only from the back row, or whenever the node behind is empty?
 - Which two columns does the Mage's field cover?
 - How much does the field do each time it deals damage — set from the Mage's damage when
@@ -557,3 +565,55 @@ they add.
 bonus is the refill, for now", and the two docs disagree. The pending "Questions on
 Vanish, taunts and the field", "Questions on the field's timing" and "Questions on the
 flurry" changes to this list are unchanged; this goes after the entries they add.
+
+## Change: The flurry's Luck pull comes as it begins, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## The Fighter`, the paragraph the pending "The flurry's leftover strikes stay
+within reach, and its strikes can miss, for now" change adds after the third
+
+**Now says:**
+
+```
+For now "always land" is read as always happening: every flurry strike rolls to hit like
+any other strike, and can miss.
+```
+
+**Proposed:**
+
+```
+For now "always land" is read as always happening: every flurry strike rolls to hit like
+any other strike, and can miss. For now, too, the pull that decides the last two strikes
+is made as the flurry begins, before its first strike, so it's spent even if the fight
+ends within the first four.
+```
+
+**Why:** The combat engine is built this way. "One Luck check … then decides the last two"
+didn't say when that pull is made. That's proposed as a question in "Questions on the
+flurry's pull".
+
+## Change: Questions on the flurry's pull
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- What are the stats, skills and abilities for each individual type?
+```
+
+**Proposed:**
+
+```
+- What are the stats, skills and abilities for each individual type?
+- Is the flurry's Luck pull made as it begins, and so spent even if the fight ends within
+  the first four strikes, or only once the fourth strike has landed, and not at all if the
+  fight is already over?
+```
+
+**Why:** The combat engine is built with a default for now on this, in "The flurry's Luck
+pull comes as it begins, for now", and none of the docs settles it. The pending changes to
+this list above are unchanged; this goes after the entries they add.

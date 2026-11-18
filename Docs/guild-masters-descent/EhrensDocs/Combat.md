@@ -542,6 +542,91 @@ new floor and starts each dive empty, for now", and none of the docs settles the
 pending "Questions on specials, taunts and the dive" and "Questions on cooldown combat's
 defaults" changes to this list are unchanged; these go after the entries they add.
 
+## Change: Every character's own Luck bag, and when no token is pulled, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Luck Checks`, second paragraph (a new paragraph after it)
+
+**Now says:**
+
+```
+A Luck check pulls one token out of a bag of 50, each token either True or False. A False
+does nothing; a True means the character is lucky. Once every token has been pulled, the
+bag fills back up — and that's the only thing that refills it. A part-used bag carries
+over rather than resetting, from one battle to the next and from one floor to the next.
+The bag exists because drawing without replacement guarantees the lucky event arrives — at
+the floor of one token in fifty it cannot be missed for long — where a roll against a
+small percentage can go cold for a very long time.
+```
+
+**Proposed:**
+
+```
+A Luck check pulls one token out of a bag of 50, each token either True or False. A False
+does nothing; a True means the character is lucky. Once every token has been pulled, the
+bag fills back up — and that's the only thing that refills it. A part-used bag carries
+over rather than resetting, from one battle to the next and from one floor to the next.
+The bag exists because drawing without replacement guarantees the lucky event arrives — at
+the floor of one token in fifty it cannot be missed for long — where a roll against a
+small percentage can go cold for a very long time.
+
+Every character that fights has a bag of its own — every guild member, specialists too,
+and every enemy — and no bag is shared; an enemy that's attacked evades from its own bag
+the same way a member does. A member's first bag is filled when they join the guild, and
+from then on it's theirs, carried part-used from one dive to the next as well, and into a
+mission played as a battle. The Luck a bag fills from is the character's own: help from
+the support ring doesn't add to it. For now:
+
+- An enemy's bag is new and full when it joins a battle, and lasts only for that battle.
+- No token is pulled for the Luck reset after an attack that ends the battle, or one its
+  attacker doesn't live through. No free attack can follow, and a True pulled then would
+  be thrown away.
+```
+
+**Why:** The combat engine is built this way. Nothing said whether an enemy's bag works
+like a member's — "Enemies get the Luck reset too, on the same terms as guild members" can
+be read either way — or whether a token is pulled when no free attack can follow. Both are
+proposed as questions in "Questions on the Luck bag's defaults". Help from the support ring
+stays off Luck the way "How a cooldown rounds, and whose Dexterity counts" keeps it off
+Dexterity.
+
+## Change: Questions on the Luck bag's defaults
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+```
+
+**Proposed:**
+
+```
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
+- Does an enemy's Luck bag last only for its own battle, new and full each time, or carry
+  on from battle to battle the way a member's does?
+- When an attack ends the battle, or its attacker doesn't live through it, is a token
+  still pulled for the Luck reset?
+- The Luck check each combatant makes as a fight begins is called "a separate roll", using
+  "the same chance" as the reset. Now that every Luck check a character makes draws from
+  its own bag, is the opening check a pull from that bag too, or a roll of its own?
+```
+
+**Why:** The combat engine is built with a default for now on the first two, in "Every
+character's own Luck bag, and when no token is pulled, for now". The third is the
+original's own: Cooldowns calls the opening check a separate roll at the reset's chance,
+and Luck Checks has every Luck check a character makes draw from the same bag. The combat
+engine doesn't make the opening check yet. The pending changes to this list above are
+unchanged; these go after the entries they add.
+
 ## Change: The fight can be paused, for now
 
 > Proposed 2026-11-16 · for review

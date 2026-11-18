@@ -26,10 +26,10 @@ exactly as it would have if the game had never closed, the same rolls and all �
 and opening the game can't re-roll an attack or dodge a death. An attack already made
 counts as made, even if it hadn't finished showing on screen. The save holds where every
 cooldown stands — how long each fighter still has to wait, whether one is owed a free
-attack from the Luck reset, and how far each lasting effect has run — so nothing is drawn
-again as it loads. Saving doesn't bank anything, either: the gold found on the dive is
-still the party's until the dive ends, and what was found since the last rest area can
-still be lost.
+attack from the Luck reset, and how far each lasting effect has run — and what's left in
+every fighter's Luck bag, the enemies' too, so nothing is drawn again as it loads. Saving
+doesn't bank anything, either: the gold found on the dive is still the party's until the
+dive ends, and what was found since the last rest area can still be lost.
 
 A battle doesn't move on while the game is closed or in the background: it picks up at
 the moment it stopped. A long gap between two frames is dropped rather than played fast —
@@ -43,15 +43,20 @@ Loading never changes or deletes a save. A save the game can't read, or one made
 newer version of the game, is reported as such and left on the phone as it is. A save
 made by an older version still loads; a dive one of those saved between battles, from
 before the save held special bars, loads with every bar empty, a save from before potions
-loads with none in the stores and none on any member, and a save from before shields
-loads with no shields in the stores and none on any Tank. A saved battle is never judged
-against a placeholder number — a fighter left waiting longer than its own cooldown is
-accepted, and so is a member holding a potion while under the drink threshold — so
-rebalancing a placeholder can't turn a good save into one the game can't read.
+loads with none in the stores and none on any member, a save from before shields loads
+with no shields in the stores and none on any Tank, and a save from before the Luck bag
+loads every member, and every enemy in a saved battle, with an empty bag that fills from
+that character's Luck at its first pull. A saved battle is never judged against a
+placeholder number — a fighter left waiting longer than its own cooldown is accepted, and
+so is a member holding a potion while under the drink threshold — so rebalancing a
+placeholder can't turn a good save into one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
 loads under the rule as it is now. A member not on the saved dive loads at full.
+
+Every member's Luck bag is saved with them, part-used as it is, so closing the game
+between battles or between dives never refills a bag or hands back a token.
 
 For now:
 
@@ -77,6 +82,10 @@ For now:
   F-rank member at level 5 loads with 6, one at level 1 with none. On a dive one of those
   saved partway through a floor, the battles already won on that floor never pay their
   experience.
+- A saved Luck bag that can't be true — more than 50 tokens, fewer than none, or more
+  Trues than tokens left — is emptied as it loads, and the save loads. A bag is never
+  judged against the character's Luck, since a level-up leaves a bag whose Trues no
+  longer match it.
 
 ## Open Questions
 
@@ -85,3 +94,5 @@ For now:
   before a floor's first battle — is that bar emptied as it loads, or is the save refused?
 - A member on a dive saved before health followed Constitution loads with the health they
   had, capped at their new maximum. Should they keep the damage they had taken instead?
+- Is a saved Luck bag that can't be true — more tokens than a bag holds, fewer than none,
+  or more Trues than tokens — emptied as it loads, or is the save refused?
