@@ -165,9 +165,15 @@ Constitution on armour.
 
 Luck then gets a check of its own, a pull from the crafter's own Luck bag: a False and the
 piece is made normally, at the quality its main stat set. A True raises the piece's
-quality, and a second pull follows — a second False holds it at that raise, a second True
-puts the piece at the maximum of its class's band. If the piece was already at that
-maximum before the check, a second True instead bumps it up to the next class.
+quality by moving its span half the remaining distance to the top of its band — it
+scales itself, so a poor roll gains a lot and a roll already near the top gains little,
+and it can never overshoot the band, so nothing has to cap it. A second pull follows: a
+second False holds the raise where it landed, a second True takes the span the rest of
+the way, to the very top of the band, keeping its rolled width. If the piece was already
+at that maximum before the check, a second True instead bumps it up to the next class,
+landing at the top of that class's band rather than the bottom — the bands overlap, so
+the bottom of the next class sits below the top of the one below it, and landing there
+would be a downgrade.
 
 When the guild holds more than one Blacksmith, it is the Blacksmith assigned to the smithy
 whose tier, Strength and Luck set the weapon quality.
@@ -263,9 +269,6 @@ materials.
   mission or a dive?
 - How narrow or wide can a rolled span be — can a piece come out with a single figure
   rather than a range, or with a span as wide as the whole band?
-- A True raises a crafted piece's quality and two Trues put it at the maximum of its
-  class, but nothing says how much a raise is worth. And when a piece already at its
-  maximum goes up a class instead, where in the new class's band does it land?
 - Is dropped gear rolled the same way a crafted or bought piece is, and does its class
   follow the dungeon floor or the mission's rank?
 - Does the gold a repair costs scale with the piece's class, and which materials does a
