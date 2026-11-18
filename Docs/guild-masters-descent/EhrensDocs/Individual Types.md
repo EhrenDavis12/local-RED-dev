@@ -305,22 +305,22 @@ hit; its neighbours take half that damage. Volley is an area attack, so it can't
 
 The Archer's bonus charge condition is hitting the same target twice running. Specials
 are outside the streak entirely — a Volley neither continues nor breaks it. Hitting the
-same target twice running also raises the Archer's accuracy and its damage — a continuous
-percentage increase that caps at 10%. A miss resets the streak. For now the second hit in
-a row starts the raise, so the first shot it lifts is the third, and each hit after adds
+same target twice running also raises the Archer's damage — a continuous percentage
+increase that caps at 10%. A miss resets the streak. For now the second hit in a row
+starts the raise, so the first shot it lifts is the third, and each hit after adds
 another step, a placeholder, up to the cap. Damage is raised in percent more after
-defence. For now the accuracy raise does nothing: a dodge is a pull from the target's Luck
-bag, which has no chance to miss for it to take points off, so a streak shot is dodged
-like any other shot. For now, too, each hit that continues the streak pays the bonus
-charge.
+defence. For now, once the raise reaches its cap, the Archer's shots on that target can't
+be dodged until the streak breaks — like Volley, they pull no token from its bag. For now,
+too, each hit that continues the streak pays the bonus charge.
 ```
 
-**Why:** The combat types are built this way. Nothing said whether Volley spills forward
-whenever the node behind is empty or only from the back row. Nor did it say whether the
-streak's raise applies from the second hit or the third, or how often the bonus pays. With
+**Why:** The combat types are built this way, apart from the capped streak, which isn't
+built yet. Nothing said whether Volley spills forward whenever the node behind is empty or
+only from the back row. Nor did it say whether the streak's raise applies from the second
+hit or the third, or how often the bonus pays. Each is proposed as a question below. With
 every dodge now a pull from the target's bag there's no miss chance left for the accuracy
-raise to lower, and what it should do instead is open. Each is proposed as a question
-below.
+raise to lower, so for now a capped streak can't be dodged in its place — the user's call,
+2026-11-17.
 
 ## Change: Every enemy in the Mage's column takes full damage, for now
 
@@ -469,11 +469,6 @@ proposed as a question below.
 - If the target of a Fighter's or a Rogue's ordinary attack dies mid-attack, do the
   rest of the strikes carry on to another enemy? Only the flurry is said to.
 - Does the Archer's streak raise start with the second hit or the third?
-- When the Archer hits the same enemy twice in a row, its later shots already get up to
-  10% more damage. Now that a dodge is a lucky draw from the target's bag rather than a
-  percentage, should the streak (A) only raise damage, (B) also give each streak shot a
-  2–10% chance to hit anyway when the target draws a dodge, or (C) make the shot impossible
-  to dodge once the streak reaches its cap?
 - Does Volley spill forward only from the back row, or whenever the node behind is empty?
 - Which two columns does the Mage's field cover?
 - How much does the field do each time it deals damage — set from the Mage's damage when
