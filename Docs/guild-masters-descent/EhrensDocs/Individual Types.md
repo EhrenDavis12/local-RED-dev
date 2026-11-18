@@ -190,6 +190,35 @@ the Fighter's bonus: it never adds 15 the way the other types' bonus conditions 
 time it's met, and this doc makes the Fighter's the refill to 90%. Which holds is proposed
 as a question below.
 
+## Change: The Rogue's evasion against a capped Archer streak, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## The Rogue`, first paragraph
+
+**Now says:**
+
+```
+The Rogue attacks at far range and has high evasion. Its advantage over the Archer is
+against the Archer's ordinary shots: a single shot is a single chance to miss, so
+high evasion beats it. It's weak to the Mage because the Mage's area attacks can't be
+dodged.
+```
+
+**Proposed:**
+
+```
+The Rogue attacks at far range and has high evasion. Its advantage over the Archer is
+against the Archer's ordinary shots: a single shot is a single chance to miss, so
+high evasion beats it. For now that holds until an Archer's streak on the Rogue reaches
+its cap: from then that Archer's shots on it can't be dodged, until the streak breaks.
+It's weak to the Mage because the Mage's area attacks can't be dodged.
+```
+
+**Why:** The combat types are built this way. Every dodge the Rogue makes is a pull from
+its bag, and a capped Archer shot pulls none ("Volley and the Archer's streak, for now"),
+so the Rogue's evasion beats the Archer's ordinary shots only below the cap.
+
 ## Change: A Rogue's second strike is lost if the first kills, for now
 
 > Proposed 2026-11-12 · for review
@@ -310,12 +339,16 @@ increase that caps at 10%. A miss resets the streak. For now the second hit in a
 starts the raise, so the first shot it lifts is the third, and each hit after adds
 another step, a placeholder, up to the cap. Damage is raised in percent more after
 defence. For now, once the raise reaches its cap, the Archer's shots on that target can't
-be dodged until the streak breaks — like Volley, they pull no token from its bag. For now,
-too, each hit that continues the streak pays the bonus charge.
+be dodged until the streak breaks — like Volley, they pull no token from its bag. They're
+still single shots, not an area attack: they pay the target's full defence, and pass over
+a vanished Rogue without ending its Vanish. A capped shot can't miss, so from then only a
+shot at another enemy breaks the streak. For now, too, each hit that continues the streak
+pays the bonus charge.
 ```
 
-**Why:** The combat types are built this way, apart from the capped streak, which isn't
-built yet. Nothing said whether Volley spills forward whenever the node behind is empty or
+**Why:** The combat types are built this way. A capped shot takes only the skipped pull
+from Volley, not the two-thirds defence or the reach onto a vanished Rogue that come with
+an area attack. Nothing said whether Volley spills forward whenever the node behind is empty or
 only from the back row. Nor did it say whether the streak's raise applies from the second
 hit or the third, or how often the bonus pays. Each is proposed as a question below. With
 every dodge now a pull from the target's bag there's no miss chance left for the accuracy
