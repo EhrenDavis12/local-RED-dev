@@ -4,12 +4,21 @@ An index of locations, not a summary. Headings only; the docs are the source of 
 
 ## Design docs (originals, read-only)
 
+### Battle Test.md — Battle Test
+A fixed pair of teams, their levels, gear and test field, so test battles can be compared.
+- What This Is For
+- The Field
+- The Player's Team
+- The Enemy Team
+- Levels and Experience
+- Open Questions
+
 ### Combat.md — Combat
-Formation, cooldowns and the Luck reset, player input, reach, the special bar, lasting
+Formation, cooldowns and Luck checks, player input, reach, the special bar, lasting
 effects, specialists and enemies in combat, targeting and gear durability.
 - Formation
 - Cooldowns
-- The Luck Reset
+- Luck Checks
 - Player Input
 - Attacks and Reach
 - The Special Bar
@@ -95,7 +104,7 @@ The dungeon board, finding and entering dungeons, and training missions.
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line,
   open question, health full at the guild hall and positions carrying between battles,
-  how a cooldown rounds, the clock, how a fight opens and who goes first, the Luck
+  how a cooldown rounds, the clock and a multi-strike attack landing in one tick, the Luck
   reset's free attack and specials, picking a target, members' specials and how a battle
   ends, a special putting nothing in its owner's bar and taking the attack's place, every
   bar emptying on a new floor and each dive, an effect's count, its end and a second cast
@@ -128,7 +137,7 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
-  flurry's checks and strikes for now and its leftover strikes staying within reach, a
+  flurry's leftover strikes staying within reach and its strikes able to miss for now, a
   failed Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's
   column, field, the field's defence, timing and bonus for now, open questions on Vanish,
   taunts, the field and the types' defaults, on the field's timing, and on the flurry, the

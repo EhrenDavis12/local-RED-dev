@@ -114,13 +114,6 @@ Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
 
     **Answer:**
 
-17. **Multi-hit attacks.** When a Fighter or Rogue strikes several times in a row:
-    - A: The game decides all the hits at once and just plays them one after another
-      (recommended — needs no new rules).
-    - B: Spread the hits out, so the target can die or move in between.
-
-    **Answer:**
-
 18. **Tapping a special.** When the player taps a member's full special: (Free to change
     now; harder once real-time fighting is built.)
     - A: It fires instantly as a free extra attack.
@@ -137,9 +130,3 @@ Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
 
     **Answer:**
 
-20. **Fighter's flurry.** The Fighter's special hits 4 times, with a chance of a 5th and
-    6th. Using the normal luck chance, a 5th hit almost never happens. Should the flurry
-    get its own higher chance — about 10% for a new Fighter, rising to about 37% later
-    (recommended, so 5 and 6 actually show up)?
-
-    **Answer:**

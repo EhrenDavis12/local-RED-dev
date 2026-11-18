@@ -19,8 +19,9 @@ individually.
 The Brute's special skips the nearest occupied row and cleaves the two rows behind it, or
 whatever rows remain if there are fewer. The cleave hits the targeted enemy and the two
 directly next to it. When the Brute pushes past the front row, it moves there, cleaves,
-and returns to its own node, all in the same action. The Brute's bonus charge condition is
-hitting multiple enemies.
+and returns to its own node, all in the same action. The Brute's bonus charge condition
+is hitting more than one enemy: each enemy beyond the first charges 5, rather than the
+flat 15 every other type's bonus condition gives.
 ```
 
 **Proposed:**
@@ -37,16 +38,16 @@ so for now the cleave centres on the targeted enemy's column in each row behind:
 the node in that column and the two directly next to it, three wide in each row — up to
 six enemies in all. Each of them can evade it individually, like the ordinary cleave.
 When the Brute pushes past the front row, it moves there, cleaves, and returns to its own
-node, all in the same action. The Brute's bonus charge condition is hitting multiple
-enemies. For now it pays once an attack, when the attack's hits land on two or more
-different enemies; a miss doesn't count, and neither does the special, which puts
-nothing in the Brute's bar.
+node, all in the same action. The Brute's bonus charge condition is hitting more than one
+enemy: each enemy beyond the first charges 5, rather than the flat 15 every other type's
+bonus condition gives. For now a miss doesn't count, and neither does the special, which
+puts nothing in the Brute's bar.
 ```
 
 **Why:** The combat types are built this way. A close attack's targeted enemy is in the
 front row, which the special skips, so the special needed a centre. Nothing said whether
-it hits three enemies in all or three in each row, whether the cleave's neighbours take
-reduced damage the way Volley's do, or how often hitting multiple enemies pays. Each is
+it hits three enemies in all or three in each row, or whether the cleave's neighbours
+take reduced damage the way Volley's do. Each is
 proposed as a question below. Nor did it say whether the special pays the bonus; that is
 proposed as a question in the Combat change notes, in "Questions on the special bar".
 
@@ -124,7 +125,7 @@ the rest are lost — only the flurry carries on to another enemy.
 **Why:** The combat engine is built this way. Only the flurry is said to carry on when its
 target dies. Whether the ordinary strikes should too is proposed as a question below.
 
-## Change: The flurry's checks and strikes for now, and its leftover strikes stay within reach
+## Change: The flurry's leftover strikes stay within reach, and its strikes can miss, for now
 
 > Proposed 2026-11-12 · for review
 
@@ -133,41 +134,38 @@ target dies. Whether the ordinary strikes should too is proposed as a question b
 **Now says:**
 
 ```
-Its special is a flurry of between 4 and 6 strikes on a single target. The first four
-strikes always land; each of the two after that happens on a Luck check, so the flurry
-only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
-If the target dies before the strikes run out, the remaining strikes carry to the nearest
-enemy still standing. If any enemy is killed during the flurry, the Fighter's charge bar
-refills to 90% — that refill is the Fighter's bonus charge condition.
+Its special is a flurry of 4 or 6 strikes on a single target. The first four strikes
+always land; one Luck check — a pull from the Fighter's Luck bag — then decides the last
+two together: a True adds both, a False ends the flurry at four. Each flurry strike does
+what one of the Fighter's ordinary strikes does. The flurry hits hard because there are
+four or six strikes in it rather than two — not because any one of them is heavier. If the
+target dies before the strikes run out, the remaining strikes carry to the nearest enemy
+still standing. If any enemy is killed during the flurry, the Fighter's charge bar refills
+to 90% — that refill is the Fighter's bonus charge condition.
 ```
 
 **Proposed:**
 
 ```
-Its special is a flurry of between 4 and 6 strikes on a single target. The first four
-strikes always land; each of the two after that happens on a Luck check, so the flurry
-only runs to five or six strikes if those checks succeed. The flurry's strikes hit hard.
-If the target dies before the strikes run out, the remaining strikes carry to the nearest
-enemy still standing that the Fighter's close range can reach, passing over a vanished
-Rogue unless that's all there is. If nothing is in reach, the remaining strikes are lost.
-If any enemy is killed during the flurry, the Fighter's charge bar refills to 90% — that
-refill is the Fighter's bonus charge condition.
+Its special is a flurry of 4 or 6 strikes on a single target. The first four strikes
+always land; one Luck check — a pull from the Fighter's Luck bag — then decides the last
+two together: a True adds both, a False ends the flurry at four. Each flurry strike does
+what one of the Fighter's ordinary strikes does. The flurry hits hard because there are
+four or six strikes in it rather than two — not because any one of them is heavier. If the
+target dies before the strikes run out, the remaining strikes carry to the nearest enemy
+still standing that the Fighter's close range can reach, passing over a vanished Rogue
+unless that's all there is. If nothing is in reach, the remaining strikes are lost. If any
+enemy is killed during the flurry, the Fighter's charge bar refills to 90% — that refill
+is the Fighter's bonus charge condition.
 
-For now the two Luck checks are the flurry's own, not the check that can reset a
-cooldown: each succeeds with a chance of 50% × Luck ÷ (Luck + 20), using the Fighter's
-Luck, and both the 50% and the 20 are placeholders. The sixth strike is checked only if
-the fifth's check succeeded, whether that strike then hit or missed. For now, too,
-"always land" is read as always happening: every flurry strike rolls to hit like any
-other strike, and can miss. Each one carries the Fighter's damage the same way an
-ordinary strike does, with nothing added for hitting hard.
+For now "always land" is read as always happening: every flurry strike rolls to hit like
+any other strike, and can miss.
 ```
 
 **Why:** The combat engine is built this way. "The nearest enemy still standing" could
-have reached past the front row, which the Fighter's close range never can. Whether the
-Luck checks are the reset's is already asked in `## Open Questions`, and stays open there.
-Nothing said whether "always land" means the flurry can't miss, or whether "hit hard"
-means more than an ordinary strike; both are proposed as questions in "Questions on the
-flurry".
+have reached past the front row, which the Fighter's close range never can. Nothing said
+whether "always land" means the flurry can't miss; that is proposed as a question in
+"Questions on the flurry".
 
 ## Change: The Fighter's bonus is the refill, for now
 
@@ -284,7 +282,7 @@ carries the type's whole damage at once. Its special is called Volley: it hits t
 the enemies one to each side of it, and the one directly behind it. If the target is in
 the enemy's back row, with nothing behind it, the extra hit spills forward instead — onto
 the position in front of the target. The target takes the full hit; its neighbours take
-reduced damage. Volley is an area attack, so it can't be dodged — evasion does nothing
+half that damage. Volley is an area attack, so it can't be dodged — evasion does nothing
 against it.
 
 The Archer's bonus charge condition is hitting the same target twice running. Specials
@@ -302,7 +300,7 @@ the enemies one to each side of it, and the one directly behind it. If the targe
 the enemy's back row, with nothing behind it, the extra hit spills forward instead — onto
 the position in front of the target. For now it spills forward only from the back row: an
 empty node behind a target in any other row just isn't hit. The target takes the full
-hit; its neighbours take reduced damage. Volley is an area attack, so it can't be dodged
+hit; its neighbours take half that damage. Volley is an area attack, so it can't be dodged
 — evasion does nothing against it.
 
 The Archer's bonus charge condition is hitting the same target twice running. Specials
@@ -360,10 +358,11 @@ alongside the Brute's cleave.
 Its special is a lingering field: it covers two columns of the enemy's grid. The field
 affects enemies only — it never damages the player's own members. The field deals damage
 through two separate events: a character standing in the field takes damage from it when
-that character begins its own attack, and a character that moves into the field, changing
-its position, takes damage for entering. Reaching in to attack from outside the field
-doesn't count as entering — an attacker reaching in to attack a character standing in the
-field takes no damage from it.
+that character begins its own attack — that damage lands before the attack does, so if it
+kills the character the attack never happens — and a character that moves into the field,
+changing its position, takes damage for entering. Reaching in to attack from outside the
+field doesn't count as entering — an attacker reaching in to attack a character standing
+in the field takes no damage from it.
 ```
 
 **Proposed:**
@@ -373,19 +372,18 @@ Its special is a lingering field: it covers two columns of the enemy's grid. The
 affects enemies only — it never damages the player's own members. A monster Mage's
 field lies on the party's grid, so it is the party it hurts: a field never damages the
 side that cast it. The field deals damage through two separate events: a character
-standing in the field takes damage from it when that character begins its own attack,
-and a character that moves into the field, changing its position, takes damage for
-entering. Reaching in to attack from outside the field doesn't count as entering — an
+standing in the field takes damage from it when that character begins its own attack —
+that damage lands before the attack does, so if it kills the character the attack never
+happens — and a character that moves into the field, changing its position, takes damage
+for entering. Reaching in to attack from outside the field doesn't count as entering — an
 attacker reaching in to attack a character standing in the field takes no damage from
 it. It stays for its whole length even when the enemy it was aimed at dies. For now the
 field's damage doesn't roll to hit, and it hurts a vanished Rogue standing in it too,
 without ending its Vanish.
 
-For now the field's damage lands before the attack does, so a character it kills never
-makes that attack. A special counts as beginning an attack, even one that strikes no one,
-like Vanish or Shields Up. The field hurts from the moment it's cast: a character standing
-in it that begins an attack later in the same tick takes its damage. The Brute's push past
-the front row isn't moving into it, since the Brute's node never changes.
+For now a special counts as beginning an attack, even one that strikes no one, like
+Vanish or Shields Up. The Brute's push past the front row isn't moving into it, since the
+Brute's node never changes.
 
 For now the two columns are the target's and the one to its right, or the one to its left
 when the target is in the right-hand column. How much the field does each time it deals
@@ -401,8 +399,7 @@ having the six types, a monster Mage's field is on the party's grid, which "the 
 own members" didn't foresee. Nothing said which two columns, how much the field does,
 whether it outlives the enemy it was aimed at, or whether it ends a vanished Rogue's
 Vanish. Which columns, how much, and Vanish are proposed as questions below. Nor did it
-say whether the field's damage comes before the attack it is set off by, whether a
-special counts as beginning an attack, whether the field hurts in the tick it's cast, or
+say whether a special counts as beginning an attack, whether the field hurts in the tick it's cast, or
 whether the Brute's push past the front row is a move into it; those are proposed as
 questions too, in "Questions on the field's timing".
 Nor did it say whether the field's damage pays defence the way an area attack does;
@@ -442,16 +439,12 @@ proposed as a question below.
 
 ```
 - What are the stats, skills and abilities for each individual type?
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
 ```
 
 **Proposed:**
 
 ```
 - What are the stats, skills and abilities for each individual type?
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
 - When Vanish fails because the Rogue is the only thing an enemy can reach, is that
   judged once for the whole attack, or again for each strike?
 - When an attack reaches further than its range usually would — the Brute's special,
@@ -478,12 +471,12 @@ proposed as a question below.
 - How much does the field do each time it deals damage — set from the Mage's damage when
   it's cast, or read again each time?
 - Does the field's damage end a Rogue's Vanish, the way an area attack does?
-- How often does each type's bonus condition pay? The sheets name the condition, not how
-  many times it pays in one attack.
+- How often does each type's bonus condition pay, the Brute's aside? The sheets name the
+  condition, not how many times it pays in one attack.
 ```
 
 **Why:** None of the docs answers these. The ones after the Tank's taunt over a vanished
-Rogue come from the defaults the six combat types are built with. The existing entries are
+Rogue come from the defaults the six combat types are built with. The existing entry is
 unchanged.
 
 ## Change: Questions on the field's timing
@@ -495,17 +488,13 @@ unchanged.
 **Now says:**
 
 ```
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
+- What are the stats, skills and abilities for each individual type?
 ```
 
 **Proposed:**
 
 ```
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
-- If the field's damage kills a character as it begins its attack, does that attack
-  still happen?
+- What are the stats, skills and abilities for each individual type?
 - Does a special count as beginning an attack for the field, including one that strikes
   no one, like Vanish or Shields Up?
 - Does a character standing in the field take its damage when it begins an attack in the
@@ -513,10 +502,10 @@ unchanged.
 - Does the Brute's push past the front row count as moving into a field?
 ```
 
-**Why:** The combat engine is built with a default for now on each of these, in "Where the
-Mage's field lies, and what it does, for now", and none of the docs settles them. The
-pending "Questions on Vanish, taunts and the field" change to this list is unchanged;
-these go after the entries it adds.
+**Why:** The combat engine is built with a default for now on the first and last of
+these, in "Where the Mage's field lies, and what it does, for now", and none of the docs
+settles them. The pending "Questions on Vanish, taunts and the field" change to this list
+is unchanged; these go after the entries it adds.
 
 ## Change: Questions on the flurry
 
@@ -527,24 +516,21 @@ these go after the entries it adds.
 **Now says:**
 
 ```
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
+- What are the stats, skills and abilities for each individual type?
 ```
 
 **Proposed:**
 
 ```
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
+- What are the stats, skills and abilities for each individual type?
 - "The first four strikes always land" — does that mean the flurry can't miss, or only
   that four strikes always happen?
-- "The flurry's strikes hit hard" — do they carry more than an ordinary strike?
 ```
 
-**Why:** The combat engine is built with a default for now on both, in "The flurry's
-checks and strikes for now, and its leftover strikes stay within reach", and none of the
-docs settles them. The pending "Questions on Vanish, taunts and the field" and "Questions
-on the field's timing" changes to this list are unchanged; these go after the entries
+**Why:** The combat engine is built with a default for now on this, in "The flurry's
+leftover strikes stay within reach, and its strikes can miss, for now", and none of the
+docs settles it. The pending "Questions on Vanish, taunts and the field" and "Questions
+on the field's timing" changes to this list are unchanged; this goes after the entries
 they add.
 
 ## Change: A question on the Fighter's bonus
@@ -556,15 +542,13 @@ they add.
 **Now says:**
 
 ```
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
+- What are the stats, skills and abilities for each individual type?
 ```
 
 **Proposed:**
 
 ```
-- The Fighter's fifth and sixth flurry strikes each turn on a Luck check — is that the
-  same check that can reset a cooldown, or a separate roll of its own?
+- What are the stats, skills and abilities for each individual type?
 - `Combat.md` gives every type's bonus 15 each time it's met, and this doc makes the
   Fighter's a refill to 90%. Is the Fighter's bonus the refill, 15, or both?
 ```

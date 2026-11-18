@@ -301,17 +301,17 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 **Now says:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 ```
 
 **Proposed:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 - Should help to a Rogue's or an Archer's Dexterity shorten its cooldown?
 - When a taunted member or enemy uses a special that hits its own choice of targets
   rather than one it aims at, is the taunt spent?
@@ -332,7 +332,7 @@ full at the guild hall, and where everyone stands carries over".
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Cooldowns`, third paragraph
+**Where:** `## Cooldowns`, the paragraph beginning "A cooldown is a number of ticks"
 
 **Now says:**
 
@@ -365,7 +365,7 @@ way, and rounding a half to the even tick, the way C# rounds by default, gives 6
 Whether help should shorten a cooldown is already proposed as a question in "Questions on
 specials, taunts and the dive", and it stays open.
 
-## Change: The clock, how a fight opens, and who goes first, for now
+## Change: The clock, and a multi-strike attack landing in one tick
 
 > Proposed 2026-11-13 · for review
 
@@ -392,35 +392,19 @@ The fight moves on only as time is handed to it. It never reads the frame rate o
 clock itself, so the same fight with the same rolls plays out the same however that time
 is split up — which is what lets a saved battle carry on exactly.
 
-For now a fight starts staggered: each combatant begins with a random share of its first
-wait already gone, somewhere between none of it and half of it. Both ends are
-placeholders; setting both to none gives everyone's empty, and both to all of it gives
-everyone's ready at once.
-
-Attacks go one after another in the order they became ready, the earlier first, so an
-attack that has been waiting goes before one whose cooldown only came up this tick.
-Between two that became ready in the same tick, the higher Dexterity goes first — the
-combatant's own, as for its cooldown — and if that's a tie too, a random draw decides,
-made once when the attack falls due. For now that order holds for every attack that falls
-due, waiting or not. A combatant killed earlier in the tick doesn't act. All the strikes
-of a multi-strike attack land in the tick the attack is made, each still rolled on its
-own.
+All the strikes of a multi-strike attack land in the tick the attack is made, each still
+rolled on its own.
 ```
 
-**Why:** The combat engine is built this way. Nothing said where cooldowns stand when a
-fight starts, who goes first when two come up together, or whether a multi-strike attack's
-strikes all land at once. The first and last stay open in `## Open Questions` as the
-original words them. The order is the user's, 2026-11-17, from close-range attacks that
-wait for their target: "let time stamps of attacks decide what comes first ... On ties
-the player with the higher dex goes first, if still a tie pick randomly." Who goes first,
-and whether that order is for every attack or only ones that wait, are proposed as
-questions below.
+**Why:** The combat engine is built this way. Nothing said whether a multi-strike
+attack's strikes all land in the tick the attack is made; `Combat.md` has them resolve
+one after another within the attack, and this keeps them in the one tick.
 
 ## Change: The free attack comes first, and a special gets no check, for now
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## The Luck Reset`, first paragraph
+**Where:** `## Luck Checks`, first paragraph
 
 **Now says:**
 
@@ -451,9 +435,8 @@ its very next attack, the one that charges its cooldown normally — the lockout
 further than the one free attack itself. Enemies get the Luck reset too, on the same terms
 as guild members. The free attack comes in the same tick, straight after the attack that
 earned it, and it's always the type's ordinary attack, never its special. For now a
-close-range fighter's free attack waits for its target like any other attack does, and
-while it waits it takes its turn in the order it became ready, not ahead of everyone
-else. For now a special gets no Luck check.
+close-range fighter's free attack waits for its target like any other attack does. For
+now a special gets no Luck check.
 ```
 
 **Why:** The combat engine is built this way. "Immediately" didn't say whether anyone else
@@ -500,18 +483,17 @@ nothing gives a specialist one. That's proposed as a question below.
 **Now says:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 ```
 
 **Proposed:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
-- When several cooldowns come up in the same tick, who goes first?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 - Is a special an attack for the Luck reset — does it get a check?
 - Does a free attack from the Luck reset count as one of the owner's three cycles for a
   lasting effect?
@@ -534,17 +516,17 @@ taunts and the dive" change to this list is unchanged; these go after the entrie
 **Now says:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 ```
 
 **Proposed:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 - Do a special's own hits — the Mage's field's damage among them — charge the bar it has
   just emptied?
 - Can a special earn its owner's bonus condition — a Brute's special landing on two or
@@ -619,7 +601,7 @@ time to react: at x3 a special's window is a third as long.
 battle screen is built with. This answers the original's open question "Can the player
 speed a fight up or slow it down, and does that change anything in the simulation or only
 how fast it's drawn?": only how fast it's drawn. The fight moves on only as time is handed
-to it, as the pending "The clock, how a fight opens, and who goes first, for now" change
+to it, as the pending "The clock, and a multi-strike attack landing in one tick" change
 says, so speed can't change what happens in it.
 
 ## Change: Speed question answered
@@ -705,17 +687,17 @@ built this way. Each "for now" is proposed as a question below.
 **Now says:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 ```
 
 **Proposed:**
 
 ```
-- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
-  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
-  close to absent early on, or should the curve start higher?
+- An enemy uses its special when its bar is full, but nothing says what decides the moment
+  or the target. Does it fire as soon as it can, or hold while a better target is in
+  reach?
 - When a fighter is already on its way to hit someone, and that someone's own turn comes
   up to attack a third character, should it stay put until the hit lands and the attacker
   is back?
@@ -725,8 +707,6 @@ built this way. Each "for now" is proposed as a question below.
   costs it time, or from when it became ready, so it catches up?
 - If the player marks a new focus target while a member is waiting to attack, does it
   switch to the new target?
-- Higher Dexterity first, then a random draw: does that order every set of attacks that
-  come up in the same tick, or only attacks that are waiting?
 - When a free attack from the Luck reset has a target that's out on an attack, does it
   wait like any other attack?
 - A fast fighter can be ready to attack again before it has walked home from its last
@@ -735,7 +715,6 @@ built this way. Each "for now" is proposed as a question below.
 ```
 
 **Why:** The combat engine is built with a default for now on each of these, in "A
-close-range attack waits for its target to be home", "The clock, how a fight opens, and
-who goes first, for now" and "The free attack comes first, and a special gets no check,
-for now". The pending changes to this list above are unchanged; these go after the
-entries they add.
+close-range attack waits for its target to be home" and "The free attack comes first, and
+a special gets no check, for now". The pending changes to this list above are unchanged;
+these go after the entries they add.
