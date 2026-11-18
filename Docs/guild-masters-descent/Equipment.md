@@ -159,11 +159,18 @@ crafter in the guild produces better than the shop's baseline.
 
 Weapon quality follows the Blacksmith's tier and armour quality the Armourer's — a
 grandmaster makes better weapons than an apprentice. The tier decides which class the
-crafter makes at; within that class, the crafter's Luck is what gives a crafted piece its
-edge over the shop's baseline, because the crafter adds its Luck stat when rolling for the
-band — the Blacksmith's Luck on a weapon, the Armourer's on armour. When the guild holds
-more than one Blacksmith, it is the Blacksmith assigned to the smithy whose tier and Luck
-set the weapon quality.
+crafter makes at. Within that class, it's the crafter's own main stat that sets where in
+the band the piece lands — the Blacksmith's Strength on a weapon, the Armourer's
+Constitution on armour.
+
+Luck then gets a check of its own, a pull from the crafter's own Luck bag: a False and the
+piece is made normally, at the quality its main stat set. A True raises the piece's
+quality, and a second pull follows — a second False holds it at that raise, a second True
+puts the piece at the maximum of its class's band. If the piece was already at that
+maximum before the check, a second True instead bumps it up to the next class.
+
+When the guild holds more than one Blacksmith, it is the Blacksmith assigned to the smithy
+whose tier, Strength and Luck set the weapon quality.
 
 ## Where Gear Comes From
 
@@ -256,8 +263,9 @@ materials.
   mission or a dive?
 - How narrow or wide can a rolled span be — can a piece come out with a single figure
   rather than a range, or with a span as wide as the whole band?
-- How does a crafter's Luck enter the roll — does it move where the span sits in the band,
-  widen it, or lift both ends?
+- A True raises a crafted piece's quality and two Trues put it at the maximum of its
+  class, but nothing says how much a raise is worth. And when a piece already at its
+  maximum goes up a class instead, where in the new class's band does it land?
 - Is dropped gear rolled the same way a crafted or bought piece is, and does its class
   follow the dungeon floor or the mission's rank?
 - Does the gold a repair costs scale with the piece's class, and which materials does a
