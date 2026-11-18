@@ -397,17 +397,24 @@ wait already gone, somewhere between none of it and half of it. Both ends are
 placeholders; setting both to none gives everyone's empty, and both to all of it gives
 everyone's ready at once.
 
-For now, when several cooldowns come up in the same tick, they go one after another:
-higher Dexterity first, then members before enemies, then the front row first, then left
-to right. Nothing in that order is random, and a combatant killed earlier in the tick
-doesn't act. All the strikes of a multi-strike attack land in the tick its cooldown comes
-up, each still rolled on its own.
+Attacks go one after another in the order they became ready, the earlier first, so an
+attack that has been waiting goes before one whose cooldown only came up this tick.
+Between two that became ready in the same tick, the higher Dexterity goes first — the
+combatant's own, as for its cooldown — and if that's a tie too, a random draw decides,
+made once when the attack falls due. For now that order holds for every attack that falls
+due, waiting or not. A combatant killed earlier in the tick doesn't act. All the strikes
+of a multi-strike attack land in the tick the attack is made, each still rolled on its
+own.
 ```
 
 **Why:** The combat engine is built this way. Nothing said where cooldowns stand when a
 fight starts, who goes first when two come up together, or whether a multi-strike attack's
 strikes all land at once. The first and last stay open in `## Open Questions` as the
-original words them, and who goes first is proposed as a question below.
+original words them. The order is the user's, 2026-11-17, from close-range attacks that
+wait for their target: "let time stamps of attacks decide what comes first ... On ties
+the player with the higher dex goes first, if still a tie pick randomly." Who goes first,
+and whether that order is for every attack or only ones that wait, are proposed as
+questions below.
 
 ## Change: The free attack comes first, and a special gets no check, for now
 
@@ -442,14 +449,16 @@ strikes land, it spends durability per hit the same as any other attack, and it 
 the special bar the same as any other attack. The member is eligible for a check again on
 its very next attack, the one that charges its cooldown normally — the lockout runs no
 further than the one free attack itself. Enemies get the Luck reset too, on the same terms
-as guild members. The free attack comes in the same tick, before anyone else acts, and
-it's always the type's ordinary attack, never its special. For now a special gets no Luck
-check.
+as guild members. The free attack comes in the same tick, straight after the attack that
+earned it, and it's always the type's ordinary attack, never its special. For now a
+close-range fighter's free attack waits for its target like any other attack does, and
+while it waits it takes its turn in the order it became ready, not ahead of everyone
+else. For now a special gets no Luck check.
 ```
 
 **Why:** The combat engine is built this way. "Immediately" didn't say whether anyone else
 could act first, and nothing said whether a special counts as an attack for the reset.
-That's proposed as a question below.
+That's proposed as a question below, and so is whether a free attack waits.
 
 ## Change: A specialist's cooldown, for now
 
@@ -631,3 +640,102 @@ this list above, stay as they are.
 
 **Why:** Answered: x1, x2 or x3, and it changes only how soon the fight is shown, written
 into Player Input.
+
+## Change: A close-range attack waits for its target to be home
+
+> Proposed 2026-11-17 · for review
+
+**Where:** `## Attacks and Reach`, last paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
+and the defender's mitigation is applied to it separately.
+```
+
+**Proposed:**
+
+```
+Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
+and the defender's mitigation is applied to it separately.
+
+A close-range fighter walks out to its target, strikes, and walks back to its own spot,
+and it never walks to a spot its target has left. When its attack comes up and the target
+it picks is out on an attack of its own, it waits until that target is back in its spot,
+then attacks. It also waits while its target is waiting to attack ahead of it, and goes
+after it. A waiting fighter keeps the target it picked, and picks again only if that
+target dies, goes out of its reach, or vanishes.
+
+Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
+attack is: a field it stands in hurts it first, whether it uses its special is decided
+then, and its strikes roll then. That's also when its next cooldown starts, when its Luck
+check is made, and when it counts as one of its attacks for a lasting effect.
+
+How long a fighter is out is worked out by the fight itself, from the same walk the battle
+screen draws, so the fight holds the same waits at any speed and when nothing is drawn at
+all. Retiming an attack's animation changes how long a fighter is out, and so how a fight
+with the same rolls plays out.
+
+For now:
+
+- A fighter someone is on the way to hit stays put until that attacker is home, whoever it
+  was going to attack.
+- Only close-range fighters wait. An Archer or a Mage shoots its target where it is, out
+  on an attack or not, and the shot follows it.
+- A fighter whose cooldown comes up, or who earns a free attack, before it's home walks
+  home first and then goes out again.
+- A waiting fighter's next cooldown starts when it finally attacks, not from when it
+  became ready.
+- Marking a new focus target doesn't change the target a waiting member has already
+  picked.
+```
+
+**Why:** The user, 2026-11-17: "the attacker needs to wait for the attacked to be in the
+spot and not on the attack" — two fighters going for each other at once each jumped to
+the other's empty spot and swung at thin air. The combat engine and the battle screen are
+built this way. Each "for now" is proposed as a question below.
+
+## Change: Questions on a close-range attack waiting
+
+> Proposed 2026-11-17 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+```
+
+**Proposed:**
+
+```
+- At F rank a member's Luck is single-digit, which puts the reset chance near one attack
+  in forty — a member might see one reset in a whole dive. Is the reset meant to be that
+  close to absent early on, or should the curve start higher?
+- When a fighter is already on its way to hit someone, and that someone's own turn comes
+  up to attack a third character, should it stay put until the hit lands and the attacker
+  is back?
+- Should an Archer or a Mage also wait to shoot someone who is out on an attack, or shoot
+  them where they are, the shot following them?
+- A waiting fighter's next cooldown: does it start when it finally attacks, so waiting
+  costs it time, or from when it became ready, so it catches up?
+- If the player marks a new focus target while a member is waiting to attack, does it
+  switch to the new target?
+- Higher Dexterity first, then a random draw: does that order every set of attacks that
+  come up in the same tick, or only attacks that are waiting?
+- When a free attack from the Luck reset has a target that's out on an attack, does it
+  wait like any other attack?
+- A fast fighter can be ready to attack again before it has walked home from its last
+  attack, and a lucky one gets a free attack straight away. Should it walk home first and
+  then go out again, or attack again from where it stands?
+```
+
+**Why:** The combat engine is built with a default for now on each of these, in "A
+close-range attack waits for its target to be home", "The clock, how a fight opens, and
+who goes first, for now" and "The free attack comes first, and a special gets no check,
+for now". The pending changes to this list above are unchanged; these go after the
+entries they add.
