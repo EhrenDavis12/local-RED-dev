@@ -105,6 +105,5 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
-- Capacity is counted in slots and an ordinary member carries five, but the Porter adds
-  "a lot more" and the Herbalist and Miner "slightly more" with no figure for either.
-  How many slots does each of them add?
+- The Herbalist and the Miner carry slightly more than an ordinary member and less than
+  a Porter, with no figure for either. How many slots does each of them carry?

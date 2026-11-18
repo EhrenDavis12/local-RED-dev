@@ -40,8 +40,18 @@ from Constitution alone.
 
 ## The Porter
 
-The Porter adds a lot more carrying capacity on top of what any party member already
-carries.
+A Porter carries the base 5 slots any member carries, plus 5 for each tier it has
+reached. The slot system itself is covered in the Dungeon doc.
+
+- Novice — 10 slots
+- Apprentice — 15
+- Journeyman — 20
+- Adept — 25
+- Master — 30
+- Grandmaster — 35
+- Grandmaster S — 40
+- Grandmaster SS — 45
+- Grandmaster SSS — 50
 
 ## The Cook
 
