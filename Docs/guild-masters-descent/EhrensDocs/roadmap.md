@@ -142,11 +142,11 @@ The dungeon board, finding and entering dungeons, and training missions.
   the Rogue's ordinary strikes when the target dies, the Rogue's evasion against a capped
   Archer streak for now, the Rogue's bonus for now, the flurry's leftover strikes staying
   within reach and its strikes able to miss for now, a failed Vanish fails for one strike,
-  Volley and the Archer's streak for now, the Mage's column, field, the field's defence,
-  timing and bonus for now, open questions on Vanish, taunts, the field and the types'
-  defaults, on the field's timing, and on the flurry, the Fighter's bonus as the refill for
-  now, an open question on the Fighter's bonus, the flurry's Luck pull coming as it begins
-  for now, and a question on the flurry's pull).
+  Volley and the Archer's streak for now, the Mage's column, field, the field's defence and
+  wear, timing and bonus for now, open questions on Vanish, taunts, the field and the
+  types' defaults, on the field's timing, and on the flurry, the Fighter's bonus as the
+  refill for now, an open question on the Fighter's bonus, the flurry's Luck pull coming as
+  it begins for now, and a question on the flurry's pull).
 - `EhrensDocs/Look and Feel.md` — new doc proposed for the originals (Look and Feel): the
   user's approved look for the game, gathered from the animation work.
   - Battle scene (meadow)

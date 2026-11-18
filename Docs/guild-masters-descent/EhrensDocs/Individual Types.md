@@ -427,8 +427,9 @@ when the target is in the right-hand column. How much the field does each time i
 damage, before defence, is set once, when it's cast: a share, a placeholder, of the Mage's
 Intelligence, with help, plus one roll of its staff. That figure isn't rounded. For now
 each time the field deals damage it's an area attack: it pays two-thirds of the victim's
-defence, worked with the Mage's K, and the victim's armour is rolled afresh for it the
-way it is for a strike. Each of those hits rounds once, after defence.
+defence, worked with the Mage's K, and the victim's armour, and a Tank's shield, are
+rolled afresh for it the way they are for a strike. Each of those hits rounds once, after
+defence, and spends a use of each of them, the way a strike that lands does.
 ```
 
 **Why:** The combat engine and the six combat types are built this way. With monsters
@@ -441,6 +442,9 @@ whether the Brute's push past the front row is a move into it; those are propose
 questions too, in "Questions on the field's timing".
 Nor did it say whether the field's damage pays defence the way an area attack does;
 `Guild Members.md` asks that in its open questions, and it stays open there.
+A field hit wears the armour and shield it's defended with because `Equipment.md`
+`## Durability` has armour wear from everything, the Mage's field named, and a shield
+spends a use wherever the armour spends one.
 
 ## Change: The Mage's bonus pays per hit, for now
 
