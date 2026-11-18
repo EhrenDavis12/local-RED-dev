@@ -591,6 +591,50 @@ proposed as questions in "Questions on the Luck bag's defaults". Help from the s
 stays off Luck the way "How a cooldown rounds, and whose Dexterity counts" keeps it off
 Dexterity.
 
+## Change: The opening check is a pull from the combatant's own bag, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Cooldowns`, the paragraph beginning "Cooldowns start empty at the beginning
+of a fight"
+
+**Now says:**
+
+```
+Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
+enemy alike — makes one Luck check of its own as the fight begins, using the same chance
+as the mid-fight reset below in Luck Checks. It's a separate roll, not tied to that
+one. On success, the combatant starts the fight ready instead of empty, attacking on the
+first tick rather than waiting out its first cooldown. On failure, it waits out that first
+cooldown like normal. A success is a full jumpstart, not a partial charge — the combatant
+is either ready or it isn't.
+```
+
+**Proposed:**
+
+```
+Cooldowns start empty at the beginning of a fight. But every combatant — guild member and
+enemy alike — makes one Luck check of its own as the fight begins, using the same chance
+as the mid-fight reset below in Luck Checks. For now that check is one pull from the
+combatant's own bag, the way every Luck check it makes is, so a member's opening pull uses
+up a token from the bag they carry between battles. On success, the combatant starts the
+fight ready instead of empty, attacking on the first tick — the tick the fight starts on,
+before any wait has passed — rather than waiting out its first cooldown. On failure, it
+waits out that first cooldown like normal. A success is a full jumpstart, not a partial
+charge — the combatant is either ready or it isn't. For now that first attack is an
+ordinary attack, not a free one: it gets the Luck reset check after it, counts as one of
+its owner's cycles for a lasting effect, and can be a special if the bar is full. The
+check is made only when a fight really begins, never when a battle is set up just to show
+who's in it, the way party planning does.
+```
+
+**Why:** The combat engine is built this way. The original calls the opening check a
+separate roll at the reset's chance, and Luck Checks has every Luck check a character
+makes draw from the same bag; the engine pulls from the bag for now. Nothing said whether
+an attack on the first tick is an ordinary attack or a free one. Both are proposed as
+questions in "Questions on the Luck bag's defaults". A battle set up only to show its
+fighters pulls nothing because a pull from a member's bag can't be handed back.
+
 ## Change: Questions on the Luck bag's defaults
 
 > Proposed 2026-11-18 · for review
@@ -618,14 +662,18 @@ Dexterity.
 - The Luck check each combatant makes as a fight begins is called "a separate roll", using
   "the same chance" as the reset. Now that every Luck check a character makes draws from
   its own bag, is the opening check a pull from that bag too, or a roll of its own?
+- A combatant that starts the fight ready attacks on the first tick. Is that an ordinary
+  attack — with the Luck reset check after it, counting as one of its owner's cycles for a
+  lasting effect, and a special if its bar is full — or a free attack that gets none of
+  that?
 ```
 
-**Why:** The combat engine is built with a default for now on the first two, in "Every
-character's own Luck bag, and when no token is pulled, for now". The third is the
+**Why:** The combat engine is built with a default for now on all four: the first two in
+"Every character's own Luck bag, and when no token is pulled, for now", the last two in
+"The opening check is a pull from the combatant's own bag, for now". The third is the
 original's own: Cooldowns calls the opening check a separate roll at the reset's chance,
-and Luck Checks has every Luck check a character makes draw from the same bag. The combat
-engine doesn't make the opening check yet. The pending changes to this list above are
-unchanged; these go after the entries they add.
+and Luck Checks has every Luck check a character makes draw from the same bag. The pending
+changes to this list above are unchanged; these go after the entries they add.
 
 ## Change: The fight can be paused, for now
 
