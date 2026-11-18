@@ -64,11 +64,15 @@ injuries heal while the player is away.
 ## Not included
 
 User (2026-11-11): "not included in the first version we are going for a MVP like a POC." So:
-guild ranks above F, the other six specialists, crafting, and the rank ladder past the first
+the other six specialists, crafting, and the rank ladder past the first
 promotion are all out of the first version. User (2026-11-11): "yes move them out of the MVP for now" —
 timed missions are out of the first version too. User (2026-11-11): "leave it out for now will
 reintroduce that later. its not needed for MVP" — training missions (automatic dungeon runs
 for experience, sent from the dungeon board) are out of the first version.
+
+User (2026-11-17), on guild ranks and finding dungeons: "If the Docs dont describe it then we
+cant do it." So: guild ranks above F and finding dungeons are back in, built only as far as the
+design docs describe them.
 
 ## Later
 
