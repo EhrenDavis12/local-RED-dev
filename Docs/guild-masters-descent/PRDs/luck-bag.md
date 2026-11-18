@@ -27,11 +27,31 @@ Luck curve.
 
 The requirements are in three groups so the test stage can be split by group: **A**, the
 bag and the save; **B**, what draws from the bag in combat; **C**, the tuning file. A is
-independent of B. B relies on A's pull.
+independent of B, and B relies on A's API (A0). The planned order is A first, then B and C
+together.
 
 ## Requirements
 
 ### Group A: the bag and the save
+
+**A0. The API both test groups build against.** Keep it to this:
+
+- `LuckBag`, a `[Serializable]` class in `GuildMastersDescent.Core`:
+  - `public const int Size = 50;`
+  - `public int TokensLeft;` and `public int TruesLeft;`
+  - `public static int TruesFor(int luck)`: the A2 count.
+  - `public void Fill(int luck)`: sets `TokensLeft = Size` and `TruesLeft = TruesFor(luck)`.
+  - `public bool Pull(IRng rng, int luck)`: one pull, per A3 and A4.
+- `Member.Bag`, a `public LuckBag` field, saved with the guild.
+- `Combatant.Bag`, read-only. It returns `Member.Bag` for a member and the monster's own
+  bag for a monster.
+- `BattleCombatantSave.Bag`, a `LuckBag`. It is written for a monster entry only, because a
+  member's bag is saved on the member.
+
+A test fixture gets a filled bag by calling `Fill(luck)`, or sets `TokensLeft` and
+`TruesLeft` directly.
+*Source:* the PRD's own, so that groups A and B share one surface. The names are binding on
+the code. What sits behind them is not.
 
 **A1. Who has a bag.** Every character that fights has its own bag: every guild member,
 divers and specialists alike, and every monster. No bag is shared.
@@ -62,13 +82,19 @@ can script a True or a False.
 using the character's own Luck at that moment. Nothing else refills or rebuilds a bag: not
 a new battle, floor, dive or mission, and not a level-up, a promotion or a change in Luck. A
 bag is never re-checked against the character's current Luck.
+
+A pull that finds the bag empty, with 0 tokens left, fills it first from the character's
+current Luck and then pulls. That is the same rule, that only emptiness refills a bag,
+applied to a bag that was never filled. A `Member` built directly with no bag filled, as
+`DiveRunTestKit.RawMember` does, therefore pulls normally.
 *Source:* `Combat.md` § Luck Checks: "Once every token has been pulled, the bag fills back
 up — and that's the only thing that refills it"; a member that levels up "keeps it exactly
 as it is, and a refill uses the member's Luck as it stands at that moment".
 
-**A5. The first bag.** A character's first bag is full, filled from its Luck when the
-character is made. A member's is filled when it joins the guild. A monster's is filled when
-it is added to its battle.
+**A5. The first bag.** A new character's bag is filled when the character is made. For a
+member that is `Member.CreateNew` and `Member.CreateFromCandidate`. For a monster it is when
+the monster is added to its battle. `Battle.AddMember` never touches a member's bag, because
+the party grid builds a throwaway battle from real members (`PartyGridView.cs:172`).
 *Source:* none. The docs do not say how a bag starts. This is the PRD's default, listed
 under Open Questions.
 
@@ -78,7 +104,10 @@ and it is saved with the guild. A monster's bag lasts only for its battle, and i
 when that battle is saved.
 *Source:* `Combat.md` § Luck Checks: "A part-used bag carries over rather than resetting,
 from one battle to the next and from one floor to the next", and only emptying refills it
-(A4).
+(A4). The member half is settled. The monster half is the PRD's own default, listed under
+Open Questions. "Enemies get the Luck reset too, on the same terms as guild members"
+(`Combat.md:113-114`) can be read either way on whether a monster's bag works like a
+member's.
 
 **A7. The save.** The save version goes from 11 to 12. For each bag, the save holds how many
 tokens are left and how many of them are True. A battle saved partway through and loaded
@@ -88,17 +117,23 @@ same holds for a member whose bag is saved between battles or between dives.
 out exactly as it would have … closing and opening the game can't re-roll an attack or dodge
 a death", and a save from a newer version is reported rather than read.
 
-**A8. Older saves.** A save from version 11 or older loads every member with a full bag,
-filled from the member's Luck as the save loads. Every monster in a saved battle loads the
-same way.
+**A8. Older saves.** In a save from version 11 or older, every member and every monster in a
+saved battle loads with an empty bag. Each bag then fills from that character's Luck at its
+first pull (A4). This is not a repair: the save predates the bag, and no repair entry is
+added for it. That follows the pre-dungeons rule at `SaveManager.cs:203-204`.
 *Source:* `EhrensDocs/Platform.md` § Saving: a save made by an older version still loads.
-The full bag is this PRD's default, listed under Open Questions.
+The empty bag is this PRD's default, listed under Open Questions.
 
-**A9. A bag that can't be true.** A saved bag can't be true if it has no tokens left, more
-than 50 tokens, a negative count, or more Trues than tokens. Such a bag loads as a full bag
-filled from the character's current Luck, and the save still loads. A bag is never judged
-against the character's Luck, because a level-up legitimately leaves a bag whose Trues no
-longer match it (A4).
+**A9. A bag that can't be true.** A saved bag can't be true if it holds more than 50
+tokens, a negative count, or more Trues than tokens. An empty bag is valid (A4). In a
+version 12 save:
+- A member's impossible bag is emptied as it loads, the save still loads, and the fix is
+  listed among the load's repairs.
+- A monster's impossible bag in a saved battle is emptied as it loads. No repair entry is
+  added, because the battle restore keeps no repair list.
+
+A bag is never judged against the character's Luck, because a level-up legitimately leaves a
+bag whose Trues no longer match it (A4).
 *Source:* `EhrensDocs/Platform.md` § Saving, "For now": the fix-it-as-it-loads pattern used
 for potions and special bars. Applying it to the bag is this PRD's default, listed under
 Open Questions.
@@ -114,8 +149,11 @@ it finally attacks.
 free attack comes first, and a special gets no check, for now" and "A close-range attack
 waits for its target to be home".
 
-**B2. No reset pull once the fight is over.** If the attack ended the battle, no reset pull
-is made and no token is spent.
+**B2. No reset pull when no free attack can follow.** No reset pull is made, and no token
+is spent, in either of these cases:
+- the attack ended the battle;
+- the attacker is no longer alive when its attack finishes.
+
 *Source:* none. This is the PRD's default, listed under Open Questions. Its reason is that
 `Combat.md` says the bag exists to guarantee the lucky event arrives, and a True pulled when
 no free attack can follow would be thrown away.
@@ -124,7 +162,8 @@ no free attack can follow would be thrown away.
 it is aimed at. A True means the strike misses. Each strike of a multi-strike attack pulls on
 its own, and each of the three enemies a Brute's cleave reaches pulls from its own bag. A
 miss from a pull counts as a miss for every rule that reads one. This replaces the
-miss-chance roll at `Battle.cs:611-616`.
+miss-chance roll at `Battle.cs:611-616`. Evasion tests must not use an Archer's streak shot
+as the attacker, because what the streak does to a pull is open (#127, see Out of Scope).
 *Source:* `Combat.md` § Luck Checks: "when a member is attacked, it pulls one token, and a
 True means the attack misses … it needs no chance of its own". `Combat.md` § Attacks and
 Reach: each strike "rolls to hit separately". `Individual Types.md` § The Brute: "each of
@@ -165,14 +204,39 @@ holds today:
 - the flurry pull comes before the flurry's first strike.
 
 No other draw moves.
+
+A pull draws over `(0, TokensLeft)`. That range can be the same as other draws that start at
+0, such as the targeting draw over `(0, weights total)`. A test that routes rng values by
+range has to tell these apart.
 *Source:* the code's fixed roll order (`Battle.cs:605-607`), which the scripted-rng tests
 depend on.
+
+**Existing tests this change breaks. Group B owns rewriting all of them**, so that only one
+test author edits `CombatTestKit`. Group A adds no changes to shared kits. Any fixture group
+A needs goes in its own new file.
+- `CombatTestKit.MissChance` (`CombatTestKit.cs:120-121`), and the fixture asserts that call
+  it in `CombatArcherTests`, `CombatGearWearTests`, `CombatLuckResetTests`,
+  `CombatRogueTests`, `CombatShieldTests`, `CombatStrikeTests`, `CombatTargetingTests`,
+  `CombatTypeContractReachTests`, `CombatTypesSharedTests` and `DamageMathTests`.
+- `CombatStrikeTests`: the miss-chance roll and cap tests (around lines 298-330).
+- `CombatLuckResetTests`: the percentage-roll check test (around line 67).
+- `DamageMathTests`: the flurry helpers `FlurryLuck`, `CheckMax` and `CheckBelow` (around
+  lines 715-717), and every flurry test that scripts them.
+- The tuning-name `TestCase`s for the removed entries: `DamageMathTests` (around lines
+  1392-1393) and `CombatResultTests` (around lines 223-224).
+- `CombatArcherTests`: the accuracy-raise tests (from around line 232). Remove them, and do
+  not replace them while #127 is open.
+- `CombatContractTests`: the `MissChanceReduction` test (around lines 141-162).
+- `CombatTypesSharedTests`: the monster Archer's streak-accuracy test (around line 159).
+  Keep its streak-charge half.
 
 ### Group C: the tuning file
 
 **C1. What leaves.** `MissChancePercentPerLuck`, `MissChanceCapPercent`,
 `FlurryLuckCeilingPercent` and `FlurryLuckConstant` are removed from `Tuning.cs`, and nothing
-reads a miss chance or a flurry Luck curve any more.
+reads a miss chance or a flurry Luck curve any more. `TargetPlan.MissChanceReduction`
+(`Contract.cs:74`) stays and the Archer still sets it, but nothing reads it until #127 is
+answered.
 *Source:* `Combat.md` § Luck Checks: evasion "needs no chance of its own — it's the bag's own
 density of Trues". `Individual Types.md` § The Fighter: the flurry is decided by one pull.
 
@@ -208,14 +272,16 @@ Checks says "there's no cap rule".
 - "The first four strikes always land" — does that mean the flurry can't miss, or only that
   four strikes always happen? *(`EhrensDocs/Individual Types.md`, "Questions on the flurry"; B5
   builds its default)*
-- *Proposal, this PRD's:* does a new character's first bag start full, filled from its
-  Luck when it is made (A5)?
+- *Proposal, this PRD's:* is a new character's first bag filled when the character is made
+  (A5)?
+- *Proposal, this PRD's:* does a monster's bag last only for its own battle, new and full
+  when the monster joins it (A6)?
 - *Proposal, this PRD's:* does a save from before the bag load each member, and each monster
-  in a saved battle, with a full bag filled from current Luck (A8)?
-- *Proposal, this PRD's:* is a saved bag that can't be true fixed by refilling it as it
-  loads, or is the save refused (A9)?
-- *Proposal, this PRD's:* when an attack ends the battle, is the reset pull skipped so no
-  token is spent (B2)?
+  in a saved battle, with an empty bag that fills at its first pull (A8)?
+- *Proposal, this PRD's:* is a saved bag that can't be true emptied as it loads, or is the
+  save refused (A9)?
+- *Proposal, this PRD's:* when an attack ends the battle, or the attacker is dead when its
+  attack finishes, is the reset pull skipped so no token is spent (B2)?
 - *Proposal, this PRD's:* is the flurry's pull made as the flurry begins, and so spent even
   if the fight ends within the first four strikes (B6), or only after the fourth strike, and
   not at all once the fight is over?
