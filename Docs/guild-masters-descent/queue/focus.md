@@ -55,6 +55,12 @@ injuries heal while the player is away.
 
 <!-- What matters most this week. Every auto job serves a line of this. -->
 
+- User (2026-11-17): "I don't want your progress to stop. Keep going create more jobs. If
+  there's anything left in the documentation that we haven't actually completed yet let's go
+  ahead and start those jobs too." So: keep the queue full — build whatever the design docs
+  settle that the game does not do yet, including the other dev's newest edits (Combat, Battle
+  Test, Individual Types).
+
 ## Not included
 
 User (2026-11-11): "not included in the first version we are going for a MVP like a POC." So:
