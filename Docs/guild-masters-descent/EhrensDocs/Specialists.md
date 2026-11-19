@@ -42,15 +42,17 @@ grows are proposed as questions for `## Open Questions`.
 **Now says:**
 
 ```
-- A weapon and a piece of armour are each rolled from a band for their kind and class —
-  what is it that a potion rolls, for the Alchemist's Luck to improve?
+- A weapon and a piece of armour each roll from a band for their kind and class — what
+  does a buff potion roll: how much it raises a stat by, and whether it has bands of
+  its own?
 ```
 
 **Proposed:**
 
 ```
-- A weapon and a piece of armour are each rolled from a band for their kind and class —
-  what is it that a potion rolls, for the Alchemist's Luck to improve?
+- A weapon and a piece of armour each roll from a band for their kind and class — what
+  does a buff potion roll: how much it raises a stat by, and whether it has bands of
+  its own?
 - Do two Cooks both heal?
 - How does a Cook's heal grow with its level and with promotion?
 ```

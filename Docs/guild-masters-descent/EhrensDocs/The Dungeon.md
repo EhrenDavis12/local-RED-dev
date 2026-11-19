@@ -31,7 +31,7 @@ through the mission board" said every dungeon is found, and the starting one isn
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## The Dungeon`, third paragraph
+**Where:** `## The Dungeon`, fourth paragraph
 
 **Now says:**
 
@@ -93,7 +93,7 @@ retreating, is the next change. Answered 2026-11-14, too: "you enter a level and
 level should go through" — a floor's battles play back to back, with no screen after
 each one showing what was gained and waiting for a click on Continue.
 
-## Change: A party can turn back anywhere, and carries only so much gold out
+## Change: A party can turn back anywhere, and carries out only what it has room for
 
 > Proposed 2026-11-11 · for review
 
@@ -122,33 +122,27 @@ since the last rest area. "Anywhere" includes the middle of a battle: a Retreat 
 is there all through a floor's battles, and the party can leave with it at any moment.
 For now a battle that ends in a stand-off counts as the party turning back there.
 
-There is a carry limit for each person. Each member can carry up to 10 gold coming out,
-and each Porter up to 100. Gold beyond what the party can carry is left behind. Both
-numbers are made up for now, to be balanced later.
-
-For now a Porter's 100 is on top of the 10 every member carries. The party holds all the
-gold it finds while it's inside, and the limit only bites on the way out: leaving between
-rest areas first loses the gold found since the last one, and then whatever is left over
-the limit stays behind. Only the living carry, so a party with no one left alive brings
-nothing out. A dead member's gear doesn't count against the limit.
+For now the party holds all the gold it finds while it's inside, and its carrying
+capacity only bites on the way out: leaving between rest areas first loses the gold found
+since the last one, and then whatever the party has no room left for stays behind. Only
+the living carry, so a party with no one left alive brings nothing out. A dead member's
+gear takes up none of the party's carrying capacity.
 ```
 
-**Why:** Answered: yes, there is a carry limit each person — up to 10 gold coming out, a
-Porter 100 gold per porter, made-up numbers to balance later. And: yes, turn back
-anywhere, losing the gold found since the last rest area. The original names the rest
-area as where the player may exit, and its retreat sentence only implies leaving
-elsewhere; this says so outright. "Any party member can carry some of it, so how much is
-lost depends on who came along" no longer holds: turning back between rest areas loses
-all the gold found since the last rest area whoever came along, and who came along
-decides instead how much gold comes out at all. Not settled by this: whether a Porter's
-100 is on top of the 10 every member carries, how much more the Herbalist and the Miner
-carry, and how a dead member's gear counts against a limit measured in gold.
-The dive is built with a default for now on the first and the last of those, in the
-third paragraph, and with defaults on rest areas and stand-offs in the first; each is
-proposed as a question for `## Open Questions`. Answered 2026-11-14: the party can
-retreat at any time, the middle of a battle included — "you can holler a retreat sign
-that will take them out". Which gold a retreat keeps is proposed as a question in
-"A question on what gold a retreat keeps".
+**Why:** Answered: yes, turn back anywhere, losing the gold found since the last rest
+area. The original names the rest area as where the player may exit, and its retreat
+sentence only implies leaving elsewhere; this says so outright. "Any party member can
+carry some of it, so how much is lost depends on who came along" no longer holds:
+turning back between rest areas loses all the gold found since the last rest area
+whoever came along, and who came along decides instead how much comes out at all, by the
+slots each member carries — the original's own paragraph on capacity, after this one.
+Not settled by the original's slots: when the capacity bites, and how a dead member's
+gear counts against it. The second paragraph has a default for now on both, and the
+first has defaults on rest areas and stand-offs; each is proposed as a question for
+`## Open Questions`. Answered 2026-11-14: the party can retreat at any time, the middle
+of a battle included — "you can holler a retreat sign that will take them out". Which
+gold a retreat keeps is proposed as a question in "A question on what gold a retreat
+keeps".
 
 ## Change: How a heal in the dive lands, for now
 
@@ -282,7 +276,8 @@ floor for the deepest floor reached. Both are proposed as questions for
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Entering the Dungeon`, last paragraph (new paragraphs after it)
+**Where:** `## Entering the Dungeon`, the paragraph beginning "The player re-enters at the
+last rest area reached" (new paragraphs after it)
 
 **Now says:**
 
@@ -350,8 +345,8 @@ the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
 
 **Why:** The user, 2026-11-14: "they won't gain any of that gold for that level. You
 should still continue with the gold they had. Before the level." The change "A party can
-turn back anywhere, and carries only so much gold out" has a retreat between rest areas
-lose all the gold found since the last rest area, and the two may not agree.
+turn back anywhere, and carries out only what it has room for" has a retreat between rest
+areas lose all the gold found since the last rest area, and the two may not agree.
 
 ## Change: Questions on the dive's defaults
 
@@ -372,10 +367,10 @@ lose all the gold found since the last rest area, and the two may not agree.
 - Is a rest-area floor a floor of battles with a rest at the end, or a safe floor with no
   battles?
 - What does a battle that ends in a stand-off do to the dive?
-- Does a Porter carry 100 in total, or 110 — the 100 on top of the 10 everyone carries?
 - When does the carry limit bite: is extra gold lost as soon as it's found, or only when
   the party walks out?
-- How does a dead member's gear count against a carry limit measured in gold?
+- How does a dead member's gear count against the party's carrying capacity, now counted
+  in slots?
 - Is a floor's set of monsters the same every dive, or new each time?
 - When does a floor count as reached, for the deepest floor reached?
 - "The last rest area reached": is that the deepest rest area ever reached, or the one the

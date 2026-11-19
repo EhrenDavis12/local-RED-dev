@@ -10,17 +10,7 @@ Reply under each question, or by number (e.g. "1: 110, 3: A"). Skip any you want
 
 ### Loot and carrying gold
 
-Each member can carry 10 gold out of the dungeon. A Porter can carry 100.
-
-1. **Porter's gold.** Does a Porter carry 100 in total, or 100 on top of the normal 10, so
-   110? (Cheap to change.)
-
-   **Answer:**
-
-2. **Herbalist and Miner.** They carry a bit more than a normal member but less than a
-   Porter. How much gold each? For example 20. (Cheap to change.)
-
-   **Answer:**
+Capacity is counted in slots: every member carries 5, and a healing potion or an item of loot takes 1 slot each.
 
 3. **A dead member's gear.** When a member dies in the dungeon, how does their gear get
    home? (Fairly easy to change.)

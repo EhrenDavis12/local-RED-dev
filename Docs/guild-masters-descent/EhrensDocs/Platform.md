@@ -47,9 +47,8 @@ loads with none in the stores and none on any member, a save from before shields
 with no shields in the stores and none on any Tank, and a save from before the Luck bag
 loads every member, and every enemy in a saved battle, with an empty bag that fills from
 that character's Luck at its first pull. A saved battle is never judged against a
-placeholder number — a fighter left waiting longer than its own cooldown is accepted, and
-so is a member holding a potion while under the drink threshold — so rebalancing a
-placeholder can't turn a good save into one the game can't read.
+placeholder number — a fighter left waiting longer than its own cooldown is accepted — so
+rebalancing a placeholder can't turn a good save into one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
@@ -68,9 +67,8 @@ For now:
   specialist, in a slot that isn't its own, on two members at once, or gear that's no
   longer in the stores — is fixed as it loads: the gear comes off and goes back to the
   stores, and the save loads. Gear on two members stays with the one hired first.
-- A save holding fewer than no potions in the stores, or a potion slot holding anything
-  but one potion or none, is fixed as it loads: the stores go to none or the slot is
-  emptied, and the save loads.
+- A save holding fewer than no potions in the stores is fixed as it loads: the stores go
+  to none, and the save loads.
 - A special bar saved below empty or past full is brought back inside the bar as it
   loads, and a dive saved between battles where every bar should be empty — at a rest
   area, or before a floor's first battle — loads with them empty.

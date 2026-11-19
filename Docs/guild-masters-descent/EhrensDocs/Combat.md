@@ -296,7 +296,8 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -487,7 +488,8 @@ nothing gives a specialist one. That's proposed as a question below.
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -522,7 +524,8 @@ taunts and the dive" change to this list is unchanged; these go after the entrie
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -650,7 +653,8 @@ fighters pulls nothing because a pull from a member's bag can't be handed back.
 
 > Proposed 2026-11-18 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -720,7 +724,8 @@ goes after these.
 
 > Proposed 2026-11-16 · for review
 
-**Where:** `## Player Input`, last paragraph (a new paragraph after it)
+**Where:** `## Player Input`, the paragraph beginning "The fight doesn't wait for the
+player" (a new paragraph after it)
 
 **Now says:**
 
@@ -880,7 +885,8 @@ this way.
 
 > Proposed 2026-11-17 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 

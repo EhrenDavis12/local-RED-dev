@@ -134,11 +134,11 @@ member is below F. A mission that's sent gives no experience, and it doesn't tou
 health or wear gear.
 
 For now, while a member is out on a mission they can't be taken on a dive, sent on
-another mission, be promoted or be dismissed — not until they're back. Their gear and
-carried healing potion can still be put on and taken off while they're out, since the
-outcome is fixed at sending and never reads gear; it can't be changed while they're in a
-dive. The next time the hall is shown after a sent mission ends, a notice says how it
-went: the gold it paid, or who came home injured.
+another mission, be promoted or be dismissed — not until they're back. Their gear can
+still be put on and taken off while they're out, since the outcome is fixed at sending
+and never reads gear; it can't be changed while they're in a dive. The next time the hall
+is shown after a sent mission ends, a notice says how it went: the gold it paid, or who
+came home injured.
 
 How many missions can run at once, how many the board offers, how often it restocks, how
 long a mission takes, what it pays and how likely each kind is to fail are all
@@ -214,11 +214,10 @@ player has stepped back out to the guild hall — not until the dive ends, the s
 member away on a mission.
 ```
 
-**Why:** The game is built this way. Dismissing a member partway through a dive would put
-the potion they carry back in the stores while the dive still counts them, handing out a
-free potion, and it can break the save. It's a default the build chose, recorded as cheap
-to change and not yet the user's word, and it's proposed as a question in "A question on
-dismissing a member on a dive".
+**Why:** The game is built this way. Dismissing a member partway through a dive can break
+the save. It's a default the build chose, recorded as cheap to change and not yet the
+user's word, and it's proposed as a question in "A question on dismissing a member on a
+dive".
 
 ## Change: A question on dismissing a member on a dive
 

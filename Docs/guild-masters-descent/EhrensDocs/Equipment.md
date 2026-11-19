@@ -104,16 +104,15 @@ If a member dies in the dungeon, the party brings their gear back if there's roo
 in the party's carrying capacity — the same capacity the Porter adds a lot of and any
 member contributes to by carrying some of the loot; otherwise the gear is lost.
 
-For now, though, a dead member's gear always comes home when the party walks out, whatever
-gold the party is carrying, and goes back to the stores, held by no one. If a battle
+For now, though, a dead member's gear always comes home when the party walks out, however
+full the party's slots are, and goes back to the stores, held by no one. If a battle
 leaves no one in the party alive, every piece the party took in is lost.
 ```
 
-**Why:** The dive is built this way. The carry limit is now measured in gold (the
-`The Dungeon.md` change "A party can turn back anywhere, and carries only so much gold
-out"), and nothing says how gear counts against it, so for now it doesn't; that question
-is proposed in The Dungeon's changes. The original didn't say what happens to the gear
-when no one comes back.
+**Why:** The dive is built this way. The party's carrying capacity is counted in slots
+(`The Dungeon.md`, `## The Dungeon`), and nothing says how many slots a dead member's
+gear takes, so for now it takes none; that question is proposed in The Dungeon's changes.
+The original didn't say what happens to the gear when no one comes back.
 
 ## Change: Gear can be sold back to the shop
 
@@ -509,7 +508,7 @@ just like all other gear, and `## Durability` already says broken gear contribut
 nothing. As written, a Tank whose armour breaks would lose its working shield's defence
 too.
 
-## Change: A member carries one healing potion and drinks it by themselves
+## Change: For now the only potion is a healing potion, bought at the shop
 
 > Proposed 2026-11-14 · for review
 
@@ -530,52 +529,49 @@ The weapon the Rogue carries adds less damage than the Fighter's. The Brute wear
 hide, which adds a little defence on top of its Constitution — less than a properly
 armoured type has.
 
-A member can also carry one potion into a dive, bought at the shop and handed over in the
-Dorms. For now the only potion is a healing potion. The member drinks it by themselves
-when they drop low in a battle — the player never taps anything. How low that is, how much
-the potion heals and what it costs at the shop are placeholders, to be balanced later.
-
-For now a potion works like this:
-
-- Every member can carry one — the six combat types, the Cook and the Porter. It sits in a
-  slot of its own beside the weapon and the armour, which holds one potion or none.
-- A potion costs 20 gold at the shop and goes into the guild's stores. In the Dorms the
-  player hands one from the stores to a member with an empty slot, or takes a member's
-  potion back to the stores. A potion can't be sold back to the shop.
-- A member drinks only in a battle, the moment a hit leaves them alive and under 30% of
-  their maximum health — at a maximum of 50, a member left on 15 doesn't drink and one
-  left on 14 does. Any hit that lands counts, whatever it comes from — a strike, a
-  special, an area hit or a lingering field, even one that defence takes to nothing — and
-  a miss never does. A hit that kills them leaves no time to drink.
-- The potion gives back 30% of the member's maximum health, rounded up, and never takes
-  them past their maximum. It lands straight after the hit that set it off, before
-  anything else happens in the battle.
-- Drinking is free: it isn't an action, and it leaves the member's wait, any free attack
-  they're owed and their special bar as they were.
-- A member who comes home without drinking keeps the potion in their slot for the next
-  dive. A member who dies still holding theirs sends it home to the stores when the dive
-  ends, the same as their gear; if a battle leaves no one in the party alive, every
-  potion the party carried is lost.
-- A potion can't be handed over or taken back from the moment the party goes into a dive
-  until that dive ends — even while the player has stepped back out to the guild hall.
-  Otherwise a member who has drunk theirs could be handed a second between battles, and a
-  fallen member's potion could be saved before the party falls. The same lock holds a
-  member's gear — weapon, armour and shield — so none of it can be put on or taken off
-  until the dive ends. A member away on a mission can still have their gear and potion put
-  on and taken off, since a mission's outcome is fixed when it's sent and never reads gear.
-  Dismissing a member puts their potion back in the stores.
+For now the only potion is a healing potion, and the shop sells it. A healing potion
+costs 20 gold, a placeholder to be balanced later, and goes into the guild's stores. A
+potion can't be sold back to the shop.
 ```
 
-**Why:** Answered 2026-11-14: "as of right now let the characters drink them when they
-need them, only healing potions for now" — one potion each, drunk by the member itself,
-with no tapping, and heal-only for now. No doc had a potion a member carries. The
-Alchemist's potions in `Specialists.md` are a separate thing and are left as they are. The
-user didn't give the figures, so they're placeholders, kept in the game's tuning file with
-the others. The game is built this way. Every "for now" in the new list is a default the
-build chose, recorded as cheap to change and not yet the user's word, and each one is
-proposed as a question in "Questions on shields and potions". A member on a dive that
-hasn't ended can't be dismissed either; that's in Core Concept's change "A member on a
-dive can't be dismissed, for now".
+**Why:** Answered 2026-11-14: "only healing potions for now". The originals say how a
+healing potion goes into a dive, how a member drinks one and how much it heals, but not
+where a guild gets one before it holds an Alchemist, who unlocks at guild rank D; for now
+the shop sells them. The price is kept in the game's tuning file with the other
+placeholders. Selling one back is a default the build chose, not yet the user's word, and
+it's proposed as a question in "Questions on shields and potions".
+
+## Change: A member's gear can't change during a dive, for now
+
+> Proposed 2026-11-16 · for review
+
+**Where:** `## Assignment`, the paragraph beginning "Nothing stops the player giving a
+member gear" (a new paragraph after it)
+
+**Now says:**
+
+```
+Nothing stops the player giving a member gear of a higher class than the member's own
+rank — a C-class piece on an F-rank diver is allowed.
+```
+
+**Proposed:**
+
+```
+Nothing stops the player giving a member gear of a higher class than the member's own
+rank — a C-class piece on an F-rank diver is allowed.
+
+For now a member's gear — weapon, armour and shield — can't be put on or taken off from
+the moment the party goes into a dive until that dive ends, even while the player has
+stepped back out to the guild hall. A member away on a mission can still have their gear
+put on and taken off, since a mission's outcome is fixed when it's sent and never reads
+gear.
+```
+
+**Why:** The game is built this way. Nothing says whether gear can change partway
+through a dive; it's a default the build chose, not yet the user's word. A member on a
+dive that hasn't ended can't be dismissed either; that's in Core Concept's change "A
+member on a dive can't be dismissed, for now".
 
 ## Change: Questions on shields and potions
 
@@ -608,9 +604,6 @@ questions on stores and condition" adds
   nobody, so shields are only repaired back at the guild hall?
 - Should all four shields share the one shield picture the game carries, or does each get
   its own — and if so, where do the other three come from?
-- Can a specialist carry a potion into a dive too, or only the six combat types?
-- Does drinking the potion cost a member anything in the battle — its next attack, or a
-  wait — or is it free?
 - If a member comes home without drinking their potion, does it go back to the stores?
 - In the guild hall, does a member's potion behave like their gear — taken back in the
   Dorms, left as it is while they're away on a mission, and back to the stores when
@@ -623,8 +616,8 @@ questions on stores and condition" adds
 ```
 
 **Why:** None of the docs answers these, and the answers on shields and potions leave them
-open. The game is built with a default for now on each potion question, in "A member
-carries one healing potion and drinks it by themselves", and on each shield question: only
+open. The game is built with a default for now on selling a potion back, in "For now the
+only potion is a healing potion, bought at the shop", and on each shield question: only
 the Tank carries a shield; a Tank with no shield equipped can still use Shields Up; a
 shield spends a use on every hit the Tank takes, wherever armour spends one, and Shields
 Up spends none of it; shields have classes and rolled numbers, built the way armour is; a
