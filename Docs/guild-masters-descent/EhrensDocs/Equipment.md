@@ -83,7 +83,7 @@ are held to gold too, for now: that's a default the build chose, not yet the use
 and it's proposed as a question in Core Concept's change "Questions on missions'
 defaults".
 
-## Change: A dead member's gear comes home, for now
+## Change: A dead member's gear takes a slot a piece, for now
 
 > Proposed 2026-11-12 · for review
 
@@ -104,15 +104,25 @@ If a member dies in the dungeon, the party brings their gear back if there's roo
 in the party's carrying capacity — the same capacity the Porter adds a lot of and any
 member contributes to by carrying some of the loot; otherwise the gear is lost.
 
-For now, though, a dead member's gear always comes home when the party walks out, however
-full the party's slots are, and goes back to the stores, held by no one. If a battle
-leaves no one in the party alive, every piece the party took in is lost.
+For now each piece a dead member had on — weapon, armour, and a Tank's shield, broken
+or not — takes one slot. The room left is counted as the dive ends: the slots of the
+members still alive, a Porter's extra ones too, less the potions they still hold. A
+dead member's slots count for nothing, their potions take none of the room, and no
+potion or gold is left behind to make room for gear. The pieces come home in the order
+the party was picked, each dead member's weapon first, then armour, then shield, and go
+back to the stores, held by no one; whatever no longer fits is left in the dungeon and
+lost. If a battle leaves no one in the party alive, every piece the party took in is
+lost.
 ```
 
-**Why:** The dive is built this way. The party's carrying capacity is counted in slots
-(`The Dungeon.md`, `## The Dungeon`), and nothing says how many slots a dead member's
-gear takes, so for now it takes none; that question is proposed in The Dungeon's changes.
-The original didn't say what happens to the gear when no one comes back.
+**Why:** The dive is built this way. The original has the gear come back only if there's
+room left in the party's carrying capacity, which is counted in slots (`The Dungeon.md`,
+`## The Dungeon`), but doesn't say how many slots a piece takes, how the room is
+counted, which pieces come home when there isn't room for all, or what happens to the
+gear when no one comes back. One slot a piece is a placeholder kept in the game's tuning
+file with the others. Which pieces come home first, and counting the room as the dive
+ends, are defaults the build chose, not yet the user's word, and they're proposed as
+questions in The Dungeon's change "Questions on the dive's defaults".
 
 ## Change: Gear can be sold back to the shop
 

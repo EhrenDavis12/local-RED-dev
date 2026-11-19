@@ -124,9 +124,9 @@ For now a battle that ends in a stand-off counts as the party turning back there
 
 For now gold takes no slots, so carrying capacity never limits the gold a party brings
 out, and who came along doesn't change how much: leaving between rest areas loses the
-gold found since the last one, and nothing else is left behind. Only the living carry,
-so a party with no one left alive brings nothing out. A dead member's gear takes up none
-of the party's carrying capacity.
+gold found since the last one, and no other gold is left behind. Only the living carry,
+so a party with no one left alive brings nothing out, and a dead member's gear comes home
+only into the slots the living have free.
 ```
 
 **Why:** Answered: yes, turn back anywhere, losing the gold found since the last rest
@@ -137,10 +137,11 @@ turning back between rest areas loses all the gold found since the last rest are
 whoever came along. The original's paragraph on capacity, after this one, counts it in
 slots and has a healing potion and an item of loot take one each, but doesn't say
 whether gold takes any; for now it takes none, so capacity never limits the gold a party
-brings out. Not settled by the original's slots either: how a dead member's gear counts
-against it. The second paragraph has a default for now on both, and the
-first has defaults on rest areas and stand-offs; each is proposed as a question for
-`## Open Questions`. Answered 2026-11-14: the party can retreat at any time, the middle
+brings out. How a dead member's gear counts against it is in Equipment's change "A dead
+member's gear takes a slot a piece, for now", which keeps the original's rule that the
+gear comes back only if there's room left. The second paragraph has a default for now on
+gold, and the first has defaults on rest areas and stand-offs; each is proposed as a
+question for `## Open Questions`. Answered 2026-11-14: the party can retreat at any time, the middle
 of a battle included — "you can holler a retreat sign that will take them out". Which
 gold a retreat keeps is proposed as a question in "A question on what gold a retreat
 keeps".
@@ -416,6 +417,12 @@ lose all the gold found since the last rest area, and the two may not agree.
   items of loot?
 - How does a dead member's gear count against the party's carrying capacity, now counted
   in slots?
+- When a member dies in the dungeon and the survivors don't have room for all of their
+  gear, which pieces get left behind?
+- Is the room for a dead member's gear counted when the dive ends, or when the member
+  falls?
+- After a dive where some of a fallen member's gear was left in the dungeon, should the
+  end-of-dive screen say which pieces were lost?
 - Is a floor's set of monsters the same every dive, or new each time?
 - When does a floor count as reached, for the deepest floor reached?
 - "The last rest area reached": is that the deepest rest area ever reached, or the one the
@@ -429,9 +436,13 @@ lose all the gold found since the last rest area, and the two may not agree.
 ```
 
 **Why:** The dive is built with a default for now on each of these but the last, in the
-changes above, and none of the docs settles them. The last is open because nothing says;
-the starting dungeon's depth is set to end on a rest area, so it doesn't come up yet. The
-pending "A question on what gold a retreat keeps" change to this list is unchanged.
+changes above and, for a dead member's gear, in Equipment's change "A dead member's gear
+takes a slot a piece, for now": one slot a piece, pieces coming home in pick order,
+weapon then armour then shield, the room counted as the dive ends, and no change to the
+end-of-dive screen. None of the docs settles them. The last is open because nothing
+says; the starting dungeon's depth is set to end on a rest area, so it doesn't come up
+yet. The pending "A question on what gold a retreat keeps" change to this list is
+unchanged.
 
 ## Change: Questions on healing in the dive
 

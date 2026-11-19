@@ -127,7 +127,7 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
-  member's gear comes home for now, the shop sells class F only for now, a span no wider
+  member's gear takes slots for now, the shop sells class F only for now, a span no wider
   at SSS than at F for now, a question on span width, the Brute's axe and the Tank's
   warhammer, the Tank's swappable shield, the healing potion bought at the shop, F rank
   and healing a fixed 18, for now, a member's gear locked for a dive for now, a broken
