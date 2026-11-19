@@ -18,6 +18,9 @@ that weight in six bodies rather than fifteen. It is a bench for checking the co
 rules against each other rather than a sample of what a dungeon floor serves up. What a
 floor's power is and what an enemy costs are covered in the Dungeon doc.
 
+The teams here are set by hand rather than generated from a floor's power budget, and
+they stay set by hand so that every run stays comparable with the ones before it.
+
 ## The Field
 
 Each side has a field three positions wide and three rows deep. Front row is row 1,
@@ -96,7 +99,3 @@ produce, not a change to the teams recorded here.
   levels, split evenly. Whether experience really buys levels at an even rate is an open
   question in the Guild Members doc — if the two run on separate counters instead, this
   figure is wrong.
-- The teams here are set by hand, and the weight and shape of the enemy side isn't one
-  the dungeon rules would generate for an F-rank floor. Should the fixture stay a
-  hand-set bench that keeps old test runs comparable, or be rebuilt from a real floor's
-  power budget, so that what it measures is what the game serves up?
