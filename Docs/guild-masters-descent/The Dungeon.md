@@ -44,7 +44,18 @@ big group to go and take it. A claim mission can fail, and it stays on the board
 dungeon isn't lost, so the guild can try again.
 
 A dungeon's depth is random when the dungeon is created, and it isn't known until the
-dungeon is claimed.
+dungeon is claimed. It's rolled from a band set by the dungeon's own rank, starting at F
+and adding 5 to each end per rank:
+
+- F — 5 to 15 floors
+- E — 10 to 20
+- D — 15 to 25
+- C — 20 to 30
+- B — 25 to 35
+- A — 30 to 40
+- S — 35 to 45
+- SS — 40 to 50
+- SSS — 45 to 55
 
 The intent is that the player tries to find as many dungeons as they can.
 
@@ -54,13 +65,32 @@ Dungeon diving is the main gameplay. Death in the dungeon is permanent — there
 to bring a dead member back. The risk is inherent in the choice: send someone you know
 will survive, or send a team and see who comes back.
 
-Each floor has 2–3 battles. Between floors, every member gets back five per cent of their
+Each floor has 1–3 battles. Between floors, every member gets back five per cent of their
 maximum health, and nothing comes back between the battles on a single floor. Every 5th
 floor is a safe rest area, where every member gets back fifteen per cent, and the player
 may choose to return to the top and exit the dungeon. The Cook adds to both figures,
 covered in the Specialists doc. Retreating always costs the loot gathered since the last
 safe floor — any party member can carry some of it, so how much is lost depends on who
 came along.
+
+Each fight's enemy count is a band set by how deep the floor is, starting at 1–3 enemies
+for the first four floors and rising by one at each four-floor step:
+
+- Floors 1–4 — 1 to 3 enemies
+- Floors 5–8 — 2 to 4
+- Floors 9–12 — 3 to 5
+- Floors 13–16 — 4 to 6
+- Floors 17–20 — 5 to 7
+- Floors 21–24 — 6 to 8
+- Floors 25–28 — 7 to 9
+- Floors 29–32 — 8 to 10
+- Floors 33–36 — 9 to 11
+- Floors 37–40 — 10 to 12
+- Floors 41–44 — 11 to 13
+- Floors 45–48 — 12 to 14
+- Floors 49 and deeper — 13 to 15
+
+The battle grid holds fifteen, so the deepest floors fill it.
 
 Capacity is counted in slots, and every member carries 5 slots. Some members carry extra
 slots restricted to a particular kind of thing — the Specialists doc covers which ones. A
@@ -69,7 +99,8 @@ loot were free a party would simply fill every slot with potions. At one slot ea
 choice is how much healing to pay for in treasure.
 
 Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
-also drop a weapon or a piece of armour.
+also drop a weapon or a piece of armour. One enemy in four drops something, and one drop
+in ten is gear rather than materials or an item.
 
 Gold is covered in the Core Concept doc.
 

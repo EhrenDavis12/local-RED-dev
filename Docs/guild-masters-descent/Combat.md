@@ -244,7 +244,7 @@ grade they are and whether they're equipped at all; depth decides how many show 
 good that gear is. That luck is in the generation, not the stat — it only shapes how many
 enemies and how much gear the fight creates; the enemies' own Luck stat is untouched,
 exactly what their type and rank would otherwise give, so depth doesn't make them evade
-more or reset their cooldowns more often.
+more or reset their cooldowns more often. The counts are covered in the Dungeon doc.
 
 ## Enemy Targeting
 
