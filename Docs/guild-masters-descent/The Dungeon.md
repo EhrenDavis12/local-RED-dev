@@ -45,17 +45,17 @@ dungeon isn't lost, so the guild can try again.
 
 A dungeon's depth is random when the dungeon is created, and it isn't known until the
 dungeon is claimed. It's rolled from a band set by the dungeon's own rank, starting at F
-and adding 5 to each end per rank:
+and adding 6 to each end per rank:
 
 - F — 5 to 15 floors
-- E — 10 to 20
-- D — 15 to 25
-- C — 20 to 30
-- B — 25 to 35
-- A — 30 to 40
-- S — 35 to 45
-- SS — 40 to 50
-- SSS — 45 to 55
+- E — 11 to 21
+- D — 17 to 27
+- C — 23 to 33
+- B — 29 to 39
+- A — 35 to 45
+- S — 41 to 51
+- SS — 47 to 57
+- SSS — 53 to 63
 
 The intent is that the player tries to find as many dungeons as they can.
 
@@ -95,7 +95,8 @@ enemies and rising by one at each step:
 - Floors 61 and deeper — 13 to 15
 
 The battle grid holds fifteen, and the top of this ladder is as many enemies as the grid
-holds.
+holds. The deepest dungeons the ranks allow reach it: an SSS dungeon rolls between 53 and
+63 floors, and the ladder's top band starts at floor 61.
 
 Each set also has a limited pool of enemy types that can appear there, growing by one type
 per set:
@@ -154,10 +155,6 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
-- The enemy-count ladder reaches thirteen to fifteen enemies at floor 61, but the deepest
-  dungeon the ranks allow is 55 floors, so no dungeon reaches the top of the ladder and
-  the fifteen-wide battle grid is never filled. Should the ranks allow deeper dungeons, or
-  should the ladder climb faster?
 - Each set of floors has a pool of enemy types that can appear there, but nothing says how
   that pool is chosen — rolled when the dungeon is created, or when the party first
   reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
