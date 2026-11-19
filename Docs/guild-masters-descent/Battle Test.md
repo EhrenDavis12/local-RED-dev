@@ -71,17 +71,17 @@ alone.
 
 ## Levels and Experience
 
-Both teams start at level 1. At F rank, crossing to E rank takes 20 experience and 16
-levels, so an even rate across the rank puts a level at a quarter past one — 1.25
-experience each.
+Both teams start at level 1. At F rank, crossing to E rank takes 20 experience and
+reaching level 16, which from level 1 is 15 level-ups, so an even rate across the rank
+puts a level at about 1.33 experience each.
 
 Every enemy here is F rank, and each is built at the full F-rank baseline cost, so each
 pays the full F value on a kill — a kill's pay scales with what the enemy cost, covered
 in the Guild Members doc. An F-rank kill is worth 1 experience, so clearing all six pays
 6, divided equally between the six party members — 1 each a battle. So a member gains a
-level roughly every battle and a quarter, and reaches the 16 levels that make it eligible
-for E rank after about 20 battles. That twenty-battle figure is a property of this
-fixture — six full-cost enemies a battle — rather than of a dungeon floor.
+level roughly every battle and a third, and reaches level 16, the level that makes it
+eligible for E rank after about 20 battles. That twenty-battle figure is a property of
+this fixture — six full-cost enemies a battle — rather than of a dungeon floor.
 
 The fixture itself stays at level 1. It is a fixed starting state, so a run never leaves
 the teams levelled up — the accumulation above is what a sequence of battles would
@@ -95,7 +95,7 @@ produce, not a change to the teams recorded here.
   Tank that primary is Constitution, and health is Constitution times ten — so does the
   help raise its health from 80 to 90, as the table assumes, or does help reach defence
   only?
-- A level costs 1.25 experience here because crossing F rank takes 20 experience and 16
-  levels, split evenly. Whether experience really buys levels at an even rate is an open
-  question in the Guild Members doc — if the two run on separate counters instead, this
-  figure is wrong.
+- A level costs about 1.33 experience here because crossing F rank takes 20 experience
+  and 15 level-ups, split evenly. Whether experience really buys levels at an even rate
+  is an open question in the Guild Members doc — if the two run on separate counters
+  instead, this figure is wrong.
