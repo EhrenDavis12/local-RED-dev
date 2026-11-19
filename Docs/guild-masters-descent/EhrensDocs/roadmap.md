@@ -115,8 +115,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   in turn, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
-  drinking a potion as an order used at the next cooldown for now, and questions on
-  drinking a potion).
+  drinking a potion as an order used at the next cooldown for now, questions on
+  drinking a potion, and a new Rogue's worked cooldown of 71 ticks).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -139,7 +139,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   health from a member's own Constitution and what's taken staying taken for now,
   questions on health, experience as the bar and level as the number for now, the
   experience-and-levels question answered, questions on experience, and the
-  rest-floor heal question answered, and help coming back to whole points once).
+  rest-floor heal question answered, help coming back to whole points once, starting
+  stats by type, and a question on the Cook's and the Porter's starting stats).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's evasion against a capped

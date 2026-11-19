@@ -1038,3 +1038,28 @@ Mage's field damages a character"
 "Drinking a potion is an order used at the next cooldown, for now": a member can drink at
 full health, and a drink leaves the taunt standing. The pending changes to this list
 above are unchanged; these go at the end of the list, after the original's last entry.
+
+## Change: A new Rogue's worked cooldown is 71 ticks
+
+> Proposed 2026-11-19 · for review
+
+**Where:** `## Cooldowns`, the worked list for the Rogue, first entry
+
+**Now says:**
+
+```
+- Dexterity 5, a newly recruited F-rank member — 80 ticks
+```
+
+**Proposed:**
+
+```
+- Dexterity 8, a newly recruited F-rank Rogue — 71 ticks
+```
+
+**Why:** The user, 2026-11-18: "if something from the new docs contradicts the choices
+that we make the new docs win". Battle Test's teams set a new F-rank Rogue at Dexterity 8
+before help (see the `Guild Members.md` change "Starting stats by type"). 100 ÷ (1 + 8 ÷
+20) is 71.4, so 71 ticks, which is what this doc's own seconds list already says: "A
+newly recruited F-rank Rogue, 71 ticks". No combat type starts at Dexterity 5. The rest
+of the list is unchanged.
