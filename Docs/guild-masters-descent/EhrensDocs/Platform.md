@@ -32,9 +32,12 @@ and opening the game can't re-roll an attack or dodge a death. An attack already
 counts as made, even if it hadn't finished showing on screen. The save holds where every
 cooldown stands — how long each fighter still has to wait, whether one is owed a free
 attack from the Luck reset, and how far each lasting effect has run — and what's left in
-every fighter's Luck bag, the enemies' too, so nothing is drawn again as it loads. Saving
-doesn't bank anything, either: the gold found on the dive is still the party's until the
-dive ends, and what was found since the last rest area can still be lost.
+every fighter's Luck bag, the enemies' too, so nothing is drawn again as it loads. It
+doesn't hold an order the player gave that hasn't been used yet: an ordered special or an
+ordered drink is lost when the game closes, and the battle carries on from the save with
+none. Saving doesn't bank anything, either: the gold found on the dive is still the
+party's until the dive ends, and what was found since the last rest area can still be
+lost.
 
 A battle doesn't move on while the game is closed or in the background: it picks up at
 the moment it stopped. A long gap between two frames is dropped rather than played fast —

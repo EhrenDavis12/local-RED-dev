@@ -242,11 +242,12 @@ there's no clock left for the effect to run on.
 
 The cycle an effect is cast in doesn't count: it lasts three of the owner's cycles after
 that. For now it ends once the third of those has played out, so the owner's next three
-attacks all happen under it — a vanished Rogue makes three that can't miss. For now, too,
-a free attack from the Luck reset isn't one of the three: only a cooldown that comes up
-after a wait counts. For now a Shields Up or a field cast while the owner's last one is
-still running stacks with it: both run, each to its own end, so the two lots of defence
-add up and both fields do their damage.
+cooldowns all happen under it — a vanished Rogue makes three attacks that can't miss, or
+one fewer for each it spends drinking a potion instead. For now, too, a free attack from
+the Luck reset isn't one of the three: only a cooldown that comes up after a wait counts.
+For now a Shields Up or a field cast while the owner's last one is still running stacks
+with it: both run, each to its own end, so the two lots of defence add up and both fields
+do their damage.
 ```
 
 **Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
@@ -254,6 +255,9 @@ doesn't say whether the cycle it's cast in counts, whether the effect ends once 
 has played out or as the fourth begins, or whether a free attack from the Luck reset is a
 cycle. Nothing says what happens when one is cast again while the last is still running;
 the six combat types are built to stack them. Each is proposed as a question below.
+A drink ordered in place of an attack uses up one of the three too, as "Drinking a potion
+is an order used at the next cooldown, for now" says, so the three are cooldowns, not
+attacks.
 
 ## Change: What the targeting weights count, and how a taunt is spent
 
@@ -925,3 +929,100 @@ its bar is full"
 close-range attack waits for its target to be home" and "The free attack comes first, and
 a special gets no check, for now". The pending changes to this list above are unchanged;
 these go after the entries they add.
+
+## Change: Drinking a potion is an order used at the next cooldown, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Player Input`, the paragraph beginning "When a member's cooldown comes up"
+(new paragraphs after it)
+
+**Now says:**
+
+```
+When a member's cooldown comes up, the player can have it drink a healing potion
+instead of attacking — drinking costs that attack.
+```
+
+**Proposed:**
+
+```
+When a member's cooldown comes up, the player can have it drink a healing potion
+instead of attacking — drinking costs that attack.
+
+The player has a member drink by ordering it while the fight runs: any living party
+member holding a potion can be ordered to, a specialist too, and the order can be taken
+back until it's used. It's used at the member's next cooldown, in place of the attack
+that cooldown brings, and the member drinks one potion from their own slots. An order
+ends when it's used or taken back, when the member dies, or when the battle ends. A
+member holds one order at a time: ordering a drink takes back an ordered special, and
+ordering the special takes back the drink, so a cooldown is a drink or a special, never
+both.
+
+Drinking costs the attack and nothing else. The member strikes no one and stays on their
+own spot, wears no weapon, charges no bar, and pulls no Luck token, so no free attack
+follows; their next cooldown then starts as it would after an attack. A drink is one of
+the member's own cooldown cycles for any lasting effect they cast. A drink never takes a
+member past their maximum health, and a member at full health can still be ordered to
+drink: the potion and the attack are used up and nothing is healed.
+
+For now:
+
+- A member standing in a Mage's field takes the field's hit first, as it would before an
+  attack, and drinks after it. If the field kills them, they drink nothing and keep the
+  potion.
+- A close-range member whose attack is already waiting when the drink is ordered drinks
+  as soon as they're back on their own spot, in the place the waiting attack had. Only
+  their own absence holds a drink, never their target's.
+- A free attack from the Luck reset is always an attack. An order placed before one is
+  used at the next cooldown that comes after a wait, the same as a special.
+- A drink never spends a taunt. A taunt is spent only by an attack that's made, so it
+  keeps for the member's next one.
+- Nothing is drunk without an order, whatever a member's health, auto on or off. With
+  auto on, a member with a drink ordered never has their special ordered for them.
+- A drink that's ordered but not yet drunk isn't saved, so it's lost if the game closes.
+- The battle screen has no drink button yet, so no potion is drunk in a fight.
+```
+
+**Why:** The original says the player can have a member drink instead of attacking when
+its cooldown comes up, and that drinking costs that attack, but not how the player says
+so before the moment goes by, what else a drink costs, or how it sits with a waiting
+attack, a free attack or a special. The combat engine is built this way. Ordering ahead,
+one order at a time, a waiting member drinking once home, a free attack never replaced
+and an unused order not being saved are the user's going-ahead defaults, 2026-11-18. The
+field's hit coming first is the default the build goes ahead with on the original's open
+question, which stays open. A drink at full health and a drink leaving a taunt standing
+are defaults the build chose, not yet the user's word, proposed as questions in
+"Questions on drinking a potion". The drink button and drinking under auto come later.
+
+## Change: Questions on drinking a potion
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Open Questions`, at the end of the list, after the entry beginning "The
+Mage's field damages a character"
+
+**Now says:**
+
+```
+- The Mage's field damages a character as it begins its own attack. A member can drink a
+  potion instead of attacking — does a member standing in a field take the field's
+  damage when it drinks?
+```
+
+**Proposed:**
+
+```
+- The Mage's field damages a character as it begins its own attack. A member can drink a
+  potion instead of attacking — does a member standing in a field take the field's
+  damage when it drinks?
+- Can a member at full health be ordered to drink, using up the potion and the attack
+  and healing nothing?
+- When a taunted member drinks instead of attacking, does the taunt keep for its next
+  attack, or does the drink spend it?
+```
+
+**Why:** The combat engine is built with a default for now on each of these, in
+"Drinking a potion is an order used at the next cooldown, for now": a member can drink at
+full health, and a drink leaves the taunt standing. The pending changes to this list
+above are unchanged; these go at the end of the list, after the original's last entry.

@@ -114,7 +114,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   close-range attack waiting for its target to be home, close-range fighters taking
   turns on the same tick for now, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
-  pull from the combatant's own bag for now, and questions on the Luck bag's defaults).
+  pull from the combatant's own bag for now, questions on the Luck bag's defaults,
+  drinking a potion as an order used at the next cooldown for now, and questions on
+  drinking a potion).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -127,9 +129,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
   member's gear comes home for now, the shop sells class F only for now, a span no wider
   at SSS than at F for now, a question on span width, the Brute's axe and the Tank's
-  warhammer, the Tank's swappable shield, the healing potion bought at the shop for now,
-  a member's gear locked for a dive for now, a broken shield adding nothing, and
-  questions on shields and potions).
+  warhammer, the Tank's swappable shield, the healing potion bought at the shop, F rank
+  and healing a fixed 18, for now, a member's gear locked for a dive for now, a broken
+  shield adding nothing, and questions on shields and potions).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   recruits and promotion, who shares a combat's experience and a stand-off's for now, help
   follows the board live, an open question on sharing experience, a specialist's K from

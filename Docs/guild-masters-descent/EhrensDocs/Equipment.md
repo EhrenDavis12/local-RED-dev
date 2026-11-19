@@ -531,7 +531,9 @@ armoured type has.
 
 For now the only potion is a healing potion, and the shop sells it. A healing potion
 costs 20 gold, a placeholder to be balanced later, and goes into the guild's stores. A
-potion can't be sold back to the shop.
+potion can't be sold back to the shop. Every potion the shop sells is F rank, and for now
+each one heals the same 18 health points, a placeholder inside the F band of 10 to 25;
+no potion rolls an amount of its own.
 ```
 
 **Why:** Answered 2026-11-14: "only healing potions for now". The originals say how a
@@ -539,7 +541,12 @@ healing potion goes into a dive, how a member drinks one and how much it heals, 
 where a guild gets one before it holds an Alchemist, who unlocks at guild rank D; for now
 the shop sells them. The price is kept in the game's tuning file with the other
 placeholders. Selling one back is a default the build chose, not yet the user's word, and
-it's proposed as a question in "Questions on shields and potions".
+it's proposed as a question in "Questions on shields and potions". The shop selling F
+rank, and every shop potion healing a fixed 18, are the user's going-ahead defaults,
+2026-11-18: "every shop potion heals a fixed 18, a placeholder in the tuning file". The
+Alchemist's bands set a potion's heal by its rank, and the Alchemist's Intelligence and
+Luck place it inside its band; with no Alchemist, nothing places a shop potion, so every
+one heals the same, inside the F band.
 
 ## Change: A member's gear can't change during a dive, for now
 
