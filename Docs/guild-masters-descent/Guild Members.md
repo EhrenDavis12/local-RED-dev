@@ -156,6 +156,15 @@ Experience comes from kills, and what a kill is worth is set by the defeated ene
 The total is added up at the end of a combat and divided equally between all party
 members, counting specialists.
 
+- What a kill pays is that rank value scaled by what the enemy cost to put on the floor.
+  An enemy built at its rank's full baseline cost pays the rank value in full; one built
+  at a third of that baseline pays a third of it.
+- So a battle's experience is set by the power it was given rather than by how that
+  power was divided — the same points spent as a horde of weak enemies and as a handful
+  of strong ones pay the same total.
+- What an enemy costs, and the baseline cost for each rank, are covered in the Dungeon
+  doc.
+
 ## Stat Weighting by Type
 
 Each type has an ordering of all five base stats. The ordering decides which three
@@ -226,11 +235,12 @@ because of possible dungeon effects — a detail that isn't fully worked out yet
   a level threshold — 16 levels for the first, doubling after. Does the experience buy
   those levels at an even rate, or do the two run on separate counters with whichever is
   slower deciding?
-- The experience a rank costs multiplies by five each step while what a kill is worth
-  doubles, so every rank takes about two and a half times the fights of the one before —
-  at around six enemies a fight and a party of six, F to E is about twenty fights and SS
-  to SSS about eight thousand, roughly thirteen and a half thousand for the whole climb.
-  Which side gets tuned, the cost of a rank or what a stronger enemy is worth?
+- The experience a rank costs multiplies by five at each step, while what a dungeon dive
+  pays grows closer to two and a half times a rank. A full dive of an F dungeon pays a
+  member about 12 experience against the 20 that crossing F costs, so under two dives.
+  By SS to SSS a full dive pays a member about 3,500 against the 1,562,500 that crossing
+  costs, so over four hundred dives. Which side gets tuned, the cost of a rank or what a
+  stronger enemy is worth?
 - A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
   the five per cent for the floor as well?
 - The Mage's lingering field damages what stands in it. Does that damage count as an area

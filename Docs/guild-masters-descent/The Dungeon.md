@@ -199,10 +199,3 @@ What the injured status means is covered in the Core Concept doc.
   that pool is chosen — rolled when the dungeon is created, or when the party first
   reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
   ones.
-- Experience pays by a defeated enemy's rank, so an enemy built at a third of its
-  baseline cost pays exactly what a full-cost one of the same rank pays. A battle's
-  power can be spent to buy more pay — the same points spent as a horde yield three
-  times the kills of the same points spent as a few strong enemies, and a horde of
-  individually weak enemies is also the easier fight for a party with cleaves and
-  area attacks. Should a kill pay by the enemy's power rather than by its rank
-  alone?
