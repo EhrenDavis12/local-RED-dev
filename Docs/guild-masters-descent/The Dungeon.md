@@ -73,27 +73,32 @@ covered in the Specialists doc. Retreating always costs the loot gathered since 
 safe floor — any party member can carry some of it, so how much is lost depends on who
 came along.
 
-Each fight's enemy count is a band set by how deep the floor is, starting at 1–3 enemies
-for the first four floors and rising by one at each four-floor step:
+The floors between rest areas group into sets of four, skipping the rest areas themselves,
+so the sets run 1–4, then 6–9, then 11–14, and so on. Both ladders below — enemy count and
+enemy type — are set by these same sets.
+
+Each fight's enemy count is a band set by the set a floor falls in, starting at 1–3
+enemies and rising by one at each step:
 
 - Floors 1–4 — 1 to 3 enemies
-- Floors 5–8 — 2 to 4
-- Floors 9–12 — 3 to 5
-- Floors 13–16 — 4 to 6
-- Floors 17–20 — 5 to 7
-- Floors 21–24 — 6 to 8
-- Floors 25–28 — 7 to 9
-- Floors 29–32 — 8 to 10
-- Floors 33–36 — 9 to 11
-- Floors 37–40 — 10 to 12
-- Floors 41–44 — 11 to 13
-- Floors 45–48 — 12 to 14
-- Floors 49 and deeper — 13 to 15
+- Floors 6–9 — 2 to 4
+- Floors 11–14 — 3 to 5
+- Floors 16–19 — 4 to 6
+- Floors 21–24 — 5 to 7
+- Floors 26–29 — 6 to 8
+- Floors 31–34 — 7 to 9
+- Floors 36–39 — 8 to 10
+- Floors 41–44 — 9 to 11
+- Floors 46–49 — 10 to 12
+- Floors 51–54 — 11 to 13
+- Floors 56–59 — 12 to 14
+- Floors 61 and deeper — 13 to 15
 
-The battle grid holds fifteen, so the deepest floors fill it.
+The battle grid holds fifteen, and the top of this ladder is as many enemies as the grid
+holds.
 
-The floors between rest areas also group into sets of four, and each set has a limited
-pool of enemy types that can appear there, growing by one type per set:
+Each set also has a limited pool of enemy types that can appear there, growing by one type
+per set:
 
 - Floors 1–4 — 1 to 2 types
 - Floors 6–9 — 2 to 3
@@ -102,8 +107,7 @@ pool of enemy types that can appear there, growing by one type per set:
 - Floors 21–24 — 5 to 6
 - Floors 26 and deeper — all six
 
-The sets skip the rest areas, which is why they run 1–4 then 6–9 rather than 1–4 then
-5–8. The ladder stops at six because there are only six combat types.
+The ladder stops at six because there are only six combat types.
 
 Capacity is counted in slots, and every member carries 5 slots. Some members carry extra
 slots restricted to a particular kind of thing — the Specialists doc covers which ones. A
@@ -150,9 +154,10 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
-- The sets of four floors that set how many enemy types can appear skip the rest areas,
-  running 1–4 then 6–9. The bands that set how many enemies a fight holds don't, running
-  1–4 then 5–8. Should the two use the same grouping?
+- The enemy-count ladder reaches thirteen to fifteen enemies at floor 61, but the deepest
+  dungeon the ranks allow is 55 floors, so no dungeon reaches the top of the ladder and
+  the fifteen-wide battle grid is never filled. Should the ranks allow deeper dungeons, or
+  should the ladder climb faster?
 - Each set of floors has a pool of enemy types that can appear there, but nothing says how
   that pool is chosen — rolled when the dungeon is created, or when the party first
   reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
