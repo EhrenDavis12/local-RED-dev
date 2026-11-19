@@ -44,6 +44,13 @@ injuries heal while the player is away.
   choices." Every look-and-feel choice the user approved on the animation side is how the game
   looks: bars, battle scene layers, menus, fonts, icons, effects.
 - **Copy annie's Unity work, don't re-create it.** User (2026-11-13): "Yes, try forge just copy first do trust what Annie did. It's all been approved. It all looks good."
+- **The one rule of ours that beats the new docs.** User (2026-11-18): "The only
+  contradiction I want to win is from our side is that an enemy must wait on the battle on the
+  attack sequence so that so that their present when being attacked so two people are attacking
+  at the same time they don't actually attack at the same time one attack than the other
+  attacks that's the only thing I want winning over what the new doc Say" So: attacks never
+  land at the same moment — one attacker goes, the other waits until its target is back in its
+  spot. Every other contradiction, the other dev's docs win.
 - **Standing yes.** User chose "Build on its own": the mastermind's proposals toward this Goal
   go straight into the queue and are built without waiting. Each finished piece still waits for
   the user's approval before it is merged.
