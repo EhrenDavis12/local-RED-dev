@@ -5,7 +5,9 @@
 > Battle Test.md, and every EhrensDocs change note (Combat, Equipment, The Dungeon,
 > Platform, Core Concept, Specialists, Look and Feel, Open Questions); queue/focus.md;
 > queue report 150. Code read: Battle.cs, Battle.Walk.cs, BattleController.cs,
-> Guild.Potions.cs, Tuning.cs, SaveManager.cs (potions), Potion*Tests.cs.
+> Guild.Potions.cs, Tuning.cs, SaveManager.cs (potions), ActionReport.cs, TurnPlayback.cs,
+> Potion*Tests.cs. Revised after review: the user's going-ahead defaults (2026-11-18) are
+> requirements 3 and 14 to 18; the reviewer's notes are settled in 19 to 24.
 
 ## Problem
 
@@ -35,9 +37,9 @@ drink-button item (#157) calls it.
    (queue report 150)*
 3. Every shop potion heals the same amount. That amount is one placeholder in the tuning
    file, set to 18 for now. It must lie inside the F band and is listed with the other
-   placeholders. It replaces the 30%-of-maximum heal. *(Whether each potion should roll
-   its own amount instead is under Open Questions.)* — *queue/focus.md, Missing details;
-   Equipment.md, Quality: "The shop sells equipment of a baseline quality"*
+   placeholders. It replaces the 30%-of-maximum heal, and no potion rolls an amount of its
+   own. — *the user's going-ahead default, 2026-11-18 ("every shop potion heals a fixed
+   18, a placeholder in the tuning file"); queue/focus.md, Missing details*
 4. A drink never takes the drinker past their maximum health. What gets reported is the
    health actually gained. — *EhrensDocs/The Dungeon.md, "How a heal in the dive lands,
    for now": "A heal never takes anyone past their maximum"*
@@ -70,7 +72,7 @@ drink-button item (#157) calls it.
    - wears no weapon,
    - charges no special bar,
    - pulls no Luck token for the reset, so no free attack follows,
-   - leaves any taunt on them unspent, kept for their next attack.
+   - leaves any taunt on them unspent, kept for their next attack (see 19).
 
    Their next cooldown then starts, exactly as it would after an attack.
    — *Combat.md, Player Input ("drinking costs that attack"); Luck Checks ("When a
@@ -95,6 +97,82 @@ drink-button item (#157) calls it.
     load exactly as they do today. — *EhrensDocs/Platform.md, Saving; follows from 2
     and 3*
 
+### The user's going-ahead defaults (2026-11-18)
+
+These five were settled with the user as defaults, cheap to change. None is in a design
+doc yet.
+
+14. **One order at a time.** A member holds at most one order. Ordering a drink takes
+    back an ordered special, and ordering a special takes back an ordered drink. So at
+    a cooldown the member either drinks or uses the special, never both.
+15. **A waiting close-range member drinks once they're home.** Say a close-range
+    member's attack is already waiting when the drink is ordered. They drink as soon as
+    they are back on their own spot. Only their own absence holds the drink. Three
+    things hold an attack but not a drink: their target being away, their target having
+    an attack due ahead of theirs, and their being the first target of a lunge that is
+    still out (Battle.Walk.cs `IsHeld`). The drink's place in the order is the one the
+    waiting attack already had.
+16. **A free attack is never replaced.** A free attack from the Luck reset is always an
+    attack. An order placed before one stays put and is used at the next cooldown that
+    comes after a wait. This is the same as a special, which is never used on a free
+    attack.
+17. **An order isn't saved.** A drink that is ordered but not yet drunk is lost if the
+    game closes. The saved battle doesn't hold drink orders, the same as an ordered
+    special today, and a battle that carries on from a save has none.
+18. **18 points.** Every shop potion heals 18 (requirement 3).
+
+### Settled from the review
+
+These are cheap defaults chosen to close the reviewer's notes.
+
+19. **Taunt.** A drink never spends a taunt. A close-range member's target may already
+    have been picked, spending the taunt, before the drink was ordered (Battle.Walk.cs,
+    the pick in `NextAction`). If the action then turns out to be a drink, the taunt
+    goes back on them and is kept for their next attack. — *follows from 9; Combat.md,
+    Enemy Targeting*
+20. **Full health.** A member at full health can be ordered to drink. The drink still
+    uses up the potion and the attack, heals 0, and reports a gain of 0. Combat.md's
+    "the player can have it drink" sets no health condition. — *Combat.md, Player Input*
+21. **Where the order lives, and the calls.** The order lives in `Battle`, so a battle
+    with no screen plays it the same way.
+    - `Battle` has `CanOrderDrink(Combatant)`, which applies requirement 6's conditions.
+      It also has `OrderDrink(Combatant)`, which returns whether the order was taken,
+      plus `CancelDrink(Combatant)` and `IsDrinkOrdered(Combatant)`.
+    - `BattleController` wraps these for the screen as `CanOrderDrink`, `ToggleDrink`
+      and `IsDrinkOrdered`, and it is what #157 calls. The controller holds rule 14,
+      since an ordered special lives there (`_armed`). Arming a special cancels the
+      drink order in `Battle`, and ordering a drink removes the member from `_armed`.
+    - The controller's tidy-up drops drink orders for the dead and at the battle's end,
+      as it already does for specials.
+22. **Report shape.** A drink made in place of an attack is an `ActionReport`. It has no
+    strikes, `UsedSpecial` and `IsFreeAttack` are both false, and there is a new
+    `DrankInstead` flag set to true.
+    - Its `Drinks` holds one `DrinkReport` with neither `FollowedStrike` nor
+      `FollowedFieldHit` set. That is how a drink in its own right is told apart, so
+      the "exactly one is set" note in ActionReport.cs is wrong from now on.
+    - `TurnPlayback.From` plays the action's field hits first and then this drink event
+      (`PlaybackKind.Drink`).
+    - The action is not a lunge (`MeleeTiming.IsLunge` false), so the drinker is never
+      away.
+    - Since no hit sets off a drink any more (requirement 5), no hit's report and no
+      `MoveReport` carries a drink.
+23. **Threshold tuning.** `Tuning.PotionDrinkThresholdPercent` stays in the tuning file,
+    at 30, for #158. Nothing reads it in this feature. `Tuning.PotionHealPercent` goes,
+    and the new heal placeholder of requirement 3 takes its place in the placeholder
+    listing.
+24. **Existing tests that are wrong.** These assert the old behaviour: drinking set off
+    by a hit under the threshold, for free, healing 30%. They must be rewritten or
+    deleted against this PRD.
+    - `PotionDrinkTests.cs`, every test.
+    - `PotionBattleScreenTests.cs`: `R11_TheHitPlaysFirst_…` and `R11a_ADrinkSetOffByFieldDamageOnAMove_…`.
+    - `PotionSaveTests.cs`: `R16old_AMemberSavedUnderTheThreshold…DrinksOnTheNextHit`, `ADiveSavedMidBattleAfterADrink…` and `ADiveSavedBeforeADrink…`. These still matter, but they must reach the drink by ordering one.
+    - `PotionHoldingTests.cs`: `R17_ThePotionPlaceholdersAreListedOnce…`, whose `PotionHealPercent` case gives way to the new heal placeholder.
+    - `BattleLiveInputTests.cs`: the four `Q137_…` drink-on-a-field-move and drink-on-a-swap tests.
+    - `CarryInSlotsRaidTests.cs`: `R13_EachDrinkUsesExactlyOnePotion…`, `R13_OneMembersPotionsNeverReachAnother…`, `R14_AMemberStillHoldingAPotionAfterDrinking…`, `R15_R16_ADrunkPotionIsNeverGivenBack…`, `R16_AMemberWhoDrankAndThenDied…`, `R17_APotionDrunkInAPlayedMissionStaysGone…` and `R18_IfTheGameClosesPartwayThroughAPlayedMission…`. Their rules still hold; only the way the drink is set off changes.
+    - `CombatMeleeWaitHoldTests.cs`: `R16_ADrinkSetOffByTheFieldHitLengthensTheWindow`.
+    - `GameAudioSoundGapsTests.cs`: `ADrinkSetOffByAHit_…` and `ADrinkSetOffByFieldDamageOnAMove_…`. The potion sound now plays on an ordered drink.
+    - `MissionPlayOutcomeTests.cs`: `AMemberCarryingAPotionDrinksItUnderTheUsualThreshold…` and `AHeldPotionAboveTheThresholdIsNeverDrunk…`.
+
 ## Out of Scope
 
 - **The drink button on each member card (#157).** This PRD provides the order that
@@ -114,20 +192,3 @@ drink-button item (#157) calls it.
   member can drink a potion instead of attacking — does a member standing in a field
   take the field's damage when it drinks?" — built with the user's going-ahead default
   of yes (requirement 8).
-- *(Mine — proposal, not the docs')* Should every shop potion heal the same amount, or
-  should each one roll its own amount inside 10–25 when it is bought, the way shop gear
-  does? And if they all heal the same, should that amount sit at the band's bottom (the
-  shop's "baseline"), or near the middle? Built with: all the same, 18. Changing to a
-  per-potion roll later means a save change.
-- *(Mine — proposal)* What if a member has a drink ordered and their special ordered,
-  and their cooldown comes up? Proposed: a member holds one order at a time, so ordering
-  either one takes back the other.
-- *(Mine — proposal)* A close-range member whose attack is already waiting for its
-  target to get home is told to drink. Do they drink at once, or keep waiting first?
-  Proposed: a drink needs no target, so they drink as soon as they are home themselves.
-- *(Mine — proposal)* Can a drink take the place of a free attack from the Luck reset?
-  Proposed: no. The free attack is "an ordinary attack in every way", and a special is
-  never used on one, so the order waits for the next cooldown that comes after a wait.
-- *(Mine — proposal)* If the game closes mid-battle with a drink ordered but not yet
-  drunk, is the order still there when the battle carries on? Proposed: no, the same as
-  an ordered special today.
