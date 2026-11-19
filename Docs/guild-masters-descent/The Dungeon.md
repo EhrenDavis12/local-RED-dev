@@ -107,17 +107,17 @@ its last fight:
 - 3 battles — 20%, then 30%, then 50%
 
 A battle's share is spent on enemies. An enemy's baseline cost is set by its rank,
-starting at 31 points at F and doubling at each rank:
+starting at 30 points at F and doubling at each rank:
 
-- F — 31 points
-- E — 62
-- D — 124
-- C — 248
-- B — 496
-- A — 992
-- S — 1,984
-- SS — 3,968
-- SSS — 7,936
+- F — 30 points
+- E — 60
+- D — 120
+- C — 240
+- B — 480
+- A — 960
+- S — 1,920
+- SS — 3,840
+- SSS — 7,680
 
 How deep the floor sits in its own dungeon scales that cost down. At a dungeon's
 shallowest floor an enemy costs its full baseline; at the deepest it costs a third of
@@ -134,8 +134,8 @@ enemy's cost instead, so the deepest floors field a full grid of enemies that ar
 individually stronger than the floor's own scaling would make them.
 
 An enemy's share becomes its stats in a fixed shape. The points are spread down the
-ordering its type's stat weighting gives, in the ratio 9 : 7 : 6 : 5 : 4 — so a
-31-point enemy comes out at 9 in its type's leading stat, then 7, 6, 5 and 4. The
+ordering its type's stat weighting gives, in the ratio 8 : 7 : 6 : 5 : 4 — so a
+30-point enemy comes out at 8 in its type's leading stat, then 7, 6, 5 and 4. The
 weightings are in the Guild Members doc.
 
 Each set also has a limited pool of enemy types that can appear there, growing by one type

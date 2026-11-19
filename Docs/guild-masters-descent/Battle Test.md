@@ -10,6 +10,14 @@ Both sides are F rank at level 1. The point is repeatability — the same teams,
 gear, the same positions every run, so a change to a rule shows up as a change in the
 outcome rather than being lost in different starting conditions.
 
+The enemy team is 180 base stat points — six enemies at the F-rank baseline cost of 30
+each, before the help bonus the formation gives. The largest single battle an F-rank
+dungeon produces is 150 points, spread across fifteen enemies that each cost a third of
+baseline. So this fixture is a heavier fight than F rank produces, and it concentrates
+that weight in six bodies rather than fifteen. It is a bench for checking the combat
+rules against each other rather than a sample of what a dungeon floor serves up. What a
+floor's power is and what an enemy costs are covered in the Dungeon doc.
+
 ## The Field
 
 Each side has a field three positions wide and three rows deep. Front row is row 1,
@@ -64,10 +72,13 @@ Both teams start at level 1. At F rank, crossing to E rank takes 20 experience a
 levels, so an even rate across the rank puts a level at a quarter past one — 1.25
 experience each.
 
-Every enemy here is F rank, and an F-rank kill is worth 1 experience, so clearing all six
-pays 6, divided equally between the six party members — 1 each a battle. So a member gains
-a level roughly every battle and a quarter, and reaches the 16 levels that make it
-eligible for E rank after about 20 battles.
+Every enemy here is F rank, and each is built at the full F-rank baseline cost, so each
+pays the full F value on a kill — a kill's pay scales with what the enemy cost, covered
+in the Guild Members doc. An F-rank kill is worth 1 experience, so clearing all six pays
+6, divided equally between the six party members — 1 each a battle. So a member gains a
+level roughly every battle and a quarter, and reaches the 16 levels that make it eligible
+for E rank after about 20 battles. That twenty-battle figure is a property of this
+fixture — six full-cost enemies a battle — rather than of a dungeon floor.
 
 The fixture itself stays at level 1. It is a fixed starting state, so a run never leaves
 the teams levelled up — the accumulation above is what a sequence of battles would
@@ -85,3 +96,7 @@ produce, not a change to the teams recorded here.
   levels, split evenly. Whether experience really buys levels at an even rate is an open
   question in the Guild Members doc — if the two run on separate counters instead, this
   figure is wrong.
+- The teams here are set by hand, and the weight and shape of the enemy side isn't one
+  the dungeon rules would generate for an F-rank floor. Should the fixture stay a
+  hand-set bench that keeps old test runs comparable, or be rebuilt from a real floor's
+  power budget, so that what it measures is what the game serves up?
