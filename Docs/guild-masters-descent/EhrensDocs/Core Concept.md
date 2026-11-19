@@ -277,10 +277,11 @@ rank, and how many depends on its secret variance: one fewer than the members it
 more if it turned out harder. The counts are placeholders. Neither the monsters nor the
 variance shows before the fight.
 
-The battle plays by every rule any battle has. Gear wears as it's used, a member drinks
-their potion as in any battle, and both stay that way after the mission. Kills pay
-experience as in any combat, to the members still standing when it ends; a retreat pays
-none.
+The battle plays by every rule any battle has. Gear wears as it's used, and a member
+drinks from the potions packed for it as in any battle; the wear and the potions drunk
+stay that way after the mission, and every potion left undrunk goes back to the stores.
+Kills pay experience as in any combat, to the members still standing when it ends; a
+retreat pays none.
 
 For now a played mission has no timer: it ends the moment its battle does, and it never
 shows among the missions out. A win pays the mission's gold at once, and nothing else. A
@@ -291,7 +292,8 @@ health drops out of the fight, and after it everyone sent is back at full health
 on the roster. The battle's result says how it went, so the hall's notice adds nothing.
 
 The battle itself isn't saved, and the save doesn't change. If the game is closed partway
-through, the mission is gone, unpaid, and nobody is injured.
+through, the mission is gone, unpaid, and nobody is injured, and the potions packed for
+it are back in the stores, less any drunk.
 ```
 
 **Why:** The user, 2026-11-15: "i need a way to actually fight with out going into the

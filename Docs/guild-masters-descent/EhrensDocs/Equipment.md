@@ -623,5 +623,11 @@ shield spends a use on every hit the Tank takes, wherever armour spends one, and
 Up spends none of it; shields have classes and rolled numbers, built the way armour is; a
 Brute's hit halves the Tank's whole defence, shield included; nobody repairs a shield on a
 dive, because field repair isn't built yet; and all four shields wear the one shield
-picture the game carries, with the other three named on the game's missing-art list. The
-existing entries, and the pending changes to this list above, are unchanged.
+picture the game carries, with the other three named on the game's missing-art list. On
+potions the default is that no member holds one in the guild hall: potions wait in the
+stores and are packed only at the start of a raid, so there's no handing one over or
+taking it back, on a dive or off it, and every undrunk potion goes back to the stores
+when the raid ends, a dead member's too, unless the whole party fell. That's in The
+Dungeon's change "Healing potions are packed at the start of a raid and come back at its
+end, for now". The existing entries, and the pending changes to this list above, are
+unchanged.

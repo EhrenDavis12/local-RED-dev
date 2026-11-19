@@ -93,7 +93,7 @@ retreating, is the next change. Answered 2026-11-14, too: "you enter a level and
 level should go through" — a floor's battles play back to back, with no screen after
 each one showing what was gained and waiting for a click on Continue.
 
-## Change: A party can turn back anywhere, and carries out only what it has room for
+## Change: A party can turn back anywhere, and gold takes no slots for now
 
 > Proposed 2026-11-11 · for review
 
@@ -122,11 +122,11 @@ since the last rest area. "Anywhere" includes the middle of a battle: a Retreat 
 is there all through a floor's battles, and the party can leave with it at any moment.
 For now a battle that ends in a stand-off counts as the party turning back there.
 
-For now the party holds all the gold it finds while it's inside, and its carrying
-capacity only bites on the way out: leaving between rest areas first loses the gold found
-since the last one, and then whatever the party has no room left for stays behind. Only
-the living carry, so a party with no one left alive brings nothing out. A dead member's
-gear takes up none of the party's carrying capacity.
+For now gold takes no slots, so carrying capacity never limits the gold a party brings
+out, and who came along doesn't change how much: leaving between rest areas loses the
+gold found since the last one, and nothing else is left behind. Only the living carry,
+so a party with no one left alive brings nothing out. A dead member's gear takes up none
+of the party's carrying capacity.
 ```
 
 **Why:** Answered: yes, turn back anywhere, losing the gold found since the last rest
@@ -134,10 +134,11 @@ area. The original names the rest area as where the player may exit, and its ret
 sentence only implies leaving elsewhere; this says so outright. "Any party member can
 carry some of it, so how much is lost depends on who came along" no longer holds:
 turning back between rest areas loses all the gold found since the last rest area
-whoever came along, and who came along decides instead how much comes out at all, by the
-slots each member carries — the original's own paragraph on capacity, after this one.
-Not settled by the original's slots: when the capacity bites, and how a dead member's
-gear counts against it. The second paragraph has a default for now on both, and the
+whoever came along. The original's paragraph on capacity, after this one, counts it in
+slots and has a healing potion and an item of loot take one each, but doesn't say
+whether gold takes any; for now it takes none, so capacity never limits the gold a party
+brings out. Not settled by the original's slots either: how a dead member's gear counts
+against it. The second paragraph has a default for now on both, and the
 first has defaults on rest areas and stand-offs; each is proposed as a question for
 `## Open Questions`. Answered 2026-11-14: the party can retreat at any time, the middle
 of a battle included — "you can holler a retreat sign that will take them out". Which
@@ -322,6 +323,50 @@ fights. I only get eight gold. ... That's financially bankrupt me instantly in t
 dungeon, the cheaper the entrance fee that might be a necessary thing. Then the lesser
 the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
 
+## Change: Healing potions are packed at the start of a raid and come back at its end, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Entering the Dungeon`, last paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+Healing potions take up the party's carrying capacity, and they're added to it at the
+start of the raid.
+```
+
+**Proposed:**
+
+```
+Healing potions take up the party's carrying capacity, and they're added to it at the
+start of the raid.
+
+A raid starts when a party goes into a dive, re-enters one at a rest area, or plays a
+mission as a battle. A mission that's sent packs nothing, and a raid that's refused packs
+nothing and changes nothing. No member holds a potion in the guild hall: there's no
+handing one to a member in the Dorms, and every potion waits in the stores until a raid
+packs it. For now, until party planning lets the player choose, the start of a raid packs
+one potion for each member from the stores, in the order the party was picked, for as
+long as the stores last. A party with too few still goes in, and the members later in the
+order go without.
+
+For now a member drinks only from the potions in their own slots, one at a time, so one
+member's potions never reach another, and a member who still holds one after drinking
+can drink again. When the raid ends, every potion left undrunk goes back to the stores —
+a dead member's too — and one drunk stays gone. If the whole party falls on a dive, every
+potion packed for it is lost.
+```
+
+**Why:** The game is built this way. The original says potions take capacity and are
+added at the start of the raid, but not which raids, how many each member takes, whose a
+member drinks from, or where the undrunk ones go. Handing a potion to a member in the
+Dorms went away with slots, since nobody holds one between raids. Every "for now" here
+is a default the build chose, not yet the user's word: how many are packed, and drinking
+from one's own slots, are proposed as questions in "Questions on carrying"; whether an
+undrunk potion goes back to the stores, and what happens to a dead member's, are already
+asked in Equipment's change "Questions on shields and potions".
+
 ## Change: A question on what gold a retreat keeps
 
 > Proposed 2026-11-14 · for review
@@ -345,8 +390,8 @@ the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
 
 **Why:** The user, 2026-11-14: "they won't gain any of that gold for that level. You
 should still continue with the gold they had. Before the level." The change "A party can
-turn back anywhere, and carries out only what it has room for" has a retreat between rest
-areas lose all the gold found since the last rest area, and the two may not agree.
+turn back anywhere, and gold takes no slots for now" has a retreat between rest areas
+lose all the gold found since the last rest area, and the two may not agree.
 
 ## Change: Questions on the dive's defaults
 
@@ -367,8 +412,8 @@ areas lose all the gold found since the last rest area, and the two may not agre
 - Is a rest-area floor a floor of battles with a rest at the end, or a safe floor with no
   battles?
 - What does a battle that ends in a stand-off do to the dive?
-- When does the carry limit bite: is extra gold lost as soon as it's found, or only when
-  the party walks out?
+- Does gold take up slots, or does it ride free, with slots holding only potions and
+  items of loot?
 - How does a dead member's gear count against the party's carrying capacity, now counted
   in slots?
 - Is a floor's set of monsters the same every dive, or new each time?
@@ -414,6 +459,36 @@ pending "A question on what gold a retreat keeps" change to this list is unchang
 **Why:** The dive is built with a default for now on each of these, in "How a heal in the
 dive lands, for now", and none of the docs settles them. The pending changes to this list
 above are unchanged.
+
+## Change: Questions on carrying
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- Until party planning lets the player choose, how many healing potions does a raid pack
+  for each member?
+- During a raid, does each member drink only from the potions in their own slots, or does
+  the party share them?
+- Does a played mission pack healing potions into slots the way a dive does?
+- Do potions and loot compete for slots during the dive, or only on the way out?
+```
+
+**Why:** The game is built with a default for now on the first three, in "Healing
+potions are packed at the start of a raid and come back at its end, for now": one each in
+pick order while the stores last, each member drinking from their own, and a played
+mission packed like a dive. The last doesn't come up until a dive yields items. The
+pending changes to this list above are unchanged.
 
 ## Change: Party planning is one screen
 

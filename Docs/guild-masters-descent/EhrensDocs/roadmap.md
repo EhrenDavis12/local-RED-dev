@@ -168,7 +168,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   for the design docs' owner): the questions the build is waiting on.
   - How to answer
   - Open Questions
-    - Loot and carrying gold
+    - Loot and carrying
     - Enemies
     - Health
     - Battle
@@ -180,11 +180,13 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
-  back anywhere and the carry limit, how many monsters a battle has, enemies are monsters
-  with a rank and level and how they fight for now, a floor's monsters the same every dive
-  and where each stands, re-entering and its fees for now, open questions on
-  what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
-  open questions on healing in the dive, and party planning as one screen).
+  back anywhere and gold taking no slots for now, how many monsters a battle has, enemies
+  are monsters with a rank and level and how they fight for now, a floor's monsters the
+  same every dive and where each stands, re-entering and its fees for now, open questions
+  on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a
+  rest area's fifteen only, settled; the rest for now), open questions on healing in the
+  dive, potions packed at a raid's start and returned at its end for now, questions on
+  carrying, and party planning as one screen).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).

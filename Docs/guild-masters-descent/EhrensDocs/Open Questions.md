@@ -8,22 +8,22 @@ Reply under each question, or by number (e.g. "1: 110, 3: A"). Skip any you want
 
 ## Open Questions
 
-### Loot and carrying gold
+### Loot and carrying
 
 Capacity is counted in slots: every member carries 5, and a healing potion or an item of loot takes 1 slot each.
 
 3. **A dead member's gear.** When a member dies in the dungeon, how does their gear get
    home? (Fairly easy to change.)
    - A: It always comes home, free.
-   - B: Each piece takes up space, say 5 gold's worth, so you leave gold behind to carry
-     it.
+   - B: Each piece takes up a slot, and it comes home only if the party has a slot free
+     for it.
    - C: Only a Porter can bring it home.
 
    **Answer:**
 
-4. **Too much gold.** When a floor drops more gold than the party can carry, is the extra
-   lost straight away? Or does the party keep it all in the dungeon and only leave the
-   extra behind when it walks out? (Cheap to change.)
+4. **Gold and slots.** Going ahead with: gold takes no slots, so the party brings out all
+   the gold it keeps, however many came along. Fine, or should gold take slots too, say
+   so many coins a slot? (Cheap to change.)
 
    **Answer:**
 
