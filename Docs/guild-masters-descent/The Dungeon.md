@@ -92,6 +92,19 @@ for the first four floors and rising by one at each four-floor step:
 
 The battle grid holds fifteen, so the deepest floors fill it.
 
+The floors between rest areas also group into sets of four, and each set has a limited
+pool of enemy types that can appear there, growing by one type per set:
+
+- Floors 1–4 — 1 to 2 types
+- Floors 6–9 — 2 to 3
+- Floors 11–14 — 3 to 4
+- Floors 16–19 — 4 to 5
+- Floors 21–24 — 5 to 6
+- Floors 26 and deeper — all six
+
+The sets skip the rest areas, which is why they run 1–4 then 6–9 rather than 1–4 then
+5–8. The ladder stops at six because there are only six combat types.
+
 Capacity is counted in slots, and every member carries 5 slots. Some members carry extra
 slots restricted to a particular kind of thing — the Specialists doc covers which ones. A
 healing potion takes 1 slot, and so does an item of loot — they cost the same, because if
@@ -137,3 +150,10 @@ What the injured status means is covered in the Core Concept doc.
 ## Open Questions
 
 - How far can a training mission level a member?
+- The sets of four floors that set how many enemy types can appear skip the rest areas,
+  running 1–4 then 6–9. The bands that set how many enemies a fight holds don't, running
+  1–4 then 5–8. Should the two use the same grouping?
+- Each set of floors has a pool of enemy types that can appear there, but nothing says how
+  that pool is chosen — rolled when the dungeon is created, or when the party first
+  reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
+  ones.
