@@ -226,6 +226,11 @@ The maximum number of members on a team is 15, including specialists. The player
 want to take that many every time, because there could be penalties incurred with AoE, and
 because of possible dungeon effects — a detail that isn't fully worked out yet.
 
+A battle's experience is split evenly between everyone who came, so each member of a big
+party gains slower than each member of a small one — a party of fifteen gains at a little
+over a third the rate of a party of six. See Levels and Experience for how the split
+works.
+
 ## Open Questions
 
 - With each matchup working through its own mechanism rather than a shared multiplier, the
