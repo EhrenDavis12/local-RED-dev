@@ -74,29 +74,69 @@ safe floor — any party member can carry some of it, so how much is lost depend
 came along.
 
 The floors between rest areas group into sets of four, skipping the rest areas themselves,
-so the sets run 1–4, then 6–9, then 11–14, and so on. Both ladders below — enemy count and
-enemy type — are set by these same sets.
+so the sets run 1–4, then 6–9, then 11–14, and so on. The enemy-type ladder below is
+set by these same sets.
 
-Each fight's enemy count is a band set by the set a floor falls in, starting at 1–3
-enemies and rising by one at each step:
+A floor has a power level, and it is counted in stat points. The power is a pool of
+base-stat points, and an enemy costs the sum of its five base stats to put on the
+floor.
 
-- Floors 1–4 — 1 to 3 enemies
-- Floors 6–9 — 2 to 4
-- Floors 11–14 — 3 to 5
-- Floors 16–19 — 4 to 6
-- Floors 21–24 — 5 to 7
-- Floors 26–29 — 6 to 8
-- Floors 31–34 — 7 to 9
-- Floors 36–39 — 8 to 10
-- Floors 41–44 — 9 to 11
-- Floors 46–49 — 10 to 12
-- Floors 51–54 — 11 to 13
-- Floors 56–59 — 12 to 14
-- Floors 61 and deeper — 13 to 15
+- A dungeon's first floor has a power set by the dungeon's own rank, 100 points at F and
+  doubling at each rank:
 
-The battle grid holds fifteen, and the top of this ladder is as many enemies as the grid
-holds. The deepest dungeons the ranks allow reach it: an SSS dungeon rolls between 53 and
-63 floors, and the ladder's top band starts at floor 61.
+  - F — 100 points
+  - E — 200
+  - D — 400
+  - C — 800
+  - B — 1,600
+  - A — 3,200
+  - S — 6,400
+  - SS — 12,800
+  - SSS — 25,600
+
+- The power triples from a dungeon's first fighting floor to its deepest, climbing evenly
+  across them. A deep dungeon has more floors to build over, so its climb from one floor
+  to the next is gentler than a shallow one's.
+- Rest areas hold no battles and no power.
+
+The floor's power is split between its battles, weighted so the floor builds toward
+its last fight:
+
+- 1 battle — the whole floor's power
+- 2 battles — 40% then 60%
+- 3 battles — 20%, then 30%, then 50%
+
+A battle's share is spent on enemies. An enemy's baseline cost is set by its rank,
+starting at 31 points at F and doubling at each rank:
+
+- F — 31 points
+- E — 62
+- D — 124
+- C — 248
+- B — 496
+- A — 992
+- S — 1,984
+- SS — 3,968
+- SSS — 7,936
+
+How deep the floor sits in its own dungeon scales that cost down. At a dungeon's
+shallowest floor an enemy costs its full baseline; at the deepest it costs a third of
+it. So the rising power of the lower floors is spent on numbers rather than on
+strength, and the bottom of a dungeon is a horde — the bottom of an F dungeon a horde
+of weak F enemies, the bottom of an SSS dungeon a horde of weak SSS ones.
+
+The count falls out of the division. The number of enemies in a battle is its share of
+the power divided by what one enemy costs, never fewer than one and never more than
+the fifteen the battle grid holds. A roll varies an enemy's cost from half to twice
+the scaled figure, so the same share can come out as a few strong enemies or a swarm
+of weak ones. Where the count would pass fifteen, the points left over raise each
+enemy's cost instead, so the deepest floors field a full grid of enemies that are
+individually stronger than the floor's own scaling would make them.
+
+An enemy's share becomes its stats in a fixed shape. The points are spread down the
+ordering its type's stat weighting gives, in the ratio 9 : 7 : 6 : 5 : 4 — so a
+31-point enemy comes out at 9 in its type's leading stat, then 7, 6, 5 and 4. The
+weightings are in the Guild Members doc.
 
 Each set also has a limited pool of enemy types that can appear there, growing by one type
 per set:
@@ -159,3 +199,10 @@ What the injured status means is covered in the Core Concept doc.
   that pool is chosen — rolled when the dungeon is created, or when the party first
   reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
   ones.
+- Experience pays by a defeated enemy's rank, so an enemy built at a third of its
+  baseline cost pays exactly what a full-cost one of the same rank pays. A battle's
+  power can be spent to buy more pay — the same points spent as a horde yield three
+  times the kills of the same points spent as a few strong enemies, and a horde of
+  individually weak enemies is also the easier fight for a party with cleaves and
+  area attacks. Should a kill pay by the enemy's power rather than by its rank
+  alone?
