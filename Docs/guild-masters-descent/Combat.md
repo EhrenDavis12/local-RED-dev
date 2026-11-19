@@ -231,6 +231,10 @@ has no special bar at all, and their attack damage works the way it does for any
 ## Enemies
 
 Enemies are built from the same six combat types as guild members, working the same way.
+That includes monsters: a monster is built from the same six combat types too, not a
+seventh structure of its own, so nothing in this section treats it any differently from
+any other enemy.
+
 What changes with a dungeon is tied to the dungeon's own rank: it sets both the rank of
 the enemies found there and their chance of gear. An enemy is either the dungeon's own
 rank or one grade below it, and no other grade — a C-rank dungeon fields C-rank and
@@ -266,8 +270,6 @@ the Equipment doc.
   which specials are ready at a glance?
 - The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
   stop there, or do they keep coming?
-- The dungeon board shows the types of monster and enemy found in a dungeon. Is a
-  monster something other than an enemy built from the six combat types?
 - An enemy uses its special when its bar is full, but nothing says what decides the moment
   or the target. Does it fire as soon as it can, or hold while a better target is in
   reach?
