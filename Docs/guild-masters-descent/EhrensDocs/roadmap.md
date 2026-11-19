@@ -111,8 +111,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   stacking, targeting weights and taunts, a specialist's cooldown, open questions on
   specials, taunts and the dive, on cooldown combat's defaults, and on the special bar,
   the fight pausing for now, the fight's speed, the speed question answered, a
-  close-range attack waiting for its target to be home, close-range fighters taking
-  turns on the same tick for now, questions on that wait, every
+  close-range attack waiting for its target to be home, attacks on the same tick going
+  in turn, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
   drinking a potion as an order used at the next cooldown for now, and questions on

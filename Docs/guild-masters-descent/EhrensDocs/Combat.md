@@ -805,12 +805,10 @@ while its target is waiting to attack ahead of it, and goes after it. A waiting 
 keeps the target it picked, and picks again only if that target dies, goes out of its
 reach, or vanishes.
 
-For now, two close-range fighters who pick each other on the same tick take turns rather
-than attacking at the same time. The attack that became ready first goes first; between
-two that became ready on the same tick, the one with the higher Dexterity of its own goes
-first, help from the support ring left out, and between equal Dexterity it's a random
-draw. The first walks out, hits and walks home, and only then does the other go. If the
-first hit kills the other fighter, it never swings.
+Two close-range fighters who pick each other on the same tick take turns, in the order
+Cooldowns sets for every attack on the same tick: the first walks out, hits and walks
+home, and only then does the other go. If the first hit kills the other fighter, it never
+swings.
 
 Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
 attack is: a field it stands in hurts it first, whether it uses its special is decided
@@ -842,16 +840,16 @@ the other's empty spot and swung at thin air. Asked then whether two close-range
 who pick each other on the same tick should hit at once or take turns, and whether a
 fighter whose target heads off on that tick should wait for it to come home, the user
 said: "B my rules for now. as it looks bad otherwise." That departs from the original's
-same-tick attacks all happening at the same time, so it stands for now; see "Close-range
-fighters take turns on the same tick, for now". The combat engine and the battle screen
-are built this way. Each "for now" in the list is proposed as a question below.
+same-tick attacks all happening at the same time, as every attack on the same tick does;
+see "Attacks on the same tick go in turn". The combat engine and the battle screen are
+built this way. Each "for now" in the list is proposed as a question below.
 
-## Change: Close-range fighters take turns on the same tick, for now
+## Change: Attacks on the same tick go in turn
 
 > Proposed 2026-11-18 · for review
 
 **Where:** `## Cooldowns`, the paragraph beginning "When more than one combatant's cooldown
-comes up on the same tick"
+comes up on the same tick" and the paragraph after it
 
 **Now says:**
 
@@ -861,29 +859,43 @@ happen at the same time — there's no order between them, and nothing resolves 
 Damage is worked out against where things stood at the start of that tick, so a combatant
 that dies on that tick still lands the attack it made on it, and two combatants can kill
 each other on the same tick.
+
+That simultaneity is between combatants, not inside one combatant's own attack: within a
+single attack the strikes still resolve one after another, which is what lets the
+Fighter's flurry carry its remaining strikes to the nearest enemy still standing when its
+target dies partway through.
 ```
 
 **Proposed:**
 
 ```
-When more than one combatant's cooldown comes up on the same tick, their attacks all
-happen at the same time — there's no order between them, and nothing resolves first.
-Damage is worked out against where things stood at the start of that tick, so a combatant
-that dies on that tick still lands the attack it made on it, and two combatants can kill
-each other on the same tick. For now two close-range fighters are the exception, as
-Attacks and Reach says: when they pick each other on the same tick they take turns, and
-the first hit can kill the other before it swings; and when a fighter's target heads off
-on that tick to hit someone else, the fighter waits until it's home, so its attack lands
-after its target's.
+When more than one combatant's cooldown comes up on the same tick, their attacks don't
+happen at the same time: they go in turn, one after another. The attack that became ready
+first goes first; between two that became ready on the same tick, the one with the higher
+Dexterity of its own goes first, help from the support ring left out, and between equal
+Dexterity it's a random draw. Each attack is worked out against the fight as it stands
+after the attacks before it, so a combatant killed earlier in the tick never makes its
+attack, and an attacker whose target has already died picks a new one still standing.
+The battle ends as soon as one side has no one left standing, even partway through a
+tick, so the last member and the last enemy never kill each other. A close-range fighter
+also waits for its target to be home, as Attacks and Reach says.
+
+Within one combatant's own attack the strikes resolve one after another too, which is
+what lets the Fighter's flurry carry its remaining strikes to the nearest enemy still
+standing when its target dies partway through.
 ```
 
-**Why:** The user, 2026-11-17: "B my rules for now. as it looks bad otherwise." — on
-whether two close-range fighters who pick each other on the same tick should hit at once
-or take turns, and whether a fighter whose target heads off on that tick should wait for
-it to come home. Hitting at once would show each fighter walking to the other's empty
-spot, which "A close-range attack waits for its target to be home" rules out, so for now
-that rule wins over same-tick attacks happening together. The combat engine is built
-this way.
+**Why:** The user, 2026-11-18: "The only contradiction I want to win is from our side is
+that an enemy must wait on the battle on the attack sequence so that so that their present
+when being attacked so two people are attacking at the same time they don't actually attack
+at the same time one attack than the other attacks that's the only thing I want winning
+over what the new doc Say" — asked whether attacks on the same tick other than between two
+close-range fighters (two Archers shooting each other, a Mage and an Archer, two members
+hitting one enemy, a fighter walking up to an Archer) should all happen at once, as the
+original says, or go one after another. With the user's 2026-11-17 answer on close-range
+fighters, "B my rules for now. as it looks bad otherwise.", every attack on the tick goes
+in turn and none happen at once, so two combatants can't kill each other on the same tick.
+The combat engine is built this way.
 
 ## Change: Questions on a close-range attack waiting
 
@@ -920,14 +932,14 @@ its bar is full"
 - A fast fighter can be ready to attack again before it has walked home from its last
   attack, and a lucky one gets a free attack straight away. Should it walk home first and
   then go out again, or attack again from where it stands?
-- When two close-range fighters who pick each other became ready on the same tick, the
-  one with the higher Dexterity goes first. Does help from the support ring count in that
-  Dexterity, the way it counts in a Rogue's or an Archer's cooldown?
+- When two attacks became ready on the same tick, the one with the higher Dexterity goes
+  first. Does help from the support ring count in that Dexterity, the way it counts in a
+  Rogue's or an Archer's cooldown?
 ```
 
 **Why:** The combat engine is built with a default for now on each of these, in "A
-close-range attack waits for its target to be home" and "The free attack comes first, and
-a special gets no check, for now". The pending changes to this list above are unchanged;
+close-range attack waits for its target to be home", "Attacks on the same tick go in
+turn" and "The free attack comes first, and a special gets no check, for now". The pending changes to this list above are unchanged;
 these go after the entries they add.
 
 ## Change: Drinking a potion is an order used at the next cooldown, for now
