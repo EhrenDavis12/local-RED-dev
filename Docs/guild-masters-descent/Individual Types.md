@@ -29,10 +29,12 @@ counts double in the calculation against a Fighter.
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
 
 The Tank's special is called Shields Up. It temporarily doubles the Tank's own defence,
-and each ally behind him in his own column gains that same figure — the Tank's own
-defence — on top of their own, two of them when he's in the front row. If more than one
-Tank uses it, the contributions are fully additive: an ally behind two Tanks gets both
-lots of defence.
+measured before any Shields Up already standing on him, and each ally behind him in his
+own column gains that same figure — the Tank's own unshielded defence — on top of their
+own, two of them when he's in the front row. Firing it again refreshes the Tank's own
+shield rather than stacking on it: the fresh shield replaces the standing one and starts
+its length over, at the same size. If more than one Tank uses it, the contributions are
+fully additive: an ally behind two Tanks gets both lots of defence.
 
 Being attacked is the Tank's bonus: the bar charges faster while the Tank is being
 attacked.
