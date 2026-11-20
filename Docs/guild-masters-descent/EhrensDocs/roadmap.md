@@ -175,6 +175,8 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Enemies
     - Health
     - Battle
+    - Guild rank
+    - Finding dungeons
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
   health afresh as a save loads and keeping every Luck bag.

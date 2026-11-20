@@ -1,6 +1,6 @@
 # Open Questions — for the design docs' owner
 
-> **Status:** Questions the build is waiting on, asked 2026-11-17, for the design docs' owner to answer. Write an answer under each question; "going ahead with" means the game already does that, so answer only if you want it different.
+> **Status:** Questions the build is waiting on, asked 2026-11-17 and 2026-11-19, for the design docs' owner to answer. Write an answer under each question; "going ahead with" means the game already does that, so answer only if you want it different.
 
 ## How to answer
 
@@ -120,3 +120,96 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 
     **Answer:**
 
+
+### Guild rank
+
+The docs say the guild moves up (F → E → … → SSS) by passing a promotion test — a one-off
+mission on the mission board that appears "when the guild is close to promotion" — and
+that a higher rank raises how many missions run at once and the roster size. None of this
+is built yet; the build waits on these.
+
+20. **When the promotion test appears.** Nothing says what "close to promotion" means.
+    A placeholder number goes with whichever you pick. (Moderate to change later.)
+    - A: Once a set number of missions or battles have been won at the current rank.
+    - B: Once some members have reached the next rank themselves (e.g. one member
+      promoted to E).
+    - C: Once the guild has earned a set amount of gold in total.
+    - D: It is always on the board, one test per rank.
+
+    **Answer:**
+
+21. **What a promotion test is.** How is it passed? (Moderate to change later — it
+    decides the test screen and what is saved.)
+    - A: A mission like the others — pick members, it runs on a timer and succeeds or
+      fails the way missions do, ranked one grade above the guild, so lower-rank members
+      on it can die.
+    - B: A special dungeon run or battle the party has to win.
+    - C: Something else.
+
+    **Answer:**
+
+22. **Failing the promotion test.** If the guild fails it, what happens? Members come
+    home injured either way, as on any failed mission. (Cheap to change.)
+    - A: It stays on the board and can be tried again straight away.
+    - B: It disappears and comes back after a wait.
+    - C: It disappears until the guild is "close to promotion" again.
+
+    **Answer:**
+
+23. **What each rank raises.** How many missions can run at once, and how big can the
+    roster be, at each rank? Numbers get placeholders until answered. (Cheap to change.)
+
+    **Answer:**
+
+24. **The shop at E rank.** What does the shop sell once the guild is E rank? The
+    equipment doc gives prices only for F-class gear. (Cheap to change.)
+    - A: Keep selling F-class gear until E-class gear gets prices.
+    - B: The shop is empty of gear.
+    - C: E-class gear at placeholder prices.
+
+    **Answer:**
+
+### Finding dungeons
+
+The docs say dungeons are found through the mission board — a small chance on an
+ordinary mission (claimed outright), and a rank-up reveals one with a claim mission that
+"requires a big group" and stays on the board if it fails; only dungeons at or below the
+guild's rank. Not built yet; waits on these and on guild rank.
+
+25. **How big a "big group" is.** How big is a "big group" for a claim mission? And is a
+    claim mission a timed mission like the others that succeeds or fails, or a battle the
+    group plays? (Moderate to change later.)
+    - A: A fixed number, e.g. at least 5.
+    - B: More than a normal mission allows.
+    - C: Something else.
+
+    **Answer:**
+
+26. **Finding on a failed mission.** Can an ordinary mission find a dungeon only when it
+    succeeds, or on a failed mission too? (Cheap to change.)
+
+    **Answer:**
+
+27. **The bottom floor of a found dungeon.** A found dungeon's depth is random. The
+    starting dungeon ends on a rest area, but a random depth can end mid-way (e.g. 13
+    floors, last rest area at floor 10). When the party clears the bottom floor:
+    (Moderate to change later — a dungeon already made keeps its depth.)
+    - A: The dive ends and the party goes home with everything it carries, as at a rest
+      area.
+    - B: The bottom floor is always a rest area — depth is a multiple of 5.
+    - C: The bottom floor is a boss floor, then home.
+
+    **Answer:**
+
+28. **What a found dungeon holds.** The docs give only the starting dungeon's monsters
+    (F rank, level 1, all six combat types, more of them deeper). Going ahead with: a
+    found dungeon is built the same way, at the guild's rank, with its own random set of
+    monsters fixed when it's found; the find chance and the depth range are placeholders.
+    Fine, or different? (Cheap to change.)
+
+    **Answer:**
+
+29. **Buying a dungeon.** Can a dungeon ever be bought? The docs only describe finding
+    and claiming them. Going ahead with: no buying. (Cheap to change.)
+
+    **Answer:**
