@@ -28,10 +28,11 @@ counts double in the calculation against a Fighter.
 
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
 
-The Tank's special is called Shields Up. It temporarily increases the Tank's own defence,
-and it also adds that defence to all the allies behind him in his own column — two of them
-when he's in the front row. If more than one Tank uses it, the contributions are fully
-additive: an ally behind two Tanks gets both lots of defence.
+The Tank's special is called Shields Up. It temporarily doubles the Tank's own defence,
+and each ally behind him in his own column gains that same figure — the Tank's own
+defence — on top of their own, two of them when he's in the front row. If more than one
+Tank uses it, the contributions are fully additive: an ally behind two Tanks gets both
+lots of defence.
 
 Being attacked is the Tank's bonus: the bar charges faster while the Tank is being
 attacked.
@@ -100,7 +101,8 @@ precise single shot is what kills it.
 
 Its special is a lingering field: it covers two columns of the enemy's grid. The field
 affects enemies only — it never damages the player's own members. The field deals damage
-through two separate events: a character standing in the field takes damage from it when
+through two separate events, each one dealing half of what the Mage's ordinary attack
+deals to that same target: a character standing in the field takes damage from it when
 that character begins its own attack — that damage lands before the attack does, so if it
 kills the character the attack never happens — and a character that moves into the field,
 changing its position, takes damage for entering. Reaching in to attack from outside the
