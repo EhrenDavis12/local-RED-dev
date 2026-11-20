@@ -105,7 +105,7 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line,
   open question, health full at the guild hall and positions carrying between battles,
   how a cooldown rounds, the clock and a multi-strike attack landing in one tick, the Luck
-  reset's free attack and specials, picking a target, members' specials and how a battle
+  reset's free attack and specials, picking a target and how a battle
   ends, a special putting nothing in its owner's bar and taking the attack's place, every
   bar emptying on a new floor and each dive, an effect's count, its end and a second cast
   stacking, targeting weights and taunts, a specialist's cooldown, open questions on
@@ -115,8 +115,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   in turn, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
-  drinking a potion as an order used at the next cooldown for now, questions on
-  drinking a potion, and a new Rogue's worked cooldown of 71 ticks).
+  drinking a potion as an order used at the next cooldown for now (the battle screen's
+  drink buttons and Auto drinking included), questions on drinking a potion, and a new Rogue's worked cooldown of 71 ticks).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -179,7 +179,7 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Finding dungeons
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
-  health afresh as a save loads and keeping every Luck bag.
+  health afresh as a save loads and keeping every Luck bag and the three saved teams.
   - Orientation
   - Saving
   - Open Questions
@@ -191,7 +191,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a
   rest area's fifteen only, settled; the rest for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
-  carrying, and party planning as one screen).
+  carrying, party planning as one screen, and the guild's three saved teams).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).

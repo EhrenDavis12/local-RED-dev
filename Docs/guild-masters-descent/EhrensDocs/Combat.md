@@ -135,8 +135,7 @@ Nothing waits for the player. The fight runs from start to finish, and the playe
 while it's running — using a member's special once that bar is full, changing formation,
 and marking the focus target. For now there's a pause button: it stops the fight and
 opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
-the player can't use a special, mark the focus target or retreat. For now, though, a
-member's special can't be used from the battle screen: the bar fills and sits full.
+the player can't use a special, mark the focus target or retreat.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
 set length of time, a placeholder, as a stand-off — 6,000 ticks, five minutes of fight —
@@ -144,8 +143,7 @@ and a stand-off kills no one further.
 ```
 
 **Why:** The combat engine is built this way. No doc says what a member does with no
-target selected, or whether a battle can run forever. Using members' specials waits on
-the battle screen being able to; the engine already lets them. The original sentences are
+target selected, or whether a battle can run forever. The original sentences are
 unchanged, apart from the pause proposed in "The fight can be paused, for now"; the new
 ones sit after them.
 
@@ -721,8 +719,7 @@ the player can't use a special, mark the focus target or retreat.
 **Why:** The user, 2026-11-16: "Leave the pause button for now we can take it out later."
 The battle screen is built with it. This departs from the original's "The fight never
 pauses", so it stands for now. The pending "How a member with no target picks one, and how
-a battle ends" change to this paragraph carries this wording too; its sentence on specials
-goes after these.
+a battle ends" change to this paragraph carries this wording too.
 
 ## Change: The fight can be sped up, and only shows sooner
 
@@ -990,10 +987,22 @@ For now:
   used at the next cooldown that comes after a wait, the same as a special.
 - A drink never spends a taunt. A taunt is spent only by an attack that's made, so it
   keeps for the member's next one.
-- Nothing is drunk without an order, whatever a member's health, auto on or off. With
-  auto on, a member with a drink ordered never has their special ordered for them.
+- Nothing is drunk without an order. With Auto on in a dive, any party member below 30%
+  of their maximum health who still holds a potion has a drink ordered for them, a Cook
+  or a Porter too, and it's used at their next cooldown like any other order. The 30% is
+  a placeholder. The drink comes before a ready special: Auto never orders a special for
+  a member with a drink ordered, and ordering the drink takes back a special already
+  ordered. Auto never takes a drink order back. If the player takes back the drink, or
+  orders that member's special, while the member is still below 30% and holds a potion,
+  Auto orders the drink again straight away.
 - A drink that's ordered but not yet drunk isn't saved, so it's lost if the game closes.
-- The battle screen has no drink button yet, so no potion is drunk in a fight.
+- On the battle screen each fighter's skill button — up to four, the fourth following
+  whichever fighter the player last tapped — has a drink button under it for the same
+  member, showing how many potions they hold; pressing it orders the drink or takes it
+  back. The Cooks and Porters share one drink button, at the end of that row, which
+  starts on the first of them in the party and follows whichever one the player last
+  taps. An order stands when its member leaves the button. A drink button can't be
+  pressed while the fight is paused, for a fallen member, or for one with no potion left.
 ```
 
 **Why:** The original says the player can have a member drink instead of attacking when
@@ -1005,7 +1014,11 @@ and an unused order not being saved are the user's going-ahead defaults, 2026-11
 field's hit coming first is the default the build goes ahead with on the original's open
 question, which stays open. A drink at full health and a drink leaving a taunt standing
 are defaults the build chose, not yet the user's word, proposed as questions in
-"Questions on drinking a potion". The drink button and drinking under auto come later.
+"Questions on drinking a potion". The battle screen's drink buttons and drinking under
+Auto are built this way too. Nothing in the docs says Auto drinks at all; drinking below
+30%, and Auto ordering the drink again over the player's own tap, are defaults the build
+chose, not yet the user's word, proposed as questions there as well. The Cooks' and
+Porters' shared button is a default too, and cheap to change.
 
 ## Change: Questions on drinking a potion
 
@@ -1032,12 +1045,16 @@ Mage's field damages a character"
   and healing nothing?
 - When a taunted member drinks instead of attacking, does the taunt keep for its next
   attack, or does the drink spend it?
+- With Auto on, below what share of their health does a member drink a potion?
+- With Auto on, when the player takes back a drink Auto ordered, or orders that member's
+  special instead, does the player's choice hold, or does Auto order the drink again?
 ```
 
-**Why:** The combat engine is built with a default for now on each of these, in
-"Drinking a potion is an order used at the next cooldown, for now": a member can drink at
-full health, and a drink leaves the taunt standing. The pending changes to this list
-above are unchanged; these go at the end of the list, after the original's last entry.
+**Why:** The game is built with a default for now on each of these, in "Drinking a
+potion is an order used at the next cooldown, for now": a member can drink at full
+health, a drink leaves the taunt standing, Auto drinks below 30%, and Auto orders the
+drink again over the player's tap. The pending changes to this list above are unchanged;
+these go at the end of the list, after the original's last entry.
 
 ## Change: A new Rogue's worked cooldown is 71 ticks
 

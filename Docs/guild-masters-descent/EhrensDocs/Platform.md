@@ -54,11 +54,12 @@ before the save held special bars, loads with every bar empty, a save from befor
 loads with none in the stores and none on any member, a save from before slots loads a
 member on the saved dive with the one potion they held and puts anyone else's in the
 stores, so no potion is made or lost, a save from before shields loads with no shields in
-the stores and none on any Tank, and a save from before the Luck bag loads every member,
-and every enemy in a saved battle, with an empty bag that fills from that character's
-Luck at its first pull. A saved battle is never judged against a placeholder number — a
-fighter left waiting longer than its own cooldown is accepted — so rebalancing a
-placeholder can't turn a good save into one the game can't read.
+the stores and none on any Tank, a save from before the Luck bag loads every member, and
+every enemy in a saved battle, with an empty bag that fills from that character's Luck at
+its first pull, and a save from before saved teams loads with all three empty. A saved
+battle is never judged against a placeholder number — a fighter left waiting longer than
+its own cooldown is accepted — so rebalancing a placeholder can't turn a good save into
+one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
@@ -96,6 +97,10 @@ For now:
   Trues than tokens left — is emptied as it loads, and the save loads. A bag is never
   judged against the character's Luck, since a level-up leaves a bag whose Trues no
   longer match it.
+- A saved team that can't be true — more than 15 members, a spot off the grid or used
+  twice, or a member in it twice — is emptied as it loads, and the save loads. A saved
+  team holding a member who has since left the guild keeps them, and can't be picked
+  until it's saved over.
 
 ## Open Questions
 

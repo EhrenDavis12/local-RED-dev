@@ -347,10 +347,18 @@ A raid starts when a party goes into a dive, re-enters one at a rest area, or pl
 mission as a battle. A mission that's sent packs nothing, and a raid that's refused packs
 nothing and changes nothing. No member holds a potion in the guild hall: there's no
 handing one to a member in the Dorms, and every potion waits in the stores until a raid
-packs it. For now, until party planning lets the player choose, the start of a raid packs
+packs it.
+
+For a dive, the player chooses how many potions each member packs while planning the
+party, and going in or re-entering packs exactly those from the stores. A member's count
+runs from none up to their slots, and the party's total never passes what the stores
+hold. While choosing, the player sees how many of that member's slots are still free for
+loot and how many potions are left in the stores. For now each member starts at one as
+they're picked, while the stores have any left, and the counts are never saved: leaving
+the board drops them. A played mission has no planning step, so for now its start packs
 one potion for each member from the stores, in the order the party was picked, for as
-long as the stores last. A party with too few still goes in, and the members later in the
-order go without.
+long as the stores last. A party with too few still goes in, and the members later in
+the order go without.
 
 For now a member drinks only from the potions in their own slots, one at a time, so one
 member's potions never reach another, and a member who still holds one after drinking
@@ -361,12 +369,15 @@ potion packed for it is lost.
 
 **Why:** The game is built this way. The original says potions take capacity and are
 added at the start of the raid, but not which raids, how many each member takes, whose a
-member drinks from, or where the undrunk ones go. Handing a potion to a member in the
-Dorms went away with slots, since nobody holds one between raids. Every "for now" here
-is a default the build chose, not yet the user's word: how many are packed, and drinking
-from one's own slots, are proposed as questions in "Questions on carrying"; whether an
-undrunk potion goes back to the stores, and what happens to a dead member's, are already
-asked in Equipment's change "Questions on shields and potions".
+member drinks from, or where the undrunk ones go. Its "the choice is how much healing to
+pay for in treasure" is why the player picks the count for a dive. Handing a potion to a
+member in the Dorms went away with slots, since nobody holds one between raids. Every
+"for now" here is a default the build chose, not yet the user's word: drinking from
+one's own slots, and what a played mission packs, are proposed as questions in
+"Questions on carrying"; whether an undrunk potion goes back to the stores, and what
+happens to a dead member's, are already asked in Equipment's change "Questions on
+shields and potions". Each member starting at one, and the counts not being saved, are
+cheap to change.
 
 ## Change: A question on what gold a retreat keeps
 
@@ -487,19 +498,18 @@ above are unchanged.
 
 ```
 - How far can a training mission level a member?
-- Until party planning lets the player choose, how many healing potions does a raid pack
-  for each member?
 - During a raid, does each member drink only from the potions in their own slots, or does
   the party share them?
 - Does a played mission pack healing potions into slots the way a dive does?
 - Do potions and loot compete for slots during the dive, or only on the way out?
 ```
 
-**Why:** The game is built with a default for now on the first three, in "Healing
-potions are packed at the start of a raid and come back at its end, for now": one each in
-pick order while the stores last, each member drinking from their own, and a played
-mission packed like a dive. The last doesn't come up until a dive yields items. The
-pending changes to this list above are unchanged.
+**Why:** The game is built with a default for now on the first two, in "Healing potions
+are packed at the start of a raid and come back at its end, for now": each member
+drinking from their own, and a played mission, which has no planning step, packing one
+each in pick order while the stores last, where a dive packs what the player chose. The
+last doesn't come up until a dive yields items. The pending changes to this list above
+are unchanged.
 
 ## Change: Party planning is one screen
 
@@ -532,3 +542,43 @@ but I won't be able to see them all. So let's design the select your characters,
 your characters on the same screen where we have the list of the characters on the left
 and the placement on the right side. This way they can place and rearrange at the same
 time, knowing who they are getting."
+
+## Change: The guild keeps three saved teams
+
+> Proposed 2026-11-20 · for review
+
+**Where:** `## The Dungeon Board`, the paragraph beginning "The dungeon board is also
+where the player enters a dungeon" (a new paragraph after it)
+
+**Now says:**
+
+```
+The dungeon board is also where the player enters a dungeon, and where they re-enter at
+the last rest area reached.
+```
+
+**Proposed:**
+
+```
+The dungeon board is also where the player enters a dungeon, and where they re-enter at
+the last rest area reached.
+
+The guild keeps three saved teams, Team 1, Team 2 and Team 3, saved with the guild. A
+saved team is who goes and the spot each one stands on. While planning a party, the
+player can pick a saved team, which fills the grid with its members on their saved spots
+in place of whatever was planned, and the player edits from there. A team can be picked
+only when every member in it is available — still in the guild, not injured and not out
+on a mission; one that isn't shows but can't be picked. During a dive, between battles
+and at a rest area, the player can save the party into any of the three, over whatever
+it held: the members still alive, on the spots they stand on now. A saved team holds no
+potions, so each member starts at one, as anyone picked does.
+```
+
+**Why:** The user, 2026-11-18: "I also what a place where i can save team formations.
+give me 3 slots to save 3 team formations. a fomratoin is available to select for a
+dongeon if all members in that team are available. clicking the formation auto populates
+those characters for the doungon dive. While in the doungon dive you should be able to
+save a formation to one of the 3 slots. for next time." The game is built this way. No
+doc has saved teams. What "available" means, and a saved team holding no potions, are
+defaults the build chose, not yet the user's word, and cheap to change. The pending
+"Party planning is one screen" change to the paragraph before is unchanged.

@@ -1,6 +1,6 @@
 # Open Questions — for the design docs' owner
 
-> **Status:** Questions the build is waiting on, asked 2026-11-17 and 2026-11-19, for the design docs' owner to answer. Write an answer under each question; "going ahead with" means the game already does that, so answer only if you want it different.
+> **Status:** Questions the build is waiting on, asked 2026-11-17, 2026-11-19 and 2026-11-20, for the design docs' owner to answer. Write an answer under each question; "going ahead with" means the game already does that, so answer only if you want it different.
 
 ## How to answer
 
@@ -120,6 +120,17 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 
     **Answer:**
 
+30. **Experience a level.** Battle Test says a level costs 1.25 experience at F rank,
+    because crossing to E rank takes 20 experience and 16 levels. But a member starts at
+    level 1, so the 20 is spread over the 15 level-ups from level 1 to level 16, about
+    1.33 a level. Going ahead with: 20 over 15 steps, each level's total rounded up to a
+    whole point — level 2 at 2 experience, level 3 at 3, level 4 at 4, level 5 at 6, and
+    level 16 at 20. At 1 experience a battle, a member in Battle Test's party still
+    reaches level 16 after 20 battles, but gains a level about every battle and a third,
+    not every battle and a quarter. Fine, or should a level cost something else? (Cheap
+    to change.)
+
+    **Answer:**
 
 ### Guild rank
 
