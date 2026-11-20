@@ -186,7 +186,11 @@ target the attack reaches — charges it by 5. That's the base, and it's the sam
 every type. A bar fills on about the third hit once a bonus condition has fired, which
 is what puts a special inside the fight that earns it rather than the one after. Each
 combat type also has its own bonus condition, and each time it's met it adds 15 on top
-of that base — covered in the Individual Types doc. The bar is full at 100.
+of that base — covered in the Individual Types doc. The attack that fills a bar need not
+be the holder's own — a bonus condition can be met while the holder isn't attacking at
+all, such as being hit or an ally taking a hit — and a bar that fills that way fires right
+then, in the middle of whichever attack filled it, the same as it would on the holder's
+own attack. The bar is full at 100.
 
 Charge and weapon durability both count hits, so what wears a weapon down is what fills
 the bar.
