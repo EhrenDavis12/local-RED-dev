@@ -1,9 +1,9 @@
 # Combat
 
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
-> reset's chance, and the never-pausing simulation are settled; whether a fight can be
-> sped up, how multi-strike cases resolve, what formation costs, how the bars read at a
-> glance, and whether the enemy grid keeps filling are not.
+> reset's chance, how a special fires, and the never-pausing simulation are settled;
+> whether a fight can be sped up, what formation costs, whether the enemies keep coming
+> once the grid is full, and whether the Mage's field bites a member that drinks are not.
 
 ## Formation
 
@@ -161,11 +161,7 @@ Default attacks are auto-selected. The player can select one enemy to be specifi
 targeted by the entire party — this cuts down on clicks during gameplay.
 
 The fight never pauses, and nothing waits for the player. It runs from start to finish,
-and the player acts while it's running — using a member's special once that bar is full,
-changing formation, and marking the focus target.
-
-The fight doesn't wait for the player, so the moment to use a special goes by while the
-fight carries on around it.
+and the player acts while it's running — changing formation and marking the focus target.
 
 When a member's cooldown comes up, the player can have it drink a healing potion
 instead of attacking — drinking costs that attack.
@@ -181,10 +177,11 @@ and the defender's mitigation is applied to it separately.
 
 ## The Special Bar
 
-Each member has a special bar. When it's full, the player can use a special. An enemy's
-bar works the same way, and an enemy uses its special when its bar is full. Each hit a
-member lands charges that member's bar: the first hit of an attack charges it by 30,
-and each additional hit — another strike of a multi-strike attack, or another
+Each member and each enemy has a special bar, and the special fires the moment that bar is
+full — the same for both sides. It goes off once the attack that filled it has finished
+resolving, and it takes no action of its own, so a member doesn't give up an attack to use
+it. Each hit a member lands charges that member's bar: the first hit of an attack charges
+it by 30, and each additional hit — another strike of a multi-strike attack, or another
 target the attack reaches — charges it by 5. That's the base, and it's the same for
 every type. A bar fills on about the third hit once a bonus condition has fired, which
 is what puts a special inside the fight that earns it rather than the one after. Each
@@ -194,10 +191,7 @@ of that base — covered in the Individual Types doc. The bar is full at 100.
 Charge and weapon durability both count hits, so what wears a weapon down is what fills
 the bar.
 
-The bar caps at full — the special is never lost, and it waits until the player uses it.
-While it sits full, charge is wasted: attacks the member makes while full charge nothing,
-and so does the type's bonus condition — that progress toward the next special is gone.
-Using the special empties the bar, and it charges again from there.
+Firing the special empties the bar, and it charges again from there.
 
 A part-filled bar carries from one battle to the next within a floor, and moving to the
 next floor resets it to empty.
@@ -250,13 +244,14 @@ enemies and how much gear the fight creates; the enemies' own Luck stat is untou
 exactly what their type and rank would otherwise give, so depth doesn't make them evade
 more or reset their cooldowns more often. The counts are covered in the Dungeon doc.
 
-## Enemy Targeting
+## Targeting
 
-Enemies pick a target from whatever they can reach. The choice is weighted by how much
-damage that target has dealt, how easy it is to kill, and — for a far-range attacker —
-how far back its row sits, so it shoots past the front line at what stands behind it
-and leaves the two front lines fighting each other. A taunt overrides all three factors
-until the taunted enemy's next hit — one attack, then it's spent.
+Members and enemies pick targets by the same rule, whichever side they're on. The choice
+is weighted by how much damage that target has dealt, how easy it is to kill, and — for a
+far-range attacker — how far back its row sits, so it shoots past the front line at what
+stands behind it and leaves the two front lines fighting each other. A taunt overrides all
+three factors for an enemy until the taunted enemy's next hit — one attack, then it's
+spent — and the focus target the player marks overrides them for the whole party.
 
 ## Equipment Durability
 
@@ -268,17 +263,8 @@ the Equipment doc.
 - What does changing formation mid-battle cost the player, if anything?
 - Can the player speed a fight up or slow it down, and does that change anything in the
   simulation or only how fast it's drawn?
-- With a party of fifteen filling bars while the fight runs, how does the player see
-  which specials are ready at a glance?
 - The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
   stop there, or do they keep coming?
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
 - The Mage's field damages a character as it begins its own attack. A member can drink a
   potion instead of attacking — does a member standing in a field take the field's
   damage when it drinks?
-- This weighting describes how enemies choose. A member's ordinary attack is
-  auto-selected without anything saying how that choice is made — does a member's own
-  far-range attacker favour the rows further back the same way, or pick by something
-  else entirely?
