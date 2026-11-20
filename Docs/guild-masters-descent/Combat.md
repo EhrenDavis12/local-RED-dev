@@ -252,9 +252,11 @@ more or reset their cooldowns more often. The counts are covered in the Dungeon 
 
 ## Enemy Targeting
 
-Enemies pick a target from whatever they can reach. The choice is weighted by both how
-much damage that target has dealt and how easy it is to kill. A taunt overrides both of
-those factors until the taunted enemy's next hit — one attack, then it's spent.
+Enemies pick a target from whatever they can reach. The choice is weighted by how much
+damage that target has dealt, how easy it is to kill, and — for a far-range attacker —
+how far back its row sits, so it shoots past the front line at what stands behind it
+and leaves the two front lines fighting each other. A taunt overrides all three factors
+until the taunted enemy's next hit — one attack, then it's spent.
 
 ## Equipment Durability
 
@@ -276,3 +278,7 @@ the Equipment doc.
 - The Mage's field damages a character as it begins its own attack. A member can drink a
   potion instead of attacking — does a member standing in a field take the field's
   damage when it drinks?
+- This weighting describes how enemies choose. A member's ordinary attack is
+  auto-selected without anything saying how that choice is made — does a member's own
+  far-range attacker favour the rows further back the same way, or pick by something
+  else entirely?
