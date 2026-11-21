@@ -47,11 +47,6 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 
    **Answer:**
 
-8. **Enemy health.** Going ahead with: a monster has the same health as a member of the
-   same level. Fine? (Cheap to change.)
-
-   **Answer:**
-
 9. **Enemy gear and loot.** The newer docs have monsters wearing gear and dives dropping
    gear. Going ahead with: keep it simple, so no monster gear and gold-only loot in the
    first version. Fine? (Easy to add later.)
