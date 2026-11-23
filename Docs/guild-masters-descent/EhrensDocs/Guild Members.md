@@ -440,3 +440,79 @@ and three add 3.
 **Why:** The combat engine is built this way. "Every later help is exact" didn't say how
 the exact helps come back to the whole points a stat counts in, and rounding the total
 down is what lets a later help come to nothing.
+
+## Change: Starting stats by type
+
+> Proposed 2026-11-19 · for review
+
+**Where:** `## Starting Stats`, second paragraph (new text after it)
+
+**Now says:**
+
+```
+A newly recruited level-1 F-rank member starts with single-digit stats.
+```
+
+**Proposed:**
+
+```
+A newly recruited level-1 F-rank member starts with single-digit stats. Before any help
+from the support ring, a member at F rank and level 1, or a specialist at Novice, starts
+with these:
+
+| Type | Str / Dex / Con / Int / Luck |
+|---|---|
+| Brute | 8 / 6 / 7 / 4 / 5 |
+| Tank | 7 / 6 / 8 / 4 / 5 |
+| Fighter | 8 / 7 / 6 / 4 / 5 |
+| Rogue | 6 / 8 / 5 / 4 / 7 |
+| Archer | 7 / 8 / 5 / 4 / 6 |
+| Mage | 4 / 7 / 6 / 8 / 5 |
+| Cook | 6 / 7 / 8 / 4 / 5 |
+| Porter | 8 / 5 / 7 / 4 / 6 |
+
+The six combat types' lines are Battle Test's teams with the one point of help each
+member gets there taken off its primary stat. For now the Cook's and the Porter's are 2
+up in every stat, in step with the fighters. Monsters are built from the same table and
+take their type's line exactly. For now a recruit on the recruiting board varies from its
+type's line by up to 1 point either way in each stat, kept between 1 and 9.
+```
+
+**Why:** The user, 2026-11-18: "if something from the new docs contradicts the choices
+that we make the new docs win". Battle Test's level-1 F-rank teams give a starting line
+for each of the six combat types. Its tables already include one point of support-ring
+help on each member's primary stat, so the starting line is that point lower. Battle Test
+doesn't cover the Cook or the Porter. The game's placeholder lines ran 2 below Battle
+Test's for every type, and the Cook's and the Porter's go up by the same 2 for now. That
+is proposed as a question in "A question on the Cook's and the Porter's starting stats".
+This doc's `Combat.md` seconds list already uses these lines. Its Rogue worked list
+doesn't, and has a change note of its own.
+
+## Change: A question on the Cook's and the Porter's starting stats
+
+> Proposed 2026-11-19 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+```
+
+**Proposed:**
+
+```
+- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
+  takes two-thirds of the defence into it. Which way does that round? It decides whether
+  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The cook and the porter aren't in the other dev's numbers. If the fighters' starting
+  stats go up by 2, should the cook and porter go up by the same 2, or stay where they
+  are?
+```
+
+**Why:** The game goes ahead with a default on this, in "Starting stats by type", and
+none of the docs settles it. The pending changes to this list above are unchanged; this
+goes after the entries they add.

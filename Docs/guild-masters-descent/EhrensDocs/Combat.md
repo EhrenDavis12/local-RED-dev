@@ -135,8 +135,7 @@ Nothing waits for the player. The fight runs from start to finish, and the playe
 while it's running — using a member's special once that bar is full, changing formation,
 and marking the focus target. For now there's a pause button: it stops the fight and
 opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
-the player can't use a special, mark the focus target or retreat. For now, though, a
-member's special can't be used from the battle screen: the bar fills and sits full.
+the player can't use a special, mark the focus target or retreat.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
 set length of time, a placeholder, as a stand-off — 6,000 ticks, five minutes of fight —
@@ -144,8 +143,7 @@ and a stand-off kills no one further.
 ```
 
 **Why:** The combat engine is built this way. No doc says what a member does with no
-target selected, or whether a battle can run forever. Using members' specials waits on
-the battle screen being able to; the engine already lets them. The original sentences are
+target selected, or whether a battle can run forever. The original sentences are
 unchanged, apart from the pause proposed in "The fight can be paused, for now"; the new
 ones sit after them.
 
@@ -242,11 +240,12 @@ there's no clock left for the effect to run on.
 
 The cycle an effect is cast in doesn't count: it lasts three of the owner's cycles after
 that. For now it ends once the third of those has played out, so the owner's next three
-attacks all happen under it — a vanished Rogue makes three that can't miss. For now, too,
-a free attack from the Luck reset isn't one of the three: only a cooldown that comes up
-after a wait counts. For now a Shields Up or a field cast while the owner's last one is
-still running stacks with it: both run, each to its own end, so the two lots of defence
-add up and both fields do their damage.
+cooldowns all happen under it — a vanished Rogue makes three attacks that can't miss, or
+one fewer for each it spends drinking a potion instead. For now, too, a free attack from
+the Luck reset isn't one of the three: only a cooldown that comes up after a wait counts.
+For now a Shields Up or a field cast while the owner's last one is still running stacks
+with it: both run, each to its own end, so the two lots of defence add up and both fields
+do their damage.
 ```
 
 **Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
@@ -254,6 +253,9 @@ doesn't say whether the cycle it's cast in counts, whether the effect ends once 
 has played out or as the fourth begins, or whether a free attack from the Luck reset is a
 cycle. Nothing says what happens when one is cast again while the last is still running;
 the six combat types are built to stack them. Each is proposed as a question below.
+A drink ordered in place of an attack uses up one of the three too, as "Drinking a potion
+is an order used at the next cooldown, for now" says, so the three are cooldowns, not
+attacks.
 
 ## Change: What the targeting weights count, and how a taunt is spent
 
@@ -296,7 +298,8 @@ selected enemy — and with monsters having the six types, a monster Tank taunts
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -487,7 +490,8 @@ nothing gives a specialist one. That's proposed as a question below.
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -522,7 +526,8 @@ taunts and the dive" change to this list is unchanged; these go after the entrie
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -650,7 +655,8 @@ fighters pulls nothing because a pull from a member's bag can't be handed back.
 
 > Proposed 2026-11-18 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -713,14 +719,14 @@ the player can't use a special, mark the focus target or retreat.
 **Why:** The user, 2026-11-16: "Leave the pause button for now we can take it out later."
 The battle screen is built with it. This departs from the original's "The fight never
 pauses", so it stands for now. The pending "How a member with no target picks one, and how
-a battle ends" change to this paragraph carries this wording too; its sentence on specials
-goes after these.
+a battle ends" change to this paragraph carries this wording too.
 
 ## Change: The fight can be sped up, and only shows sooner
 
 > Proposed 2026-11-16 · for review
 
-**Where:** `## Player Input`, last paragraph (a new paragraph after it)
+**Where:** `## Player Input`, the paragraph beginning "The fight doesn't wait for the
+player" (a new paragraph after it)
 
 **Now says:**
 
@@ -796,12 +802,10 @@ while its target is waiting to attack ahead of it, and goes after it. A waiting 
 keeps the target it picked, and picks again only if that target dies, goes out of its
 reach, or vanishes.
 
-For now, two close-range fighters who pick each other on the same tick take turns rather
-than attacking at the same time. The attack that became ready first goes first; between
-two that became ready on the same tick, the one with the higher Dexterity of its own goes
-first, help from the support ring left out, and between equal Dexterity it's a random
-draw. The first walks out, hits and walks home, and only then does the other go. If the
-first hit kills the other fighter, it never swings.
+Two close-range fighters who pick each other on the same tick take turns, in the order
+Cooldowns sets for every attack on the same tick: the first walks out, hits and walks
+home, and only then does the other go. If the first hit kills the other fighter, it never
+swings.
 
 Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
 attack is: a field it stands in hurts it first, whether it uses its special is decided
@@ -833,16 +837,16 @@ the other's empty spot and swung at thin air. Asked then whether two close-range
 who pick each other on the same tick should hit at once or take turns, and whether a
 fighter whose target heads off on that tick should wait for it to come home, the user
 said: "B my rules for now. as it looks bad otherwise." That departs from the original's
-same-tick attacks all happening at the same time, so it stands for now; see "Close-range
-fighters take turns on the same tick, for now". The combat engine and the battle screen
-are built this way. Each "for now" in the list is proposed as a question below.
+same-tick attacks all happening at the same time, as every attack on the same tick does;
+see "Attacks on the same tick go in turn". The combat engine and the battle screen are
+built this way. Each "for now" in the list is proposed as a question below.
 
-## Change: Close-range fighters take turns on the same tick, for now
+## Change: Attacks on the same tick go in turn
 
 > Proposed 2026-11-18 · for review
 
 **Where:** `## Cooldowns`, the paragraph beginning "When more than one combatant's cooldown
-comes up on the same tick"
+comes up on the same tick" and the paragraph after it
 
 **Now says:**
 
@@ -852,35 +856,50 @@ happen at the same time — there's no order between them, and nothing resolves 
 Damage is worked out against where things stood at the start of that tick, so a combatant
 that dies on that tick still lands the attack it made on it, and two combatants can kill
 each other on the same tick.
+
+That simultaneity is between combatants, not inside one combatant's own attack: within a
+single attack the strikes still resolve one after another, which is what lets the
+Fighter's flurry carry its remaining strikes to the nearest enemy still standing when its
+target dies partway through.
 ```
 
 **Proposed:**
 
 ```
-When more than one combatant's cooldown comes up on the same tick, their attacks all
-happen at the same time — there's no order between them, and nothing resolves first.
-Damage is worked out against where things stood at the start of that tick, so a combatant
-that dies on that tick still lands the attack it made on it, and two combatants can kill
-each other on the same tick. For now two close-range fighters are the exception, as
-Attacks and Reach says: when they pick each other on the same tick they take turns, and
-the first hit can kill the other before it swings; and when a fighter's target heads off
-on that tick to hit someone else, the fighter waits until it's home, so its attack lands
-after its target's.
+When more than one combatant's cooldown comes up on the same tick, their attacks don't
+happen at the same time: they go in turn, one after another. The attack that became ready
+first goes first; between two that became ready on the same tick, the one with the higher
+Dexterity of its own goes first, help from the support ring left out, and between equal
+Dexterity it's a random draw. Each attack is worked out against the fight as it stands
+after the attacks before it, so a combatant killed earlier in the tick never makes its
+attack, and an attacker whose target has already died picks a new one still standing.
+The battle ends as soon as one side has no one left standing, even partway through a
+tick, so the last member and the last enemy never kill each other. A close-range fighter
+also waits for its target to be home, as Attacks and Reach says.
+
+Within one combatant's own attack the strikes resolve one after another too, which is
+what lets the Fighter's flurry carry its remaining strikes to the nearest enemy still
+standing when its target dies partway through.
 ```
 
-**Why:** The user, 2026-11-17: "B my rules for now. as it looks bad otherwise." — on
-whether two close-range fighters who pick each other on the same tick should hit at once
-or take turns, and whether a fighter whose target heads off on that tick should wait for
-it to come home. Hitting at once would show each fighter walking to the other's empty
-spot, which "A close-range attack waits for its target to be home" rules out, so for now
-that rule wins over same-tick attacks happening together. The combat engine is built
-this way.
+**Why:** The user, 2026-11-18: "The only contradiction I want to win is from our side is
+that an enemy must wait on the battle on the attack sequence so that so that their present
+when being attacked so two people are attacking at the same time they don't actually attack
+at the same time one attack than the other attacks that's the only thing I want winning
+over what the new doc Say" — asked whether attacks on the same tick other than between two
+close-range fighters (two Archers shooting each other, a Mage and an Archer, two members
+hitting one enemy, a fighter walking up to an Archer) should all happen at once, as the
+original says, or go one after another. With the user's 2026-11-17 answer on close-range
+fighters, "B my rules for now. as it looks bad otherwise.", every attack on the tick goes
+in turn and none happen at once, so two combatants can't kill each other on the same tick.
+The combat engine is built this way.
 
 ## Change: Questions on a close-range attack waiting
 
 > Proposed 2026-11-17 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
+its bar is full"
 
 **Now says:**
 
@@ -910,12 +929,154 @@ this way.
 - A fast fighter can be ready to attack again before it has walked home from its last
   attack, and a lucky one gets a free attack straight away. Should it walk home first and
   then go out again, or attack again from where it stands?
-- When two close-range fighters who pick each other became ready on the same tick, the
-  one with the higher Dexterity goes first. Does help from the support ring count in that
-  Dexterity, the way it counts in a Rogue's or an Archer's cooldown?
+- When two attacks became ready on the same tick, the one with the higher Dexterity goes
+  first. Does help from the support ring count in that Dexterity, the way it counts in a
+  Rogue's or an Archer's cooldown?
 ```
 
 **Why:** The combat engine is built with a default for now on each of these, in "A
-close-range attack waits for its target to be home" and "The free attack comes first, and
-a special gets no check, for now". The pending changes to this list above are unchanged;
+close-range attack waits for its target to be home", "Attacks on the same tick go in
+turn" and "The free attack comes first, and a special gets no check, for now". The pending changes to this list above are unchanged;
 these go after the entries they add.
+
+## Change: Drinking a potion is an order used at the next cooldown, for now
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Player Input`, the paragraph beginning "When a member's cooldown comes up"
+(new paragraphs after it)
+
+**Now says:**
+
+```
+When a member's cooldown comes up, the player can have it drink a healing potion
+instead of attacking — drinking costs that attack.
+```
+
+**Proposed:**
+
+```
+When a member's cooldown comes up, the player can have it drink a healing potion
+instead of attacking — drinking costs that attack.
+
+The player has a member drink by ordering it while the fight runs: any living party
+member holding a potion can be ordered to, a specialist too, and the order can be taken
+back until it's used. It's used at the member's next cooldown, in place of the attack
+that cooldown brings, and the member drinks one potion from their own slots. An order
+ends when it's used or taken back, when the member dies, or when the battle ends. A
+member holds one order at a time: ordering a drink takes back an ordered special, and
+ordering the special takes back the drink, so a cooldown is a drink or a special, never
+both.
+
+Drinking costs the attack and nothing else. The member strikes no one and stays on their
+own spot, wears no weapon, charges no bar, and pulls no Luck token, so no free attack
+follows; their next cooldown then starts as it would after an attack. A drink is one of
+the member's own cooldown cycles for any lasting effect they cast. A drink never takes a
+member past their maximum health, and a member at full health can still be ordered to
+drink: the potion and the attack are used up and nothing is healed.
+
+For now:
+
+- A member standing in a Mage's field takes the field's hit first, as it would before an
+  attack, and drinks after it. If the field kills them, they drink nothing and keep the
+  potion.
+- A close-range member whose attack is already waiting when the drink is ordered drinks
+  as soon as they're back on their own spot, in the place the waiting attack had. Only
+  their own absence holds a drink, never their target's.
+- A free attack from the Luck reset is always an attack. An order placed before one is
+  used at the next cooldown that comes after a wait, the same as a special.
+- A drink never spends a taunt. A taunt is spent only by an attack that's made, so it
+  keeps for the member's next one.
+- Nothing is drunk without an order. With Auto on in a dive, any party member below 30%
+  of their maximum health who still holds a potion has a drink ordered for them, a Cook
+  or a Porter too, and it's used at their next cooldown like any other order. The 30% is
+  a placeholder. The drink comes before a ready special: Auto never orders a special for
+  a member with a drink ordered, and ordering the drink takes back a special already
+  ordered. Auto never takes a drink order back. If the player takes back the drink, or
+  orders that member's special, while the member is still below 30% and holds a potion,
+  Auto orders the drink again straight away.
+- A drink that's ordered but not yet drunk isn't saved, so it's lost if the game closes.
+- On the battle screen each fighter's skill button — up to four, the fourth following
+  whichever fighter the player last tapped — has a drink button under it for the same
+  member, showing how many potions they hold; pressing it orders the drink or takes it
+  back. The Cooks and Porters share one drink button, at the end of that row, which
+  starts on the first of them in the party and follows whichever one the player last
+  taps. An order stands when its member leaves the button. A drink button can't be
+  pressed while the fight is paused, for a fallen member, or for one with no potion left.
+```
+
+**Why:** The original says the player can have a member drink instead of attacking when
+its cooldown comes up, and that drinking costs that attack, but not how the player says
+so before the moment goes by, what else a drink costs, or how it sits with a waiting
+attack, a free attack or a special. The combat engine is built this way. Ordering ahead,
+one order at a time, a waiting member drinking once home, a free attack never replaced
+and an unused order not being saved are the user's going-ahead defaults, 2026-11-18. The
+field's hit coming first is the default the build goes ahead with on the original's open
+question, which stays open. A drink at full health and a drink leaving a taunt standing
+are defaults the build chose, not yet the user's word, proposed as questions in
+"Questions on drinking a potion". The battle screen's drink buttons and drinking under
+Auto are built this way too. Nothing in the docs says Auto drinks at all; drinking below
+30%, and Auto ordering the drink again over the player's own tap, are defaults the build
+chose, not yet the user's word, proposed as questions there as well. The Cooks' and
+Porters' shared button is a default too, and cheap to change.
+
+## Change: Questions on drinking a potion
+
+> Proposed 2026-11-18 · for review
+
+**Where:** `## Open Questions`, at the end of the list, after the entry beginning "The
+Mage's field damages a character"
+
+**Now says:**
+
+```
+- The Mage's field damages a character as it begins its own attack. A member can drink a
+  potion instead of attacking — does a member standing in a field take the field's
+  damage when it drinks?
+```
+
+**Proposed:**
+
+```
+- The Mage's field damages a character as it begins its own attack. A member can drink a
+  potion instead of attacking — does a member standing in a field take the field's
+  damage when it drinks?
+- Can a member at full health be ordered to drink, using up the potion and the attack
+  and healing nothing?
+- When a taunted member drinks instead of attacking, does the taunt keep for its next
+  attack, or does the drink spend it?
+- With Auto on, below what share of their health does a member drink a potion?
+- With Auto on, when the player takes back a drink Auto ordered, or orders that member's
+  special instead, does the player's choice hold, or does Auto order the drink again?
+```
+
+**Why:** The game is built with a default for now on each of these, in "Drinking a
+potion is an order used at the next cooldown, for now": a member can drink at full
+health, a drink leaves the taunt standing, Auto drinks below 30%, and Auto orders the
+drink again over the player's tap. The pending changes to this list above are unchanged;
+these go at the end of the list, after the original's last entry.
+
+## Change: A new Rogue's worked cooldown is 71 ticks
+
+> Proposed 2026-11-19 · for review
+
+**Where:** `## Cooldowns`, the worked list for the Rogue, first entry
+
+**Now says:**
+
+```
+- Dexterity 5, a newly recruited F-rank member — 80 ticks
+```
+
+**Proposed:**
+
+```
+- Dexterity 8, a newly recruited F-rank Rogue — 71 ticks
+```
+
+**Why:** The user, 2026-11-18: "if something from the new docs contradicts the choices
+that we make the new docs win". Battle Test's teams set a new F-rank Rogue at Dexterity 8
+before help (see the `Guild Members.md` change "Starting stats by type"). 100 ÷ (1 + 8 ÷
+20) is 71.4, so 71 ticks, which is what this doc's own seconds list already says: "A
+newly recruited F-rank Rogue, 71 ticks". No combat type starts at Dexterity 5. The rest
+of the list is unchanged.

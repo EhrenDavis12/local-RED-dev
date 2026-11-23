@@ -105,16 +105,18 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line,
   open question, health full at the guild hall and positions carrying between battles,
   how a cooldown rounds, the clock and a multi-strike attack landing in one tick, the Luck
-  reset's free attack and specials, picking a target, members' specials and how a battle
+  reset's free attack and specials, picking a target and how a battle
   ends, a special putting nothing in its owner's bar and taking the attack's place, every
   bar emptying on a new floor and each dive, an effect's count, its end and a second cast
   stacking, targeting weights and taunts, a specialist's cooldown, open questions on
   specials, taunts and the dive, on cooldown combat's defaults, and on the special bar,
   the fight pausing for now, the fight's speed, the speed question answered, a
-  close-range attack waiting for its target to be home, close-range fighters taking
-  turns on the same tick for now, questions on that wait, every
+  close-range attack waiting for its target to be home, attacks on the same tick going
+  in turn, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
-  pull from the combatant's own bag for now, and questions on the Luck bag's defaults).
+  pull from the combatant's own bag for now, questions on the Luck bag's defaults,
+  drinking a potion as an order used at the next cooldown for now (the battle screen's
+  drink buttons and Auto drinking included), questions on drinking a potion, and a new Rogue's worked cooldown of 71 ticks).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -125,9 +127,10 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
-  member's gear comes home for now, the shop sells class F only for now, a span no wider
+  member's gear takes slots for now, the shop sells class F only for now, a span no wider
   at SSS than at F for now, a question on span width, the Brute's axe and the Tank's
-  warhammer, the Tank's swappable shield, a member's one healing potion, a broken
+  warhammer, the Tank's swappable shield, the healing potion bought at the shop, F rank
+  and healing a fixed 18, for now, a member's gear locked for a dive for now, a broken
   shield adding nothing, and questions on shields and potions).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   recruits and promotion, who shares a combat's experience and a stand-off's for now, help
@@ -136,7 +139,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   health from a member's own Constitution and what's taken staying taken for now,
   questions on health, experience as the bar and level as the number for now, the
   experience-and-levels question answered, questions on experience, and the
-  rest-floor heal question answered, and help coming back to whole points once).
+  rest-floor heal question answered, help coming back to whole points once, starting
+  stats by type, and a question on the Cook's and the Porter's starting stats).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's evasion against a capped
@@ -167,23 +171,27 @@ The dungeon board, finding and entering dungeons, and training missions.
   for the design docs' owner): the questions the build is waiting on.
   - How to answer
   - Open Questions
-    - Loot and carrying gold
+    - Loot and carrying
     - Enemies
     - Health
     - Battle
+    - Guild rank
+    - Finding dungeons
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
-  health afresh as a save loads and keeping every Luck bag.
+  health afresh as a save loads and keeping every Luck bag and the three saved teams.
   - Orientation
   - Saving
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
-  back anywhere and the carry limit, how many monsters a battle has, enemies are monsters
-  with a rank and level and how they fight for now, a floor's monsters the same every dive
-  and where each stands, re-entering and its fees for now, open questions on
-  what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a rest area's fifteen only, settled; the rest for now),
-  open questions on healing in the dive, and party planning as one screen).
+  back anywhere and gold taking no slots for now, how many monsters a battle has, enemies
+  are monsters with a rank and level and how they fight for now, a floor's monsters the
+  same every dive and where each stands, re-entering and its fees for now, open questions
+  on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a
+  rest area's fifteen only, settled; the rest for now), open questions on healing in the
+  dive, potions packed at a raid's start and returned at its end for now, questions on
+  carrying, party planning as one screen, and the guild's three saved teams).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).

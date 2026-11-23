@@ -186,14 +186,42 @@ the hit spark are still in review, not approved.
 is a 0.6 second start-and-end chop (animation item #208, 2026-11-12): "OuRS SE(TEST) looks
 the best". Asset:
 `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/characters/fighter/startend_v1/`.
-Idle (animation item #218) and defend (animation item #217) are in review, not approved;
-hurt (animation item #216) and death (animation item #219) are blocked.
+- Idle v4 (animation item #218, 2026-11-19): "Fighter idle_v4 is approved."
+- Defend, the guard (animation item #217, 2026-11-16): "approved for the fighter guard".
+- Hurt (animation item #216, 2026-11-20): "Fighter hurt is approved".
+- Death, take 1 (animation item #219, 2026-11-15): "The fighter death animation is good
+  just approve it".
+- Six basic poses, relaxed, ready, attack start, attack end, hurt and dead (animation item
+  #249, 2026-11-16): "Yes keep these poses for our selves."
+- Game sheets: attack, idle, defend, hit (the hurt) and death, in
+  `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/handoff/characters/Fighter/`
+  (`<clip>.png` and `<clip>.sheet.json`).
+
+**Knight** (the Tank). Base key F_s3935_fix (animation item #13) with the warhammer
+(animation item #115).
+- Attack from the user's start and end keys, hurt recovering to the ready pose, and death
+  from the ready pose to the dead key (animation items #244, #245 and #246, 2026-11-16):
+  "wow the Attack, Hurt and, death look good they are approved."
+- The six cleaned keys with the warhammer grip fixed are approved with them (animation
+  item #175).
+- Game sheets: attack, hit (the hurt) and death, in
+  `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/handoff/characters/Knight/`.
+
+**Six-pose sets.** Relaxed, ready, attack start, attack end, hurt and dead, approved for:
+- Assassin (animation item #250, 2026-11-17): "assasin approved."
+- Archer (animation item #251, 2026-11-19): "archer 6 poses is approved"
+- Porter, relaxed v2 plus the five already approved (animation item #254, 2026-11-20):
+  "Porter is approved."
+- Cave spider (animation item #263, 2026-11-17): "cave spider is approved."
+- Dragon boss, six keys v2, Ember Wyrm (animation item #264, 2026-11-20): "Dragon is
+  approved."
 
 **Designs approved as stills only.** No animations yet.
+- Cook, ready pose, the cleaned Cook picture (animation item #243, 2026-11-19): "Cook at
+  the ready is approved." Files:
+  `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/characters/cook/`.
 - Mage, Star Sage (animation item #96), ready pose 2 (animation item #102):
   `/Users/ehrendavis/work/local-RED-dev/src/asset-animation-demo/local_runs/characters/mage/ready_v2/`.
-- Tank, base key F_s3935_fix (animation item #13) with the warhammer (animation item
-  #115). The grip fix (animation item #175) is blocked.
 - Brute, stance G_s3741 (animation item #12).
 - Porter, design 4 (animation item #117), "for now".
 - Blacksmith, design 2 with the hammer fix (animation item #176):
