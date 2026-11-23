@@ -128,9 +128,13 @@ Alchemist can brew from what the party has gathered.
 - Rock Skin — raises Constitution, but it reaches defence only — it does not raise the
   member's health.
 - Ancient Gift — raises Intelligence.
-- God's Wish — adds 2 Trues to the member's Luck bag, rather than raising Luck the way
-  the other four raise their stat. See the Combat doc for how a Luck bag and its Trues
-  work.
+- God's Wish — turns 2 of the member's Luck bag's Falses into Trues, rather than
+  raising Luck the way the other four raise their stat. See the Combat doc for how a
+  Luck bag and its Trues work.
+
+A converted True is spent when it's drawn, turning back into a False, and any of the two
+still unspent when the battle ends turn back as well — the potion reaches no further
+than the battle it was drunk for.
 
 A healing potion restores a number of health points, from a band set by its rank:
 
@@ -167,8 +171,3 @@ band and raises it — the same shape as a crafter's main stat and Luck for gear
 - A healing potion takes one slot of a party's carrying capacity. It isn't said whether
   a buff takes a slot too, and if it doesn't, nothing stops a party carrying as many as
   it likes.
-- A buff lasts for a fight, but a part-used Luck bag carries from one battle to the
-  next and refills only when it is emptied. It isn't said whether two Trues added to a
-  bag sit there until they happen to be drawn, outlasting the fight they were drunk
-  for, or go when the fight ends — nor whether the bag holds fifty-two tokens for a
-  while or two of its Falses turn True.
