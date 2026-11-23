@@ -123,6 +123,15 @@ The Alchemist makes potions. Potions come in two kinds: temporary buffs, which r
 stats for a fight, and healing potions, which restore health. At a rest area, the
 Alchemist can brew from what the party has gathered.
 
+- Wind Step — raises Dexterity.
+- Dragon's Vein — raises Strength.
+- Rock Skin — raises Constitution, but it reaches defence only — it does not raise the
+  member's health.
+- Ancient Gift — raises Intelligence.
+- God's Wish — adds 2 Trues to the member's Luck bag, rather than raising Luck the way
+  the other four raise their stat. See the Combat doc for how a Luck bag and its Trues
+  work.
+
 A healing potion restores a number of health points, from a band set by its rank:
 
 - F — 10 to 25
@@ -151,3 +160,15 @@ band and raises it — the same shape as a crafter's main stat and Luck for gear
 - A weapon and a piece of armour each roll from a band for their kind and class — what
   does a buff potion roll: how much it raises a stat by, and whether it has bands of
   its own?
+- A buff raises a stat for a fight, and a member can drink a healing potion when its
+  cooldown comes up at the cost of that attack. It isn't said whether a buff is drunk
+  the same way, costing the member an attack mid-fight, or taken before a fight starts
+  and so costing nothing.
+- A healing potion takes one slot of a party's carrying capacity. It isn't said whether
+  a buff takes a slot too, and if it doesn't, nothing stops a party carrying as many as
+  it likes.
+- A buff lasts for a fight, but a part-used Luck bag carries from one battle to the
+  next and refills only when it is emptied. It isn't said whether two Trues added to a
+  bag sit there until they happen to be drawn, outlasting the fight they were drunk
+  for, or go when the fight ends — nor whether the bag holds fifty-two tokens for a
+  while or two of its Falses turn True.
