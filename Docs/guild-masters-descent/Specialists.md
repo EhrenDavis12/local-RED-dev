@@ -143,6 +143,23 @@ All five buffs can be in effect at once — they raise different stats, so there
 for them to collide over. Using the same buff again replaces what's already running
 rather than adding to it.
 
+A buff raises its stat by a number rolled from a band set by the potion's rank:
+
+- F — 2 to 5
+- E — 4 to 10
+- D — 8 to 20
+- C — 16 to 40
+- B — 32 to 80
+- A — 64 to 160
+- S — 128 to 320
+- SS — 256 to 640
+- SSS — 512 to 1,280
+
+The band doubles at each rank.
+
+God's Wish has no band of its own — it turns 2 of the bag's Falses into Trues at any
+rank.
+
 A healing potion restores a number of health points, from a band set by its rank:
 
 - F — 10 to 25
@@ -168,6 +185,7 @@ band and raises it — the same shape as a crafter's main stat and Luck for gear
 
 ## Open Questions
 
-- A weapon and a piece of armour each roll from a band for their kind and class — what
-  does a buff potion roll: how much it raises a stat by, and whether it has bands of
-  its own?
+- A potion's strength scales with the Alchemist's Intelligence, and the Alchemist's Luck
+  check places a potion within its band and can raise it — but God's Wish has no band of
+  its own. Does either of those reach God's Wish, and does it turn 2 Falses into Trues
+  no matter who brewed it?
