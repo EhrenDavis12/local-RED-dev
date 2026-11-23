@@ -59,8 +59,9 @@ The Cook heals a little between floors — another five per cent — and substan
 a rest area — a further fifteen per cent — on top of what the party gets anyway.
 
 At the mead hall, a Cook heals a member by the amount of the Cook's own highest stat —
-a flat number of health points, not a percentage. Each heal costs gold, set by the
-Cook's own tier:
+a flat number of health points, not a percentage. That heal lands once a minute, the
+same beat healing runs on with no Cook at all, so each heal's gold cost — set by the
+Cook's own tier — is a cost per minute rather than a one-off:
 
 - Novice — 1 gold
 - Apprentice — 5

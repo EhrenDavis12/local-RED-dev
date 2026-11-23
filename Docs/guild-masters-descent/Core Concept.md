@@ -42,9 +42,9 @@ How gear and quality actually work is covered in the Equipment doc.
 
 Health lost on a dive doesn't come back at once — a member that comes home hurt needs
 time to heal, the same as an injury. With no Cook in the guild, health comes back on its
-own at 1 point a minute, and there's nothing to pay for. The mead hall is a room in the
-hall where the player pays gold to speed that up: recovery happens on its own given
-time, and gold buys it sooner.
+own at 1 point a minute, and there is nothing to pay for — waiting is all there is. The
+mead hall is a room in the hall where the player pays gold to speed that up: recovery
+happens on its own given time, and gold buys it sooner.
 
 What a single heal restores, and what it costs, are both set by the Cook — the
 Specialists doc covers the Cook's tiers.
@@ -137,7 +137,7 @@ covered in the Equipment doc.
 - The smithy counts the Blacksmith assigned to it when the guild holds more than one.
   It isn't said whether the mead hall works the same way when the guild holds more
   than one Cook, or whether a Cook away on a dive still counts.
-- Healing with no Cook arrives a point a minute, and a Cook heals by its own highest
-  stat for a price. It isn't said whether a Cook's healing lands on that same
-  once-a-minute beat, which would make its price a cost per minute, or on some other
-  schedule.
+- A Cook charges for every minute it heals, so it isn't said whether the player picks
+  which members are being healed one at a time or whether the mead hall works on the
+  whole party at once — which would multiply what that minute costs by however many
+  members are hurt.
