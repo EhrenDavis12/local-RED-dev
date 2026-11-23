@@ -45,9 +45,8 @@ time to heal, the same as an injury. The mead hall is a room in the hall where t
 pays gold to speed that up: recovery happens on its own given time, and gold buys it
 sooner.
 
-The price is set by how much health is missing — 1 gold for every 10 points of health
-missing. A Cook raises how much health the mead hall replenishes, and raises the price
-along with it. The Cook's tiers are covered in the Specialists doc.
+What a single heal restores, and what it costs, are both set by the Cook — the
+Specialists doc covers the Cook's tiers.
 
 ## The Party
 
@@ -137,6 +136,9 @@ covered in the Equipment doc.
 - A member short of health is not the same as an injured one, and nothing says whether
   it holds them back. Can a member be sent on a dive or a mission while still short of
   health, or must they be whole first?
-- The bill is set by the health missing, and a Cook raises both the health replenished
-  and the price. It isn't said whether a better Cook means the same total gold paid in
-  fewer, larger instalments, or genuinely more gold for the same recovery.
+- What one heal restores and what it costs are both set by the Cook, so it isn't said
+  what happens with no Cook in the guild at all — whether the player can pay at the
+  mead hall without one, or whether healing then only happens by waiting.
+- The smithy counts the Blacksmith assigned to it when the guild holds more than one.
+  It isn't said whether the mead hall works the same way when the guild holds more
+  than one Cook, or whether a Cook away on a dive still counts.

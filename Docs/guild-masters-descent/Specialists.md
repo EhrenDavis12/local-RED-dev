@@ -58,8 +58,25 @@ reached. The slot system itself is covered in the Dungeon doc.
 The Cook heals a little between floors — another five per cent — and substantially more at
 a rest area — a further fifteen per cent — on top of what the party gets anyway.
 
-A Cook's tier also raises how much health the mead hall replenishes between dives —
-what that costs is covered in the Core Concept doc.
+At the mead hall, a Cook heals a member by the amount of the Cook's own highest stat —
+a flat number of health points, not a percentage. Each heal costs gold, set by the
+Cook's own tier:
+
+- Novice — 1 gold
+- Apprentice — 5
+- Journeyman — 10
+- Adept — 15
+- Master — 20
+- Grandmaster — 25
+- Grandmaster S — 30
+- Grandmaster SS — 35
+- Grandmaster SSS — 40
+
+Each heal also makes a Luck check, a pull from the Cook's own Luck bag — see the Combat
+doc for how a Luck check and its bag of fifty work. A True fully heals that member and
+costs no gold at all.
+
+The mead hall itself is covered in the Core Concept doc.
 
 ## The Scout
 
