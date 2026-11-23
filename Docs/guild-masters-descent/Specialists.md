@@ -163,17 +163,16 @@ rank.
 A healing potion restores a number of health points, from a band set by its rank:
 
 - F — 10 to 25
-- E — 25 to 60
-- D — 60 to 115
-- C — 115 to 190
-- B — 190 to 285
-- A — 285 to 400
-- S — 400 to 535
-- SS — 535 to 690
-- SSS — 690 to 865
+- E — 20 to 50
+- D — 40 to 100
+- C — 80 to 200
+- B — 160 to 400
+- A — 320 to 800
+- S — 640 to 1,600
+- SS — 1,280 to 3,200
+- SSS — 2,560 to 6,400
 
-Each band starts where the one below it ends, and each is 20 points wider than the one
-below.
+The band doubles at each rank, the same way the buff band above it does.
 
 A potion's strength scales with the Alchemist's Intelligence, so a cleverer Alchemist
 brews stronger potions.
