@@ -110,14 +110,16 @@ covered in the Dungeon doc.
 
 Damage is the stat plus what you carry, defence is the stat plus what you wear.
 
-There is no minimum damage — enough defence can reduce a hit to nothing.
+There is no minimum damage — enough defence can reduce a hit to nothing, and a hit's
+damage rounds down, so anything short of a full point is nothing at all.
 
 A member's evasion comes from Luck.
 
 An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
 land on a space rather than on a person, so evasion does nothing against them. They do
 pay a reduced defence, though: an area attack uses two-thirds of the target's defence
-when working the fraction above.
+when working the fraction above. The Mage's lingering field counts as an area attack
+too, on both counts.
 
 ## Weapons and Armour
 
@@ -218,6 +220,11 @@ Crossing a rank also costs a set amount of experience, multiplying by five at ea
 A rank's cost multiplies by five while what a kill is worth only doubles, so each rank
 takes more diving than the one below it, and the climb is meant to steepen that way.
 
+The two are one counter rather than two: a rank's experience cost is spread evenly
+across its level-ups, so reaching the threshold and paying the cost are the same event —
+crossing F takes 20 experience and 15 level-ups from level 1, about 1.33 experience a
+level.
+
 ## Specialists
 
 Specialist types include Porter, Cook, Scout, Herbalist, Miner, Blacksmith, Armourer, and
@@ -236,18 +243,6 @@ works.
 
 ## Open Questions
 
-- With each matchup working through its own mechanism rather than a shared multiplier, the
-  six advantages aren't necessarily worth the same amount. Should they be, or is it fine
-  for some matchups to bite harder than others?
-- Crossing a rank costs a set amount of experience, and reaching the next rank also needs
-  a level threshold — 16 levels for the first, doubling after. Does the experience buy
-  those levels at an even rate, or do the two run on separate counters with whichever is
-  slower deciding?
-- A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
-  the five per cent for the floor as well?
-- The Mage's lingering field damages what stands in it. Does that damage count as an area
-  attack too, paying two-thirds defence, or is the reduction only for an attack that is
-  aimed?
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?

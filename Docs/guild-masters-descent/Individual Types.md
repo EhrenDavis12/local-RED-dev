@@ -5,7 +5,7 @@
 ## The Brute
 
 The Brute attacks at close range. It has advantage over the Tank — it can push the Tank's
-shield aside and bash the weak points in the armour underneath, halving the Tank's
+shield aside and bash the weak points in the armour underneath, quartering the Tank's
 defence in the calculation. It's weak to the Fighter: the Fighter halves the Brute's
 defence in the calculation. The Brute wears tanned hide, which adds a little defence on
 top of its Constitution.
@@ -64,9 +64,10 @@ The flurry's own strikes don't charge the bar.
 ## The Rogue
 
 The Rogue attacks at far range and has high evasion. Its advantage over the Archer is
-against the Archer's ordinary shots: a single shot is a single chance to miss, so
-high evasion beats it. It's weak to the Mage because the Mage's area attacks can't be
-dodged.
+against the Archer's attacks: it draws up to two evasion tokens instead of one — if the
+first comes up False it draws again, and a single True evades. See the Combat doc for
+how an evasion draw works. It's weak to the Mage because the Mage's area attacks can't
+be dodged.
 
 The Rogue's ordinary attack is two quick strikes. Its strikes don't hit as hard as a
 Fighter's, because the weapon it carries adds less damage.

@@ -65,13 +65,13 @@ Dungeon diving is the main gameplay. Death in the dungeon is permanent — there
 to bring a dead member back. The risk is inherent in the choice: send someone you know
 will survive, or send a team and see who comes back.
 
-Each floor has 1–3 battles. Between floors, every member gets back five per cent of their
-maximum health, and nothing comes back between the battles on a single floor. Every 5th
-floor is a safe rest area, where every member gets back fifteen per cent, and the player
-may choose to return to the top and exit the dungeon. The Cook adds to both figures,
-covered in the Specialists doc. Retreating always costs the loot gathered since the last
-safe floor — any party member can carry some of it, so how much is lost depends on who
-came along.
+Each floor has 1–3 battles. Between floors, every member gets back five per cent of
+their maximum health, and nothing comes back between the battles on a single floor.
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent
+instead of the five, not both, and the player may choose to return to the top and exit
+the dungeon. The Cook adds to both figures, covered in the Specialists doc. Retreating
+always costs the loot gathered since the last safe floor — any party member can carry
+some of it, so how much is lost depends on who came along.
 
 The floors between rest areas group into sets of four, skipping the rest areas themselves,
 so the sets run 1–4, then 6–9, then 11–14, and so on. The enemy-type ladder below is
