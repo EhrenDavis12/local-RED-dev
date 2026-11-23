@@ -57,7 +57,9 @@ a fixed figure for its kind and class: each kind at each class has a wider band,
 individual piece's own range is drawn from inside that band when the piece is made, so two
 pieces of the same kind and class are not the same. The span itself is rolled too, not
 just where it sits in the band — one piece's range can come out wider or narrower than
-another's, not only higher or lower within it.
+another's, not only higher or lower within it. A span is never narrower than a quarter
+of its band and never wider than half of it, so no piece comes out as a single flat
+figure and none spans its whole band.
 
 Each kind's F-class Attack Damage band, in ascending order:
 
@@ -185,10 +187,16 @@ The guild gets equipment from the shop, from crafting, and from drops.
 The shop is available from rank F, where the player can buy items and equipment.
 
 Crafting is something the guild has only by holding a Blacksmith or an Armourer — the
-Blacksmith and the Armourer unlock at guild rank D.
+Blacksmith and the Armourer unlock at guild rank D. A craft takes real time and runs on
+the same clock as missions, carrying on while the game is closed. How long depends on
+the piece's class — a low-class piece takes minutes, a high-class one takes hours. A
+crafter away from the hall is not crafting — the Core Concept doc covers the stations.
 
 Gear can drop too: both the dungeon and missions can drop a weapon or a piece of armour,
-alongside the materials and items they yield.
+alongside the materials and items they yield. Dropped gear is rolled the same way a
+crafted or bought piece is, and its class comes from where it dropped — from the
+dungeon's own rank and how deep the floor is for a dungeon drop, and from the mission's
+rank for a mission drop.
 
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
@@ -251,7 +259,8 @@ weapon only wears from ordinary attacks, armour wears from everything.
 
 Repairs happen in the guild hall between dives. Repairing a piece that still has
 durability left costs gold; fixing a piece that has broken costs gold and materials
-both.
+both. The gold a repair costs scales with the piece's class, the way its damage and
+defence bands do.
 
 A Blacksmith or Armourer in the party can also repair in the field, between battles — a
 convenience rather than a requirement, and each is scoped to its own trade: the Blacksmith
@@ -265,15 +274,7 @@ materials.
 
 ## Open Questions
 
-- What does crafting consume, and how long does it take? Can a crafter work while out on a
-  mission or a dive?
-- How narrow or wide can a rolled span be — can a piece come out with a single figure
-  rather than a range, or with a span as wide as the whole band?
-- Is dropped gear rolled the same way a crafted or bought piece is, and does its class
-  follow the dungeon floor or the mission's rank?
-- Does the gold a repair costs scale with the piece's class, and which materials does a
-  broken piece need?
+- Crafting a piece and fixing a broken one both take materials, and it isn't said which
+  kinds or how many either needs.
 - Does the player see a piece's exact rolled range and durability in the Dorms, or only a
   rough impression the way the recruiting board shows a candidate's strengths?
-- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
-  deciding which of two Armourers sets armour quality?

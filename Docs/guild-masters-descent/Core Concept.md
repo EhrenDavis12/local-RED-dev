@@ -29,12 +29,15 @@ F → E → D → C → B → A → S → SS → SSS
 
 The hall has three boards — a mission board, a recruiting board, and a dungeon board.
 
-## The Dorms and the Smithy
+## The Dorms and the Stations
 
 The Dorms are where the player sees members' stats and assigns their weapons and armour.
 
-The smithy is where a Blacksmith is assigned. When the guild holds more than one
-Blacksmith, it is the one assigned to the smithy whose work counts.
+Each specialist that works at home has a station of its own: the smithy for the
+Blacksmith, the armoury for the Armourer, the laboratory for the Alchemist, and the mead
+hall for the Cook. When the guild holds more than one of a trade, it is the one assigned
+to that station whose work counts. A specialist away from the hall, on a dive or a
+mission, is not working its station.
 
 How gear and quality actually work is covered in the Equipment doc.
 
@@ -139,6 +142,3 @@ covered in the Equipment doc.
 - A member short of health is not the same as an injured one, and nothing says whether
   it holds them back. Can a member be sent on a dive or a mission while still short of
   health, or must they be whole first?
-- The smithy counts the Blacksmith assigned to it when the guild holds more than one.
-  It isn't said whether the mead hall works the same way when the guild holds more
-  than one Cook, or whether a Cook away on a dive still counts.
