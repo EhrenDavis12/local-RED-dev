@@ -139,6 +139,10 @@ than the battle it was drunk for.
 A buff is used by the player, not drunk by a member, so using one costs no member an
 attack, and it reaches every member of the party rather than just one.
 
+All five buffs can be in effect at once — they raise different stats, so there's nothing
+for them to collide over. Using the same buff again replaces what's already running
+rather than adding to it.
+
 A healing potion restores a number of health points, from a band set by its rank:
 
 - F — 10 to 25
@@ -167,6 +171,3 @@ band and raises it — the same shape as a crafter's main stat and Luck for gear
 - A weapon and a piece of armour each roll from a band for their kind and class — what
   does a buff potion roll: how much it raises a stat by, and whether it has bands of
   its own?
-- There are five buffs and each reaches the whole party. It isn't said whether more
-  than one can be in effect at a time, or whether two of the same buff stack or the
-  second simply replaces the first.
