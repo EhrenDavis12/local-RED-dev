@@ -58,6 +58,9 @@ reached. The slot system itself is covered in the Dungeon doc.
 The Cook heals a little between floors — another five per cent — and substantially more at
 a rest area — a further fifteen per cent — on top of what the party gets anyway.
 
+A Cook's tier also raises how much health the mead hall replenishes between dives —
+what that costs is covered in the Core Concept doc.
+
 ## The Scout
 
 The Scout can "Search" the next 5 floors for the party and give an idea of what is coming.
