@@ -161,7 +161,8 @@ Default attacks are auto-selected. The player can select one enemy to be specifi
 targeted by the entire party — this cuts down on clicks during gameplay.
 
 The fight never pauses, and nothing waits for the player. It runs from start to finish,
-and the player acts while it's running — changing formation and marking the focus target.
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 
 When a member's cooldown comes up, the player can have it drink a healing potion
 instead of attacking — drinking costs that attack.

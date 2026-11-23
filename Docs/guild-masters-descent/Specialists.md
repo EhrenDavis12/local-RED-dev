@@ -136,6 +136,9 @@ A converted True is spent when it's drawn, turning back into a False, and any of
 still unspent when the battle ends turn back as well — the potion reaches no further
 than the battle it was drunk for.
 
+A buff is used by the player, not drunk by a member, so using one costs no member an
+attack, and it reaches every member of the party rather than just one.
+
 A healing potion restores a number of health points, from a band set by its rank:
 
 - F — 10 to 25
@@ -164,10 +167,6 @@ band and raises it — the same shape as a crafter's main stat and Luck for gear
 - A weapon and a piece of armour each roll from a band for their kind and class — what
   does a buff potion roll: how much it raises a stat by, and whether it has bands of
   its own?
-- A buff raises a stat for a fight, and a member can drink a healing potion when its
-  cooldown comes up at the cost of that attack. It isn't said whether a buff is drunk
-  the same way, costing the member an attack mid-fight, or taken before a fight starts
-  and so costing nothing.
-- A healing potion takes one slot of a party's carrying capacity. It isn't said whether
-  a buff takes a slot too, and if it doesn't, nothing stops a party carrying as many as
-  it likes.
+- There are five buffs and each reaches the whole party. It isn't said whether more
+  than one can be in effect at a time, or whether two of the same buff stack or the
+  second simply replaces the first.

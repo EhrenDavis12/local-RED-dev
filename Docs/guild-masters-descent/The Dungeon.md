@@ -151,10 +151,10 @@ per set:
 The ladder stops at six because there are only six combat types.
 
 Capacity is counted in slots, and every member carries 5 slots. Some members carry extra
-slots restricted to a particular kind of thing — the Specialists doc covers which ones. A
-healing potion takes 1 slot, and so does an item of loot — they cost the same, because if
-loot were free a party would simply fill every slot with potions. At one slot each, the
-choice is how much healing to pay for in treasure.
+slots restricted to a particular kind of thing — the Specialists doc covers which ones.
+A potion takes 1 slot, and so does an item of loot — they cost the same, because if loot
+were free a party would simply fill every slot with potions. At one slot each, the
+choice is how many potions to pay for in treasure.
 
 Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
 also drop a weapon or a piece of armour. One enemy in four drops something, and one drop
@@ -180,8 +180,8 @@ The player re-enters at the last rest area reached, and must pay the entry fee a
 a teleportation fee. This stops the player exploring five floors, returning, and
 rearranging the party with no penalty.
 
-Healing potions take up the party's carrying capacity, and they're added to it at the
-start of the raid.
+Potions take up the party's carrying capacity, and they're added to it at the start of
+the raid.
 
 ## Training Missions
 
