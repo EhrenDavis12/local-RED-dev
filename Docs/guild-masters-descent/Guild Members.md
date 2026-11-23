@@ -215,6 +215,9 @@ Crossing a rank also costs a set amount of experience, multiplying by five at ea
 - S to SS — 312,500
 - SS to SSS — 1,562,500
 
+A rank's cost multiplies by five while what a kill is worth only doubles, so each rank
+takes more diving than the one below it, and the climb is meant to steepen that way.
+
 ## Specialists
 
 Specialist types include Porter, Cook, Scout, Herbalist, Miner, Blacksmith, Armourer, and
@@ -240,12 +243,6 @@ works.
   a level threshold — 16 levels for the first, doubling after. Does the experience buy
   those levels at an even rate, or do the two run on separate counters with whichever is
   slower deciding?
-- The experience a rank costs multiplies by five at each step, while what a dungeon dive
-  pays grows closer to two and a half times a rank. A full dive of an F dungeon pays a
-  member about 12 experience against the 20 that crossing F costs, so under two dives.
-  By SS to SSS a full dive pays a member about 3,500 against the 1,562,500 that crossing
-  costs, so over four hundred dives. Which side gets tuned, the cost of a rank or what a
-  stronger enemy is worth?
 - A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
   the five per cent for the floor as well?
 - The Mage's lingering field damages what stands in it. Does that damage count as an area
