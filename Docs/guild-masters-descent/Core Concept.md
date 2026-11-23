@@ -41,9 +41,10 @@ How gear and quality actually work is covered in the Equipment doc.
 ## The Mead Hall
 
 Health lost on a dive doesn't come back at once — a member that comes home hurt needs
-time to heal, the same as an injury. The mead hall is a room in the hall where the player
-pays gold to speed that up: recovery happens on its own given time, and gold buys it
-sooner.
+time to heal, the same as an injury. With no Cook in the guild, health comes back on its
+own at 1 point a minute, and there's nothing to pay for. The mead hall is a room in the
+hall where the player pays gold to speed that up: recovery happens on its own given
+time, and gold buys it sooner.
 
 What a single heal restores, and what it costs, are both set by the Cook — the
 Specialists doc covers the Cook's tiers.
@@ -130,15 +131,13 @@ covered in the Equipment doc.
 ## Open Questions
 
 - What changes at each rank from F to SSS?
-- Recovery runs on the real-time clock, but nothing says how fast — how long a member
-  takes to come back from, say, half health, and whether that time depends on the
-  member's rank or on how much is missing.
 - A member short of health is not the same as an injured one, and nothing says whether
   it holds them back. Can a member be sent on a dive or a mission while still short of
   health, or must they be whole first?
-- What one heal restores and what it costs are both set by the Cook, so it isn't said
-  what happens with no Cook in the guild at all — whether the player can pay at the
-  mead hall without one, or whether healing then only happens by waiting.
 - The smithy counts the Blacksmith assigned to it when the guild holds more than one.
   It isn't said whether the mead hall works the same way when the guild holds more
   than one Cook, or whether a Cook away on a dive still counts.
+- Healing with no Cook arrives a point a minute, and a Cook heals by its own highest
+  stat for a price. It isn't said whether a Cook's healing lands on that same
+  once-a-minute beat, which would make its price a cost per minute, or on some other
+  schedule.
