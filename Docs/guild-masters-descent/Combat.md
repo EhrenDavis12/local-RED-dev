@@ -149,9 +149,11 @@ Every Luck check a character makes draws from the same bag, so the checks compet
 each other for the same tokens.
 
 Evasion draws from that same bag: when a member is attacked, it pulls one token, and a
-True means the attack misses. That's where a member's evasion comes from, and it needs no
-chance of its own — it's the bag's own density of Trues, same as the reset above. An area
-attack pulls no token at all; evasion still does nothing against one.
+True means the attack misses. A Rogue attacked by an Archer draws up to two tokens — a
+second only if the first is False — and one True is enough to evade. That's where a
+member's evasion comes from, and it needs no chance of its own — it's the bag's own
+density of Trues, same as the reset above. An area attack pulls no token at all;
+evasion still does nothing against one.
 
 Dexterity sets the rhythm; Luck occasionally skips the wait.
 
@@ -161,7 +163,8 @@ Default attacks are auto-selected. The player can select one enemy to be specifi
 targeted by the entire party — this cuts down on clicks during gameplay.
 
 The fight never pauses, and nothing waits for the player. It runs from start to finish,
-and the player acts while it's running — changing formation and marking the focus target.
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 
 When a member's cooldown comes up, the player can have it drink a healing potion
 instead of attacking — drinking costs that attack.

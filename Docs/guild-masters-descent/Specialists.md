@@ -58,6 +58,27 @@ reached. The slot system itself is covered in the Dungeon doc.
 The Cook heals a little between floors — another five per cent — and substantially more at
 a rest area — a further fifteen per cent — on top of what the party gets anyway.
 
+At the mead hall, a Cook heals a member by the amount of the Cook's own highest stat —
+a flat number of health points, not a percentage. That heal lands once a minute, the
+same beat healing runs on with no Cook at all, so each heal's gold cost — set by the
+Cook's own tier — is a cost per minute rather than a one-off:
+
+- Novice — 1 gold
+- Apprentice — 5
+- Journeyman — 10
+- Adept — 15
+- Master — 20
+- Grandmaster — 25
+- Grandmaster S — 30
+- Grandmaster SS — 35
+- Grandmaster SSS — 40
+
+Each heal also makes a Luck check, a pull from the Cook's own Luck bag — see the Combat
+doc for how a Luck check and its bag of fifty work. A True fully heals that member and
+costs no gold at all.
+
+The mead hall itself is covered in the Core Concept doc.
+
 ## The Scout
 
 The Scout can "Search" the next 5 floors for the party and give an idea of what is coming.
@@ -102,20 +123,56 @@ The Alchemist makes potions. Potions come in two kinds: temporary buffs, which r
 stats for a fight, and healing potions, which restore health. At a rest area, the
 Alchemist can brew from what the party has gathered.
 
+- Wind Step — raises Dexterity.
+- Dragon's Vein — raises Strength.
+- Rock Skin — raises Constitution, but it reaches defence only — it does not raise the
+  member's health.
+- Ancient Gift — raises Intelligence.
+- God's Wish — turns 2 of the member's Luck bag's Falses into Trues, rather than
+  raising Luck the way the other four raise their stat. See the Combat doc for how a
+  Luck bag and its Trues work.
+
+A converted True is spent when it's drawn, turning back into a False, and any of the two
+still unspent when the battle ends turn back as well — the potion reaches no further
+than the battle it was drunk for.
+
+A buff is used by the player, not drunk by a member, so using one costs no member an
+attack, and it reaches every member of the party rather than just one.
+
+All five buffs can be in effect at once — they raise different stats, so there's nothing
+for them to collide over. Using the same buff again replaces what's already running
+rather than adding to it.
+
+A buff raises its stat by a number rolled from a band set by the potion's rank:
+
+- F — 2 to 5
+- E — 4 to 10
+- D — 8 to 20
+- C — 16 to 40
+- B — 32 to 80
+- A — 64 to 160
+- S — 128 to 320
+- SS — 256 to 640
+- SSS — 512 to 1,280
+
+The band doubles at each rank.
+
+God's Wish has no band of its own — it turns 2 of the bag's Falses into Trues at any
+rank.
+
 A healing potion restores a number of health points, from a band set by its rank:
 
 - F — 10 to 25
-- E — 25 to 60
-- D — 60 to 115
-- C — 115 to 190
-- B — 190 to 285
-- A — 285 to 400
-- S — 400 to 535
-- SS — 535 to 690
-- SSS — 690 to 865
+- E — 20 to 50
+- D — 40 to 100
+- C — 80 to 200
+- B — 160 to 400
+- A — 320 to 800
+- S — 640 to 1,600
+- SS — 1,280 to 3,200
+- SSS — 2,560 to 6,400
 
-Each band starts where the one below it ends, and each is 20 points wider than the one
-below.
+The band doubles at each rank, the same way the buff band above it does.
 
 A potion's strength scales with the Alchemist's Intelligence, so a cleverer Alchemist
 brews stronger potions.
@@ -127,6 +184,7 @@ band and raises it — the same shape as a crafter's main stat and Luck for gear
 
 ## Open Questions
 
-- A weapon and a piece of armour each roll from a band for their kind and class — what
-  does a buff potion roll: how much it raises a stat by, and whether it has bands of
-  its own?
+- A potion's strength scales with the Alchemist's Intelligence, and the Alchemist's Luck
+  check places a potion within its band and can raise it — but God's Wish has no band of
+  its own. Does either of those reach God's Wish, and does it turn 2 Falses into Trues
+  no matter who brewed it?

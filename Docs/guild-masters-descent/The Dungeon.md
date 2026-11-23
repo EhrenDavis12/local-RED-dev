@@ -65,13 +65,13 @@ Dungeon diving is the main gameplay. Death in the dungeon is permanent — there
 to bring a dead member back. The risk is inherent in the choice: send someone you know
 will survive, or send a team and see who comes back.
 
-Each floor has 1–3 battles. Between floors, every member gets back five per cent of their
-maximum health, and nothing comes back between the battles on a single floor. Every 5th
-floor is a safe rest area, where every member gets back fifteen per cent, and the player
-may choose to return to the top and exit the dungeon. The Cook adds to both figures,
-covered in the Specialists doc. Retreating always costs the loot gathered since the last
-safe floor — any party member can carry some of it, so how much is lost depends on who
-came along.
+Each floor has 1–3 battles. Between floors, every member gets back five per cent of
+their maximum health, and nothing comes back between the battles on a single floor.
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent
+instead of the five, not both, and the player may choose to return to the top and exit
+the dungeon. The Cook adds to both figures, covered in the Specialists doc. Retreating
+always costs the loot gathered since the last safe floor — any party member can carry
+some of it, so how much is lost depends on who came along.
 
 The floors between rest areas group into sets of four, skipping the rest areas themselves,
 so the sets run 1–4, then 6–9, then 11–14, and so on. The enemy-type ladder below is
@@ -151,10 +151,10 @@ per set:
 The ladder stops at six because there are only six combat types.
 
 Capacity is counted in slots, and every member carries 5 slots. Some members carry extra
-slots restricted to a particular kind of thing — the Specialists doc covers which ones. A
-healing potion takes 1 slot, and so does an item of loot — they cost the same, because if
-loot were free a party would simply fill every slot with potions. At one slot each, the
-choice is how much healing to pay for in treasure.
+slots restricted to a particular kind of thing — the Specialists doc covers which ones.
+A potion takes 1 slot, and so does an item of loot — they cost the same, because if loot
+were free a party would simply fill every slot with potions. At one slot each, the
+choice is how many potions to pay for in treasure.
 
 Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
 also drop a weapon or a piece of armour. One enemy in four drops something, and one drop
@@ -180,8 +180,8 @@ The player re-enters at the last rest area reached, and must pay the entry fee a
 a teleportation fee. This stops the player exploring five floors, returning, and
 rearranging the party with no penalty.
 
-Healing potions take up the party's carrying capacity, and they're added to it at the
-start of the raid.
+Potions take up the party's carrying capacity, and they're added to it at the start of
+the raid.
 
 ## Training Missions
 

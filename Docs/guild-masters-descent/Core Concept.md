@@ -11,7 +11,7 @@ not a character in it. The main screen is the inside of a guild hall.
 ## Time
 
 Time passes in real time, and it keeps passing while the game is closed — missions
-complete and injuries heal while the player is away.
+complete, injuries heal, and lost health is recovered while the player is away.
 
 A dive in progress is the exception: it doesn't advance while the game is closed. It
 pauses, and picks up again right where it left off.
@@ -29,14 +29,33 @@ F → E → D → C → B → A → S → SS → SSS
 
 The hall has three boards — a mission board, a recruiting board, and a dungeon board.
 
-## The Dorms and the Smithy
+## The Dorms and the Stations
 
 The Dorms are where the player sees members' stats and assigns their weapons and armour.
 
-The smithy is where a Blacksmith is assigned. When the guild holds more than one
-Blacksmith, it is the one assigned to the smithy whose work counts.
+Each specialist that works at home has a station of its own: the smithy for the
+Blacksmith, the armoury for the Armourer, the laboratory for the Alchemist, and the mead
+hall for the Cook. When the guild holds more than one of a trade, it is the one assigned
+to that station whose work counts. A specialist away from the hall, on a dive or a
+mission, is not working its station.
 
 How gear and quality actually work is covered in the Equipment doc.
+
+## The Mead Hall
+
+Health lost on a dive doesn't come back at once — a member that comes home hurt needs
+time to heal, the same as an injury. With no Cook in the guild, health comes back on its
+own at 1 point a minute, and there is nothing to pay for — waiting is all there is. The
+mead hall is a room in the hall where the player pays gold to speed that up: recovery
+happens on its own given time, and gold buys it sooner.
+
+What a single heal restores, and what it costs, are both set by the Cook — the
+Specialists doc covers the Cook's tiers.
+
+The mead hall works on every member that needs healing at once, not one at a time. Each
+member being healed is charged for each minute, so what a minute costs is the Cook's
+price multiplied by however many members it's healing at once — a whole party is put
+right in the time a single member alone would take.
 
 ## The Party
 
@@ -120,3 +139,6 @@ covered in the Equipment doc.
 ## Open Questions
 
 - What changes at each rank from F to SSS?
+- A member short of health is not the same as an injured one, and nothing says whether
+  it holds them back. Can a member be sent on a dive or a mission while still short of
+  health, or must they be whole first?
