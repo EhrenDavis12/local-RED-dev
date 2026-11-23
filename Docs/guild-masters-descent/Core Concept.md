@@ -49,6 +49,11 @@ happens on its own given time, and gold buys it sooner.
 What a single heal restores, and what it costs, are both set by the Cook — the
 Specialists doc covers the Cook's tiers.
 
+The mead hall works on every member that needs healing at once, not one at a time. Each
+member being healed is charged for each minute, so what a minute costs is the Cook's
+price multiplied by however many members it's healing at once — a whole party is put
+right in the time a single member alone would take.
+
 ## The Party
 
 A party is made of multiple divers, plus specialists. Specialists have a reason for being
@@ -137,7 +142,3 @@ covered in the Equipment doc.
 - The smithy counts the Blacksmith assigned to it when the guild holds more than one.
   It isn't said whether the mead hall works the same way when the guild holds more
   than one Cook, or whether a Cook away on a dive still counts.
-- A Cook charges for every minute it heals, so it isn't said whether the player picks
-  which members are being healed one at a time or whether the mead hall works on the
-  whole party at once — which would multiply what that minute costs by however many
-  members are hurt.
