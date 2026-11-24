@@ -14,8 +14,8 @@ quality.
 The six weapon kinds, one per combat type:
 
 - Fighter — two-handed swords, and only two-handed swords
-- Brute — clubs
-- Tank — short swords
+- Brute — axes
+- Tank — war hammers
 - Archer — bows
 - Mage — staffs
 - Rogue — knives
@@ -66,8 +66,8 @@ Each kind's F-class Attack Damage band, in ascending order:
 - Knife, the Rogue's — 2–12
 - Staff, the Mage's — 3–15
 - Two-handed sword, the Fighter's — 4–16
-- Club, the Brute's — 4–18
-- Short sword, the Tank's — 5–21
+- Axe, the Brute's — 4–18
+- War hammer, the Tank's — 5–21
 - Bow, the Archer's — 6–26
 
 A band is set by how much work one strike has to do: a kind that strikes more than once in
@@ -94,17 +94,18 @@ not strikes made: the Brute's cleave and the Mage's column land three hits from 
 strike, the same as a kind that strikes three separate times. The weapon breaks when it
 reaches zero.
 
-Each kind's F-class Durability band, grouped by how many hits it lands in one attack:
+Each kind's F-class Durability band, grouped by how fast the kind spends durability —
+usually the hits it lands in one attack, but for the bow, how often it attacks:
 
-- Bow, the Archer's, and short sword, the Tank's — 40–80. One strike on one target, so
-  one hit an attack.
-- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
-  hits an attack.
-- Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
+- War hammer, the Tank's — 40–80. One strike on one target, so one hit an attack.
+- Knife, the Rogue's, two-handed sword, the Fighter's, and bow, the Archer's — 80–160.
+  The knife and sword land two hits an attack; the bow lands one hit, but the Archer
+  attacks about twice as often as the Tank, so it spends durability just as fast.
+- Axe, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
   so three hits an attack.
 
-A kind's band scales with the hits it lands in an attack, so every kind lasts about the
-same number of attacks — somewhere around sixty at the middle of its band.
+A band follows how fast a kind spends durability — both the hits it lands in an attack
+and how often it attacks — so that no kind runs out markedly sooner than the others.
 
 Unlike the damage bands, a kind's Durability band is the same at every class — an SSS
 weapon is no more durable than an F one; what it has is a far bigger damage band. Higher
@@ -274,7 +275,8 @@ materials.
 
 ## Open Questions
 
-- Crafting a piece and fixing a broken one both take materials, and it isn't said which
-  kinds or how many either needs.
+- Crafting a piece and fixing a broken one both take materials, which come as ores or
+  herbs — the Dungeon doc covers where they come from — and it isn't said how much of
+  either goes into which.
 - Does the player see a piece's exact rolled range and durability in the Dorms, or only a
   rough impression the way the recruiting board shows a candidate's strengths?

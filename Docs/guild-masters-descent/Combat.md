@@ -236,20 +236,20 @@ That includes monsters: a monster is built from the same six combat types too, n
 seventh structure of its own, so nothing in this section treats it any differently from
 any other enemy.
 
-What changes with a dungeon is tied to the dungeon's own rank: it sets both the rank of
-the enemies found there and their chance of gear. An enemy is either the dungeon's own
-rank or one grade below it, and no other grade — a C-rank dungeon fields C-rank and
-D-rank enemies, nothing higher and nothing lower. The dungeon's rank also determines the
-chance that an enemy carries a weapon and the chance that it wears armour.
+What changes with a dungeon is tied to the dungeon's own rank: it sets the rank of
+the enemies found there. An enemy is either the dungeon's own rank or one grade below it,
+and no other grade — a C-rank dungeon fields C-rank and D-rank enemies, nothing higher
+and nothing lower.
 
 Depth is a second dial, separate from rank. The deeper into a dungeon the player goes,
 the more enemies turn up in each fight, and the better the equipment those enemies carry.
 Think of it as the enemies getting luckier the deeper the dungeon runs — rank sets what
-grade they are and whether they're equipped at all; depth decides how many show up and how
-good that gear is. That luck is in the generation, not the stat — it only shapes how many
-enemies and how much gear the fight creates; the enemies' own Luck stat is untouched,
-exactly what their type and rank would otherwise give, so depth doesn't make them evade
-more or reset their cooldowns more often. The counts are covered in the Dungeon doc.
+grade the enemies are; depth sets how many show up, how likely they are to be equipped,
+and how good that gear is. That luck is in the generation, not the stat — it only shapes
+how many enemies and how much gear the fight creates; the enemies' own Luck stat is
+untouched, exactly what their type and rank would otherwise give, so depth doesn't make
+them evade more or reset their cooldowns more often. The counts and the chance figures
+are covered in the Dungeon doc.
 
 ## Targeting
 

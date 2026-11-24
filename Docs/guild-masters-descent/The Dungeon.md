@@ -133,6 +133,14 @@ of weak ones. Where the count would pass fifteen, the points left over raise eac
 enemy's cost instead, so the deepest floors field a full grid of enemies that are
 individually stronger than the floor's own scaling would make them.
 
+The chance an enemy carries a weapon or wears armour rises with the floor. A weapon's
+chance is 1 to 3 per cent on the first floor and rises 5 to 7 points a floor; armour's
+chance starts on floor 11 at 3 to 5 per cent and rises at the same rate a floor. A
+weapon is therefore always the likelier of the two.
+
+An enemy's cost is its stat points plus what its gear is worth, a piece being worth
+the middle of its rolled range — so arming an enemy means fewer of them on the floor.
+
 An enemy's share becomes its stats in a fixed shape. The points are spread down the
 ordering its type's stat weighting gives, in the ratio 8 : 7 : 6 : 5 : 4 — so a
 30-point enemy comes out at 8 in its type's leading stat, then 7, 6, 5 and 4. The
@@ -156,16 +164,28 @@ A potion takes 1 slot, and so does an item of loot — they cost the same, becau
 were free a party would simply fill every slot with potions. At one slot each, the
 choice is how many potions to pay for in treasure.
 
-Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
-also drop a weapon or a piece of armour. One enemy in four drops something, and one drop
-in ten is gear rather than materials or an item.
+Dungeon diving yields materials or items, and the floor itself pays gold. A dive can also
+drop a weapon or a piece of armour on certain floors.
+
+- One enemy in four drops materials or an item.
+- Materials come as ores or herbs, the two kinds the Miner and the Herbalist carry
+  restricted slots for.
+- Gold comes by the floor rather than by the enemy. A floor pays a count drawn from its
+  enemy count less two up to its enemy count, and each one in that count is worth 1 gold
+  in an F-rank dungeon, doubling each rank — a floor of fifteen enemies pays 13 to 15
+  gold.
+- A weapon or a piece of armour drops on the last fighting floor before each rest area,
+  and on the dungeon's last floor.
+- A drop the party has no room for is lost, the same way a dead member's gear is lost
+  when there's no capacity left for it.
 
 Gold is covered in the Core Concept doc.
 
 ## Entering the Dungeon
 
-There is a cost to enter the dungeon, and the more members taken, the more expensive it
-is. This makes party size a choice for the player.
+There is a cost to enter the dungeon, 2 gold a member in an F-rank dungeon doubling each
+rank, and the more members taken, the more expensive it is. This makes party size a
+choice for the player.
 
 A large party can have advantages — boss floors where more members are needed to secure
 victory — while for exploring, a large party is less advantageous.
@@ -177,8 +197,9 @@ A Scout in the party is what turns that risk into a decision: the player can cho
 return and build a new team, or train to be more powerful, before continuing.
 
 The player re-enters at the last rest area reached, and must pay the entry fee again plus
-a teleportation fee. This stops the player exploring five floors, returning, and
-rearranging the party with no penalty.
+a teleportation fee, reckoned from the floor being returned to: 1 gold a floor in an
+F-rank dungeon, rising 1 a rank. This stops the player exploring five floors, returning,
+and rearranging the party with no penalty.
 
 Potions take up the party's carrying capacity, and they're added to it at the start of
 the raid.
@@ -199,3 +220,11 @@ What the injured status means is covered in the Core Concept doc.
   that pool is chosen — rolled when the dungeon is created, or when the party first
   reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
   ones.
+- One enemy in four drops materials or an item, and nothing says how often it is one
+  rather than the other.
+- A weapon or a piece of armour drops on the floor before each rest area and on the
+  last floor, and it isn't said how many pieces drop there — one, or more the deeper
+  the floor.
+- A drop the party has no room for is lost, which is the same rule a dead member's
+  gear follows. Should a full party be able to throw something away to make room for
+  a find instead?
