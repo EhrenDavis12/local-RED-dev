@@ -98,12 +98,12 @@ K doubles at each rank, the same way the damage and defence bands double.
 
 A member's defence comes from Constitution plus their equipment.
 
-A member's health is their Constitution times ten — at F rank, where stats are
-single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
-through defence is taken off that pool. Because it comes from Constitution, it grows as
-Constitution grows, with no separate rule for levelling. Constitution already means
-toughness, so it is the pool and the base of defence both, and health needs no stat of its
-own.
+A member's health is their Constitution times ten — the Brute's is times twelve — at F
+rank, where stats are single-digit, that's a pool in the tens. It is what damage comes
+out of: whatever gets through defence is taken off that pool. Because it comes from
+Constitution, it grows as Constitution grows, with no separate rule for levelling.
+Constitution already means toughness, so it is the pool and the base of defence both, and
+health needs no stat of its own.
 
 When a member's health reaches zero, they are dead. What that means in the dungeon is
 covered in the Dungeon doc.
@@ -242,7 +242,3 @@ over a third the rate of a party of six. See Levels and Experience for how the s
 works.
 
 ## Open Questions
-
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?

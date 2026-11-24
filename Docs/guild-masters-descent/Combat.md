@@ -149,8 +149,8 @@ Every Luck check a character makes draws from the same bag, so the checks compet
 each other for the same tokens.
 
 Evasion draws from that same bag: when a member is attacked, it pulls one token, and a
-True means the attack misses. A Rogue attacked by an Archer draws up to two tokens — a
-second only if the first is False — and one True is enough to evade. That's where a
+True means the attack misses. A Rogue draws up to two tokens against any attack it faces
+— a second only if the first is False — and one True is enough to evade. That's where a
 member's evasion comes from, and it needs no chance of its own — it's the bag's own
 density of Trues, same as the reset above. An area attack pulls no token at all;
 evasion still does nothing against one.
@@ -253,12 +253,22 @@ more or reset their cooldowns more often. The counts are covered in the Dungeon 
 
 ## Targeting
 
-Members and enemies pick targets by the same rule, whichever side they're on. The choice
-is weighted by how much damage that target has dealt, how easy it is to kill, and — for a
-far-range attacker — how far back its row sits, so it shoots past the front line at what
-stands behind it and leaves the two front lines fighting each other. A taunt overrides all
-three factors for an enemy until the taunted enemy's next hit — one attack, then it's
-spent — and the focus target the player marks overrides them for the whole party.
+Members and enemies pick targets by the same rule, whichever side they're on. Every
+character the attacker can reach has a chance of being the target, and the chances
+add up to a hundred:
+
+- Twenty of the hundred is set aside for whichever reachable target has the least
+  health left.
+- The other eighty is shared out among everything reachable, that one included.
+- For a far-range attacker, the eighty is shared by row, each row further back
+  counting double, so it still shoots past the front line at what stands behind it
+  and leaves the two front lines fighting each other.
+- A taunt makes the taunted target the only one it can pick — a hundred per cent —
+  until the taunted enemy's next hit, one attack and then it's spent. The focus
+  target the player marks does the same for the whole party.
+
+A close attacker facing five in a front line gives the weakest of them 36% and each
+of the others 16%.
 
 ## Equipment Durability
 
@@ -275,3 +285,6 @@ the Equipment doc.
 - The Mage's field damages a character as it begins its own attack. A member can drink a
   potion instead of attacking — does a member standing in a field take the field's
   damage when it drinks?
+- For a far-range attacker, each row further back counts double when the eighty is
+  shared out. Is that the right weight, and should it hold the same way on a grid three
+  rows deep as it does on the five-wide one?

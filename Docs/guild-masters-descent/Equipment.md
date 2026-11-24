@@ -126,7 +126,7 @@ Each kind's F-class Defence band, in ascending order:
 - Hooded armour, the Rogue's — 2–8
 - Tanned hide, the Brute's — 2–9
 - Leather, the Archer's — 3–10
-- Light armour, the Fighter's — 4–13
+- Light armour, the Fighter's — 5–16
 - Full armour, the Tank's — 6–18
 
 Armour covers roughly a third of a typical strike at the same class, with Constitution
