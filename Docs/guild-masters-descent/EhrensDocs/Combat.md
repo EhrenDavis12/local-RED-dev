@@ -38,18 +38,18 @@ stays free for now.
 
 ```
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
-> reset's chance, and the never-pausing simulation are settled; whether a fight can be
-> sped up, how multi-strike cases resolve, what formation costs, how the bars read at a
-> glance, and whether the enemy grid keeps filling are not.
+> reset's chance, how a special fires, and the never-pausing simulation are settled;
+> whether a fight can be sped up, what formation costs, whether the enemies keep coming
+> once the grid is full, and whether the Mage's field bites a member that drinks are not.
 ```
 
 **Proposed:**
 
 ```
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
-> reset's chance, what formation costs and the fight's speed are settled, and for now the
-> fight can be paused; how multi-strike cases resolve, how the bars read at a glance, and
-> whether the enemy grid keeps filling are not.
+> reset's chance, how a special fires, what formation costs and the fight's speed are
+> settled, and for now the fight can be paused; whether the enemies keep coming once the
+> grid is full, and whether the Mage's field bites a member that drinks are not.
 ```
 
 **Why:** What formation costs and the fight's speed are now settled, and the fight can be paused for now (see the changes on Formation and Player Input).
@@ -70,7 +70,7 @@ stays free for now.
 
 **Why:** Answered: free for now, written into Formation.
 
-## Change: Health is full at the guild hall, and where everyone stands carries over
+## Change: A dive never injures, and where everyone stands carries over, for now
 
 > Proposed 2026-11-11 · for review
 
@@ -89,99 +89,74 @@ and the defender's mitigation is applied to it separately.
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
 and the defender's mitigation is applied to it separately.
 
-Health only matters inside a dive. Back at the guild hall a member's health is back to
-full; injury is what carries from one dive to the next.
-
 For now a dive never leaves a member injured: a member comes home fine, or doesn't come
 home. Where everyone stands at the end of a battle is where they start the next one, and
 the dead leave their places empty.
 ```
 
-**Why:** Answered: back at the guild hall health is back to full — health only matters
-inside a dive, and injury is what carries between dives. No doc says what happens to
-health after a dive. The existing paragraph is unchanged. Not settled by this: what
+**Why:** The dive is built this way. No doc says whether a dive can leave a member injured,
+or whether the formation carries from one battle to the next. Not settled by this: what
 reaching 0 health does on a training run, which "can injure a member, but can never kill
-one", and whether a dive can leave a member injured. The dive is built with a default for
-now on that, and on one thing nothing raised — whether the formation carries from one
-battle to the next — in the last paragraph; each is proposed as a question for
-`## Open Questions`.
+one". Each is proposed as a question for `## Open Questions`.
 
-## Change: How a member with no target picks one, and how a battle ends
+## Change: A battle ends in a stand-off after a set time, for now
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Player Input`, first and second paragraphs (a new paragraph after the second)
+**Where:** `## Player Input`, the paragraph beginning "The fight never pauses" (a new
+paragraph after it)
 
 **Now says:**
 
 ```
-Default attacks are auto-selected. The player can select one enemy to be specifically
-targeted by the entire party — this cuts down on clicks during gameplay.
-
 The fight never pauses, and nothing waits for the player. It runs from start to finish,
-and the player acts while it's running — using a member's special once that bar is full,
-changing formation, and marking the focus target.
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 ```
 
 **Proposed:**
 
 ```
-Default attacks are auto-selected. The player can select one enemy to be specifically
-targeted by the entire party — this cuts down on clicks during gameplay. A member with
-no enemy selected, or who can't reach the one selected, picks its target the way an
-enemy does.
-
-Nothing waits for the player. The fight runs from start to finish, and the player acts
-while it's running — using a member's special once that bar is full, changing formation,
-and marking the focus target. For now there's a pause button: it stops the fight and
-opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
-the player can't use a special, mark the focus target or retreat.
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 
 A battle ends when one side has no one left standing. For now a battle also ends after a
 set length of time, a placeholder, as a stand-off — 6,000 ticks, five minutes of fight —
 and a stand-off kills no one further.
 ```
 
-**Why:** The combat engine is built this way. No doc says what a member does with no
-target selected, or whether a battle can run forever. The original sentences are
-unchanged, apart from the pause proposed in "The fight can be paused, for now"; the new
-ones sit after them.
+**Why:** The combat engine is built this way. No doc says whether a battle can run forever.
+The original paragraph is unchanged apart from the pause proposed in "The fight can be
+paused, for now"; the new one sits after it.
 
 ## Change: A special puts nothing in its owner's bar, for now
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## The Special Bar`, third paragraph
+**Where:** `## The Special Bar`, the line "Firing the special empties the bar, and it
+charges again from there."
 
 **Now says:**
 
 ```
-The bar caps at full — the special is never lost, and it waits until the player uses it.
-While it sits full, charge is wasted: attacks the member makes while full charge nothing,
-and so does the type's bonus condition — that progress toward the next special is gone.
-Using the special empties the bar, and it charges again from there.
+Firing the special empties the bar, and it charges again from there.
 ```
 
 **Proposed:**
 
 ```
-The bar caps at full — the special is never lost, and it waits until the player uses it.
-While it sits full, charge is wasted: attacks the member makes while full charge nothing,
-and so does the type's bonus condition — that progress toward the next special is gone.
-Using the special empties the bar, and it charges again from there. For now a special
+Firing the special empties the bar, and it charges again from there. For now a special
 puts nothing into its owner's bar: its own hits charge nothing, the Mage's field's damage
 included, and it earns no bonus either — a Brute's special landing on two or more
 enemies pays nothing. The one exception is the Fighter's flurry, whose kill refills the
-bar to 90%, as the Individual Types doc says. For now, too, a special is used when the
-member's cooldown comes up, in place of the ordinary attack that cooldown brings round.
+bar to 90%, as the Individual Types doc says.
 ```
 
 **Why:** The combat engine is built this way. This doc says what wears a weapon down is
 what fills the bar, and the Equipment doc says a special wears the weapon not at all, so
 nothing a special does charges it; nothing says whether a special can earn its type's
-bonus. Both are proposed as questions in "Questions on the special bar". Whether using a
-special also costs the member an ordinary attack is proposed as a question below; for now
-it takes the place of the attack its cooldown brings round.
+bonus. Both are proposed as questions in "Questions on the special bar".
 
 ## Change: Every bar empties on a new floor and starts each dive empty, for now
 
@@ -200,16 +175,12 @@ next floor resets it to empty.
 
 ```
 A part-filled bar carries from one battle to the next within a floor, and moving to the
-next floor resets it to empty. For now a full bar empties too: every bar starts a new
-floor empty, and a rest area is a floor, so arriving at one empties them. For now, too,
-every dive starts with every bar empty, a dive that re-enters at a rest area included —
-the bar belongs to the dive, not to the member.
+next floor resets it to empty. For now every dive starts with every bar empty, a dive that
+re-enters at a rest area included — the bar belongs to the dive, not to the member.
 ```
 
-**Why:** The dive is built this way. "The special is never lost" and "a part-filled bar
-… resets it" leave open whether moving to the next floor empties a full bar, and nothing
-says whether a bar outlives the dive. Both are proposed as questions in "Questions on the
-special bar".
+**Why:** The dive is built this way. Nothing says whether a bar outlives the dive. That's
+proposed as a question in "Questions on the special bar".
 
 ## Change: When an effect's count starts, and a second cast stacking
 
@@ -243,16 +214,15 @@ that. For now it ends once the third of those has played out, so the owner's nex
 cooldowns all happen under it — a vanished Rogue makes three attacks that can't miss, or
 one fewer for each it spends drinking a potion instead. For now, too, a free attack from
 the Luck reset isn't one of the three: only a cooldown that comes up after a wait counts.
-For now a Shields Up or a field cast while the owner's last one is still running stacks
-with it: both run, each to its own end, so the two lots of defence add up and both fields
-do their damage.
+For now a field cast while the Mage's last one is still running stacks with it: both run,
+each to its own end, and both fields do their damage.
 ```
 
 **Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
 doesn't say whether the cycle it's cast in counts, whether the effect ends once the third
 has played out or as the fourth begins, or whether a free attack from the Luck reset is a
-cycle. Nothing says what happens when one is cast again while the last is still running;
-the six combat types are built to stack them. Each is proposed as a question below.
+cycle. Nothing says what happens when a Mage's field is cast again while the last is still
+running; the Mage is built to stack them. Each is proposed as a question below.
 A drink ordered in place of an attack uses up one of the three too, as "Drinking a potion
 is an order used at the next cooldown, for now" says, so the three are cooldowns, not
 attacks.
@@ -261,25 +231,32 @@ attacks.
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Enemy Targeting`, the paragraph (a new paragraph after it)
+**Where:** `## Targeting`, the paragraph (new paragraphs after it)
 
 **Now says:**
 
 ```
-Enemies pick a target from whatever they can reach. The choice is weighted by both how
-much damage that target has dealt and how easy it is to kill. A taunt overrides both of
-those factors until the taunted enemy's next hit — one attack, then it's spent.
+Members and enemies pick targets by the same rule, whichever side they're on. The choice
+is weighted by how much damage that target has dealt, how easy it is to kill, and — for a
+far-range attacker — how far back its row sits, so it shoots past the front line at what
+stands behind it and leaves the two front lines fighting each other. A taunt overrides all
+three factors for an enemy until the taunted enemy's next hit — one attack, then it's
+spent — and the focus target the player marks overrides them for the whole party.
 ```
 
 **Proposed:**
 
 ```
-Enemies pick a target from whatever they can reach. The choice is weighted by both how
-much damage that target has dealt and how easy it is to kill. The damage counted is what
-the target has dealt in this battle, the Mage's lingering field included; how easy it is
-to kill is how low its health is now, next to the others the enemy can reach. How much
-each counts is a placeholder. A taunt overrides both of those factors until the taunted
-enemy's next hit — one attack, then it's spent.
+Members and enemies pick targets by the same rule, whichever side they're on. The choice
+is weighted by how much damage that target has dealt, how easy it is to kill, and — for a
+far-range attacker — how far back its row sits, so it shoots past the front line at what
+stands behind it and leaves the two front lines fighting each other. A taunt overrides all
+three factors for an enemy until the taunted enemy's next hit — one attack, then it's
+spent — and the focus target the player marks overrides them for the whole party.
+
+The damage counted is what the target has dealt in this battle, the Mage's lingering
+field included; how easy it is to kill is how low its health is now, next to the others
+the attacker can reach. How much each counts is a placeholder.
 
 The taunt is spent by that attack whether it hits or misses. While the taunter is out of
 reach, the taunted one picks as normal, and the taunt keeps for its next attack that can
@@ -291,44 +268,40 @@ goes for the Tank.
 **Why:** The combat engine is built this way. "Damage dealt" didn't say over what span,
 and "easy to kill" didn't say how it's judged. "Next hit — one attack" read two ways; this
 takes it as one attack, hit or miss. Nothing said what a taunt does while the taunter is
-out of reach, when two taunts overlap, when the taunter dies, or against the party's
-selected enemy — and with monsters having the six types, a monster Tank taunts members.
+out of reach, when two taunts overlap, when the taunter dies, or against the
+focus target the player marks — and with monsters having the six types, a monster Tank
+taunts members.
 
 ## Change: Questions on specials, taunts and the dive
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
-its bar is full"
+**Where:** `## Open Questions`, after the entry beginning "The enemy grid holds fifteen"
 
 **Now says:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 ```
 
 **Proposed:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 - When a taunted member or enemy uses a special that hits its own choice of targets
   rather than one it aims at, is the taunt spent?
-- When a Rogue casts Vanish, a Tank uses Shields Up or a Mage casts its field, does that
-  cost it an ordinary attack, or does its cooldown run on untouched?
-- If a Tank uses Shields Up, or a Mage casts its field, while its last one is still
-  running, do the two stack, or does the new one replace the old?
+- If a Mage casts its field while its last one is still running, do the two stack, or
+  does the new one replace the old?
 - Can a dive leave a member injured?
 - Does the formation carry from one battle to the next?
 ```
 
 **Why:** None of the docs answers these. The second comes from how a taunt is spent once
-the six types' specials are built, and the next two from the specials that strike no one.
-The last two come from the dive as it's built: each has a default for now in "Health is
-full at the guild hall, and where everyone stands carries over".
+the six types' specials are built, and the third from the Mage's field. The last two come
+from the dive as it's built: each has a default for now in "A dive never injures, and
+where everyone stands carries over, for now".
 
 ## Change: How a cooldown rounds, and whose Dexterity counts
 
@@ -490,23 +463,20 @@ nothing gives a specialist one. That's proposed as a question below.
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
-its bar is full"
+**Where:** `## Open Questions`, after the entry beginning "The enemy grid holds fifteen"
 
 **Now says:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 ```
 
 **Proposed:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 - Is a special an attack for the Luck reset — does it get a check?
 - Does a free attack from the Luck reset count as one of the owner's three cycles for a
   lasting effect?
@@ -526,28 +496,24 @@ taunts and the dive" change to this list is unchanged; these go after the entrie
 
 > Proposed 2026-11-13 · for review
 
-**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
-its bar is full"
+**Where:** `## Open Questions`, after the entry beginning "The enemy grid holds fifteen"
 
 **Now says:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 ```
 
 **Proposed:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 - Do a special's own hits — the Mage's field's damage among them — charge the bar it has
   just emptied?
 - Can a special earn its owner's bonus condition — a Brute's special landing on two or
   more enemies, say?
-- Does moving to the next floor empty a full bar too, or only a part-filled one?
 - Does a member's special bar carry from one dive to the next, or does every dive start
   with it empty?
 ```
@@ -638,8 +604,8 @@ fight ready instead of empty, attacking on the first tick — the tick the fight
 before any wait has passed — rather than waiting out its first cooldown. On failure, it
 waits out that first cooldown like normal. A success is a full jumpstart, not a partial
 charge — the combatant is either ready or it isn't. For now that first attack is an
-ordinary attack, not a free one: it gets the Luck reset check after it, counts as one of
-its owner's cycles for a lasting effect, and can be a special if the bar is full. The
+ordinary attack, not a free one: it gets the Luck reset check after it, and counts as one of
+its owner's cycles for a lasting effect. The
 check is made only when a fight really begins, never when a battle is set up just to show
 who's in it, the way party planning does.
 ```
@@ -655,23 +621,20 @@ fighters pulls nothing because a pull from a member's bag can't be handed back.
 
 > Proposed 2026-11-18 · for review
 
-**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
-its bar is full"
+**Where:** `## Open Questions`, after the entry beginning "The enemy grid holds fifteen"
 
 **Now says:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 ```
 
 **Proposed:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 - Does an enemy's Luck bag last only for its own battle, new and full each time, or carry
   on from battle to battle the way a member's does?
 - When an attack ends the battle, or its attacker doesn't live through it, is a token
@@ -702,49 +665,49 @@ changes to this list above are unchanged; these go after the entries they add.
 
 ```
 The fight never pauses, and nothing waits for the player. It runs from start to finish,
-and the player acts while it's running — using a member's special once that bar is full,
-changing formation, and marking the focus target.
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 ```
 
 **Proposed:**
 
 ```
 Nothing waits for the player. The fight runs from start to finish, and the player acts
-while it's running — using a member's special once that bar is full, changing formation,
-and marking the focus target. For now there's a pause button: it stops the fight and
-opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
-the player can't use a special, mark the focus target or retreat.
+while it's running — changing formation, marking the focus target and using a buff potion.
+For now there's a pause button: it stops the fight and opens a pop-up to resume it or, on
+a dive or a played mission, quit. While it's paused the player can't mark the focus target
+or retreat.
 ```
 
 **Why:** The user, 2026-11-16: "Leave the pause button for now we can take it out later."
 The battle screen is built with it. This departs from the original's "The fight never
-pauses", so it stands for now. The pending "How a member with no target picks one, and how
-a battle ends" change to this paragraph carries this wording too.
+pauses", so it stands for now.
 
 ## Change: The fight can be sped up, and only shows sooner
 
 > Proposed 2026-11-16 · for review
 
-**Where:** `## Player Input`, the paragraph beginning "The fight doesn't wait for the
-player" (a new paragraph after it)
+**Where:** `## Player Input`, the paragraph beginning "The fight never pauses" (a new
+paragraph after it)
 
 **Now says:**
 
 ```
-The fight doesn't wait for the player, so the moment to use a special goes by while the
-fight carries on around it.
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 ```
 
 **Proposed:**
 
 ```
-The fight doesn't wait for the player, so the moment to use a special goes by while the
-fight carries on around it.
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
 
 The player can speed the fight up — x1, x2 or x3 — but can't slow it below x1. Faster
 only shows the same fight sooner: the same ticks and the same rolls, so the same taps at
-the same moments of the fight give the same result. What it changes is the player's real
-time to react: at x3 a special's window is a third as long.
+the same moments of the fight give the same result.
 ```
 
 **Why:** The user, 2026-11-16: "yes its fine." — to keeping the x1/x2/x3 speed button the
@@ -808,8 +771,7 @@ home, and only then does the other go. If the first hit kills the other fighter,
 swings.
 
 Nothing of a waiting attack happens until the wait ends. Then it's made whole, as any
-attack is: a field it stands in hurts it first, whether it uses its special is decided
-then, and its strikes roll then. That's also when its next cooldown starts, when its Luck
+attack is: a field it stands in hurts it first, and its strikes roll then. That's also when its next cooldown starts, when its Luck
 check is made, and when it counts as one of its attacks for a lasting effect.
 
 How long a fighter is out is worked out by the fight itself, from the same walk the battle
@@ -898,23 +860,20 @@ The combat engine is built this way.
 
 > Proposed 2026-11-17 · for review
 
-**Where:** `## Open Questions`, after the entry beginning "An enemy uses its special when
-its bar is full"
+**Where:** `## Open Questions`, after the entry beginning "The enemy grid holds fifteen"
 
 **Now says:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 ```
 
 **Proposed:**
 
 ```
-- An enemy uses its special when its bar is full, but nothing says what decides the moment
-  or the target. Does it fire as soon as it can, or hold while a better target is in
-  reach?
+- The enemy grid holds fifteen. When a floor is deep enough to fill it, do the enemies
+  stop there, or do they keep coming?
 - When a fighter is already on its way to hit someone, and that someone's own turn comes
   up to attack a third character, should it stay put until the hit lands and the attacker
   is back?
@@ -963,10 +922,7 @@ The player has a member drink by ordering it while the fight runs: any living pa
 member holding a potion can be ordered to, a specialist too, and the order can be taken
 back until it's used. It's used at the member's next cooldown, in place of the attack
 that cooldown brings, and the member drinks one potion from their own slots. An order
-ends when it's used or taken back, when the member dies, or when the battle ends. A
-member holds one order at a time: ordering a drink takes back an ordered special, and
-ordering the special takes back the drink, so a cooldown is a drink or a special, never
-both.
+ends when it's used or taken back, when the member dies, or when the battle ends.
 
 Drinking costs the attack and nothing else. The member strikes no one and stays on their
 own spot, wears no weapon, charges no bar, and pulls no Luck token, so no free attack
@@ -984,17 +940,15 @@ For now:
   as soon as they're back on their own spot, in the place the waiting attack had. Only
   their own absence holds a drink, never their target's.
 - A free attack from the Luck reset is always an attack. An order placed before one is
-  used at the next cooldown that comes after a wait, the same as a special.
+  used at the next cooldown that comes after a wait.
 - A drink never spends a taunt. A taunt is spent only by an attack that's made, so it
   keeps for the member's next one.
 - Nothing is drunk without an order. With Auto on in a dive, any party member below 30%
   of their maximum health who still holds a potion has a drink ordered for them, a Cook
   or a Porter too, and it's used at their next cooldown like any other order. The 30% is
-  a placeholder. The drink comes before a ready special: Auto never orders a special for
-  a member with a drink ordered, and ordering the drink takes back a special already
-  ordered. Auto never takes a drink order back. If the player takes back the drink, or
-  orders that member's special, while the member is still below 30% and holds a potion,
-  Auto orders the drink again straight away.
+  a placeholder. Auto never takes a drink order back. If the player takes back the drink
+  while the member is still below 30% and holds a potion, Auto orders the drink again
+  straight away.
 - A drink that's ordered but not yet drunk isn't saved, so it's lost if the game closes.
 - On the battle screen each fighter's skill button — up to four, the fourth following
   whichever fighter the player last tapped — has a drink button under it for the same
@@ -1009,7 +963,7 @@ For now:
 its cooldown comes up, and that drinking costs that attack, but not how the player says
 so before the moment goes by, what else a drink costs, or how it sits with a waiting
 attack, a free attack or a special. The combat engine is built this way. Ordering ahead,
-one order at a time, a waiting member drinking once home, a free attack never replaced
+a waiting member drinking once home, a free attack never replaced
 and an unused order not being saved are the user's going-ahead defaults, 2026-11-18. The
 field's hit coming first is the default the build goes ahead with on the original's open
 question, which stays open. A drink at full health and a drink leaving a taunt standing

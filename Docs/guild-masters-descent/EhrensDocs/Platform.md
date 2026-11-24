@@ -33,11 +33,10 @@ counts as made, even if it hadn't finished showing on screen. The save holds whe
 cooldown stands — how long each fighter still has to wait, whether one is owed a free
 attack from the Luck reset, and how far each lasting effect has run — and what's left in
 every fighter's Luck bag, the enemies' too, so nothing is drawn again as it loads. It
-doesn't hold an order the player gave that hasn't been used yet: an ordered special or an
-ordered drink is lost when the game closes, and the battle carries on from the save with
-none. Saving doesn't bank anything, either: the gold found on the dive is still the
-party's until the dive ends, and what was found since the last rest area can still be
-lost.
+doesn't hold an order the player gave that hasn't been used yet: an ordered drink is
+lost when the game closes, and the battle carries on from the save with none. Saving
+doesn't bank anything, either: the gold found on the dive is still the party's until the
+dive ends, and what was found since the last rest area can still be lost.
 
 A battle doesn't move on while the game is closed or in the background: it picks up at
 the moment it stopped. A long gap between two frames is dropped rather than played fast —
@@ -63,7 +62,7 @@ one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
-loads under the rule as it is now. A member not on the saved dive loads at full.
+loads under the rule as it is now.
 
 Every member's Luck bag is saved with them, part-used as it is, so closing the game
 between battles or between dives never refills a bag or hands back a token.

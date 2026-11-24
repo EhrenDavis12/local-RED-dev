@@ -12,17 +12,17 @@
 **Now says:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 ```
 
 **Proposed:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - Do two recruits of the same type and the same rank or tier start with exactly the same
   stats? Starting Stats says they're set by type and rank or tier, but the recruiting
   board's rough impression of a candidate's strengths — promising, unremarkable — suggests
@@ -100,17 +100,17 @@ the board as it changes.
 **Now says:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 ```
 
 **Proposed:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - In "divided equally between all party members", which members count: the ones who
   started the combat or the ones still alive?
 ```
@@ -152,53 +152,22 @@ for rung wherever a rank is compared to something else, which this reads as cove
 **Now says:**
 
 ```
-There is no minimum damage — enough defence can reduce a hit to nothing.
+There is no minimum damage — enough defence can reduce a hit to nothing, and a hit's
+damage rounds down, so anything short of a full point is nothing at all.
 ```
 
 **Proposed:**
 
 ```
-There is no minimum damage — enough defence can reduce a hit to nothing. For now a hit's
-damage is worked out exactly and rounded down once, at the end of the hit, after
-everything that changes it: the fraction, the reduced damage Volley's neighbours take,
-and the Archer's streak. Nothing rounds along the way, and a hit that comes to less than
-one does nothing.
+There is no minimum damage — enough defence can reduce a hit to nothing, and a hit's
+damage rounds down, so anything short of a full point is nothing at all. For now that
+rounding happens once, at the end of the hit, after everything that changes it: the
+fraction, the reduced damage Volley's neighbours take, and the Archer's streak. Nothing
+rounds along the way.
 ```
 
-**Why:** The combat engine is built this way. Which way a fractional hit rounds is asked
-in `## Open Questions` and stays open there. Nothing said whether a hit rounds once or at
+**Why:** The combat engine is built this way. Nothing says whether a hit rounds once or at
 each step, and rounding at each step loses a point every time.
-
-## Change: The Mage's field is an area attack, for now
-
-> Proposed 2026-11-13 · for review
-
-**Where:** `## Base Stats`, last paragraph
-
-**Now says:**
-
-```
-An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
-land on a space rather than on a person, so evasion does nothing against them. They do
-pay a reduced defence, though: an area attack uses two-thirds of the target's defence
-when working the fraction above.
-```
-
-**Proposed:**
-
-```
-An attack can miss an evasive target. Area attacks — the AoE effects — can't miss: they
-land on a space rather than on a person, so evasion does nothing against them. They do
-pay a reduced defence, though: an area attack uses two-thirds of the target's defence
-when working the fraction above. For now the Mage's lingering field counts as an area
-attack each time it deals damage: it can't miss, and it uses two-thirds of the victim's
-defence, worked with the Mage's K.
-```
-
-**Why:** The combat engine is built this way. Whether the field's damage counts as an area
-attack is asked in `## Open Questions` and stays open there. What else the field does is
-in the `Individual Types.md` change "Where the Mage's field lies, and what it does, for
-now".
 
 ## Change: Health counts a member's own Constitution, and what's taken stays taken, for now
 
@@ -256,17 +225,17 @@ battles on a single floor.
 **Now says:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 ```
 
 **Proposed:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - Help raises the receiver's primary stat, and the Tank's is Constitution. Does that help
   raise the Tank's health too, or only its defence?
 - When a level-up raises a member's Constitution mid-dive, does their current health rise
@@ -314,12 +283,6 @@ Crossing a rank also costs a set amount of experience, multiplying by five at ea
 - S to SS — 312,500
 - SS to SSS — 1,562,500
 
-Level is a number and experience is a bar — one bar, not two counters. The experience a
-rank costs is exactly what takes a member from level 1 to that rank's level threshold,
-spread across the levels: F to E's 20 takes a member from level 1 to level 16, and E to
-D's 100 takes them from level 1 to level 32. Reaching the threshold and having earned the
-rank's experience happen at the same moment.
-
 For now the steps are uneven by at most a point, so a rank's total stays exact: level N of
 a rank is reached once ceil(cost × (N−1) ÷ (threshold−1)) experience has been earned in
 that rank. For F to E that puts level 2 at 2, level 3 at 3, level 4 at 4, level 5 at 6,
@@ -333,34 +296,15 @@ top of the ladder — SSS, or a specialist at Grandmaster SSS — has no rank le
 so earns no experience and gains no levels.
 ```
 
-**Why:** Answered 2026-11-13: "level is a number experience as a bar". How the cost is cut
-into single levels isn't settled; the even spread, rounded up, is a placeholder for now
-and cheap to change. The one bar also settles whether leftover experience carries toward
-the next level: the bar is never spent, only read, so nothing is left over, and that
-question is no longer proposed. Promotion's "only the level counter resets" is about the
-stats being kept; the bar empties with the level, since it holds what was earned in the
-old rank. What the member sheet's bar fills toward, and the top of the ladder, are
-defaults for now, each proposed as a question in "Questions on experience".
-
-## Change: Experience-and-levels question answered
-
-> Proposed 2026-11-13 · for review
-
-**Where:** `## Open Questions`, second entry
-
-**Now says:**
-
-```
-- Crossing a rank costs a set amount of experience, and reaching the next rank also needs
-  a level threshold — 16 levels for the first, doubling after. Does the experience buy
-  those levels at an even rate, or do the two run on separate counters with whichever is
-  slower deciding?
-```
-
-**Proposed:** delete. The other entries in `## Open Questions` stay as they are.
-
-**Why:** Answered: one bar, written into Promotion (see "Experience is the bar, level is
-the number").
+**Why:** Answered 2026-11-13: "level is a number experience as a bar". The original's
+`## Promotion` spreads a rank's cost evenly across its level-ups; how that even spread
+lands on whole points isn't settled, and rounding up is a placeholder for now and cheap
+to change. The one bar also settles whether leftover experience carries toward the next
+level: the bar is never spent, only read, so nothing is left over. Promotion's "only the
+level counter resets" is about the stats being kept; the bar empties with the level,
+since it holds what was earned in the old rank. What the member sheet's bar fills toward,
+and the top of the ladder, are defaults for now, each proposed as a question in
+"Questions on experience".
 
 ## Change: Questions on experience
 
@@ -371,17 +315,17 @@ the number").
 **Now says:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 ```
 
 **Proposed:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - Does a combat that ends in a stand-off still pay for the enemies killed in it?
 - The member sheet shows one experience bar. Does it fill toward the next level, or across
   the whole rank toward the threshold?
@@ -393,25 +337,6 @@ the number").
 combat's experience, for now" and "Experience is the bar, level is the number", and none
 of the docs settles them. The pending changes to this list above are unchanged; these go
 after the entries they add.
-
-## Change: Rest-floor heal question answered
-
-> Proposed 2026-11-14 · for review
-
-**Where:** `## Open Questions`, the entry beginning "A rest floor is still a floor"
-
-**Now says:**
-
-```
-- A rest floor is still a floor. Does arriving at one give the fifteen per cent only, or
-  the five per cent for the floor as well?
-```
-
-**Proposed:** delete. The other entries in `## Open Questions` stay as they are.
-
-**Why:** Answered 2026-11-13: "OK, then just the 15%" — the fifteen per cent only, and a
-Cook's fifteen only too. Written into The Dungeon.md's change notes (see "How a heal in
-the dive lands, for now").
 
 ## Change: Help comes back to whole points once
 
@@ -473,9 +398,9 @@ with these:
 
 The six combat types' lines are Battle Test's teams with the one point of help each
 member gets there taken off its primary stat. For now the Cook's and the Porter's are 2
-up in every stat, in step with the fighters. Monsters are built from the same table and
-take their type's line exactly. For now a recruit on the recruiting board varies from its
-type's line by up to 1 point either way in each stat, kept between 1 and 9.
+up in every stat, in step with the fighters. For now a recruit on the recruiting board
+varies from its type's line by up to 1 point either way in each stat, kept between 1 and
+9.
 ```
 
 **Why:** The user, 2026-11-18: "if something from the new docs contradicts the choices
@@ -497,17 +422,17 @@ doesn't, and has a change note of its own.
 **Now says:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 ```
 
 **Proposed:**
 
 ```
-- A hit's damage can land on a fraction — the mitigation is a ratio, and an area attack
-  takes two-thirds of the defence into it. Which way does that round? It decides whether
-  a hit from far below a member's rank is chip damage forever or genuinely nothing.
+- The Rogue is described as having high evasion, but it draws a second token only
+  against an Archer, so its evasion is no better than anyone else's against the other
+  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - The cook and the porter aren't in the other dev's numbers. If the fighters' starting
   stats go up by 2, should the cook and porter go up by the same 2, or stay where they
   are?

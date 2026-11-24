@@ -62,10 +62,13 @@ proposed as a question in the Combat change notes, in "Questions on the special 
 ```
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
 
-The Tank's special is called Shields Up. It temporarily increases the Tank's own defence,
-and it also adds that defence to all the allies behind him in his own column — two of them
-when he's in the front row. If more than one Tank uses it, the contributions are fully
-additive: an ally behind two Tanks gets both lots of defence.
+The Tank's special is called Shields Up. It temporarily doubles the Tank's own defence,
+measured before any Shields Up already standing on him, and each ally behind him in his
+own column gains that same figure — the Tank's own unshielded defence — on top of their
+own, two of them when he's in the front row. Firing it again refreshes the Tank's own
+shield rather than stacking on it: the fresh shield replaces the standing one and starts
+its length over, at the same size. If more than one Tank uses it, the contributions are
+fully additive: an ally behind two Tanks gets both lots of defence.
 
 Being attacked is the Tank's bonus: the bar charges faster while the Tank is being
 attacked.
@@ -77,13 +80,15 @@ attacked.
 The Tank's ordinary attack hits one target and taunts it, drawing that enemy's attention.
 For now the target is taunted even when the attack misses.
 
-The Tank's special is called Shields Up. It temporarily increases the Tank's own defence,
-and it also adds that defence to all the allies behind him in his own column — two of them
-when he's in the front row. If more than one Tank uses it, the contributions are fully
-additive: an ally behind two Tanks gets both lots of defence. For now what the allies get
-is the increase, the same amount the Tank gains, not the Tank's whole defence. It goes
-to whoever stands behind him when he raises it, and doesn't follow anyone moving into or
-out of his column while it lasts.
+The Tank's special is called Shields Up. It temporarily doubles the Tank's own defence,
+measured before any Shields Up already standing on him, and each ally behind him in his
+own column gains that same figure — the Tank's own unshielded defence — on top of their
+own, two of them when he's in the front row. Firing it again refreshes the Tank's own
+shield rather than stacking on it: the fresh shield replaces the standing one and starts
+its length over, at the same size. If more than one Tank uses it, the contributions are
+fully additive: an ally behind two Tanks gets both lots of defence. For now it goes to
+whoever stands behind him when he raises it, and doesn't follow anyone moving into or out
+of his column while it lasts.
 
 Being attacked is the Tank's bonus: the bar charges faster while the Tank is being
 attacked. For now it pays for each enemy strike aimed at him, hit or miss. The Mage's
@@ -91,9 +96,8 @@ lingering field isn't a strike, so its damage earns nothing.
 ```
 
 **Why:** The combat types are built this way. Nothing said whether a miss still taunts,
-whether "that defence" is the increase or the Tank's whole defence, whether the bonus
-follows the column as allies move, or how often being attacked pays. Each is proposed as a
-question below.
+whether the bonus follows the column as allies move, or how often being attacked pays.
+Each is proposed as a question below.
 
 ## Change: The Fighter's ordinary strikes stop when the target dies, for now
 
@@ -189,35 +193,6 @@ the Fighter's bonus: it never adds 15 the way the other types' bonus conditions 
 **Why:** The combat engine is built this way. `Combat.md` gives every type's bonus 15 each
 time it's met, and this doc makes the Fighter's the refill to 90%. Which holds is proposed
 as a question below.
-
-## Change: The Rogue's evasion against a capped Archer streak, for now
-
-> Proposed 2026-11-18 · for review
-
-**Where:** `## The Rogue`, first paragraph
-
-**Now says:**
-
-```
-The Rogue attacks at far range and has high evasion. Its advantage over the Archer is
-against the Archer's ordinary shots: a single shot is a single chance to miss, so
-high evasion beats it. It's weak to the Mage because the Mage's area attacks can't be
-dodged.
-```
-
-**Proposed:**
-
-```
-The Rogue attacks at far range and has high evasion. Its advantage over the Archer is
-against the Archer's ordinary shots: a single shot is a single chance to miss, so
-high evasion beats it. For now that holds until an Archer's streak on the Rogue reaches
-its cap: from then that Archer's shots on it can't be dodged, until the streak breaks.
-It's weak to the Mage because the Mage's area attacks can't be dodged.
-```
-
-**Why:** The combat types are built this way. Every dodge the Rogue makes is a pull from
-its bag, and a capped Archer shot pulls none ("Volley and the Archer's streak, for now"),
-so the Rogue's evasion beats the Archer's ordinary shots only below the cap.
 
 ## Change: A Rogue's second strike is lost if the first kills, for now
 
@@ -394,7 +369,8 @@ alongside the Brute's cleave.
 ```
 Its special is a lingering field: it covers two columns of the enemy's grid. The field
 affects enemies only — it never damages the player's own members. The field deals damage
-through two separate events: a character standing in the field takes damage from it when
+through two separate events, each one dealing half of what the Mage's ordinary attack
+deals to that same target: a character standing in the field takes damage from it when
 that character begins its own attack — that damage lands before the attack does, so if it
 kills the character the attack never happens — and a character that moves into the field,
 changing its position, takes damage for entering. Reaching in to attack from outside the
@@ -406,45 +382,42 @@ in the field takes no damage from it.
 
 ```
 Its special is a lingering field: it covers two columns of the enemy's grid. The field
-affects enemies only — it never damages the player's own members. A monster Mage's
-field lies on the party's grid, so it is the party it hurts: a field never damages the
-side that cast it. The field deals damage through two separate events: a character
-standing in the field takes damage from it when that character begins its own attack —
-that damage lands before the attack does, so if it kills the character the attack never
-happens — and a character that moves into the field, changing its position, takes damage
-for entering. Reaching in to attack from outside the field doesn't count as entering — an
+affects enemies only — it never damages the player's own members. A monster Mage's field
+lies on the party's grid, so it is the party it hurts: a field never damages the side
+that cast it. The field deals damage through two separate events, each one dealing half
+of what the Mage's ordinary attack deals to that same target: a character standing in
+the field takes damage from it when that character begins its own attack — that damage
+lands before the attack does, so if it kills the character the attack never happens —
+and a character that moves into the field, changing its position, takes damage for
+entering. Reaching in to attack from outside the field doesn't count as entering — an
 attacker reaching in to attack a character standing in the field takes no damage from
-it. It stays for its whole length even when the enemy it was aimed at dies. For now the
-field's damage doesn't roll to hit, and it hurts a vanished Rogue standing in it too,
-without ending its Vanish.
+it. It stays for its whole length even when the enemy it was aimed at dies. For now it
+hurts a vanished Rogue standing in it too, without ending its Vanish.
 
 For now a special counts as beginning an attack, even one that strikes no one, like
 Vanish or Shields Up. The Brute's push past the front row isn't moving into it, since the
 Brute's node never changes.
 
 For now the two columns are the target's and the one to its right, or the one to its left
-when the target is in the right-hand column. How much the field does each time it deals
-damage, before defence, is set once, when it's cast: a share, a placeholder, of the Mage's
-Intelligence, with help, plus one roll of its staff. That figure isn't rounded. For now
-each time the field deals damage it's an area attack: it pays two-thirds of the victim's
-defence, worked with the Mage's K, and the victim's armour, and a Tank's shield, are
-rolled afresh for it the way they are for a strike. Each of those hits rounds once, after
-defence, and spends a use of each of them, the way a strike that lands does.
+when the target is in the right-hand column. The half each hit deals is taken from a
+figure set once, when the field is cast: the Mage's Intelligence, with help, plus one roll
+of its staff, before defence. That figure isn't rounded. Each time the field deals damage,
+the victim's armour, and a Tank's shield, are rolled afresh for it the way they are for a
+strike. Each of those hits rounds once, after defence, and spends a use of each of them,
+the way a strike that lands does.
 ```
 
 **Why:** The combat engine and the six combat types are built this way. With monsters
 having the six types, a monster Mage's field is on the party's grid, which "the player's
-own members" didn't foresee. Nothing said which two columns, how much the field does,
-whether it outlives the enemy it was aimed at, or whether it ends a vanished Rogue's
-Vanish. Which columns, how much, and Vanish are proposed as questions below. Nor did it
-say whether a special counts as beginning an attack, whether the field hurts in the tick it's cast, or
-whether the Brute's push past the front row is a move into it; those are proposed as
-questions too, in "Questions on the field's timing".
-Nor did it say whether the field's damage pays defence the way an area attack does;
-`Guild Members.md` asks that in its open questions, and it stays open there.
-A field hit wears the armour and shield it's defended with because `Equipment.md`
-`## Durability` has armour wear from everything, the Mage's field named, and a shield
-spends a use wherever the armour spends one.
+own members" didn't foresee. Nothing said which two columns, whether the half is read once
+at the cast or again each time, whether the field outlives the enemy it was aimed at, or
+whether it ends a vanished Rogue's Vanish. Which columns, how much, and Vanish are
+proposed as questions below. Nor did it say whether a special counts as beginning an
+attack, whether the field hurts in the tick it's cast, or whether the Brute's push past
+the front row is a move into it; those are proposed as questions too, in "Questions on the
+field's timing". A field hit wears the armour and shield it's defended with because
+`Equipment.md` `## Durability` has armour wear from everything, the Mage's field named,
+and a shield spends a use wherever the armour spends one.
 
 ## Change: The Mage's bonus pays per hit, for now
 
@@ -499,8 +472,6 @@ proposed as a question below.
 - Do the enemies next to the Brute's target, and every enemy in the Mage's column,
   take the full damage? Only Volley's neighbours are said to take reduced damage.
 - Is the Tank's target taunted when his attack misses?
-- "It also adds that defence to all the allies behind him" — is that the Shields Up
-  increase, or the Tank's whole defence?
 - If an ally moves into or out of the Tank's column while Shields Up lasts, does the bonus
   follow them?
 - If the target of a Fighter's or a Rogue's ordinary attack dies mid-attack, do the

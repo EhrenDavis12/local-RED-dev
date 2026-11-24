@@ -57,7 +57,10 @@ Assignment.
 
 ```
 Gear can drop too: both the dungeon and missions can drop a weapon or a piece of armour,
-alongside the materials and items they yield.
+alongside the materials and items they yield. Dropped gear is rolled the same way a
+crafted or bought piece is, and its class comes from where it dropped — from the
+dungeon's own rank and how deep the floor is for a dungeon drop, and from the mission's
+rank for a mission drop.
 
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
@@ -67,7 +70,10 @@ equipment, and dives yield materials or items.
 
 ```
 Gear can drop too: both the dungeon and missions can drop a weapon or a piece of armour,
-alongside the materials and items they yield.
+alongside the materials and items they yield. Dropped gear is rolled the same way a
+crafted or bought piece is, and its class comes from where it dropped — from the
+dungeon's own rank and how deep the floor is for a dungeon drop, and from the mission's
+rank for a mission drop.
 
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
@@ -162,7 +168,8 @@ bought — is not settled by this.
 ```
 Repairs happen in the guild hall between dives. Repairing a piece that still has
 durability left costs gold; fixing a piece that has broken costs gold and materials
-both.
+both. The gold a repair costs scales with the piece's class, the way its damage and
+defence bands do.
 ```
 
 **Proposed:**
@@ -170,8 +177,9 @@ both.
 ```
 Repairs happen in the guild hall between dives. Repairing a piece that still has
 durability left costs gold; fixing a piece that has broken costs gold and materials
-both. For now, though, repair costs gold only: in the first version a broken piece is
-fixed for gold and no materials.
+both. The gold a repair costs scales with the piece's class, the way its damage and
+defence bands do. For now, though, repair costs gold only: in the first version a broken
+piece is fixed for gold and no materials.
 ```
 
 **Why:** Answered: for now, repair costs gold only. Nothing in the first version gives the
@@ -184,20 +192,21 @@ longer-term design.
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, after the entry beginning "Crafting a piece and fixing a
+broken one"
 
 **Now says:**
 
 ```
-- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
-  deciding which of two Armourers sets armour quality?
+- Crafting a piece and fixing a broken one both take materials, and it isn't said which
+  kinds or how many either needs.
 ```
 
 **Proposed:**
 
 ```
-- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
-  deciding which of two Armourers sets armour quality?
+- Crafting a piece and fixing a broken one both take materials, and it isn't said which
+  kinds or how many either needs.
 - Are the guild's stores capped?
 - Where do the condition bands' edges fall? Good is above 50% and Worn is 25% to 49%, so a
   piece at exactly 50% — or between 49% and 50%, or between 24% and 25% — sits in no band.
@@ -263,73 +272,6 @@ nothing for a guild above rank F.
 **Why:** The game is built this way. What the baseline is above F, and what a piece costs
 there, isn't settled, so the shop doesn't rise with the guild yet. No guild rises above
 rank F yet, so the empty shop above F doesn't come up.
-
-## Change: For now a span is no wider at SSS than at F
-
-> Proposed 2026-11-13 · for review
-
-**Where:** `## Quality`, second paragraph
-
-**Now says:**
-
-```
-A weapon carries two attributes: an Attack Damage range and a Durability. Each kind of
-weapon has its own Attack Damage range, and so does each class — the ranges differ per
-kind so the damage comes out balanced across the combat types. But a weapon's range is not
-a fixed figure for its kind and class: each kind at each class has a wider band, and an
-individual piece's own range is drawn from inside that band when the piece is made, so two
-pieces of the same kind and class are not the same. The span itself is rolled too, not
-just where it sits in the band — one piece's range can come out wider or narrower than
-another's, not only higher or lower within it.
-```
-
-**Proposed:**
-
-```
-A weapon carries two attributes: an Attack Damage range and a Durability. Each kind of
-weapon has its own Attack Damage range, and so does each class — the ranges differ per
-kind so the damage comes out balanced across the combat types. But a weapon's range is not
-a fixed figure for its kind and class: each kind at each class has a wider band, and an
-individual piece's own range is drawn from inside that band when the piece is made, so two
-pieces of the same kind and class are not the same. The span itself is rolled too, not
-just where it sits in the band — one piece's range can come out wider or narrower than
-another's, not only higher or lower within it.
-For now a span is rolled anywhere from a single figure to four points wide, and never
-wider than its band, at every class — so an SSS knife's span, inside 512–3072, is no wider
-than an F knife's inside 2–12. The same goes for armour's Defence.
-```
-
-**Why:** The game is built this way, with placeholder widths. How narrow or wide a span can
-be is asked in `## Open Questions` and stays open there. Because the bands double each
-class and the width doesn't, a top-class piece comes out as almost a single figure.
-Whether the widest span should grow with class is proposed as a question for
-`## Open Questions`.
-
-## Change: A question on span width
-
-> Proposed 2026-11-13 · for review
-
-**Where:** `## Open Questions`, after the entry beginning "How narrow or wide can a rolled
-span be"
-
-**Now says:**
-
-```
-- How narrow or wide can a rolled span be — can a piece come out with a single figure
-  rather than a range, or with a span as wide as the whole band?
-```
-
-**Proposed:**
-
-```
-- How narrow or wide can a rolled span be — can a piece come out with a single figure
-  rather than a range, or with a span as wide as the whole band?
-- Should the widest a rolled span can be grow with class, doubling the way the bands do,
-  or stay the same at every class?
-```
-
-**Why:** None of the docs answers it. The span width above is a default for now. The other
-entries, and the pending changes to this list, are unchanged.
 
 ## Change: The Brute carries axes and the Tank warhammers
 
@@ -471,7 +413,7 @@ each class above F, and its Durability band is the same at every class. There ar
 shields, each its own item with its own shop entry, and the shop sells all four at class
 F. In a battle the shield's range is rolled afresh on every strike, the same as the
 armour's, and it counts as part of the Tank's defence wherever defence is used — a
-Brute's hit halves the whole of it, shield and armour together. It spends one use on
+Brute's hit quarters the whole of it, shield and armour together. It spends one use on
 every hit that lands on the Tank, wherever the armour spends one, and Shields Up spends
 none of it.
 ```
@@ -600,15 +542,15 @@ questions on stores and condition" adds
 **Now says:**
 
 ```
-- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
-  deciding which of two Armourers sets armour quality?
+- Crafting a piece and fixing a broken one both take materials, and it isn't said which
+  kinds or how many either needs.
 ```
 
 **Proposed:**
 
 ```
-- Does the Armourer have a station of its own the way the Blacksmith has the smithy,
-  deciding which of two Armourers sets armour quality?
+- Crafting a piece and fixing a broken one both take materials, and it isn't said which
+  kinds or how many either needs.
 - Can a type other than the Tank carry a shield?
 - When a Tank has no shield equipped, can it still use Shields Up?
 - What wears a Tank's shield down — every time the Tank is hit, the same as armour; only
@@ -638,7 +580,7 @@ only potion is a healing potion, bought at the shop", and on each shield questio
 the Tank carries a shield; a Tank with no shield equipped can still use Shields Up; a
 shield spends a use on every hit the Tank takes, wherever armour spends one, and Shields
 Up spends none of it; shields have classes and rolled numbers, built the way armour is; a
-Brute's hit halves the Tank's whole defence, shield included; nobody repairs a shield on a
+Brute's hit quarters the Tank's whole defence, shield included; nobody repairs a shield on a
 dive, because field repair isn't built yet; and all four shields wear the one shield
 picture the game carries, with the other three named on the game's missing-art list. On
 potions the default is that no member holds one in the guild hall: potions wait in the

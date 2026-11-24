@@ -57,26 +57,24 @@ scopes the first version and leaves the longer-term design standing.
 > Proposed 2026-11-11 · for review
 
 **Where:** `## The Dungeon`, second paragraph, its first sentence (the paragraph beginning
-"Each floor has 2–3 battles.")
+"Each floor has 1–3 battles.")
 
 **Now says:**
 
 ```
-Each floor has 2–3 battles.
+Each floor has 1–3 battles.
 ```
 
 **Proposed:**
 
 ```
-Each floor is a series of battles, 2–3 of them. At the end of a battle the screen scrolls
+Each floor is a series of battles, 1–3 of them. At the end of a battle the screen scrolls
 right into the next battle, with no result screen and nothing to click in between: a
 floor's battles play straight through, back to back. The first dungeon has 3 battles a
 floor to win. After the last one comes victory, dropping loot: the floor's gold drops as
 one lump at the end of the floor, and only once every battle on that floor is won — if a
 floor has 3 battles, the party needs to beat all 3. How much gold a floor drops is a
-placeholder, to be balanced later. For now every battle on a floor has the same number of
-monsters, set by the floor: a deeper floor never has fewer, and the deepest floor with
-battles has more than the first. How many is a placeholder too, to be balanced later.
+placeholder, to be balanced later.
 ```
 
 **Why:** Answered: each floor is a series of battles, and at the end of a battle the
@@ -84,10 +82,7 @@ screen scrolls right into the next one; the first dungeon has 3 battles to win, 
 victory, dropping loot. Answered too: loot at the end of the floor — if 3 battles on that
 floor then they need to beat all 3. "Each floor has 2–3 battles" gave the count but not
 how one battle leads into the next, or where the loot drops. The 3 battles are inside the
-existing 2–3 range, so the range stays for dungeons in general. How many monsters a battle
-has follows Combat's `## Enemies` — the deeper the floor, the more enemies turn up in each
-fight — and the dive is built with a set number for each floor, the same every battle on
-it. What the board's floor layout shows, whether a party picks a route, and what makes a
+original's 1–3 range, so the range stays for dungeons in general. What the board's floor layout shows, whether a party picks a route, and what makes a
 boss floor are not settled by this. The rest of the paragraph, on rest areas and
 retreating, is the next change. Answered 2026-11-14, too: "you enter a level and the
 level should go through" — a floor's battles play back to back, with no screen after
@@ -103,24 +98,24 @@ the end of the paragraph
 **Now says:**
 
 ```
-Every 5th floor is a safe rest area, where every member gets back fifteen per cent, and
-the player may choose to return to the top and exit the dungeon. The Cook adds to both
-figures, covered in the Specialists doc. Retreating always costs the loot gathered since
-the last safe floor — any party member can carry some of it, so how much is lost depends
-on who came along.
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent
+instead of the five, not both, and the player may choose to return to the top and exit
+the dungeon. The Cook adds to both figures, covered in the Specialists doc. Retreating
+always costs the loot gathered since the last safe floor — any party member can carry
+some of it, so how much is lost depends on who came along.
 ```
 
 **Proposed:**
 
 ```
-Every 5th floor is a safe rest area, where every member gets back fifteen per cent, and
-the player may choose to return to the top and exit the dungeon. The Cook adds to both
-figures, covered in the Specialists doc. For now a rest area is a safe floor with no
-battles on it, so it drops no gold and gives no experience. The party can turn back
-anywhere, not only at a rest area — but leaving between rest areas loses the gold found
-since the last rest area. "Anywhere" includes the middle of a battle: a Retreat button
-is there all through a floor's battles, and the party can leave with it at any moment.
-For now a battle that ends in a stand-off counts as the party turning back there.
+Every 5th floor is a safe rest area, where every member gets back fifteen per cent
+instead of the five, not both, and the player may choose to return to the top and exit
+the dungeon. The Cook adds to both figures, covered in the Specialists doc. The party can
+turn back anywhere, not only at a rest area — but leaving between rest areas loses the
+gold found since the last rest area. "Anywhere" includes the middle of a battle: a
+Retreat button is there all through a floor's battles, and the party can leave with it at
+any moment. For now a battle that ends in a stand-off counts as the party turning back
+there.
 
 For now gold takes no slots, so carrying capacity never limits the gold a party brings
 out, and who came along doesn't change how much: leaving between rest areas loses the
@@ -140,7 +135,7 @@ whether gold takes any; for now it takes none, so capacity never limits the gold
 brings out. How a dead member's gear counts against it is in Equipment's change "A dead
 member's gear takes a slot a piece, for now", which keeps the original's rule that the
 gear comes back only if there's room left. The second paragraph has a default for now on
-gold, and the first has defaults on rest areas and stand-offs; each is proposed as a
+gold, and the first has a default on stand-offs; each is proposed as a
 question for `## Open Questions`. Answered 2026-11-14: the party can retreat at any time, the middle
 of a battle included — "you can holler a retreat sign that will take them out". Which
 gold a retreat keeps is proposed as a question in "A question on what gold a retreat
@@ -164,23 +159,19 @@ comes back between the battles on a single floor.
 
 ```
 Between floors, every member gets back five per cent of their maximum health, and nothing
-comes back between the battles on a single floor. A rest area's fifteen per cent is in
-place of the five, not on top of it, and a Cook's is the same — its fifteen there, not
-its five as well. Clearing the floor before a rest area gives the fifteen alone, and
-pushing on from the rest area to the next floor gives nothing, so floors 4 → 5 → 6 give
-one fifteen per cent and no five. For now a heal is a share of the maximum health a
-member has once the floor's last battle has shared its experience, so a level-up on that
-floor counts. Everything that lands on a member at
-once — the party's share and every Cook's — is added up first and turned into health
-once, and a fraction of a point rounds up, so every living member gets at least one point
-back. A heal never takes anyone past their maximum.
+comes back between the battles on a single floor. Clearing the floor before a rest area
+gives the fifteen alone, and pushing on from the rest area to the next floor gives
+nothing, so floors 4 → 5 → 6 give one fifteen per cent and no five. For now a heal is a
+share of the maximum health a member has once the floor's last battle has shared its
+experience, so a level-up on that floor counts. Everything that lands on a member at once
+— the party's share and every Cook's — is added up first and turned into health once, and
+a fraction of a point rounds up, so every living member gets at least one point back. A
+heal never takes anyone past their maximum.
 ```
 
-**Why:** Answered 2026-11-13: "OK, then just the 15%" — arriving at a rest floor gives the
-fifteen per cent only, never the five as well, and a Cook adds its fifteen only, not its
-five too. The question goes from Guild Members.md's `## Open Questions` (see "Rest-floor
-heal question answered" in its change notes). The rest of the paragraph is how the dive is
-built. Nothing said which maximum a heal is a share of
+**Why:** Answered 2026-11-13: "OK, then just the 15%", which the original now says too.
+Clearing the floor before a rest area, and pushing on past it, follow from that; the rest
+of the paragraph is how the dive is built. Nothing said which maximum a heal is a share of
 when a member levels up on the floor just cleared, whether the party's share and a Cook's
 are rounded together or one at a time, or which way a fraction of a point rounds. Those
 three are proposed as questions for `## Open Questions`.
@@ -210,34 +201,21 @@ The dungeon's enemies are monsters. For now the monsters might be limited to jus
 Archer's animations; anything a monster has no art for is a bright yellow shape with its
 name written on it.
 
-Every monster is assigned one of the six combat types, just like the guild's members,
-and has the same characteristics of that type — a monster Tank or a monster Archer has
-that type's attacks, its special and its type advantages.
-
 A monster is given a rank and a level like a member is, and uses the same stat rules. For
 now every monster in a dungeon is the dungeon's own rank — F, as the guild's starting
-dungeon is, and there's no grade below F — and level 1, with exactly its type's starting
-stats at that rank, on every floor. Depth changes how many monsters turn up in a battle,
-never what each one is.
+dungeon is, and there's no grade below F — and level 1.
 
 In a battle, for now, a monster's damage is its damage stat alone and its defence its
-Constitution alone — there's no weapon or armour in either. Monsters get the support ring
-among themselves, a special bar and the Tank's taunt the same as members do, and a
-monster uses its special as soon as its bar is full.
+Constitution alone — there's no weapon or armour in either.
 ```
 
 **Why:** Answered: the enemies are monsters, but for now we might be limited to just the
-archer animations. Answered too: yes, monsters will be assigned one of the types just
-like the characters and have those same characteristics of that type; and on gear, fixed
-numbers. Combat's `## Enemies` builds enemies from the six combat types and asks, in its
-open questions, whether a monster is something other than that; this says it isn't. The
-yellow-shape clause is the project's standing rule for missing art. A monster's rank and
-level follow Combat's `## Enemies` too: an enemy is the dungeon's rank or one grade below
-it, with exactly what its type and rank give, and depth decides how many turn up, not what
-each one is. The first paragraph is unchanged. How a monster fights is a default for now:
-the answer on gear was fixed numbers, read as the monster's own stats with nothing added
-for gear, while Combat's `## Enemies` gives an enemy a chance of a weapon and of armour
-set by the dungeon's rank.
+archer animations. Answered too, on gear: fixed numbers. The yellow-shape clause is the
+project's standing rule for missing art. A monster's rank follows Combat's `## Enemies`:
+an enemy is the dungeon's rank or one grade below it. The first paragraph is unchanged.
+How a monster fights is a default for now: the answer on gear was fixed numbers, read as
+the monster's own stats with nothing added for gear, while Combat's `## Enemies` gives an
+enemy a chance of a weapon and of armour set by the dungeon's rank.
 For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
 a monster Brute or Rogue carries none for now.
@@ -333,15 +311,15 @@ the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
 **Now says:**
 
 ```
-Healing potions take up the party's carrying capacity, and they're added to it at the
-start of the raid.
+Potions take up the party's carrying capacity, and they're added to it at the start of
+the raid.
 ```
 
 **Proposed:**
 
 ```
-Healing potions take up the party's carrying capacity, and they're added to it at the
-start of the raid.
+Potions take up the party's carrying capacity, and they're added to it at the start of
+the raid.
 
 A raid starts when a party goes into a dive, re-enters one at a rest area, or plays a
 mission as a battle. A mission that's sent packs nothing, and a raid that's refused packs
@@ -421,8 +399,6 @@ lose all the gold found since the last rest area, and the two may not agree.
 
 ```
 - How far can a training mission level a member?
-- Is a rest-area floor a floor of battles with a rest at the end, or a safe floor with no
-  battles?
 - What does a battle that ends in a stand-off do to the dive?
 - Does gold take up slots, or does it ride free, with slots holding only potions and
   items of loot?
