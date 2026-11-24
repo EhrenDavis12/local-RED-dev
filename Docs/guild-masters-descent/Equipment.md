@@ -275,7 +275,8 @@ materials.
 
 ## Open Questions
 
-- Crafting a piece and fixing a broken one both take materials, and it isn't said which
-  kinds or how many either needs.
+- Crafting a piece and fixing a broken one both take materials, which come as ores or
+  herbs — the Dungeon doc covers where they come from — and it isn't said how much of
+  either goes into which.
 - Does the player see a piece's exact rolled range and durability in the Dorms, or only a
   rough impression the way the recruiting board shows a candidate's strengths?

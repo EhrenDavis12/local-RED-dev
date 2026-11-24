@@ -164,9 +164,19 @@ A potion takes 1 slot, and so does an item of loot — they cost the same, becau
 were free a party would simply fill every slot with potions. At one slot each, the
 choice is how many potions to pay for in treasure.
 
-Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
-also drop a weapon or a piece of armour. One enemy in four drops something, and one drop
-in ten is gear rather than materials or an item.
+Dungeon diving yields materials or items, and the floor itself pays gold. A dive can also
+drop a weapon or a piece of armour on certain floors.
+
+- One enemy in four drops materials or an item.
+- Materials come as ores or herbs, the two kinds the Miner and the Herbalist carry
+  restricted slots for.
+- Gold comes by the floor rather than by the enemy. At F rank a floor pays a band from
+  its enemy count less three up to its enemy count — a floor of fifteen enemies pays 12
+  to 15 gold. Each rank above F adds 10 gold of base to both ends of that band.
+- A weapon or a piece of armour drops on the last fighting floor before each rest area,
+  and on the dungeon's last floor.
+- A drop the party has no room for is lost, the same way a dead member's gear is lost
+  when there's no capacity left for it.
 
 Gold is covered in the Core Concept doc.
 
@@ -207,3 +217,11 @@ What the injured status means is covered in the Core Concept doc.
   that pool is chosen — rolled when the dungeon is created, or when the party first
   reaches the set, and whether a deeper set keeps the shallower set's types or draws fresh
   ones.
+- One enemy in four drops materials or an item, and nothing says how often it is one
+  rather than the other.
+- A weapon or a piece of armour drops on the floor before each rest area and on the
+  last floor, and it isn't said how many pieces drop there — one, or more the deeper
+  the floor.
+- A drop the party has no room for is lost, which is the same rule a dead member's
+  gear follows. Should a full party be able to throw something away to make room for
+  a find instead?
