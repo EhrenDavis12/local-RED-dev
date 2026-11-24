@@ -108,7 +108,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   how a cooldown rounds, the clock and a multi-strike attack landing in one tick, the Luck
   reset's free attack and specials, a battle ending in a stand-off after a set time, a
   special putting nothing in its owner's bar, every dive starting with every bar empty,
-  an effect's count, its end and a second cast stacking, targeting weights and taunts, a
+  an effect's count, its end and a second cast stacking, how a taunt is spent, a
   specialist's cooldown, open questions on specials, taunts and the dive, on cooldown
   combat's defaults, and on the special bar, the fight pausing for now, the fight's
   speed, the speed question answered, a close-range attack waiting for its target to be
@@ -129,8 +129,8 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
-  member's gear takes slots for now, the shop sells class F only for now, the Brute's
-  axe and the Tank's warhammer, the Tank's swappable shield, the healing potion bought at
+  member's gear takes slots for now, the shop sells class F only for now, the Tank's
+  swappable shield, the healing potion bought at
   the shop, F rank and healing a fixed 18, for now, a member's gear locked for a dive for
   now, a broken shield adding nothing, and questions on shields and potions).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
@@ -188,7 +188,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
   back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level and how they fight for now, a floor's monsters the
-  same every dive and where each stands, re-entering and its fees for now, open questions
+  same every dive and where each stands, re-entering for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
   carrying, party planning as one screen, and the guild's three saved teams).

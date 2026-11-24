@@ -31,26 +31,28 @@ through the mission board" said every dungeon is found, and the starting one isn
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## The Dungeon`, fourth paragraph
+**Where:** `## The Dungeon`, the paragraph beginning "Dungeon diving yields materials or items"
 
 **Now says:**
 
 ```
-Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
-also drop a weapon or a piece of armour.
+Dungeon diving yields materials or items, and the floor itself pays gold. A dive can also
+drop a weapon or a piece of armour on certain floors.
 ```
 
 **Proposed:**
 
 ```
-Dungeon diving yields materials or items, and sometimes small amounts of gold. A dive can
-also drop a weapon or a piece of armour. For now, though, loot is just gold: in the first
-version a dive yields gold and nothing else — no materials, no items, and no dropped gear.
+Dungeon diving yields materials or items, and the floor itself pays gold. A dive can also
+drop a weapon or a piece of armour on certain floors. For now, though, loot is just gold:
+in the first version a dive yields gold and nothing else — no materials, no items, and no
+dropped gear.
 ```
 
-**Why:** Answered: for now loot will just be gold. The paragraph names materials, items and
-dropped gear as what a dive yields, which the first version doesn't do; the new sentence
-scopes the first version and leaves the longer-term design standing.
+**Why:** Answered: for now loot will just be gold. The paragraph and the list after it
+name materials, items and dropped gear as what a dive yields, which the first version
+doesn't do; the new sentence scopes the first version and leaves the longer-term design
+standing.
 
 ## Change: A floor is a series of battles that scrolls right into the next
 
@@ -73,14 +75,13 @@ right into the next battle, with no result screen and nothing to click in betwee
 floor's battles play straight through, back to back. The first dungeon has 3 battles a
 floor to win. After the last one comes victory, dropping loot: the floor's gold drops as
 one lump at the end of the floor, and only once every battle on that floor is won — if a
-floor has 3 battles, the party needs to beat all 3. How much gold a floor drops is a
-placeholder, to be balanced later.
+floor has 3 battles, the party needs to beat all 3.
 ```
 
 **Why:** Answered: each floor is a series of battles, and at the end of a battle the
 screen scrolls right into the next one; the first dungeon has 3 battles to win, then
 victory, dropping loot. Answered too: loot at the end of the floor — if 3 battles on that
-floor then they need to beat all 3. "Each floor has 2–3 battles" gave the count but not
+floor then they need to beat all 3. "Each floor has 1–3 battles" gave the count but not
 how one battle leads into the next, or where the loot drops. The 3 battles are inside the
 original's 1–3 range, so the range stays for dungeons in general. What the board's floor layout shows, whether a party picks a route, and what makes a
 boss floor are not settled by this. The rest of the paragraph, on rest areas and
@@ -214,8 +215,9 @@ archer animations. Answered too, on gear: fixed numbers. The yellow-shape clause
 project's standing rule for missing art. A monster's rank follows Combat's `## Enemies`:
 an enemy is the dungeon's rank or one grade below it. The first paragraph is unchanged.
 How a monster fights is a default for now: the answer on gear was fixed numbers, read as
-the monster's own stats with nothing added for gear, while Combat's `## Enemies` gives an
-enemy a chance of a weapon and of armour set by the dungeon's rank.
+the monster's own stats with nothing added for gear, while The Dungeon's `## The Dungeon`
+gives an enemy a chance of a weapon from the first floor and of armour from floor 11,
+rising with the floor.
 For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
 a monster Brute or Rogue carries none for now.
@@ -252,7 +254,7 @@ floor for the deepest floor reached. Both are proposed as questions for
 `## Open Questions`. Nothing said where a monster stands on its grid either; Combat's
 `## Formation` says only that enemies use the same style of grid.
 
-## Change: Where a party re-enters, and what it pays, for now
+## Change: Where a party re-enters, for now
 
 > Proposed 2026-11-12 · for review
 
@@ -263,16 +265,18 @@ last rest area reached" (new paragraphs after it)
 
 ```
 The player re-enters at the last rest area reached, and must pay the entry fee again plus
-a teleportation fee. This stops the player exploring five floors, returning, and
-rearranging the party with no penalty.
+a teleportation fee, reckoned from the floor being returned to: 1 gold a floor in an
+F-rank dungeon, rising 1 a rank. This stops the player exploring five floors, returning,
+and rearranging the party with no penalty.
 ```
 
 **Proposed:**
 
 ```
 The player re-enters at the last rest area reached, and must pay the entry fee again plus
-a teleportation fee. This stops the player exploring five floors, returning, and
-rearranging the party with no penalty.
+a teleportation fee, reckoned from the floor being returned to: 1 gold a floor in an
+F-rank dungeon, rising 1 a rank. This stops the player exploring five floors, returning,
+and rearranging the party with no penalty.
 
 For now the last rest area reached is the deepest one the most recent dive reached, and
 a dive that re-entered counts the rest area it started at. So the re-entry point can move
@@ -280,27 +284,14 @@ back up, from floor 10 to floor 5, and a dive that reaches no rest area leaves n
 party can re-enter, not only the one that got there, and its first battle is on the floor
 after the rest area. There's no re-entering at a rest area with no floor past it.
 
-For now the entry fee is so much for each member of the party, and how much depends on
-the dungeon's rank — the lower the rank, the cheaper the fee, and the less gold its floors
-drop. An F-rank dungeon costs 2 gold a member, so a party of three pays 6 and the first
-floor's 8 gold more than pays it back. Each rank up costs more per member and drops more
-gold a floor. The teleportation fee stays one flat amount whatever the party's size. All
-the amounts are placeholders.
-
 For now, once a party is in, the guild hall can't be reached until the dive ends — no
 hiring, shopping or changing gear partway through a dive and then carrying on with it.
 ```
 
 **Why:** The dive is built this way. "The last rest area reached" reads two ways — the
 deepest one ever reached, or the one the most recent dive reached — and nothing said
-whether the teleportation fee grows with the party the way the entry fee does, or whether
-the player can leave a dive for the guild hall and come back to it. All three are
-proposed as questions for `## Open Questions`. Answered 2026-11-14, too, on the entry
-fee: "it takes 10 gold per person to send them into the dungeon after completing three
-fights. I only get eight gold. ... That's financially bankrupt me instantly in the game.
-... We need to make the entrance fee a lot cheaper for these dungeons. The cheaper, the
-dungeon, the cheaper the entrance fee that might be a necessary thing. Then the lesser
-the reward." At 10 gold a member a party of three paid 30 to win 8 on floor 1.
+whether the player can leave a dive for the guild hall and come back to it. Both are
+proposed as questions for `## Open Questions`.
 
 ## Change: Healing potions are packed at the start of a raid and come back at its end, for now
 
@@ -414,8 +405,6 @@ lose all the gold found since the last rest area, and the two may not agree.
 - When does a floor count as reached, for the deepest floor reached?
 - "The last rest area reached": is that the deepest rest area ever reached, or the one the
   most recent dive reached?
-- Is the teleportation fee flat, or does it rise with party size the way the entry fee
-  does?
 - While a dive is in progress, can the player leave it for the guild hall — hire, shop,
   change gear — and come back to it?
 - If a dungeon is deeper than its last rest area, what happens when the bottom floor is

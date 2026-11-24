@@ -185,8 +185,8 @@ piece is fixed for gold and no materials.
 **Why:** Answered: for now, repair costs gold only. Nothing in the first version gives the
 guild materials, so a broken piece could not otherwise be fixed. The paragraph and the
 third paragraph's "for gold and materials" stay as the longer-term design; the new
-sentence scopes the first version. The open question on which materials a broken piece needs stays open for that
-longer-term design.
+sentence scopes the first version. The open question on how much ore or herb a broken
+piece needs stays open for that longer-term design.
 
 ## Change: Two questions on stores and condition
 
@@ -198,15 +198,17 @@ broken one"
 **Now says:**
 
 ```
-- Crafting a piece and fixing a broken one both take materials, and it isn't said which
-  kinds or how many either needs.
+- Crafting a piece and fixing a broken one both take materials, which come as ores or
+  herbs — the Dungeon doc covers where they come from — and it isn't said how much of
+  either goes into which.
 ```
 
 **Proposed:**
 
 ```
-- Crafting a piece and fixing a broken one both take materials, and it isn't said which
-  kinds or how many either needs.
+- Crafting a piece and fixing a broken one both take materials, which come as ores or
+  herbs — the Dungeon doc covers where they come from — and it isn't said how much of
+  either goes into which.
 - Are the guild's stores capped?
 - Where do the condition bands' edges fall? Good is above 50% and Worn is 25% to 49%, so a
   piece at exactly 50% — or between 49% and 50%, or between 24% and 25% — sits in no band.
@@ -272,105 +274,6 @@ nothing for a guild above rank F.
 **Why:** The game is built this way. What the baseline is above F, and what a piece costs
 there, isn't settled, so the shop doesn't rise with the guild yet. No guild rises above
 rank F yet, so the empty shop above F doesn't come up.
-
-## Change: The Brute carries axes and the Tank warhammers
-
-> Proposed 2026-11-14 · for review
-
-**Where:** `## What a Member Carries`, the list of the six weapon kinds
-
-**Now says:**
-
-```
-- Fighter — two-handed swords, and only two-handed swords
-- Brute — clubs
-- Tank — short swords
-- Archer — bows
-- Mage — staffs
-- Rogue — knives
-```
-
-**Proposed:**
-
-```
-- Fighter — two-handed swords, and only two-handed swords
-- Brute — axes
-- Tank — warhammers
-- Archer — bows
-- Mage — staffs
-- Rogue — knives
-```
-
-**Why:** Answered 2026-11-14: the weapons follow the character art that's already drawn —
-the Brute swings an axe and the Tank holds a warhammer. The user: "the tank now has a
-Warhammer just just make it so cause the animations to redo is painful". Only the names
-change. Each band in `## Quality` stays as it is, because a band is set by how a kind's
-strikes land, and the axe cleaves the way the club did. The next two changes rename the
-kinds in Quality's band lists.
-
-## Change: The Attack Damage bands name the axe and the warhammer
-
-> Proposed 2026-11-14 · for review
-
-**Where:** `## Quality`, the list after "Each kind's F-class Attack Damage band, in
-ascending order:"
-
-**Now says:**
-
-```
-- Knife, the Rogue's — 2–12
-- Staff, the Mage's — 3–15
-- Two-handed sword, the Fighter's — 4–16
-- Club, the Brute's — 4–18
-- Short sword, the Tank's — 5–21
-- Bow, the Archer's — 6–26
-```
-
-**Proposed:**
-
-```
-- Knife, the Rogue's — 2–12
-- Staff, the Mage's — 3–15
-- Two-handed sword, the Fighter's — 4–16
-- Axe, the Brute's — 4–18
-- Warhammer, the Tank's — 5–21
-- Bow, the Archer's — 6–26
-```
-
-**Why:** Follows "The Brute carries axes and the Tank warhammers". The bands are
-unchanged.
-
-## Change: The Durability bands name the axe and the warhammer
-
-> Proposed 2026-11-14 · for review
-
-**Where:** `## Quality`, the list after "Each kind's F-class Durability band, grouped by
-how many hits it lands in one attack:"
-
-**Now says:**
-
-```
-- Bow, the Archer's, and short sword, the Tank's — 40–80. One strike on one target, so
-  one hit an attack.
-- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
-  hits an attack.
-- Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
-  so three hits an attack.
-```
-
-**Proposed:**
-
-```
-- Bow, the Archer's, and warhammer, the Tank's — 40–80. One strike on one target, so one
-  hit an attack.
-- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
-  hits an attack.
-- Axe, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
-  so three hits an attack.
-```
-
-**Why:** Follows "The Brute carries axes and the Tank warhammers". The bands are
-unchanged.
 
 ## Change: The Tank carries a shield, and shields can be swapped
 
@@ -542,15 +445,17 @@ questions on stores and condition" adds
 **Now says:**
 
 ```
-- Crafting a piece and fixing a broken one both take materials, and it isn't said which
-  kinds or how many either needs.
+- Crafting a piece and fixing a broken one both take materials, which come as ores or
+  herbs — the Dungeon doc covers where they come from — and it isn't said how much of
+  either goes into which.
 ```
 
 **Proposed:**
 
 ```
-- Crafting a piece and fixing a broken one both take materials, and it isn't said which
-  kinds or how many either needs.
+- Crafting a piece and fixing a broken one both take materials, which come as ores or
+  herbs — the Dungeon doc covers where they come from — and it isn't said how much of
+  either goes into which.
 - Can a type other than the Tank carry a shield?
 - When a Tank has no shield equipped, can it still use Shields Up?
 - What wears a Tank's shield down — every time the Tank is hit, the same as armour; only

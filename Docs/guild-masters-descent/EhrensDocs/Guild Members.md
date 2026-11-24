@@ -7,22 +7,13 @@
 
 > Proposed 2026-11-11 · for review
 
-**Where:** `## Open Questions`, at the end of the list
+**Where:** `## Open Questions`, which is empty in the original
 
-**Now says:**
-
-```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
-```
+**Now says:** nothing — the original's `## Open Questions` is empty.
 
 **Proposed:**
 
 ```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - Do two recruits of the same type and the same rank or tier start with exactly the same
   stats? Starting Stats says they're set by type and rank or tier, but the recruiting
   board's rough impression of a candidate's strengths — promising, unremarkable — suggests
@@ -30,7 +21,7 @@
 - Can an injured member be promoted?
 ```
 
-**Why:** None of the docs answers these. The existing entries are unchanged.
+**Why:** None of the docs answers these.
 
 ## Change: Who shares a combat's experience, for now
 
@@ -97,20 +88,11 @@ the board as it changes.
 
 **Where:** `## Open Questions`, at the end of the list
 
-**Now says:**
-
-```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
-```
+**Now says:** nothing — the original's `## Open Questions` is empty.
 
 **Proposed:**
 
 ```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - In "divided equally between all party members", which members count: the ones who
   started the combat or the ones still alive?
 ```
@@ -178,31 +160,31 @@ each step, and rounding at each step loses a point every time.
 **Now says:**
 
 ```
-A member's health is their Constitution times ten — at F rank, where stats are
-single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
-through defence is taken off that pool. Because it comes from Constitution, it grows as
-Constitution grows, with no separate rule for levelling. Constitution already means
-toughness, so it is the pool and the base of defence both, and health needs no stat of its
-own.
+A member's health is their Constitution times ten — the Brute's is times twelve — at F
+rank, where stats are single-digit, that's a pool in the tens. It is what damage comes
+out of: whatever gets through defence is taken off that pool. Because it comes from
+Constitution, it grows as Constitution grows, with no separate rule for levelling.
+Constitution already means toughness, so it is the pool and the base of defence both, and
+health needs no stat of its own.
 ```
 
 **Proposed:**
 
 ```
-A member's health is their Constitution times ten — at F rank, where stats are
-single-digit, that's a pool in the tens. It is what damage comes out of: whatever gets
-through defence is taken off that pool. Because it comes from Constitution, it grows as
-Constitution grows, with no separate rule for levelling. Constitution already means
-toughness, so it is the pool and the base of defence both, and health needs no stat of its
-own. A specialist's health and a monster's come the same way, from their own
+A member's health is their Constitution times ten — the Brute's is times twelve — at F
+rank, where stats are single-digit, that's a pool in the tens. It is what damage comes
+out of: whatever gets through defence is taken off that pool. Because it comes from
+Constitution, it grows as Constitution grows, with no separate rule for levelling.
+Constitution already means toughness, so it is the pool and the base of defence both, and
+health needs no stat of its own. A specialist's health and a monster's come the same way, from their own
 Constitution.
 
 For now health counts only a member's own Constitution, never what the support ring adds.
 The Tank's primary stat is Constitution, and help that reached its health would make its
 pool change with who stands next to it, and shrink when they move away or die. Help still
 counts toward the defence Constitution gives. For now, too, when a level-up raises
-Constitution mid-dive, current health rises by the same ten a point as the maximum does,
-so the damage already taken stays taken.
+Constitution mid-dive, current health rises by as much as the maximum does, so the damage
+already taken stays taken.
 ```
 
 **Why:** The game is built this way. "A member's health" sits under "the fighting
@@ -222,20 +204,11 @@ battles on a single floor.
 
 **Where:** `## Open Questions`, at the end of the list
 
-**Now says:**
-
-```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
-```
+**Now says:** nothing — the original's `## Open Questions` is empty.
 
 **Proposed:**
 
 ```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - Help raises the receiver's primary stat, and the Tank's is Constitution. Does that help
   raise the Tank's health too, or only its defence?
 - When a level-up raises a member's Constitution mid-dive, does their current health rise
@@ -312,20 +285,11 @@ and the top of the ladder, are defaults for now, each proposed as a question in
 
 **Where:** `## Open Questions`, at the end of the list
 
-**Now says:**
-
-```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
-```
+**Now says:** nothing — the original's `## Open Questions` is empty.
 
 **Proposed:**
 
 ```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - Does a combat that ends in a stand-off still pay for the enemies killed in it?
 - The member sheet shows one experience bar. Does it fill toward the next level, or across
   the whole rank toward the threshold?
@@ -419,20 +383,11 @@ doesn't, and has a change note of its own.
 
 **Where:** `## Open Questions`, at the end of the list
 
-**Now says:**
-
-```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
-```
+**Now says:** nothing — the original's `## Open Questions` is empty.
 
 **Proposed:**
 
 ```
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?
 - The cook and the porter aren't in the other dev's numbers. If the fighters' starting
   stats go up by 2, should the cook and porter go up by the same 2, or stay where they
   are?

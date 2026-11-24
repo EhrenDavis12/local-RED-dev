@@ -89,15 +89,16 @@ and the defender's mitigation is applied to it separately.
 Each strike of a multi-strike attack is resolved on its own: it rolls to hit separately,
 and the defender's mitigation is applied to it separately.
 
-For now a dive never leaves a member injured: a member comes home fine, or doesn't come
-home. Where everyone stands at the end of a battle is where they start the next one, and
+For now a dive never leaves a member injured: a member comes home, hurt or not, or
+doesn't come home. Where everyone stands at the end of a battle is where they start the next one, and
 the dead leave their places empty.
 ```
 
 **Why:** The dive is built this way. No doc says whether a dive can leave a member injured,
 or whether the formation carries from one battle to the next. Not settled by this: what
 reaching 0 health does on a training run, which "can injure a member, but can never kill
-one". Each is proposed as a question for `## Open Questions`.
+one". Each is proposed as a question for `## Open Questions`. Coming home hurt is lost health
+that heals at home, as `Core Concept.md` `## The Mead Hall` says, not the injured status.
 
 ## Change: A battle ends in a stand-off after a set time, for now
 
@@ -228,36 +229,24 @@ A drink ordered in place of an attack uses up one of the three too, as "Drinking
 is an order used at the next cooldown, for now" says, so the three are cooldowns, not
 attacks.
 
-## Change: What the targeting weights count, and how a taunt is spent
+## Change: How a taunt is spent
 
 > Proposed 2026-11-12 · for review
 
-**Where:** `## Targeting`, the paragraph (new paragraphs after it)
+**Where:** `## Targeting`, last paragraph (a new paragraph after it)
 
 **Now says:**
 
 ```
-Members and enemies pick targets by the same rule, whichever side they're on. The choice
-is weighted by how much damage that target has dealt, how easy it is to kill, and — for a
-far-range attacker — how far back its row sits, so it shoots past the front line at what
-stands behind it and leaves the two front lines fighting each other. A taunt overrides all
-three factors for an enemy until the taunted enemy's next hit — one attack, then it's
-spent — and the focus target the player marks overrides them for the whole party.
+A close attacker facing five in a front line gives the weakest of them 36% and each
+of the others 16%.
 ```
 
 **Proposed:**
 
 ```
-Members and enemies pick targets by the same rule, whichever side they're on. The choice
-is weighted by how much damage that target has dealt, how easy it is to kill, and — for a
-far-range attacker — how far back its row sits, so it shoots past the front line at what
-stands behind it and leaves the two front lines fighting each other. A taunt overrides all
-three factors for an enemy until the taunted enemy's next hit — one attack, then it's
-spent — and the focus target the player marks overrides them for the whole party.
-
-The damage counted is what the target has dealt in this battle, the Mage's lingering
-field included; how easy it is to kill is how low its health is now, next to the others
-the attacker can reach. How much each counts is a placeholder.
+A close attacker facing five in a front line gives the weakest of them 36% and each
+of the others 16%.
 
 The taunt is spent by that attack whether it hits or misses. While the taunter is out of
 reach, the taunted one picks as normal, and the taunt keeps for its next attack that can
@@ -266,12 +255,12 @@ dies. A taunt overrides the party's selected enemy too: a member taunted by an e
 goes for the Tank.
 ```
 
-**Why:** The combat engine is built this way. "Damage dealt" didn't say over what span,
-and "easy to kill" didn't say how it's judged. "Next hit — one attack" read two ways; this
-takes it as one attack, hit or miss. Nothing said what a taunt does while the taunter is
-out of reach, when two taunts overlap, when the taunter dies, or against the
-focus target the player marks — and with monsters having the six types, a monster Tank
-taunts members.
+**Why:** The combat engine is built this way. "Until the taunted enemy's next hit, one
+attack and then it's spent" reads two ways; this takes it as one attack, hit or miss.
+Nothing says what a taunt does while the taunter is out of reach, when two taunts
+overlap, when the taunter dies, or when a taunt and the focus target the player marks
+both make one target the only pick — and with monsters having the six types, a monster
+Tank taunts members.
 
 ## Change: Questions on specials, taunts and the dive
 
