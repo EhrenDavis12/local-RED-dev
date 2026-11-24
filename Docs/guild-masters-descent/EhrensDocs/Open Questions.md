@@ -34,19 +34,6 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 
 ### Enemies
 
-6. **Enemy strength.** Monsters have no gear. How are their attack and defence worked out?
-   - A: From their level alone, so they get stronger automatically deeper down.
-   - B: Each monster has its own hand-set attack and defence, and level drives only things
-     like speed.
-
-   **Answer:**
-
-7. **Enemy types.** Going ahead with: monsters can be any of the six fighter types,
-   picked at random, and each is drawn as a mirrored guild member of that type. Fine?
-   (Cheap to change.)
-
-   **Answer:**
-
 9. **Enemy gear and loot.** The newer docs have monsters wearing gear and dives dropping
    gear. Going ahead with: keep it simple, so no monster gear and gold-only loot in the
    first version. Fine? (Easy to add later.)
@@ -96,34 +83,6 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 16. **Special bar refilling.** After a special is used, its bar empties. Going ahead
     with: no, the special's own hits don't refill it; only ordinary attacks do. Fine?
     (Easy to change.)
-
-    **Answer:**
-
-18. **Tapping a special.** When the player taps a member's full special: (Free to change
-    now; harder once real-time fighting is built.)
-    - A: It fires instantly as a free extra attack.
-    - B: It fires instantly, and their next normal attack waits a full turn (recommended).
-    - C: It waits for their next attack and replaces it, as now — up to about 7 seconds
-      for a Tank.
-
-    **Answer:**
-
-19. **Mage's field.** The Mage's special leaves a damaging field on two enemy columns.
-    Going ahead with: the field works like the Mage's other area attacks — it can't be
-    dodged, and enemies use two-thirds of their defence. Fine, or should full defence
-    apply? (Cheap to change.)
-
-    **Answer:**
-
-30. **Experience a level.** Battle Test says a level costs 1.25 experience at F rank,
-    because crossing to E rank takes 20 experience and 16 levels. But a member starts at
-    level 1, so the 20 is spread over the 15 level-ups from level 1 to level 16, about
-    1.33 a level. Going ahead with: 20 over 15 steps, each level's total rounded up to a
-    whole point — level 2 at 2 experience, level 3 at 3, level 4 at 4, level 5 at 6, and
-    level 16 at 20. At 1 experience a battle, a member in Battle Test's party still
-    reaches level 16 after 20 battles, but gains a level about every battle and a third,
-    not every battle and a quarter. Fine, or should a level cost something else? (Cheap
-    to change.)
 
     **Answer:**
 
@@ -204,14 +163,6 @@ guild's rank. Not built yet; waits on these and on guild rank.
       area.
     - B: The bottom floor is always a rest area — depth is a multiple of 5.
     - C: The bottom floor is a boss floor, then home.
-
-    **Answer:**
-
-28. **What a found dungeon holds.** The docs give only the starting dungeon's monsters
-    (F rank, level 1, all six combat types, more of them deeper). Going ahead with: a
-    found dungeon is built the same way, at the guild's rank, with its own random set of
-    monsters fixed when it's found; the find chance and the depth range are placeholders.
-    Fine, or different? (Cheap to change.)
 
     **Answer:**
 

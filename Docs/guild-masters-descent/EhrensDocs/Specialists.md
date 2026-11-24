@@ -42,17 +42,19 @@ grows are proposed as questions for `## Open Questions`.
 **Now says:**
 
 ```
-- A weapon and a piece of armour each roll from a band for their kind and class — what
-  does a buff potion roll: how much it raises a stat by, and whether it has bands of
-  its own?
+- A potion's strength scales with the Alchemist's Intelligence, and the Alchemist's Luck
+  check places a potion within its band and can raise it — but God's Wish has no band of
+  its own. Does either of those reach God's Wish, and does it turn 2 Falses into Trues
+  no matter who brewed it?
 ```
 
 **Proposed:**
 
 ```
-- A weapon and a piece of armour each roll from a band for their kind and class — what
-  does a buff potion roll: how much it raises a stat by, and whether it has bands of
-  its own?
+- A potion's strength scales with the Alchemist's Intelligence, and the Alchemist's Luck
+  check places a potion within its band and can raise it — but God's Wish has no band of
+  its own. Does either of those reach God's Wish, and does it turn 2 Falses into Trues
+  no matter who brewed it?
 - Do two Cooks both heal?
 - How does a Cook's heal grow with its level and with promotion?
 ```

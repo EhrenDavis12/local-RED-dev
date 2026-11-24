@@ -62,14 +62,14 @@ state all need an answer. The existing entry is unchanged.
 
 ```
 Time passes in real time, and it keeps passing while the game is closed — missions
-complete and injuries heal while the player is away.
+complete, injuries heal, and lost health is recovered while the player is away.
 ```
 
 **Proposed:**
 
 ```
 Time passes in real time, and it keeps passing while the game is closed — missions
-complete and injuries heal while the player is away.
+complete, injuries heal, and lost health is recovered while the player is away.
 
 Every second counts once, whether the game was open, sitting in the background or
 closed: an injury heals by exactly the time that has passed since it happened. The

@@ -25,7 +25,7 @@ effects, specialists and enemies in combat, targeting and gear durability.
 - Lasting Effects
 - Specialists in Combat
 - Enemies
-- Enemy Targeting
+- Targeting
 - Equipment Durability
 - Open Questions
 
@@ -35,7 +35,8 @@ The overall premise and top-level systems.
 - Time
 - Guild Rank
 - The Three Boards
-- The Dorms and the Smithy
+- The Dorms and the Stations
+- The Mead Hall
 - The Party
 - Missions
 - The Recruiting Board
@@ -103,20 +104,20 @@ The dungeon board, finding and entering dungeons, and training missions.
 ## Files with pending changes
 
 - `EhrensDocs/Combat.md` — proposed changes to Combat.md (formation cost, status line,
-  open question, health full at the guild hall and positions carrying between battles,
+  open question, a dive never injuring and positions carrying between battles for now,
   how a cooldown rounds, the clock and a multi-strike attack landing in one tick, the Luck
-  reset's free attack and specials, picking a target and how a battle
-  ends, a special putting nothing in its owner's bar and taking the attack's place, every
-  bar emptying on a new floor and each dive, an effect's count, its end and a second cast
-  stacking, targeting weights and taunts, a specialist's cooldown, open questions on
-  specials, taunts and the dive, on cooldown combat's defaults, and on the special bar,
-  the fight pausing for now, the fight's speed, the speed question answered, a
-  close-range attack waiting for its target to be home, attacks on the same tick going
-  in turn, questions on that wait, every
+  reset's free attack and specials, a battle ending in a stand-off after a set time, a
+  special putting nothing in its owner's bar, every dive starting with every bar empty,
+  an effect's count, its end and a second cast stacking, targeting weights and taunts, a
+  specialist's cooldown, open questions on specials, taunts and the dive, on cooldown
+  combat's defaults, and on the special bar, the fight pausing for now, the fight's
+  speed, the speed question answered, a close-range attack waiting for its target to be
+  home, attacks on the same tick going in turn, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
   drinking a potion as an order used at the next cooldown for now (the battle screen's
-  drink buttons and Auto drinking included), questions on drinking a potion, and a new Rogue's worked cooldown of 71 ticks).
+  drink buttons and Auto drinking included), questions on drinking a potion, and a new
+  Rogue's worked cooldown of 71 ticks).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -127,30 +128,28 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
-  member's gear takes slots for now, the shop sells class F only for now, a span no wider
-  at SSS than at F for now, a question on span width, the Brute's axe and the Tank's
-  warhammer, the Tank's swappable shield, the healing potion bought at the shop, F rank
-  and healing a fixed 18, for now, a member's gear locked for a dive for now, a broken
-  shield adding nothing, and questions on shields and potions).
+  member's gear takes slots for now, the shop sells class F only for now, the Brute's
+  axe and the Tank's warhammer, the Tank's swappable shield, the healing potion bought at
+  the shop, F rank and healing a fixed 18, for now, a member's gear locked for a dive for
+  now, a broken shield adding nothing, and questions on shields and potions).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   recruits and promotion, who shares a combat's experience and a stand-off's for now, help
   follows the board live, an open question on sharing experience, a specialist's K from
-  its tier, a hit rounding down once for now, the Mage's field as an area attack for now,
-  health from a member's own Constitution and what's taken staying taken for now,
-  questions on health, experience as the bar and level as the number for now, the
-  experience-and-levels question answered, questions on experience, and the
-  rest-floor heal question answered, help coming back to whole points once, starting
-  stats by type, and a question on the Cook's and the Porter's starting stats).
+  its tier, a hit rounding down once for now, health from a member's own Constitution
+  and what's taken staying taken for now, questions on health, experience as the bar and
+  level as the number for now, questions on experience, help coming back to whole points
+  once, starting stats by type, and a question on the Cook's and the Porter's starting
+  stats).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
-  the Rogue's ordinary strikes when the target dies, the Rogue's evasion against a capped
-  Archer streak for now, the Rogue's bonus for now, the flurry's leftover strikes staying
-  within reach and its strikes able to miss for now, a failed Vanish fails for one strike,
-  Volley and the Archer's streak for now, the Mage's column, field, the field's defence and
-  wear, timing and bonus for now, open questions on Vanish, taunts, the field and the
-  types' defaults, on the field's timing, and on the flurry, the Fighter's bonus as the
-  refill for now, an open question on the Fighter's bonus, the flurry's Luck pull coming as
-  it begins for now, and a question on the flurry's pull).
+  the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
+  flurry's leftover strikes staying within reach and its strikes able to miss for now, a
+  failed Vanish fails for one strike, Volley and the Archer's streak for now, the Mage's
+  column, field, the field's defence and wear, timing and bonus for now, open questions
+  on Vanish, taunts, the field and the types' defaults, on the field's timing, and on the
+  flurry, the Fighter's bonus as the refill for now, an open question on the Fighter's
+  bonus, the flurry's Luck pull coming as it begins for now, and a question on the
+  flurry's pull).
 - `EhrensDocs/Look and Feel.md` — new doc proposed for the originals (Look and Feel): the
   user's approved look for the game, gathered from the animation work.
   - Battle scene (meadow)
@@ -185,11 +184,10 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
-  back anywhere and gold taking no slots for now, how many monsters a battle has, enemies
+  back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level and how they fight for now, a floor's monsters the
   same every dive and where each stands, re-entering and its fees for now, open questions
-  on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (a
-  rest area's fifteen only, settled; the rest for now), open questions on healing in the
+  on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
   carrying, party planning as one screen, and the guild's three saved teams).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
