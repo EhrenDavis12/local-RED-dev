@@ -42,7 +42,10 @@ for testing.
 
 ## The Player's Team
 
-Every piece of gear has **20 durability**.
+Every piece of gear is at the top of its durability band: **120** for every armour, **80**
+for the bow and the short sword, **160** for the knife and the two-handed sword, and
+**240** for the club and the staff. Gear starts full so a run measures the rules rather
+than gear wearing out partway through a fight.
 
 | Member | Position | Level | Stats (Str/Dex/Con/Int/Luck) | Health | Cooldown | Weapon | Armour | Attack power | Defence |
 |---|---|---|---|---|---|---|---|---|---|
