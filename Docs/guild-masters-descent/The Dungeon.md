@@ -170,9 +170,10 @@ drop a weapon or a piece of armour on certain floors.
 - One enemy in four drops materials or an item.
 - Materials come as ores or herbs, the two kinds the Miner and the Herbalist carry
   restricted slots for.
-- Gold comes by the floor rather than by the enemy. At F rank a floor pays a band from
-  its enemy count less three up to its enemy count — a floor of fifteen enemies pays 12
-  to 15 gold. Each rank above F adds 10 gold of base to both ends of that band.
+- Gold comes by the floor rather than by the enemy. A floor pays a count drawn from its
+  enemy count less two up to its enemy count, and each one in that count is worth 1 gold
+  in an F-rank dungeon, doubling each rank — a floor of fifteen enemies pays 13 to 15
+  gold.
 - A weapon or a piece of armour drops on the last fighting floor before each rest area,
   and on the dungeon's last floor.
 - A drop the party has no room for is lost, the same way a dead member's gear is lost
@@ -182,7 +183,7 @@ Gold is covered in the Core Concept doc.
 
 ## Entering the Dungeon
 
-There is a cost to enter the dungeon, 2 gold a member in an F-rank dungeon rising 2 a
+There is a cost to enter the dungeon, 2 gold a member in an F-rank dungeon doubling each
 rank, and the more members taken, the more expensive it is. This makes party size a
 choice for the player.
 
