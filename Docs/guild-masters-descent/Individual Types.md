@@ -8,7 +8,8 @@ The Brute attacks at close range. It has advantage over the Tank — it can push
 shield aside and bash the weak points in the armour underneath, quartering the Tank's
 defence in the calculation. It's weak to the Fighter: the Fighter halves the Brute's
 defence in the calculation. The Brute wears tanned hide, which adds a little defence on
-top of its Constitution.
+top of its Constitution, and it carries more health than its Constitution alone would
+give — see the Guild Members doc for the figure.
 
 The Brute's ordinary attack cleaves too: it hits the targeted enemy and the two directly
 next to it, on whichever row its close range can reach, and each of them can evade it
