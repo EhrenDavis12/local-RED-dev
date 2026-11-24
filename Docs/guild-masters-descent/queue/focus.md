@@ -51,6 +51,9 @@ injuries heal while the player is away.
   attacks that's the only thing I want winning over what the new doc Say" So: attacks never
   land at the same moment — one attacker goes, the other waits until its target is back in its
   spot. Every other contradiction, the other dev's docs win.
+- **TestFlight deploys.** User (2026-11-24): "once you hit a good spot to deploy run the deploy
+  to testflight." So: the desk runs `deploy-ios.sh beta` whenever main is at a good spot (new
+  work merged, tests green, nothing half-done), without asking first.
 - **Standing yes.** User chose "Build on its own": the mastermind's proposals toward this Goal
   go straight into the queue and are built without waiting. Each finished piece still waits for
   the user's approval before it is merged.
