@@ -133,6 +133,14 @@ of weak ones. Where the count would pass fifteen, the points left over raise eac
 enemy's cost instead, so the deepest floors field a full grid of enemies that are
 individually stronger than the floor's own scaling would make them.
 
+The chance an enemy carries a weapon or wears armour rises with the floor. A weapon's
+chance is 1 to 3 per cent on the first floor and rises 5 to 7 points a floor; armour's
+chance starts on floor 11 at 3 to 5 per cent and rises at the same rate a floor. A
+weapon is therefore always the likelier of the two.
+
+An enemy's cost is its stat points plus what its gear is worth, a piece being worth
+the middle of its rolled range — so arming an enemy means fewer of them on the floor.
+
 An enemy's share becomes its stats in a fixed shape. The points are spread down the
 ordering its type's stat weighting gives, in the ratio 8 : 7 : 6 : 5 : 4 — so a
 30-point enemy comes out at 8 in its type's leading stat, then 7, 6, 5 and 4. The

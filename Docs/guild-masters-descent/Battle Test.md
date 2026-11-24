@@ -80,35 +80,37 @@ the outcome rather than being lost in different starting conditions.
 - Power starts at 100 on the first floor and triples to 300 on the last, spread evenly
   across the fighting floors.
 - An enemy costs 30 points on the first floor, falling to a third of that by the last.
-- 2,204 points of power across the whole dungeon, 137 enemies, paying 73 experience to
+- 2,204 points of power across the whole dungeon, 96 enemies, paying 73 experience to
   the party.
 
-| Floor | Power | Battles | Enemies a battle | Points an enemy | Types it can field |
-|---|---|---|---|---|---|
-| 1 | 100 | 1 | 3 | 33 | Fighter, Rogue |
-| 2 | 111 | 1 | 4 | 28 | Fighter, Rogue |
-| 3 | 122 | 2 | 2, 3 | 24, 24 | Fighter, Rogue |
-| 4 | 135 | 3 | 1, 2, 3 | 27, 20, 22 | Fighter, Rogue |
-| 5 | rest area | — | — | — | — |
-| 6 | 149 | 2 | 3, 4 | 20, 22 | Fighter, Rogue, Tank |
-| 7 | 165 | 2 | 3, 5 | 22, 20 | Fighter, Rogue, Tank |
-| 8 | 182 | 3 | 2, 3, 5 | 18, 18, 18 | Fighter, Rogue, Tank |
-| 9 | 201 | 2 | 5, 7 | 16, 17 | Fighter, Rogue, Tank |
-| 10 | rest area | — | — | — | — |
-| 11 | 222 | 3 | 3, 4, 7 | 15, 17, 16 | Fighter, Rogue, Tank, Brute |
-| 12 | 246 | 3 | 4, 5, 9 | 12, 15, 14 | Fighter, Rogue, Tank, Brute |
-| 13 | 271 | 3 | 5, 7, 11 | 11, 12, 12 | Fighter, Rogue, Tank, Brute |
-| 14 | 300 | 2 | 12, 15 | 10, 12 | Fighter, Rogue, Tank, Brute |
+| Floor | Power | Battles | Weapon | Armour | Enemies a battle | Points an enemy |
+|---|---|---|---|---|---|---|
+| 1 | 100 | 1 | 2% | — | 3 | 33 |
+| 2 | 111 | 1 | 8% | — | 4 | 28 |
+| 3 | 122 | 2 | 14% | — | 2, 3 | 24, 24 |
+| 4 | 135 | 3 | 20% | — | 1, 2, 3 | 27, 20, 22 |
+| 5 | rest area | — | — | — | — | — |
+| 6 | 149 | 2 | 32% | — | 2, 3 | 30, 30 |
+| 7 | 165 | 2 | 38% | — | 3, 4 | 22, 25 |
+| 8 | 182 | 3 | 44% | — | 2, 2, 4 | 18, 27, 23 |
+| 9 | 201 | 2 | 50% | — | 4, 5 | 20, 24 |
+| 10 | rest area | — | — | — | — | — |
+| 11 | 222 | 3 | 62% | 4% | 2, 3, 5 | 22, 22, 22 |
+| 12 | 246 | 3 | 68% | 10% | 2, 3, 6 | 25, 25, 20 |
+| 13 | 271 | 3 | 74% | 16% | 3, 4, 6 | 18, 20, 23 |
+| 14 | 300 | 2 | 80% | 22% | 6, 9 | 20, 20 |
 
 - Each enemy's points become its stats the way the Dungeon doc says — spread down its
   type's weighting — so the table gives what an enemy costs and the shape follows from
   it.
 - The type pools here nest: each set of four floors keeps the types of the set above it
-  and adds one. This is a property of this particular dungeon rather than a rule — how a
-  set's pool is chosen is an open question in the Dungeon doc, and this fixture must not
-  be read as settling it.
-- Its enemies wear the armour of their type at 10 durability and carry no weapons, so
-  they attack for their stat alone, as on the enemy team above.
+  and adds one — set 1, floors 1 to 4, fields Fighter and Rogue; set 2, floors 6 to 9,
+  adds Tank; set 3, floors 11 to 14, adds Brute. This is a property of this particular
+  dungeon rather than a rule — how a set's pool is chosen is an open question in the
+  Dungeon doc, and this fixture must not be read as settling it.
+- The weapon and armour columns are the chance each enemy on that floor has of carrying
+  one. Gear is bought out of the same points as the enemy itself, and any gear an enemy
+  has is of its own type's kind.
 
 ## Levels and Experience
 
@@ -140,6 +142,3 @@ produce, not a change to the teams recorded here.
   and 15 level-ups, split evenly. Whether experience really buys levels at an even rate
   is an open question in the Guild Members doc — if the two run on separate counters
   instead, this figure is wrong.
-- A dungeon's rank sets the chance an enemy carries a weapon and the chance it wears
-  armour, but no figures are given for either chance anywhere, so this dungeon's enemies
-  had to be equipped by hand. What should a generated F-rank enemy actually carry?
