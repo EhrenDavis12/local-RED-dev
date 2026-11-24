@@ -242,7 +242,3 @@ over a third the rate of a party of six. See Levels and Experience for how the s
 works.
 
 ## Open Questions
-
-- The Rogue is described as having high evasion, but it draws a second token only
-  against an Archer, so its evasion is no better than anyone else's against the other
-  five types — is the second draw meant for every attack it faces, or only an Archer's?

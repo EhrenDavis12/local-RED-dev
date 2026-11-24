@@ -149,8 +149,8 @@ Every Luck check a character makes draws from the same bag, so the checks compet
 each other for the same tokens.
 
 Evasion draws from that same bag: when a member is attacked, it pulls one token, and a
-True means the attack misses. A Rogue attacked by an Archer draws up to two tokens — a
-second only if the first is False — and one True is enough to evade. That's where a
+True means the attack misses. A Rogue draws up to two tokens against any attack it faces
+— a second only if the first is False — and one True is enough to evade. That's where a
 member's evasion comes from, and it needs no chance of its own — it's the bag's own
 density of Trues, same as the reset above. An area attack pulls no token at all;
 evasion still does nothing against one.

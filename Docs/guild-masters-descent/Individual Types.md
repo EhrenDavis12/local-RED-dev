@@ -63,10 +63,12 @@ The flurry's own strikes don't charge the bar.
 
 ## The Rogue
 
-The Rogue attacks at far range and has high evasion. Its advantage over the Archer is
-against the Archer's attacks: it draws up to two evasion tokens instead of one — if the
-first comes up False it draws again, and a single True evades. See the Combat doc for
-how an evasion draw works. It's weak to the Mage because the Mage's area attacks can't
+The Rogue attacks at far range and has high evasion: it draws up to two evasion tokens
+against every attack it faces — if the first comes up False it draws again, and a single
+True evades. See the Combat doc for how an evasion draw works. Its advantage over the
+Archer is that the Archer's single shot carries the type's whole damage at once, so one
+evasion wipes out the whole attack, where a type that strikes more than once only loses
+the strike that was evaded. It's weak to the Mage because the Mage's area attacks can't
 be dodged.
 
 The Rogue's ordinary attack is two quick strikes. Its strikes don't hit as hard as a
