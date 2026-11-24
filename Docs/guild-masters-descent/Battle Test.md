@@ -48,7 +48,7 @@ Every piece of gear has **20 durability**.
 |---|---|---|---|---|---|---|---|---|---|
 | Brute | row 1 left | 1 | 9 / 6 / 7 / 4 / 5 | 84 | 138 ticks | club, 9–13 | tanned hide, 4–6 | 18–22, cleaves 3 | 11–13 |
 | Tank | row 1 centre | 1 | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | short sword, 11–15 | full armour, 11–15 | 18–22, taunts | 20–24 |
-| Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 6–9 | 17–20 per strike, 2 strikes | 12–15 |
+| Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 11–15 | 17–20 per strike, 2 strikes | 17–21 |
 | Rogue | row 2 left | 1 | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | knife, 4–7 | hooded armour, 3–5 | 13–16 per strike, 2 strikes | 8–10 |
 | Mage | row 2 centre | 1 | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | staff, 6–10 | robe, 2–4 | 15–19, column | 8–10 |
 | Archer | row 2 right | 1 | 7 / 9 / 5 / 4 / 6 | 50 | 69 ticks | bow, 14–19 | leather, 5–8 | 23–28 | 10–13 |
@@ -64,7 +64,7 @@ alone.
 |---|---|---|---|---|---|---|---|---|---|
 | Brute | row 1 left | 1 | 9 / 6 / 7 / 4 / 5 | 84 | 138 ticks | none | tanned hide, 4–6 | 9, cleaves 3 | 11–13 |
 | Tank | row 1 centre | 1 | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | none | full armour, 11–15 | 7, taunts | 20–24 |
-| Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 6–9 | 17–20 per strike, 2 strikes | 12–15 |
+| Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 11–15 | 17–20 per strike, 2 strikes | 17–21 |
 | Rogue | row 2 left | 1 | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | none | hooded armour, 3–5 | 9 per strike, 2 strikes | 8–10 |
 | Mage | row 2 centre | 1 | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | none | robe, 2–4 | 9, column | 8–10 |
 | Archer | row 2 right | 1 | 7 / 9 / 5 / 4 / 6 | 50 | 69 ticks | none | leather, 5–8 | 9 | 10–13 |
