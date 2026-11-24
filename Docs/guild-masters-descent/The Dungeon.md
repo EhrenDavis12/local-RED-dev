@@ -182,8 +182,9 @@ Gold is covered in the Core Concept doc.
 
 ## Entering the Dungeon
 
-There is a cost to enter the dungeon, and the more members taken, the more expensive it
-is. This makes party size a choice for the player.
+There is a cost to enter the dungeon, 2 gold a member in an F-rank dungeon rising 2 a
+rank, and the more members taken, the more expensive it is. This makes party size a
+choice for the player.
 
 A large party can have advantages — boss floors where more members are needed to secure
 victory — while for exploring, a large party is less advantageous.
@@ -195,8 +196,9 @@ A Scout in the party is what turns that risk into a decision: the player can cho
 return and build a new team, or train to be more powerful, before continuing.
 
 The player re-enters at the last rest area reached, and must pay the entry fee again plus
-a teleportation fee. This stops the player exploring five floors, returning, and
-rearranging the party with no penalty.
+a teleportation fee, reckoned from the floor being returned to: 1 gold a floor in an
+F-rank dungeon, rising 1 a rank. This stops the player exploring five floors, returning,
+and rearranging the party with no penalty.
 
 Potions take up the party's carrying capacity, and they're added to it at the start of
 the raid.
