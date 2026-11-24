@@ -14,8 +14,8 @@ quality.
 The six weapon kinds, one per combat type:
 
 - Fighter — two-handed swords, and only two-handed swords
-- Brute — clubs
-- Tank — short swords
+- Brute — axes
+- Tank — war hammers
 - Archer — bows
 - Mage — staffs
 - Rogue — knives
@@ -66,8 +66,8 @@ Each kind's F-class Attack Damage band, in ascending order:
 - Knife, the Rogue's — 2–12
 - Staff, the Mage's — 3–15
 - Two-handed sword, the Fighter's — 4–16
-- Club, the Brute's — 4–18
-- Short sword, the Tank's — 5–21
+- Axe, the Brute's — 4–18
+- War hammer, the Tank's — 5–21
 - Bow, the Archer's — 6–26
 
 A band is set by how much work one strike has to do: a kind that strikes more than once in
@@ -97,11 +97,11 @@ reaches zero.
 Each kind's F-class Durability band, grouped by how fast the kind spends durability —
 usually the hits it lands in one attack, but for the bow, how often it attacks:
 
-- Short sword, the Tank's — 40–80. One strike on one target, so one hit an attack.
+- War hammer, the Tank's — 40–80. One strike on one target, so one hit an attack.
 - Knife, the Rogue's, two-handed sword, the Fighter's, and bow, the Archer's — 80–160.
   The knife and sword land two hits an attack; the bow lands one hit, but the Archer
   attacks about twice as often as the Tank, so it spends durability just as fast.
-- Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
+- Axe, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
   so three hits an attack.
 
 A band follows how fast a kind spends durability — both the hits it lands in an attack

@@ -43,14 +43,14 @@ for testing.
 ## The Player's Team
 
 Every piece of gear is at the top of its durability band: **120** for every armour,
-**80** for the short sword, **160** for the knife, the two-handed sword and the bow, and
-**240** for the club and the staff. Gear starts full so a run measures the rules rather
+**80** for the war hammer, **160** for the knife, the two-handed sword and the bow, and
+**240** for the axe and the staff. Gear starts full so a run measures the rules rather
 than gear wearing out partway through a fight.
 
 | Member | Position | Level | Stats (Str/Dex/Con/Int/Luck) | Health | Cooldown | Weapon | Armour | Attack power | Defence |
 |---|---|---|---|---|---|---|---|---|---|
-| Brute | row 1 left | 1 | 9 / 6 / 7 / 4 / 5 | 84 | 138 ticks | club, 9–13 | tanned hide, 4–6 | 18–22, cleaves 3 | 11–13 |
-| Tank | row 1 centre | 1 | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | short sword, 11–15 | full armour, 11–15 | 18–22, taunts | 20–24 |
+| Brute | row 1 left | 1 | 9 / 6 / 7 / 4 / 5 | 84 | 138 ticks | axe, 9–13 | tanned hide, 4–6 | 18–22, cleaves 3 | 11–13 |
+| Tank | row 1 centre | 1 | 7 / 6 / 9 / 4 / 5 | 90 | 138 ticks | war hammer, 11–15 | full armour, 11–15 | 18–22, taunts | 20–24 |
 | Fighter | row 1 right | 1 | 9 / 7 / 6 / 4 / 5 | 60 | 104 ticks | two-handed sword, 8–11 | light armour, 11–15 | 17–20 per strike, 2 strikes | 17–21 |
 | Rogue | row 2 left | 1 | 6 / 9 / 5 / 4 / 7 | 50 | 69 ticks | knife, 4–7 | hooded armour, 3–5 | 13–16 per strike, 2 strikes | 8–10 |
 | Mage | row 2 centre | 1 | 4 / 7 / 6 / 9 / 5 | 60 | 104 ticks | staff, 6–10 | robe, 2–4 | 15–19, column | 8–10 |
