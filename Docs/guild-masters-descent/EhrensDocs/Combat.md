@@ -209,13 +209,14 @@ the allies behind the Tank rather than on the Tank. The duration is a count of t
 owner's own cooldown cycles, and a member who is dead completes no more of them, so
 there's no clock left for the effect to run on.
 
-The cycle an effect is cast in doesn't count: it lasts three of the owner's cycles after
-that. For now it ends once the third of those has played out, so the owner's next three
-cooldowns all happen under it — a vanished Rogue makes three attacks that can't miss, or
-one fewer for each it spends drinking a potion instead. For now, too, a free attack from
-the Luck reset isn't one of the three: only a cooldown that comes up after a wait counts.
-For now a field cast while the Mage's last one is still running stacks with it: both run,
-each to its own end, and both fields do their damage.
+A special going off isn't one of its owner's cycles, since it takes no action: the
+effect it casts lasts three of the owner's cycles after that. For now it ends once the
+third of those has played out, so the owner's next three cooldowns all happen under
+it — a vanished Rogue makes three attacks that can't miss, or one fewer for each it
+spends drinking a potion instead. For now, too, a free attack from the Luck reset isn't
+one of the three: only a cooldown that comes up after a wait counts. For now a field
+cast while the Mage's last one is still running stacks with it: both run, each to its
+own end, and both fields do their damage.
 ```
 
 **Why:** The combat engine is built this way. "Three of the owner's own cooldown cycles"
@@ -419,9 +420,10 @@ the special bar the same as any other attack. The member is eligible for a check
 its very next attack, the one that charges its cooldown normally — the lockout runs no
 further than the one free attack itself. Enemies get the Luck reset too, on the same terms
 as guild members. The free attack comes in the same tick, straight after the attack that
-earned it, and it's always the type's ordinary attack, never its special. For now a
-close-range fighter's free attack waits for its target like any other attack does. For
-now a special gets no Luck check.
+earned it — or after the special, when that attack filled its own bar — and it's always
+the type's ordinary attack, never its special. For now a close-range fighter's free
+attack waits for its target like any other attack does. For now a special gets no Luck
+check.
 ```
 
 **Why:** The combat engine is built this way. "Immediately" didn't say whether anyone else
@@ -644,8 +646,7 @@ fighters pulls nothing because a pull from a member's bag can't be handed back.
   its own bag, is the opening check a pull from that bag too, or a roll of its own?
 - A combatant that starts the fight ready attacks on the first tick. Is that an ordinary
   attack — with the Luck reset check after it, counting as one of its owner's cycles for a
-  lasting effect, and a special if its bar is full — or a free attack that gets none of
-  that?
+  lasting effect — or a free attack that gets none of that?
 ```
 
 **Why:** The combat engine is built with a default for now on all four: the first two in
@@ -1000,8 +1001,8 @@ Mage's field damages a character"
 - When a taunted member drinks instead of attacking, does the taunt keep for its next
   attack, or does the drink spend it?
 - With Auto on, below what share of their health does a member drink a potion?
-- With Auto on, when the player takes back a drink Auto ordered, or orders that member's
-  special instead, does the player's choice hold, or does Auto order the drink again?
+- With Auto on, when the player takes back a drink Auto ordered, does the player's choice
+  hold, or does Auto order the drink again?
 ```
 
 **Why:** The game is built with a default for now on each of these, in "Drinking a
@@ -1034,3 +1035,139 @@ before help (see the `Guild Members.md` change "Starting stats by type"). 100 ÷
 20) is 71.4, so 71 ticks, which is what this doc's own seconds list already says: "A
 newly recruited F-rank Rogue, 71 ticks". No combat type starts at Dexterity 5. The rest
 of the list is unchanged.
+
+## Change: A special goes off by itself, in its own turn
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## The Special Bar`, first paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+Each member and each enemy has a special bar, and the special fires the moment that bar is
+full — the same for both sides. It goes off once the attack that filled it has finished
+resolving, and it takes no action of its own, so a member doesn't give up an attack to use
+it. Each hit a member lands charges that member's bar: the first hit of an attack charges
+it by 30, and each additional hit — another strike of a multi-strike attack, or another
+target the attack reaches — charges it by 5. That's the base, and it's the same for
+every type. A bar fills on about the third hit once a bonus condition has fired, which
+is what puts a special inside the fight that earns it rather than the one after. Each
+combat type also has its own bonus condition, and each time it's met it adds 15 on top
+of that base — covered in the Individual Types doc. The attack that fills a bar need not
+be the holder's own — a bonus condition can be met while the holder isn't attacking at
+all, such as being hit or an ally taking a hit — and a bar that fills that way fires right
+then, in the middle of whichever attack filled it, the same as it would on the holder's
+own attack. The bar is full at 100.
+```
+
+**Proposed:**
+
+```
+Each member and each enemy has a special bar, and the special fires the moment that bar is
+full — the same for both sides. It goes off once the attack that filled it has finished
+resolving, and it takes no action of its own, so a member doesn't give up an attack to use
+it. Each hit a member lands charges that member's bar: the first hit of an attack charges
+it by 30, and each additional hit — another strike of a multi-strike attack, or another
+target the attack reaches — charges it by 5. That's the base, and it's the same for
+every type. A bar fills on about the third hit once a bonus condition has fired, which
+is what puts a special inside the fight that earns it rather than the one after. Each
+combat type also has its own bonus condition, and each time it's met it adds 15 on top
+of that base — covered in the Individual Types doc. The attack that fills a bar need not
+be the holder's own — a bonus condition can be met while the holder isn't attacking at
+all, such as being hit or an ally taking a hit — and a bar that fills that way fires right
+then, in the middle of whichever attack filled it, the same as it would on the holder's
+own attack. The bar is full at 100.
+
+A special goes off by itself. Nothing the player does, and nothing Auto does, can start,
+hold or take back a special, and a special and an ordered drink don't affect each other.
+A special takes its own turn and never lands at the same moment as another attack, hit
+or special. One that comes ready goes ahead of every attack that comes ready on the same
+tick, its holder's own free attack included, with no Dexterity compared and no draw
+between them; an attack that came ready on an earlier tick and is still waiting keeps
+its place ahead of it. Specials that come ready together go by their holders' own
+Dexterity, help from the support ring left out, highest first, then by a random draw.
+
+A bar filled in the middle of someone else's attack goes off after the hit that filled
+it and before that attack's next strike or next target, and the rest of the attack
+carries on against the fight as the special left it: a Fighter's first strike can fill a
+Tank's bar, so that its second strike meets Shields Up. When one strike fills several
+bars, they all go off after it, in the order above, so the order is set strike by strike
+rather than at the end of the attack. A special's own hits can fill someone else's bar
+the same way, so one special can go off in the middle of another. A special that has to
+wait doesn't hold the attack up: the attack carries on without it, and the special goes
+once its wait ends.
+
+Going off costs the holder nothing of its cooldown: the wait already running carries
+on, and when it comes up the holder makes its ordinary attack, or drinks if ordered to,
+never a special in its place. The attack that filled the bar still gets its Luck reset
+check. Charge earned while the bar is already full, such as the later strikes of the
+attack that filled it, is lost rather than carried into the next bar.
+
+A Fighter's flurry and a Brute's special wait the way a close-range attack does, until
+their target is back in its own spot, keeping that target and picking again only if it
+dies, goes out of reach or vanishes. A special whose holder dies before it goes off is
+lost, and none goes off once the battle has ended.
+
+For now:
+
+- A Fighter's or a Brute's special also waits until its holder is home. When the
+  holder's own attack filled the bar, it walks home first and then goes out again for
+  the special, ahead of any free attack that attack earned.
+- Volley and the Mage's field don't wait: they hit their target where it is, the way an
+  Archer's or a Mage's ordinary attack does. Vanish and Shields Up have no target, so
+  they never wait.
+- A bar already full when a fight begins goes off as the fight's first step, once the
+  battle's intro, or the ride in from the last battle, is over: after every opening Luck
+  check and before the first attack. That covers a bar carried full from the floor's
+  last battle.
+- Each member's skill button shows how full that member's bar is. Pressing it selects
+  that member, so the next tap on the grid moves them, and orders nothing.
+```
+
+**Why:** The combat engine and the battle screen are built this way. The original has a
+special go off the moment its bar is full, taking no action, but doesn't say where it
+falls among the other attacks on its tick, what becomes of charge earned while the bar
+is full, or what a bar already full as a fight begins does. Ordering it keeps the one
+rule of ours that beats the new docs — nothing lands at the same moment as anything
+else — and a close-range special waits for its target for the same reason a close-range
+attack does, as "A close-range attack waits for its target to be home" says. The skill
+buttons stay as a display of the bar, now that nobody orders a special. Each "for now" in
+the list is proposed as a question in "Questions on a special going off by itself".
+
+## Change: Questions on a special going off by itself
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- For a far-range attacker, each row further back counts double when the eighty is
+  shared out. Is that the right weight, and should it hold the same way on a grid three
+  rows deep as it does on the five-wide one?
+```
+
+**Proposed:**
+
+```
+- For a far-range attacker, each row further back counts double when the eighty is
+  shared out. Is that the right weight, and should it hold the same way on a grid three
+  rows deep as it does on the five-wide one?
+- When an Archer's Volley or a Mage's field goes off and the enemy it aims at is out of
+  its spot on an attack, should the special wait for it to walk back, or hit it wherever
+  it is?
+- A Fighter's or a Brute's own attack is usually what fills its special bar, and it is
+  out at its target when that happens. Should it walk back to its spot first and then
+  fire the special, or fire straight from where it stands?
+- A special bar that is already full when a fight starts — carried over from the floor's
+  last battle — should it go off the moment the fight begins?
+- Tapping a member's skill button no longer fires anything. Should the tap still select
+  that member, so they can then be moved on the grid, or should the button do nothing at
+  all?
+```
+
+**Why:** The game is built with a default for now on each of these, in "A special goes
+off by itself, in its own turn". The pending changes to this list above are unchanged;
+these go at the end of the list, after them.

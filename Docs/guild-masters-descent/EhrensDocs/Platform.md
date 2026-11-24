@@ -29,14 +29,17 @@ ones gone.
 That holds inside a battle too. For now the rest of a battle the game closed in plays out
 exactly as it would have if the game had never closed, the same rolls and all — closing
 and opening the game can't re-roll an attack or dodge a death. An attack already made
-counts as made, even if it hadn't finished showing on screen. The save holds where every
-cooldown stands — how long each fighter still has to wait, whether one is owed a free
-attack from the Luck reset, and how far each lasting effect has run — and what's left in
-every fighter's Luck bag, the enemies' too, so nothing is drawn again as it loads. It
-doesn't hold an order the player gave that hasn't been used yet: an ordered drink is
-lost when the game closes, and the battle carries on from the save with none. Saving
-doesn't bank anything, either: the gold found on the dive is still the party's until the
-dive ends, and what was found since the last rest area can still be lost.
+counts as made, even if it hadn't finished showing on screen, and so does every special
+that went off in the middle of it. The save holds where every cooldown stands — how long
+each fighter still has to wait, whether one is owed a free attack from the Luck reset,
+whether a full bar's special is still waiting to go off, and how far each lasting effect
+has run — and what's left in every fighter's Luck bag, the enemies' too, so nothing is
+drawn again as it loads. A Fighter or a Brute can be waiting on its special and a free
+attack at once, and the save holds both. It doesn't hold an order the player gave that
+hasn't been used yet: an ordered drink is lost when the game closes, and the battle
+carries on from the save with none. Saving doesn't bank anything, either: the gold found
+on the dive is still the party's until the dive ends, and what was found since the last
+rest area can still be lost.
 
 A battle doesn't move on while the game is closed or in the background: it picks up at
 the moment it stopped. A long gap between two frames is dropped rather than played fast —
@@ -55,10 +58,11 @@ member on the saved dive with the one potion they held and puts anyone else's in
 stores, so no potion is made or lost, a save from before shields loads with no shields in
 the stores and none on any Tank, a save from before the Luck bag loads every member, and
 every enemy in a saved battle, with an empty bag that fills from that character's Luck at
-its first pull, and a save from before saved teams loads with all three empty. A saved
-battle is never judged against a placeholder number — a fighter left waiting longer than
-its own cooldown is accepted — so rebalancing a placeholder can't turn a good save into
-one the game can't read.
+its first pull, a save from before saved teams loads with all three empty, and a battle
+saved before specials went off by themselves loads with no special waiting, a bar full in
+it going off as the battle carries on. A saved battle is never judged against a
+placeholder number — a fighter left waiting longer than its own cooldown is accepted — so
+rebalancing a placeholder can't turn a good save into one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution

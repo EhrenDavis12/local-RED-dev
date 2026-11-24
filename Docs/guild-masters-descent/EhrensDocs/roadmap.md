@@ -116,8 +116,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   character's own Luck bag and when no token is pulled for now, the opening check as a
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
   drinking a potion as an order used at the next cooldown for now (the battle screen's
-  drink buttons and Auto drinking included), questions on drinking a potion, and a new
-  Rogue's worked cooldown of 71 ticks).
+  drink buttons and Auto drinking included), questions on drinking a potion, a new
+  Rogue's worked cooldown of 71 ticks, a special going off by itself in its own turn, and
+  questions on it).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -178,7 +179,8 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Finding dungeons
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
-  health afresh as a save loads and keeping every Luck bag and the three saved teams.
+  health afresh as a save loads and keeping every Luck bag, any special waiting to go off
+  and the three saved teams.
   - Orientation
   - Saving
   - Open Questions

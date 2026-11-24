@@ -37,6 +37,8 @@ directly next to it. A close attack's targeted enemy stands in the row the speci
 so for now the cleave centres on the targeted enemy's column in each row behind: it hits
 the node in that column and the two directly next to it, three wide in each row — up to
 six enemies in all. Each of them can evade it individually, like the ordinary cleave.
+With no row behind the front one, the special still goes off when the bar is full: it
+hits nothing, and the bar empties.
 When the Brute pushes past the front row, it moves there, cleaves, and returns to its own
 node, all in the same action. The Brute's bonus charge condition is hitting more than one
 enemy: each enemy beyond the first charges 5, rather than the flat 15 every other type's
@@ -49,7 +51,9 @@ front row, which the special skips, so the special needed a centre. Nothing said
 it hits three enemies in all or three in each row, or whether the cleave's neighbours
 take reduced damage the way Volley's do. Each is
 proposed as a question below. Nor did it say whether the special pays the bonus; that is
-proposed as a question in the Combat change notes, in "Questions on the special bar".
+proposed as a question in the Combat change notes, in "Questions on the special bar". A
+special goes off the moment its bar is full, so a Brute with no row behind the front one
+can't hold it for a better moment.
 
 ## Change: The Tank's taunt, Shields Up and bonus, for now
 
