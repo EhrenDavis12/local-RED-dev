@@ -51,6 +51,9 @@ injuries heal while the player is away.
   attacks that's the only thing I want winning over what the new doc Say" So: attacks never
   land at the same moment — one attacker goes, the other waits until its target is back in its
   spot. Every other contradiction, the other dev's docs win.
+- **Weapons beat the new docs too.** User (2026-11-24): "weapons: Brute and tank now carry an
+  axe and warhammer. This is tied to animations so im going to stick with it and I will let the
+  other dev know to update his docs." So: the Brute's axe and the Tank's warhammer stay.
 - **TestFlight deploys.** User (2026-11-24): "once you hit a good spot to deploy run the deploy
   to testflight." So: the desk runs `deploy-ios.sh beta` whenever main is at a good spot (new
   work merged, tests green, nothing half-done), without asking first.
