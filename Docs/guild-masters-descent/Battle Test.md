@@ -42,8 +42,8 @@ for testing.
 
 ## The Player's Team
 
-Every piece of gear is at the top of its durability band: **120** for every armour, **80**
-for the bow and the short sword, **160** for the knife and the two-handed sword, and
+Every piece of gear is at the top of its durability band: **120** for every armour,
+**80** for the short sword, **160** for the knife, the two-handed sword and the bow, and
 **240** for the club and the staff. Gear starts full so a run measures the rules rather
 than gear wearing out partway through a fight.
 

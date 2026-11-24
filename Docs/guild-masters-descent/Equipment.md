@@ -94,17 +94,18 @@ not strikes made: the Brute's cleave and the Mage's column land three hits from 
 strike, the same as a kind that strikes three separate times. The weapon breaks when it
 reaches zero.
 
-Each kind's F-class Durability band, grouped by how many hits it lands in one attack:
+Each kind's F-class Durability band, grouped by how fast the kind spends durability —
+usually the hits it lands in one attack, but for the bow, how often it attacks:
 
-- Bow, the Archer's, and short sword, the Tank's — 40–80. One strike on one target, so
-  one hit an attack.
-- Knife, the Rogue's, and two-handed sword, the Fighter's — 80–160. Two strikes, so two
-  hits an attack.
+- Short sword, the Tank's — 40–80. One strike on one target, so one hit an attack.
+- Knife, the Rogue's, two-handed sword, the Fighter's, and bow, the Archer's — 80–160.
+  The knife and sword land two hits an attack; the bow lands one hit, but the Archer
+  attacks about twice as often as the Tank, so it spends durability just as fast.
 - Club, the Brute's, and staff, the Mage's — 120–240. One strike, but it lands on three,
   so three hits an attack.
 
-A kind's band scales with the hits it lands in an attack, so every kind lasts about the
-same number of attacks — somewhere around sixty at the middle of its band.
+A band follows how fast a kind spends durability — both the hits it lands in an attack
+and how often it attacks — so that no kind runs out markedly sooner than the others.
 
 Unlike the damage bands, a kind's Durability band is the same at every class — an SSS
 weapon is no more durable than an F one; what it has is a far bigger damage band. Higher
