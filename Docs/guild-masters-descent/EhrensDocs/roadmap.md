@@ -124,7 +124,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   counted, missions in the first version as F-rank jobs that pay gold, open
   questions on missions' defaults, a member on a dive can't be dismissed for now, and a
   question on dismissing a member on a dive, a mission can be played as a battle for
-  now, questions on played missions, a guild with no members and no way to hire gets
+  now (its monsters not built from a floor's power), questions on played missions, a guild with no members and no way to hire gets
   nothing, for now, and lost health heals at home, for now).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
@@ -141,7 +141,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   and what's taken staying taken for now, questions on health, experience as the bar and
   level as the number for now, questions on experience, help coming back to whole points
   once, starting stats by type, and a question on the Cook's and the Porter's starting
-  stats).
+  stats, and a kill paying on the enemy's cost exactly).
 - `EhrensDocs/Individual Types.md` — proposed changes to Individual Types.md (where the
   Brute's cleaves land, the Tank's taunt, Shields Up and bonus for now, the Fighter's and
   the Rogue's ordinary strikes when the target dies, the Rogue's bonus for now, the
@@ -181,7 +181,8 @@ The dungeon board, finding and entering dungeons, and training missions.
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
   health afresh as a save loads, keeping each member's health and every Luck bag, any
-  special waiting to go off and the three saved teams.
+  special waiting to go off and the three saved teams, and experience saved exactly in
+  whole parts of a point.
   - Orientation
   - Saving
   - Open Questions
@@ -189,10 +190,12 @@ The dungeon board, finding and entering dungeons, and training missions.
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
   back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level and how they fight for now, a floor's monsters the
-  same every dive and where each stands, re-entering for now, open questions
+  same every dive and where each stands, how a floor's power becomes its enemies for now,
+  re-entering for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
-  carrying, party planning as one screen, and the guild's three saved teams).
+  carrying, party planning as one screen, the guild's three saved teams, and questions on
+  the floor power budget).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).

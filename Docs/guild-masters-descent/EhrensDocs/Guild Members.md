@@ -53,6 +53,51 @@ which nobody wins, pays for its kills; experience comes from kills and is added 
 end of a combat, and a stand-off still ends one. The stand-off is proposed as a question
 in "Questions on experience".
 
+## Change: A kill pays on the enemy's cost, exactly
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## Levels and Experience`, the list after "The total is added up at the end of
+a combat" (a new paragraph after it)
+
+**Now says:**
+
+```
+- What a kill pays is that rank value scaled by what the enemy cost to put on the floor.
+  An enemy built at its rank's full baseline cost pays the rank value in full; one built
+  at a third of that baseline pays a third of it.
+- So a battle's experience is set by the power it was given rather than by how that
+  power was divided — the same points spent as a horde of weak enemies and as a handful
+  of strong ones pay the same total.
+- What an enemy costs, and the baseline cost for each rank, are covered in the Dungeon
+  doc.
+```
+
+**Proposed:**
+
+```
+- What a kill pays is that rank value scaled by what the enemy cost to put on the floor.
+  An enemy built at its rank's full baseline cost pays the rank value in full; one built
+  at a third of that baseline pays a third of it.
+- So a battle's experience is set by the power it was given rather than by how that
+  power was divided — the same points spent as a horde of weak enemies and as a handful
+  of strong ones pay the same total.
+- What an enemy costs, and the baseline cost for each rank, are covered in the Dungeon
+  doc.
+
+What a kill pays is exact and never rounded, and an enemy that cost more than its rank's
+baseline pays more than the rank value. The cost it pays on is the enemy's whole cost,
+never what its stats add up to. For now an enemy on a mission played by hand isn't built
+from a floor's power, so its kill pays its rank's value in full.
+```
+
+**Why:** The game is built this way. The original scales a kill by the enemy's cost but
+doesn't say whether that rounds; paying exactly is what keeps its promise that a horde
+and a handful pay the same total. Paying on the cost rather than the stats means gear on
+a monster later takes part of its points without changing what its kill pays. The
+pending "Who shares a combat's experience, for now" change to the paragraph before is
+unchanged.
+
 ## Change: Help counts where everyone stands right now
 
 > Proposed 2026-11-12 · for review

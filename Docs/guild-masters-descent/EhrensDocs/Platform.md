@@ -50,20 +50,24 @@ A save never costs the player the save before it. If saving fails, or the phone 
 partway through, the slot still holds the last good save, whole.
 
 Loading never changes or deletes a save. A save the game can't read, or one made by a
-newer version of the game, is reported as such and left on the phone as it is. A save
-made by an older version still loads; a dive one of those saved between battles, from
-before the save held special bars, loads with every bar empty, a save from before potions
-loads with none in the stores and none on any member, a save from before slots loads a
-member on the saved dive with the one potion they held and puts anyone else's in the
-stores, so no potion is made or lost, a save from before shields loads with no shields in
-the stores and none on any Tank, a save from before the Luck bag loads every member, and
-every enemy in a saved battle, with an empty bag that fills from that character's Luck at
-its first pull, a save from before saved teams loads with all three empty, a battle saved
-before specials went off by themselves loads with no special waiting, a bar full in it
-going off as the battle carries on, and a save from before lost health healed at home
-loads every member in the hall at full health. A saved battle is never judged against a
-placeholder number — a fighter left waiting longer than its own cooldown is accepted — so
-rebalancing a placeholder can't turn a good save into one the game can't read.
+newer version of the game, is reported as such and left on the phone as it is. A save made
+by an older version still loads; a dive one of those saved between battles, from before
+the save held special bars, loads with every bar empty, a save from before potions loads
+with none in the stores and none on any member, a save from before slots loads a member on
+the saved dive with the one potion they held and puts anyone else's in the stores, so no
+potion is made or lost, a save from before shields loads with no shields in the stores and
+none on any Tank, a save from before the Luck bag loads every member, and every enemy in a
+saved battle, with an empty bag that fills from that character's Luck at its first pull, a
+save from before saved teams loads with all three empty, a battle saved before specials
+went off by themselves loads with no special waiting, a bar full in it going off as the
+battle carries on, a save from before lost health healed at home loads every member in the
+hall at full health, and a save from before enemies had a cost keeps each dungeon as it
+was made, three battles a floor, with every monster saved without a cost, on a floor or in
+a battle saved partway through, costing its rank's baseline: at F its type's starting
+stats, and a kill that pays the full F value, never nothing. A saved battle is never
+judged against a placeholder number — a fighter left waiting longer than its own cooldown
+is accepted — so rebalancing a placeholder can't turn a good save into one the game can't
+read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
@@ -77,6 +81,15 @@ gives; a higher maximum doesn't raise it, and the gap heals with time at home.
 
 Every member's Luck bag is saved with them, part-used as it is, so closing the game
 between battles or between dives never refills a bag or hands back a token.
+
+Experience is saved exactly, as a whole number of parts of a point, 21,621,600 parts to
+the point. That is 360,360, which every party size from 1 to 15 divides, times 60, so a
+point of an enemy's cost pays a whole number of parts — a thirtieth of a point at F, a
+twentieth from E up — and a combat's share is never rounded. Times 30 would cover F only:
+an E-rank share split eight ways would stop coming out whole. A save from before enemies
+had a cost counted 360,360 parts to the point, and as it loads every member's experience
+is multiplied by 60, once and without loss, so their bar, level and whole experience
+read the same.
 
 For now:
 

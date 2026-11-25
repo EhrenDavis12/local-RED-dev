@@ -72,20 +72,22 @@ Each floor has 1–3 battles.
 ```
 Each floor is a series of battles, 1–3 of them. At the end of a battle the screen scrolls
 right into the next battle, with no result screen and nothing to click in between: a
-floor's battles play straight through, back to back. The first dungeon has 3 battles a
-floor to win. After the last one comes victory, dropping loot: the floor's gold drops as
+floor's battles play straight through, back to back. How many a floor has is rolled for
+each fighting floor when the dungeon is created, 1, 2 or 3 at equal odds, the starting
+dungeon too. After the last one comes victory, dropping loot: the floor's gold drops as
 one lump at the end of the floor, and only once every battle on that floor is won — if a
 floor has 3 battles, the party needs to beat all 3.
 ```
 
 **Why:** Answered: each floor is a series of battles, and at the end of a battle the
-screen scrolls right into the next one; the first dungeon has 3 battles to win, then
-victory, dropping loot. Answered too: loot at the end of the floor — if 3 battles on that
-floor then they need to beat all 3. "Each floor has 1–3 battles" gave the count but not
-how one battle leads into the next, or where the loot drops. The 3 battles are inside the
-original's 1–3 range, so the range stays for dungeons in general. What the board's floor layout shows, whether a party picks a route, and what makes a
-boss floor are not settled by this. The rest of the paragraph, on rest areas and
-retreating, is the next change. Answered 2026-11-14, too: "you enter a level and the
+screen scrolls right into the next one, then victory, dropping loot. Answered too: loot
+at the end of the floor — if 3 battles on that floor then they need to beat all 3. "Each
+floor has 1–3 battles" gave the count but not how one battle leads into the next, or
+where the loot drops. The original's 1–3 holds for the starting dungeon too, since the
+new docs win where they and an earlier answer disagree; the equal odds are a default the
+build chose, not yet the user's word. What the board's floor layout shows, whether a
+party picks a route, and what makes a boss floor are not settled by this. The rest of the
+paragraph, on rest areas and retreating, is the next change. Answered 2026-11-14, too: "you enter a level and the
 level should go through" — a floor's battles play back to back, with no screen after
 each one showing what was gained and waiting for a click on Continue.
 
@@ -222,6 +224,71 @@ For the owner to reconcile: `Individual Types.md` explains two type traits by ge
 Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
 a monster Brute or Rogue carries none for now.
 
+## Change: How a floor's power becomes its enemies, for now
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## The Dungeon`, the paragraph beginning "An enemy's share becomes its stats in
+a fixed shape" (new paragraphs after it)
+
+**Now says:**
+
+```
+An enemy's share becomes its stats in a fixed shape. The points are spread down the
+ordering its type's stat weighting gives, in the ratio 8 : 7 : 6 : 5 : 4 — so a
+30-point enemy comes out at 8 in its type's leading stat, then 7, 6, 5 and 4. The
+weightings are in the Guild Members doc.
+```
+
+**Proposed:**
+
+```
+An enemy's share becomes its stats in a fixed shape. The points are spread down the
+ordering its type's stat weighting gives, in the ratio 8 : 7 : 6 : 5 : 4 — so a
+30-point enemy comes out at 8 in its type's leading stat, then 7, 6, 5 and 4. The
+weightings are in the Guild Members doc.
+
+For now the starting dungeon is 10 floors deep, with rest areas on 5 and 10, rather than
+rolled from the F band. "Climbing evenly" is the same ratio from each fighting floor to
+the next, counting fighting floors only, and an enemy's scaled cost falls the same way,
+from its baseline on the first fighting floor to a third of it on the deepest. So the
+starting dungeon runs from 100 power on floor 1 to 300 on floor 9, and from 30 points an
+enemy down to 10.
+
+Each battle makes one roll for the cost, from half to twice the scaled figure at even
+odds. Its enemy count is its share divided by the rolled cost, rounded down, then held
+between 1 and 15. Every enemy in a battle has the same points: the share divided by the
+count, rounded to the nearest whole point, an exact half rounding up. That is the only
+rounding — neither the floor's power nor the share is rounded first — so a battle can
+spend a little more or a little less than its share. The same rule covers both edges:
+past 15, the share divided by 15 raises every enemy's points, and a share smaller than
+one rolled cost fields a single enemy holding the whole share.
+
+An enemy's cost is kept as a figure of its own and never worked back out from its stats,
+so gear can later take part of the points without changing what a kill pays. Monsters
+carry no gear for now, so all of an enemy's points become stats. For now the stats are
+rounded so they add up to the enemy's points: each stat's exact share is rounded down,
+and the points left over go one at a time to the stats with the largest fractions, the
+stat earlier in the ordering winning a tie. An F enemy never has fewer than 5 points, so
+no stat is below 1, and a 30-point enemy has exactly its type's starting stats.
+
+For now there's no enemy-type ladder: every floor draws each monster's type from all six
+combat types.
+```
+
+**Why:** The game is built this way. The original gives the power, the shares, the
+baseline, the roll and the 8 : 7 : 6 : 5 : 4 shape, but not the curve "climbing evenly"
+means, how the count and the points round, or how the ratio lands on whole stats; Battle
+Test's Test Dungeon table, rolled from these rules, shows the equal ratio. The starting
+dungeon's depth, the even odds, rounding the count down and having no type ladder yet
+are defaults the build chose. How the stats round, and which way an exact half goes, are
+waiting on the user's word, and are proposed as questions in "Questions on the floor
+power budget". For the owner to reconcile: Battle Test's `## What This Is For` says "The
+largest single battle an F-rank dungeon produces is 150 points", but these rules give
+300 when the deepest fighting floor rolls one battle; and Combat's `## Open Questions`
+still asks whether the enemies keep coming once the grid of fifteen fills, though this
+doc caps a battle at fifteen.
+
 ## Change: A floor's monsters are the same every dive, for now
 
 > Proposed 2026-11-12 · for review
@@ -241,11 +308,11 @@ as the party reaches each floor.
 A newly claimed dungeon starts near-blank. The enemy types and the floor layout appear
 as the party reaches each floor.
 
-For now a floor's monsters are the same on every dive: which monsters, their levels and
-where they stand are set once, when the dungeon is created, and a dungeon from an older
-save keeps the monsters it was made with. Each monster stands on a node of its own, drawn
-at random. A floor counts as reached once the party starts its first battle there, or
-arrives there if it's a rest area.
+For now a floor's monsters are the same on every dive: how many battles the floor has,
+which monsters, their levels, their points and where they stand are set once, when the
+dungeon is created, and a dungeon from an older save keeps the monsters it was made with.
+Each monster stands on a node of its own, drawn at random. A floor counts as reached once
+the party starts its first battle there, or arrives there if it's a rest area.
 ```
 
 **Why:** The dive is built this way. "Appear as the party reaches each floor" reads as a
@@ -547,3 +614,33 @@ save a formation to one of the 3 slots. for next time." The game is built this w
 doc has saved teams. What "available" means, and a saved team holding no potions, are
 defaults the build chose, not yet the user's word, and cheap to change. The pending
 "Party planning is one screen" change to the paragraph before is unchanged.
+
+## Change: Questions on the floor power budget
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- A drop the party has no room for is lost, which is the same rule a dead member's
+  gear follows. Should a full party be able to throw something away to make room for
+  a find instead?
+```
+
+**Proposed:**
+
+```
+- A drop the party has no room for is lost, which is the same rule a dead member's
+  gear follows. Should a full party be able to throw something away to make room for
+  a find instead?
+- How does 8 : 7 : 6 : 5 : 4 round to whole stats?
+- When an enemy's points (share ÷ count) come out at exactly a half, which way do they
+  round?
+```
+
+**Why:** The game goes ahead with a default on both, in "How a floor's power becomes its
+enemies, for now": stats that add up to the enemy's points with none below 1, and a half
+rounding up. A half can only come up on the first and last fighting floors, where the
+floor's power is a whole number. The pending changes to this list above are unchanged.
