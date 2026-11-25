@@ -194,7 +194,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   re-entering for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
-  carrying, party planning as one screen, the guild's three saved teams, and questions on
+  carrying, the guild's three saved teams, and questions on
   the floor power budget).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open

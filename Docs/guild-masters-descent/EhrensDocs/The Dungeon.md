@@ -543,38 +543,6 @@ each in pick order while the stores last, where a dive packs what the player cho
 last doesn't come up until a dive yields items. The pending changes to this list above
 are unchanged.
 
-## Change: Party planning is one screen
-
-> Proposed 2026-11-16 · for review
-
-**Where:** `## The Dungeon Board`, the paragraph beginning "Planning happens in two steps"
-
-**Now says:**
-
-```
-Planning happens in two steps: the player selects the members first, then arranges them
-on the grid. That second step is a zoomed-in view of the battle map rather than a
-separate screen. The system does the initial placement, putting combat types in front and
-making support links where it can — the player can edit it from there.
-```
-
-**Proposed:**
-
-```
-Party planning is one screen. The guild's characters are listed on the left, each showing
-who it is — picture, type, name and level — and the placement grid is on the right. The
-player picks, places and rearranges at the same time, and can see everyone they are
-taking, up to 15. As each member is added, the game still places them first, putting
-combat types in front and making support links where it can, and the player edits from
-there. Taking a member off the grid puts them back in the list.
-```
-
-**Why:** The user, 2026-11-16: "If we choose our members we can choose up to 15 members
-but I won't be able to see them all. So let's design the select your characters, place
-your characters on the same screen where we have the list of the characters on the left
-and the placement on the right side. This way they can place and rearrange at the same
-time, knowing who they are getting."
-
 ## Change: The guild keeps three saved teams
 
 > Proposed 2026-11-20 · for review
@@ -612,8 +580,7 @@ dongeon if all members in that team are available. clicking the formation auto p
 those characters for the doungon dive. While in the doungon dive you should be able to
 save a formation to one of the 3 slots. for next time." The game is built this way. No
 doc has saved teams. What "available" means, and a saved team holding no potions, are
-defaults the build chose, not yet the user's word, and cheap to change. The pending
-"Party planning is one screen" change to the paragraph before is unchanged.
+defaults the build chose, not yet the user's word, and cheap to change.
 
 ## Change: Questions on the floor power budget
 
