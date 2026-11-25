@@ -15,6 +15,9 @@ Citation keys used below:
   change). The originals win over the item title's "drunk like the healing potion".
 - **Healing model** — where a doc is silent, the buff follows the healing potion as the
   game is built, per the Brief. The EhrensDocs change note named is the record of that.
+- **Main loop 2026-11-25** — decisions the coordinator made after PRD review, as
+  going-ahead defaults the user is to confirm: **D7** (which True a draw spends) and the
+  build defaults for Open Questions 1–3. Each is also listed under Open Questions.
 
 ## Problem
 
@@ -51,25 +54,39 @@ living party member until that battle ends, and nothing of it outlasts the battl
 5. God's Wish turns 2 Falses into Trues in each reached member's own Luck bag. A bag left
    with fewer than 2 Falses converts as many as it has (none for none). It has no band and
    no tuning figure: it is 2 at any rank. — `Specialists.md` § The Alchemist; Brief D4
-6. A converted True is a token like any other in the bag: a pull is as likely to take it
-   as any other token left, and drawn, it is a True (the check succeeds) and leaves the bag
-   as any pulled token does. It does not go back into the bag. — `Specialists.md` § The
-   Alchemist ("spent when it's drawn"); `Combat.md` § Luck Checks
-7. When the battle a God's Wish was used in ends, every converted True still in a bag
-   becomes a False again, so the bag holds exactly the Trues it would have held without the
-   potion. This holds however the battle ends — won, lost, stand-off, or the party turning
-   back mid-battle (which drops the battle unsettled). — `Specialists.md` § The Alchemist
-   ("reaches no further than the battle"); code: `Dive.TurnBack`
-8. How the other battle rules read a raised stat — the support-ring help, the same-tick
-   attack order, and the Tank's Shields Up figure — is open; see Open Questions 1–3.
+6. Converting adds the converted Falses to the bag's Trues and records them as the
+   member's converted count; the bag's token count is unchanged. A pull is the bag's one
+   ordinary draw, with no extra draw: if it comes out True while the converted count is
+   above 0, the converted count goes down by 1 — converted Trues are spent first. A drawn
+   converted True leaves the bag like any pulled token, the check succeeding; it does not
+   go back in. — `Specialists.md` § The Alchemist ("spent when it's drawn"); `Combat.md` §
+   Luck Checks; Main loop 2026-11-25 D7 (converted first)
+7. When the battle a God's Wish was used in ends, each member's bag loses as many Trues as
+   its converted count still holds, those tokens staying in the bag as Falses (its token
+   count unchanged), and the converted count goes to 0. This holds however the battle ends
+   — won, lost, stand-off, or the party turning back mid-battle (which drops the battle
+   unsettled). — `Specialists.md` § The Alchemist ("reaches no further than the battle");
+   Main loop 2026-11-25 D7; code: `Dive.TurnBack`
+8. A stat buff's raise lives in the combatant's stat as the battle reads it
+   (`Combatant.GetStat`), never in the member's own stat (`Member.GetStat`), so it never
+   reaches anything outside the battle and every battle rule that reads the stat reads it
+   raised — damage, cooldown waits (req 4), the support-ring help, the same-tick attack
+   order and the Tank's Shields Up figure. Rock Skin's carve-out (req 3) still holds:
+   maximum health never reads it. Tests pin help, same-tick order and Shields Up as
+   reading the raise. — Main loop 2026-11-25 (defaults for Open Questions 1–3)
 
 ### Using a buff
 
 9. The player uses a buff; no member drinks it. Using one costs no member an attack or a
-   cooldown, wears nothing, charges no bar and pulls no Luck token. It takes effect the
-   moment the player uses it, between ticks, and uses no fight time — the way a formation
-   change does. — `Specialists.md` § The Alchemist; `Combat.md` § Player Input; code:
-   `Battle.Move` ("not an action: it uses no time")
+   cooldown, wears nothing, charges no bar and pulls no Luck token. It uses no fight time —
+   the way a formation change does — and is applied between ticks. A use made while a tick
+   is only partly walked (between two `StepAction` calls on one tick) is applied at the
+   next tick boundary: after every action due on that tick has resolved, before any action
+   of the next. Until applied, no potion is taken; if the battle ends first, nothing is
+   used; and a use not yet applied isn't saved, the way an ordered drink isn't. —
+   `Specialists.md` § The Alchemist; `Combat.md` § Player Input; code: `Battle.Move` ("not
+   an action: it uses no time"); Main loop 2026-11-25; EhrensDocs `Platform.md` § Saving
+   (an ordered drink is lost on close)
 10. A buff reaches every party member alive at the moment it is used, specialists included,
     and lasts for the rest of that battle. A member who dies afterwards stops mattering; no
     one is reached later. Monsters are never reached. — `Specialists.md` § The Alchemist;
@@ -83,8 +100,9 @@ living party member until that battle ends, and nothing of it outlasts the battl
     order used at the next cooldown" (drink button not pressable while paused)
 13. All five kinds can run at once. Using a kind that is already running replaces it:
     for a stat buff the raise is the new one, not the two added (with fixed figures, the
-    same figure); for God's Wish, every converted True still unspent reverts first and then
-    2 are converted afresh, so a bag never holds more than 2 converted Trues. The replaced
+    same figure); for God's Wish, each bag's remaining converted Trues revert first, as
+    req 7 says, and then up to 2 Falses are converted afresh (req 5, 6), so a converted
+    count never passes 2. The replaced
     potion is used up. — `Specialists.md` § The Alchemist
 14. Auto never uses a buff. — Brief D3
 15. Using a buff is deterministic: the same uses at the same ticks of the same fight give
@@ -124,10 +142,13 @@ living party member until that battle ends, and nothing of it outlasts the battl
     member not on the saved dive has their buffs put back in the stores as the save loads.
     — Healing model: EhrensDocs `Platform.md` § Saving
 23. A battle saved partway through carries on exactly: the save holds which buffs are
-    running and each one's raise, and each member's converted Trues still unspent, so
-    closing and opening the game neither ends a buff early nor gives back a used one. —
-    EhrensDocs `Platform.md` § Saving ("plays out exactly as it would have if the game had
-    never closed"; "one drunk on the dive is still gone")
+    running and each one's raise, and each member's converted count, so closing and
+    opening the game neither ends a buff early nor gives back a used one. A saved battle
+    that can't be true is repaired as it loads, not refused: a converted count is clamped
+    to 0 through the smaller of 2 and the bag's Trues left, and a raise below 0 goes to 0,
+    so the bag still passes `LuckBag.CanBeTrue`. — EhrensDocs `Platform.md` § Saving
+    ("plays out exactly as it would have if the game had never closed"; "one drunk on the
+    dive is still gone"); Main loop 2026-11-25 (the repair)
 24. A save from before buffs loads with none in the stores, none on any member, and none
     running. — Brief D6
 25. A save holding a negative buff count, in the stores or on a member, loads with that
@@ -155,19 +176,20 @@ living party member until that battle ends, and nothing of it outlasts the battl
 
 ## Open Questions
 
-Items 1–5 are gaps the docs and code don't settle. Each carries a **proposed default** —
-the PRD author's, not the user's — that the build can go ahead with; all are cheap to
-change.
+Items 1–5 and 7 are gaps the docs and code don't settle. Items 1–3 and 7 are built with
+the main loop's going-ahead default (2026-11-25), which tests pin, and wait on the user's
+confirmation; items 4–5 carry a **proposed default** — the PRD author's, not the user's.
+All are cheap to change.
 
 1. Support-ring help is a share of the member's primary stat. When a buff raises that stat,
-   is the help worked out on the raised stat? *Proposed default: yes — a raised stat is
-   the stat.* (At F it rarely moves the help by more than a point.)
+   is the help worked out on the raised stat? *Going-ahead default: yes (req 8).* (At F
+   it rarely moves the help by more than a point.)
 2. Two attacks ready on the same tick go in order of "the higher Dexterity of its own, help
    from the support ring left out". Does Wind Step's raise count in that Dexterity?
-   *Proposed default: yes, as for 1.*
+   *Going-ahead default: yes (req 8).*
 3. The Tank's Shields Up figure is his Constitution plus a roll of his armour, given to the
    allies behind him as defence. Rock Skin "reaches defence only" — does it reach that
-   figure? *Proposed default: yes, it is defence.*
+   figure? *Going-ahead default: yes (req 8).*
 4. When several living members hold the kind being used, whose slot does it come out of?
    It decides whose slot is free for loot at the dive's end. *Proposed default: the first
    holder in the order the party was picked, the order potions are packed in.*
@@ -178,3 +200,7 @@ change.
    scales with the Alchemist's Intelligence, and the Alchemist's Luck check places a potion
    within its band and can raise it — but God's Wish has no band of its own. Does either of
    those reach God's Wish, and does it turn 2 Falses into Trues no matter who brewed it?"
+7. After God's Wish, a member's bag holds its own Trues and up to 2 converted ones. When a
+   True is drawn, which is spent — a converted one first, or either at random? It decides
+   how many Trues the bag keeps once the battle ends. *Going-ahead default D7: converted
+   first (req 6, 7).*
