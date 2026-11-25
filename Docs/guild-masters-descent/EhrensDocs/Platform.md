@@ -58,15 +58,22 @@ member on the saved dive with the one potion they held and puts anyone else's in
 stores, so no potion is made or lost, a save from before shields loads with no shields in
 the stores and none on any Tank, a save from before the Luck bag loads every member, and
 every enemy in a saved battle, with an empty bag that fills from that character's Luck at
-its first pull, a save from before saved teams loads with all three empty, and a battle
-saved before specials went off by themselves loads with no special waiting, a bar full in
-it going off as the battle carries on. A saved battle is never judged against a
+its first pull, a save from before saved teams loads with all three empty, a battle saved
+before specials went off by themselves loads with no special waiting, a bar full in it
+going off as the battle carries on, and a save from before lost health healed at home
+loads every member in the hall at full health. A saved battle is never judged against a
 placeholder number — a fighter left waiting longer than its own cooldown is accepted — so
 rebalancing a placeholder can't turn a good save into one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
 loads under the rule as it is now.
+
+Current health is taken from a save. Every member is saved with the health they have and
+the part of a minute already counted toward their next point, so closing and opening the
+game gives back no more health than the time away heals, and never loses that part of a
+minute. As a save loads, a member's health is capped at the maximum their Constitution
+gives; a higher maximum doesn't raise it, and the gap heals with time at home.
 
 Every member's Luck bag is saved with them, part-used as it is, so closing the game
 between battles or between dives never refills a bag or hands back a token.
@@ -91,6 +98,9 @@ For now:
 - A member on a saved dive keeps the health they had when the game saved, capped at
   their maximum — so a member saved at 7 of 10 under the old rule loads at 7 of, say,
   50, rather than keeping the damage they had taken.
+- A member in the hall saved with no health, which would read as dead, loads with 1. A
+  count toward the next point saved below none, or at a full minute or more, is brought
+  inside the minute as it loads, and a member at full loads with none counted.
 - A save made before experience became one bar per rank loads each member with their
   level and stats kept and their experience at the point where that level starts — an
   F-rank member at level 5 loads with 6, one at level 1 with none. On a dive one of those
@@ -114,3 +124,5 @@ For now:
   had, capped at their new maximum. Should they keep the damage they had taken instead?
 - Is a saved Luck bag that can't be true — more tokens than a bag holds, fewer than none,
   or more Trues than tokens — emptied as it loads, or is the save refused?
+- A member in the hall saved with no health loads with 1. Is that right, or is the save
+  refused?

@@ -124,8 +124,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   counted, missions in the first version as F-rank jobs that pay gold, open
   questions on missions' defaults, a member on a dive can't be dismissed for now, and a
   question on dismissing a member on a dive, a mission can be played as a battle for
-  now, questions on played missions, and a guild with no members and no way to hire gets
-  nothing, for now).
+  now, questions on played missions, a guild with no members and no way to hire gets
+  nothing, for now, and lost health heals at home, for now).
 - `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
   question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
@@ -180,8 +180,8 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Finding dungeons
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
-  health afresh as a save loads and keeping every Luck bag, any special waiting to go off
-  and the three saved teams.
+  health afresh as a save loads, keeping each member's health and every Luck bag, any
+  special waiting to go off and the three saved teams.
   - Orientation
   - Saving
   - Open Questions

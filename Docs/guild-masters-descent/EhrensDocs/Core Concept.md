@@ -84,10 +84,10 @@ forward again never counts the same time twice.
 
 **Why:** No doc said how time away is counted, and the game now counts it. The existing
 paragraph is unchanged. Everything that moves while the player is away moves by this one
-count: injuries healing, the recruiting board's and the mission board's restocks, and the
-missions that are out. The two "for now" rules are defaults, not yet the user's word.
-With no limit, setting the phone's clock forward heals the guild early and brings
-missions home early; nothing guards against that.
+count: injuries healing, lost health coming back, the recruiting board's and the mission
+board's restocks, and the missions that are out. The two "for now" rules are defaults, not
+yet the user's word. With no limit, setting the phone's clock forward heals the guild
+early and brings missions home early; nothing guards against that.
 
 ## Change: Missions are in the first version, as F-rank jobs that pay gold
 
@@ -293,7 +293,9 @@ on the roster. The battle's result says how it went, so the hall's notice adds n
 
 The battle itself isn't saved, and the save doesn't change. If the game is closed partway
 through, the mission is gone, unpaid, and nobody is injured, and the potions packed for
-it are back in the stores, less any drunk.
+it are back in the stores, less any drunk. For now its fighters keep the health they had
+when the game closed, one brought to no health coming back with 1, and heal from there at
+home.
 ```
 
 **Why:** The user, 2026-11-15: "i need a way to actually fight with out going into the
@@ -349,6 +351,10 @@ on dismissing a member on a dive" adds
   when the battle starts.
 - Does a played mission need a free mission slot, even though it never runs on a timer?
   The default is yes.
+- If the game is closed partway through a played mission, its fighters keep the health
+  they had when it closed, rather than coming back at full as they do once its battle is
+  decided. Should a cut-off battle send them home at full too? The default is they keep
+  it.
 ```
 
 **Why:** The game is built with a default for now on each of these, in "A mission can be
@@ -386,3 +392,56 @@ members and no money. Death is permanent and the guild can't go into debt, so a 
 this state can never move again. A guild with even one living member is never stuck,
 because missions cost nothing to send and pay gold. Starting a new game over the stuck
 save already asks the player first, as the Platform doc's save slots say.
+
+## Change: Lost health heals at home, for now
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## The Mead Hall`, first paragraph (new paragraphs after it)
+
+**Now says:**
+
+```
+Health lost on a dive doesn't come back at once — a member that comes home hurt needs
+time to heal, the same as an injury. With no Cook in the guild, health comes back on its
+own at 1 point a minute, and there is nothing to pay for — waiting is all there is. The
+mead hall is a room in the hall where the player pays gold to speed that up: recovery
+happens on its own given time, and gold buys it sooner.
+```
+
+**Proposed:**
+
+```
+Health lost on a dive doesn't come back at once — a member that comes home hurt needs
+time to heal, the same as an injury. With no Cook in the guild, health comes back on its
+own at 1 point a minute, and there is nothing to pay for — waiting is all there is. The
+mead hall is a room in the hall where the player pays gold to speed that up: recovery
+happens on its own given time, and gold buys it sooner.
+
+A member comes home from a dive with the health they ended it on, however it ended —
+from a rest area, on a retreat or in a stand-off. From then on they get 1 point back for
+every full minute, up to their maximum and never past it. The minute is counted the way
+all time away is: open, in the background or closed, every second counts once. Part of a
+minute is never lost; it carries over to the next point, across saving and loading too.
+
+Only time at home counts. Time a member spends in a dive that hasn't ended, or in a
+played mission whose battle isn't decided, heals them nothing, whether the game is open
+or closed. A member out on a sent mission keeps healing, the same as one in the hall.
+Once a played mission's battle is decided, everyone sent is back at full health anyway.
+
+For now there is no mead hall to pay at, so every member heals at 1 point a minute,
+whether or not the guild has a Cook. For now, too, lost health holds no one back: a
+member short of health isn't injured, and can still be sent on a dive or a mission or
+picked into a saved team. Lost health and an injury heal on their own counts, and neither
+pauses or speeds up the other.
+```
+
+**Why:** The game is built this way. The original says lost health comes back at 1 point
+a minute and keeps coming back while the game is closed, and that a dive doesn't advance
+while closed, but not what time counts toward a member's healing while they're away
+fighting, or what becomes of part of a minute. Lost health comes back by the same count
+as everything else time moves, in "How time away is counted". A member on a sent mission
+healing, and a played mission still sending everyone home at full, are the user's word on
+2026-11-24. The "for now" rules are defaults the build chose, not yet the user's word.
+Whether a member short of health may be sent stays a question, as the original's
+`## Open Questions` already asks it.
