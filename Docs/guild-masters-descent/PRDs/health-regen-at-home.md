@@ -19,7 +19,7 @@ mead hall (#189) to speed up.
 A member who survives a dive comes home with the health they ended it on. From then on they
 get 1 point back a minute, up to their maximum, counted on the guild's existing clock. That
 clock keeps running while the game is closed or in the background, and never counts the
-time a member spends in a dive. Saves keep each member's health, and an older save loads
+time a member spends fighting, in a dive or a played mission. Saves keep each member's health, and an older save loads
 with everyone in the hall at full.
 
 ## Requirements
@@ -49,13 +49,45 @@ with everyone in the hall at full.
    a phone clock set back counts nothing until it catches up. Don't add a second clock.
    *Core Concept, Time ("lost health is recovered while the player is away"); EhrensDocs
    Core Concept, "How time away is counted"; the brief.*
-5. No time counts toward a member's healing while they are in a dive that hasn't ended.
-   That covers time with the game closed partway through a dive, a backgrounded game being
-   settled while a dive is held, and loading a save that holds a dive. It must hold
-   however the settles fall around the dive's start and end. A test that settles only
-   before the dive starts and after it ends must credit only the time at home, never the
-   time spent in the dive. *Core Concept, Time ("A dive in progress ... doesn't advance
-   while the game is closed"); the brief.*
+5. No time counts toward a member's healing while they are away fighting. That means in a
+   dive that hasn't ended, or in a played mission whose result isn't decided yet. It
+   covers:
+   - time with the game closed partway through a dive;
+   - a backgrounded game settling while a dive or a played mission is on
+     (`SaveLifecycle.OnApplicationPause`);
+   - loading a save that holds a dive;
+   - every other settle, whoever calls it.
+
+   Only the time at home counts. That holds however the settles fall around the day the
+   party leaves and the day it comes back. *Core Concept, Time ("A dive in progress ...
+   doesn't advance while the game is closed"); the brief; user's call 2026-11-24 for
+   played missions.*
+5a. **How the exclusion works.** The guild holds the dive in progress and the played
+   mission in progress, if any. It holds them in memory only and never saves them, the
+   same way it holds its clock (`AttachClock`). `Guild.Settle()` keeps no arguments. Each
+   time it heals a member, it first asks those held fights whether that member is still
+   away (`Dive.Holds`, or the played mission's party while its result is null). A fight
+   that has ended stops excluding its members, even if it is still held. The fights are
+   registered by the code that creates them, never by the code that calls `Settle`:
+   - `Dive.TryBegin` (`Dive.cs:226`) settles the guild before the party leaves, then
+     registers the dive.
+   - `Dive.Restore` (`Dive.cs:624`) registers the dive it restores. That runs inside
+     `SaveManager.Check`, so it is in place before `SaveManager.Load:130` settles.
+   - `Dive.End` (`Dive.cs:505`) settles the guild while the dive still holds its party,
+     before it marks the dive ended and sends anyone home. Then it clears the
+     registration.
+   - `PlayedMission.TryBegin` already settles at line 86. It registers the mission once
+     the battle starts.
+   - `PlayedMission.End` already settles at line 194, while the mission is still
+     registered. It clears the registration afterwards.
+
+   No caller of `Settle` changes. That includes `OpenBoard`, `TryHire`, `TryHeal`,
+   `InjureMember`, the mission board's settles, `SaveManager.Load`,
+   `SaveLifecycle.OnApplicationPause` and every screen's `Refresh`. *Mechanism chosen
+   from the code, per the reviewer's finding.* Passing the dive into `Settle` from every
+   caller is the other way to do it, and it's rejected. Most of those callers have no
+   dive in reach and would pass none. Then one missed or null caller heals the party
+   mid-dive. With registration done where a fight begins, no caller can get it wrong.
 6. Partial minutes are never lost. The seconds counted toward a member's next point carry
    over between settles and across a save and reload. So a member settled every 30
    seconds still gets 1 point a minute. *Default (author's pick, per the brief). The
@@ -72,10 +104,9 @@ with everyone in the hall at full.
    Every member heals at 1 point a minute whether or not the guild has a Cook. *Core
    Concept, The Mead Hall ("recovery happens on its own given time, and gold buys it
    sooner"). Adding the Cook is #189's work.*
-10. A member out on a sent mission keeps healing, the same as one in the hall. *Default
-    (author's pick, cheap to change). A sent mission "doesn't touch health" (EhrensDocs
-    Core Concept, missions change), and the brief excludes only a dive. See Needs your
-    call in the hand-back.*
+10. A member out on a sent mission keeps healing, the same as one in the hall. *User's
+    call, 2026-11-24. A sent mission "doesn't touch health" (EhrensDocs Core Concept,
+    missions change).*
 11. Injury and lost health are tracked separately. Each heals on its own count, and
     neither one pauses or speeds up the other. *Core Concept, Open Questions ("A member
     short of health is not the same as an injured one"); default for the case where both
@@ -137,9 +168,10 @@ with everyone in the hall at full.
   1-a-minute heal.
 - Healing inside a dive (the 5% between floors and the 15% at rest areas) and the Cook's
   dive healing. None of that changes.
-- A played mission. A member still comes home from one at full health, as EhrensDocs Core
-  Concept "A mission can be played as a battle" says. See Needs your call in the
-  hand-back.
+- A played mission's outcome. A member still comes home from one at full health, as
+  EhrensDocs Core Concept "A mission can be played as a battle" says (user's call,
+  2026-11-24). The only change here is that its fighters don't heal while it's on
+  (requirement 5).
 - Whether a member short of health may be sent: allowed, as today (requirement 2). The
   question isn't answered here.
 - A "full in N minutes" readout, a hall notice, or any other new UI beyond requirement
@@ -152,9 +184,3 @@ with everyone in the hall at full.
   it holds them back. Can a member be sent on a dive or a mission while still short of
   health, or must they be whole first? *(Core Concept, Open Questions. The originals'
   owner hasn't answered; the build allows it, per requirement 2.)*
-- *Proposal (PRD author's, not from the docs):* does a member out on a sent mission keep
-  healing, or does healing wait until they're back in the hall? The build heals them, per
-  requirement 10.
-- *Proposal (PRD author's, not from the docs):* a played mission sends everyone home at
-  full health. Now that health heals slowly, a hurt member can be healed in full by
-  playing any mission. Should a played mission bring its damage home the way a dive does?
