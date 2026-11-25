@@ -96,7 +96,8 @@ and with a battle saved partway through. Older saves load with their monsters un
 11. **How a battle is filled.** The battle rolls its cost multiplier exactly as today. Then
     enemies are drawn one at a time, up to 15. Each drawn enemy costs the rolled cost plus
     the worth of whatever gear it rolled. An enemy is kept if it is the first, or if the
-    running total of kept costs including it is no more than the battle's share; the first
+    running total of kept costs including it is no more than the battle's share — a total
+    landing exactly on the share is kept, armed or not; the first
     enemy that does not fit is discarded and drawing stops. *Test:* with no piece rolled
     the count is exactly `PowerBudget.EnemyCount(share, rolledCost)` for every share and
     cost; share 100, rolled cost 30, first enemy armed with an axe worth 11 and the rest
@@ -126,7 +127,10 @@ and with a battle saved partway through. Older saves load with their monsters un
     seeded RNG the whole dungeon is reproducible. The rule is not bent to keep existing
     #188 tests green: those that assume unarmed monsters (`FloorPowerDungeonTests.cs`
     ~188–206, with `ConstantRng(false)`, under which every chance roll arms the monster)
-    are narrowed to unarmed battles.
+    are narrowed to unarmed battles. Dungeon creation goes through
+    `internal static Dungeon Create(int id, Rank rank, int depth, IRng rng)`, which
+    `CreateStarting` calls with its own rank and rolled depth, its behaviour unchanged, so a
+    dungeon deep enough to reach armour (floor 11 on) can be tested. *Default (D14).*
 
 ### In a fight
 
@@ -160,7 +164,12 @@ and with a battle saved partway through. Older saves load with their monsters un
     monster has exactly the stats, cost and gear it was made with, whatever later changes
     to the worth rule (requirement 9) or the bands — so its stat points are kept as a figure
     of their own, as its cost already is, and never worked back out from cost less worth.
-    A monster with no gear has stat points equal to its cost. *Source:* EhrensDocs/The Dungeon.md
+    A monster with no gear has stat points equal to its cost. Saved stat points of 0 mean
+    "unset": the monster's stat points equal its cost. That covers a hand-built monster
+    spot that sets only its cost, and every older save. On load the unset stat points are
+    filled from the cost only after the existing step that turns a missing cost into the
+    rank's baseline (`SaveManager.SetMonsterPointsFromRank`), so a version 16 save gets the
+    baseline. *Default (D13).* *Source:* EhrensDocs/The Dungeon.md
     change "A floor's monsters are the same every dive, for now".
 20. **Saved in a battle.** A battle saved partway through holds each monster's pieces at
     their current durability, and restores to play on exactly as the original would have.
@@ -177,7 +186,8 @@ and with a battle saved partway through. Older saves load with their monsters un
 22. **A saved piece that cannot be true** — the wrong kind for the monster's type or slot,
     an undefined class, a minimum below 0 or above its maximum, a maximum durability below
     1, a current durability below 0 or above its maximum, or a monster whose stat points
-    are under 5 or above its cost — makes the save corrupt, the same as an impossible
+    are set and are 1 to 4 or above its cost — makes the save corrupt (stat points of 0
+    are unset, requirement 19, and never corrupt), the same as an impossible
     dungeon monster does today. The same check, with the same result, applies to a
     monster's pieces in a battle saved partway through. Nothing is checked against the
     bands. *Default (D10).*
@@ -217,6 +227,11 @@ keeps the monsters it was made with — so changing a default later reaches new 
   floor, so the floor chance does not apply.
 - **D12 — The three figures are not saved** (req 1). Each monster's gear is saved, which is
   all play needs; a board that shows the chance later would need them added.
+- **D13 — Stat points of 0 mean "unset", equal to the cost** (reqs 19, 22). Filled after
+  the older-save baseline step, so existing fixtures and version 16 saves load as today;
+  only 1 to 4 is corrupt.
+- **D14 — A `Create(id, rank, depth, rng)` seam under `CreateStarting`** (req 14). A test
+  seam only; the starting dungeon is made exactly as before.
 
 ## Out of Scope
 
