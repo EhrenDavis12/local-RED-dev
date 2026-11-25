@@ -214,6 +214,80 @@ archer animations. The yellow-shape clause is the
 project's standing rule for missing art. A monster's rank follows Combat's `## Enemies`:
 an enemy is the dungeon's rank or one grade below it. The first paragraph is unchanged.
 
+## Change: How a monster's gear is rolled and paid for, for now
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## The Dungeon`, the two paragraphs beginning "The chance an enemy carries a
+weapon or wears armour rises with the floor" (new paragraphs after them)
+
+**Now says:**
+
+```
+The chance an enemy carries a weapon or wears armour rises with the floor. A weapon's
+chance is 1 to 3 per cent on the first floor and rises 5 to 7 points a floor; armour's
+chance starts on floor 11 at 3 to 5 per cent and rises at the same rate a floor. A
+weapon is therefore always the likelier of the two.
+
+An enemy's cost is its stat points plus what its gear is worth, a piece being worth
+the middle of its rolled range — so arming an enemy means fewer of them on the floor.
+```
+
+**Proposed:**
+
+```
+The chance an enemy carries a weapon or wears armour rises with the floor. A weapon's
+chance is 1 to 3 per cent on the first floor and rises 5 to 7 points a floor; armour's
+chance starts on floor 11 at 3 to 5 per cent and rises at the same rate a floor. A
+weapon is therefore always the likelier of the two.
+
+An enemy's cost is its stat points plus what its gear is worth, a piece being worth
+the middle of its rolled range — so arming an enemy means fewer of them on the floor.
+
+For now each dungeon rolls its own three figures once, when it's created, each a whole
+number at even odds: the weapon's chance on the first floor, 1 to 3 per cent; the rise,
+5 to 7 points a floor, the same for both; and armour's chance on floor 11, 3 to 5 per
+cent. Every floor counts toward the rise, rest areas included — so with a start of 2 and
+a rise of 6, a weapon's chance is 32 per cent on floor 6 — and a chance of 100 or more
+means always. Each monster rolls its weapon chance and its armour chance for itself, one
+apart from the other. The starting dungeon is 10 floors deep, so its monsters carry
+weapons only.
+
+A monster's weapon is its type's weapon kind and its armour its type's armour kind, as a
+member's are, and a monster never carries a shield. For now a piece is the class of the
+monster's own rank, and its range and durability are rolled from the same bands, the same
+way, as any member's piece, starting at full durability. Deeper floors give better gear:
+once rolled, the piece's range slides toward the top of its band, keeping its width — not
+at all on the dungeon's first fighting floor, all the way to the top on its deepest, and
+evenly between, counting fighting floors only and rounding down to a whole figure. The
+slide stays inside the class's band, so F gear never outclasses F. Durability doesn't
+slide.
+
+A piece's worth is the middle of its range after the slide, an exact half rounding up:
+an axe of 9–13 is worth 11, and a knife of 4–7 is worth 6.
+
+In a fight a monster's gear adds, wears and breaks exactly as a member's does. For now
+the wear lasts that battle only, the same as a monster's health: every battle starts from
+the pieces as the dungeon made them, so a floor fought again on a later dive meets the
+same gear, unworn. A monster's gear is its own and never the guild's — it never goes into
+the stores.
+```
+
+**Why:** The game is built this way. The original gives each chance's range, the rise
+and what a piece is worth, but not whether the figures are rolled once a dungeon or
+afresh, whether rest areas count toward the rise, whether a monster's two chances are
+rolled together, what class a monster's piece is, how "the better the equipment those
+enemies carry" in Combat's `## Enemies` works, which way a half rounds, or what happens
+to a monster's gear after a battle. Battle Test's Test Dungeon table has a weapon at 32
+per cent on floor 6, which counts the rest area on 5, and says "any gear an enemy has is
+of its own type's kind". Every "for now" here is a default the build chose, not yet the
+user's word, and changing one reaches only dungeons made after it: a dungeon already made
+keeps its monsters and their gear. For the owner to reconcile: Battle Test's `## The
+Enemy Team` has its armour and the Fighter's sword at 10 durability, "matching the player
+team's own rolls", but `## The Player's Team` has every piece at the top of its
+durability band — 120 for every armour, 160 for the two-handed sword — and a monster's
+piece here starts at full durability, as a member's does.
+
 ## Change: How a floor's power becomes its enemies, for now
 
 > Proposed 2026-11-24 · for review
@@ -247,19 +321,31 @@ enemy down to 10.
 
 Each battle makes one roll for the cost, from half to twice the scaled figure at even
 odds. Its enemy count is its share divided by the rolled cost, rounded down, then held
-between 1 and 15. Every enemy in a battle has the same points: the share divided by the
-count, rounded to the nearest whole point, an exact half rounding up. That is the only
-rounding — neither the floor's power nor the share is rounded first — so a battle can
-spend a little more or a little less than its share. The same rule covers both edges:
-past 15, the share divided by 15 raises every enemy's points, and a share smaller than
-one rolled cost fields a single enemy holding the whole share.
+between 1 and 15. Every enemy in a battle has the same stat points: the share divided by
+the count, rounded to the nearest whole point, an exact half rounding up. That is the
+only rounding — neither the floor's power nor the share is rounded first — so a battle
+can spend a little more or a little less than its share. The same rule covers both
+edges: past 15, the share divided by 15 raises every enemy's points, and a share smaller
+than one rolled cost fields a single enemy holding the whole share.
 
-An enemy's cost is kept as a figure of its own and never worked back out from its stats,
-so gear can take part of the points without changing what a kill pays. For now the stats are
-rounded so they add up to the enemy's points: each stat's exact share is rounded down,
-and the points left over go one at a time to the stats with the largest fractions, the
-stat earlier in the ordering winning a tie. An F enemy never has fewer than 5 points, so
-no stat is below 1, and a 30-point enemy has exactly its type's starting stats.
+For now a battle with gear in it is filled one enemy at a time. Enemies are drawn up to
+15, each costing the rolled cost plus the worth of whatever gear it rolled, and one is
+kept if it's the first, or if the kept enemies' costs, its own included, come to no more
+than the share — landing exactly on the share is kept, armed or not. The first that
+doesn't fit is let go and no more are drawn. With no one armed, that is exactly the count
+above. The kept enemies still all have the same stat points: the share less the worth of
+all their gear, divided by the count and rounded the same way, never below 5. So a share
+of 100 at a rolled cost of 30, with the first enemy carrying an axe worth 11, fields two
+enemies, each on 45 stat points, costing 56 and 45.
+
+An enemy's cost is its stat points plus its gear's worth, and both are kept as figures of
+their own: the cost is never worked back out from the stats, nor the stat points from the
+cost less the worth. An unarmed enemy's cost is its stat points. For now the stats are
+rounded so they add up to the enemy's stat points: each stat's exact share is rounded
+down, and the points left over go one at a time to the stats with the largest fractions,
+the stat earlier in the ordering winning a tie. An F enemy never has fewer than 5 stat
+points, so no stat is below 1, and a 30-point enemy has exactly its type's starting
+stats.
 
 For now there's no enemy-type ladder: every floor draws each monster's type from all six
 combat types.
@@ -267,16 +353,19 @@ combat types.
 
 **Why:** The game is built this way. The original gives the power, the shares, the
 baseline, the roll and the 8 : 7 : 6 : 5 : 4 shape, but not the curve "climbing evenly"
-means, how the count and the points round, or how the ratio lands on whole stats; Battle
-Test's Test Dungeon table, rolled from these rules, shows the equal ratio. The starting
-dungeon's depth, the even odds, rounding the count down and having no type ladder yet
-are defaults the build chose. How the stats round, and which way an exact half goes, are
-waiting on the user's word, and are proposed as questions in "Questions on the floor
-power budget". For the owner to reconcile: Battle Test's `## What This Is For` says "The
-largest single battle an F-rank dungeon produces is 150 points", but these rules give
-300 when the deepest fighting floor rolls one battle; and Combat's `## Open Questions`
-still asks whether the enemies keep coming once the grid of fifteen fills, though this
-doc caps a battle at fifteen.
+means, how the count and the points round, how the ratio lands on whole stats, or how a
+battle is filled once its enemies carry gear; Battle Test's Test Dungeon table, rolled
+from these rules, shows the equal ratio. The starting dungeon's depth, the even odds,
+rounding the count down and having no type ladder yet are defaults the build chose, and
+so are filling a battle with gear in it one enemy at a time and its enemies sharing the
+stat points the gear leaves, never below 5 — the original's "arming an enemy means fewer
+of them on the floor" is what that keeps. How the stats round, and which way an exact
+half goes, are waiting on the user's word, and are proposed as questions in "Questions on
+the floor power budget". For the owner to reconcile: Battle Test's `## What This Is For`
+says "The largest single battle an F-rank dungeon produces is 150 points", but these
+rules give 300 when the deepest fighting floor rolls one battle; and Combat's `## Open
+Questions` still asks whether the enemies keep coming once the grid of fifteen fills,
+though this doc caps a battle at fifteen.
 
 ## Change: A floor's monsters are the same every dive, for now
 
@@ -298,10 +387,11 @@ A newly claimed dungeon starts near-blank. The enemy types and the floor layout 
 as the party reaches each floor.
 
 For now a floor's monsters are the same on every dive: how many battles the floor has,
-which monsters, their levels, their points and where they stand are set once, when the
-dungeon is created, and a dungeon from an older save keeps the monsters it was made with.
-Each monster stands on a node of its own, drawn at random. A floor counts as reached once
-the party starts its first battle there, or arrives there if it's a rest area.
+which monsters, their levels, their points, their gear and where they stand are set
+once, when the dungeon is created, and a dungeon from an older save keeps the monsters it
+was made with. Each monster stands on a node of its own, drawn at random. A floor counts
+as reached once the party starts its first battle there, or arrives there if it's a rest
+area.
 ```
 
 **Why:** The dive is built this way. "Appear as the party reaches each floor" reads as a

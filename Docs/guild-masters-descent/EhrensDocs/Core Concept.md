@@ -275,8 +275,9 @@ For now a played mission fields monsters drawn the way a dungeon's are, at the m
 rank, and how many depends on its secret variance: one fewer than the members it needs
 (never fewer than one) if it turned out easier, the same number if it's as stated, one
 more if it turned out harder. The counts are placeholders. A mission isn't a floor, so
-its monsters aren't built from a floor's power: each has its type's starting stats, and
-its kill pays its rank's value in full. Neither the monsters nor the variance shows
+its monsters aren't built from a floor's power: each has its type's starting stats,
+carries no gear, since there's no floor for the chance to come from, and its kill pays
+its rank's value in full. Neither the monsters nor the variance shows
 before the fight.
 
 The battle plays by every rule any battle has. Gear wears as it's used, and a member

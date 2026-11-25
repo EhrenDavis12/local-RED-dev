@@ -64,10 +64,12 @@ battle carries on, a save from before lost health healed at home loads every mem
 hall at full health, and a save from before enemies had a cost keeps each dungeon as it
 was made, three battles a floor, with every monster saved without a cost, on a floor or in
 a battle saved partway through, costing its rank's baseline: at F its type's starting
-stats, and a kill that pays the full F value, never nothing. A saved battle is never
-judged against a placeholder number — a fighter left waiting longer than its own cooldown
-is accepted — so rebalancing a placeholder can't turn a good save into one the game can't
-read.
+stats, and a kill that pays the full F value, never nothing. A save from before monsters
+carried gear keeps each dungeon as it was made, with every monster, on a floor or in a
+battle saved partway through, carrying no gear and keeping the cost and stats it was
+saved with. A saved battle is never judged against a placeholder number — a fighter left
+waiting longer than its own cooldown is accepted — so rebalancing a placeholder can't
+turn a good save into one the game can't read.
 
 Maximum health is never taken from a save: every member's and every monster's comes from
 the Constitution saved with them, so a save made before health followed Constitution
@@ -127,6 +129,13 @@ For now:
   twice, or a member in it twice — is emptied as it loads, and the save loads. A saved
   team holding a member who has since left the guild keeps them, and can't be picked
   until it's saved over.
+- A saved monster's weapon or armour that can't be true — not its own type's kind for
+  that slot, a class that doesn't exist, a range starting below 0 or above its top, a
+  maximum durability below 1, or a current durability below none or past its maximum —
+  makes the save one the game can't read, on a dungeon floor or in a battle saved partway
+  through. So do a monster's stat points saved above its cost, or below 5 other than 0,
+  which reads as the cost. Nothing is judged against the gear bands, so rebalancing a
+  band can't turn a good save into one the game can't read.
 
 ## Open Questions
 

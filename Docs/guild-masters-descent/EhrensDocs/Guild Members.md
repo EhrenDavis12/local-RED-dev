@@ -87,16 +87,17 @@ a combat" (a new paragraph after it)
 
 What a kill pays is exact and never rounded, and an enemy that cost more than its rank's
 baseline pays more than the rank value. The cost it pays on is the enemy's whole cost,
-never what its stats add up to. For now an enemy on a mission played by hand isn't built
-from a floor's power, so its kill pays its rank's value in full.
+its gear's worth included, never what its stats add up to. For now an enemy on a mission
+played by hand isn't built from a floor's power, so its kill pays its rank's value in
+full.
 ```
 
 **Why:** The game is built this way. The original scales a kill by the enemy's cost but
 doesn't say whether that rounds; paying exactly is what keeps its promise that a horde
-and a handful pay the same total. Paying on the cost rather than the stats means gear on
-a monster takes part of its points without changing what its kill pays. The
-pending "Who shares a combat's experience, for now" change to the paragraph before is
-unchanged.
+and a handful pay the same total. An armed enemy's cost is its stat points plus its
+gear's worth, so gear makes its cost differ from its stat points, and paying on the cost
+means its kill pays for the gear too. The pending "Who shares a combat's experience, for
+now" change to the paragraph before is unchanged.
 
 ## Change: Help counts where everyone stands right now
 

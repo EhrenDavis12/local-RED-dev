@@ -189,7 +189,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   loot is gold only, a floor is a series of battles whose gold drops at the end, turning
   back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level, a floor's monsters the
-  same every dive and where each stands, how a floor's power becomes its enemies for now,
+  same every dive and where each stands, how a monster's gear is rolled and paid for, for
+  now, how a floor's power becomes its enemies for now,
   re-entering for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
