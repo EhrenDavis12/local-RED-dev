@@ -32,8 +32,11 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 
    **Answer:**
 
-9. **Loot.** The newer docs have dives dropping gear. Going ahead with: keep it simple,
-   so gold-only loot in the first version. Fine? (Easy to add later.)
+9. **Loot.** Going ahead with: when a party clears a floor, each enemy on it has a
+   one-in-four chance to drop something — half the time a healing potion like the
+   shop's, otherwise one ore or one herb. Dropped weapons and armour aren't in yet.
+   Fine, or should an item of loot be something other than a healing potion? (Cheap to
+   change.)
 
    **Answer:**
 

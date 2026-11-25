@@ -21,6 +21,8 @@ dive on where it stopped — partway through a floor, if that's where it was. Cl
 game never undoes a death: a member who died on the dive is still dead when the game
 opens again. Nor does it give back a potion: one drunk on the dive is still gone, and
 every member on the dive opens again holding exactly the potions left in their slots.
+Nor does it roll a floor's loot again: a floor's drops come from the dive's own saved
+rolls.
 A member holds potions only on a raid, so as a save loads, whatever sits in the slots of
 a member not on the saved dive goes back to the stores — which is how a played mission
 the game closed partway through comes back: its undrunk potions in the stores, its drunk
@@ -37,9 +39,9 @@ has run — and what's left in every fighter's Luck bag, the enemies' too, so no
 drawn again as it loads. A Fighter or a Brute can be waiting on its special and a free
 attack at once, and the save holds both. It doesn't hold an order the player gave that
 hasn't been used yet: an ordered drink is lost when the game closes, and the battle
-carries on from the save with none. Saving doesn't bank anything, either: the gold found
-on the dive is still the party's until the dive ends, and what was found since the last
-rest area can still be lost.
+carries on from the save with none. Saving doesn't bank anything, either: the gold and
+loot found on the dive are still the party's until the dive ends, and what was found
+since the last rest area can still be lost.
 
 A battle doesn't move on while the game is closed or in the background: it picks up at
 the moment it stopped. A long gap between two frames is dropped rather than played fast —
@@ -67,7 +69,8 @@ a battle saved partway through, costing its rank's baseline: at F its type's sta
 stats, and a kill that pays the full F value, never nothing. A save from before monsters
 carried gear keeps each dungeon as it was made, with every monster, on a floor or in a
 battle saved partway through, carrying no gear and keeping the cost and stats it was
-saved with. A saved battle is never judged against a placeholder number — a fighter left
+saved with. A save from before loot loads with no ore or herb in the stores, and a dive
+saved in it carries no loot. A saved battle is never judged against a placeholder number — a fighter left
 waiting longer than its own cooldown is accepted — so rebalancing a placeholder can't
 turn a good save into one the game can't read.
 
@@ -107,6 +110,12 @@ For now:
   to none, and the save loads. So is a member holding fewer than none, who goes to none,
   and a member on the saved dive holding more than their slots take, whose extra goes to
   the stores.
+- A save holding fewer than no ore or herb of a kind and rank in the stores, or a
+  material or rank that doesn't exist, is fixed as it loads: that count goes to none,
+  and the save loads.
+- A saved dive's loot that can't be true — fewer than none of anything, a material or
+  rank that doesn't exist, or more found since the last rest area than the party carries
+  in all — makes the save one the game can't read, as the dive's gold does.
 - A special bar saved below empty or past full is brought back inside the bar as it
   loads, and a dive saved between battles where every bar should be empty — at a rest
   area, or before a floor's first battle — loads with them empty.

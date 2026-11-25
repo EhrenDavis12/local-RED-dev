@@ -3,9 +3,9 @@
 > **Status:** Change notes against `Equipment.md`, for its owner to review. The original is
 > not edited.
 
-## Change: For now a dive yields only gold
+## Change: For now no gear drops, and a mission yields only gold
 
-> Proposed 2026-11-11 · for review
+> Proposed 2026-11-25 · for review
 
 **Where:** `## Where Gear Comes From`, fourth and fifth paragraphs
 
@@ -34,16 +34,16 @@ rank for a mission drop.
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
 
-For now, though, loot is just gold. In the first version a dive or a mission yields gold and nothing
-else — no materials, no items, and no dropped gear.
+For now, though, no gear drops. In the first version a dive yields gold, ore, herb and
+healing potions, and a mission yields gold and nothing else.
 ```
 
-**Why:** Answered: for now loot will just be gold. Both paragraphs have the dungeon
-dropping gear and yielding materials or items, which the first version doesn't do; they
-stay as the longer-term design, and the new paragraph scopes the first version. Missions
-are held to gold too, for now: that's a default the build chose, not yet the user's word,
-and it's proposed as a question in Core Concept's change "Questions on missions'
-defaults".
+**Why:** Dropped gear isn't built. Both paragraphs have the dungeon dropping gear; they
+stay as the longer-term design, and the new paragraph scopes the first version. What a
+dive drops, and how it's carried home, is in The Dungeon's change "For now a dive drops
+ore, herb and healing potions, and no gear". Missions are held to gold, for now: that's a
+default the build chose, not yet the user's word, and it's proposed as a question in Core
+Concept's change "Questions on missions' defaults".
 
 ## Change: A dead member's gear takes a slot a piece, for now
 
@@ -70,7 +70,8 @@ For now each piece a dead member had on — weapon, armour, and a Tank's shield,
 or not — takes one slot. The room left is counted as the dive ends: the slots of the
 members still alive, a Porter's extra ones too, less the potions they still hold. A
 dead member's slots count for nothing, their potions take none of the room, and no
-potion or gold is left behind to make room for gear. The pieces come home in the order
+potion or gold is left behind to make room for gear, though loot is: the gear takes its
+slots first, and loot gets what's left. The pieces come home in the order
 the party was picked, each dead member's weapon first, then armour, then shield, and go
 back to the stores, held by no one; whatever no longer fits is left in the dungeon and
 lost. If a battle leaves no one in the party alive, every piece the party took in is
@@ -84,7 +85,9 @@ counted, which pieces come home when there isn't room for all, or what happens t
 gear when no one comes back. One slot a piece is a placeholder kept in the game's tuning
 file with the others. Which pieces come home first, and counting the room as the dive
 ends, are defaults the build chose, not yet the user's word, and they're proposed as
-questions in The Dungeon's change "Questions on the dive's defaults".
+questions in The Dungeon's change "Questions on the dive's defaults". Gear coming home
+before loot is a default too, proposed as a question in The Dungeon's change "Questions
+on loot".
 
 ## Change: Gear can be sold back to the shop
 
@@ -108,8 +111,8 @@ placeholder, to be balanced later.
 
 **Why:** Answered: sure, yes — the player can sell gear back to the shop. No doc said gear
 can be sold: `Core Concept.md`'s `## The Economy` has the guild selling items and
-materials at the shop, and that sentence is left as it is. With a dive yielding only gold
-for now, gear is the one thing the guild has to sell. What a piece's price is — each piece
+materials at the shop, and that sentence is left as it is. For now the shop buys back
+only gear: ore, herb and potions can't be sold. What a piece's price is — each piece
 is rolled, so two of the same kind and class differ, and crafted or dropped gear was never
 bought — is not settled by this.
 
@@ -138,8 +141,8 @@ defence bands do. For now, though, repair costs gold only: in the first version 
 piece is fixed for gold and no materials.
 ```
 
-**Why:** Answered: for now, repair costs gold only. Nothing in the first version gives the
-guild materials, so a broken piece could not otherwise be fixed. The paragraph and the
+**Why:** Answered: for now, repair costs gold only. Dives bring home ore and herb, but
+nothing spends them yet, so a broken piece is fixed for gold alone. The paragraph and the
 third paragraph's "for gold and materials" stay as the longer-term design; the new
 sentence scopes the first version. The open question on how much ore or herb a broken
 piece needs stays open for that longer-term design.

@@ -126,8 +126,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   question on dismissing a member on a dive, a mission can be played as a battle for
   now (its monsters not built from a floor's power), questions on played missions, a guild with no members and no way to hire gets
   nothing, for now, and lost health heals at home, for now).
-- `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (dive and mission loot is
-  gold only, selling gear back, repair costs gold only for now,
+- `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (no gear drops and a mission
+  yields only gold, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
   member's gear takes slots for now, the shop sells class F only for now, the Tank's
   swappable shield, the healing potion bought at
@@ -185,8 +185,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Orientation
   - Saving
   - Open Questions
-- `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, dive
-  loot is gold only, a floor is a series of battles whose gold drops at the end, turning
+- `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, a dive
+  drops ore, herb and healing potions and no gear, a floor is a series of battles whose gold drops at the end, turning
   back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level, a floor's monsters the
   same every dive and where each stands, how a monster's gear is rolled and paid for, for
@@ -194,7 +194,7 @@ The dungeon board, finding and entering dungeons, and training missions.
   re-entering for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
-  carrying, the guild's three saved teams, and questions on
+  carrying, questions on loot, the guild's three saved teams, and questions on
   the floor power budget).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open

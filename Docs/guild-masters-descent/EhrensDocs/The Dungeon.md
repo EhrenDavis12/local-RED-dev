@@ -27,9 +27,9 @@ against.
 **Why:** Answered: a guild starts off with a single F-rank dungeon. "Dungeons are found
 through the mission board" said every dungeon is found, and the starting one isn't.
 
-## Change: For now a dive yields only gold
+## Change: For now a dive drops ore, herb and healing potions, and no gear
 
-> Proposed 2026-11-11 · for review
+> Proposed 2026-11-25 · for review
 
 **Where:** `## The Dungeon`, the paragraph beginning "Dungeon diving yields materials or items"
 
@@ -44,15 +44,39 @@ drop a weapon or a piece of armour on certain floors.
 
 ```
 Dungeon diving yields materials or items, and the floor itself pays gold. A dive can also
-drop a weapon or a piece of armour on certain floors. For now, though, loot is just gold:
-in the first version a dive yields gold and nothing else — no materials, no items, and no
-dropped gear.
+drop a weapon or a piece of armour on certain floors. For now, though, no gear drops, and
+the materials and items are ore, herb and the healing potion. When a floor is cleared,
+each enemy on it has its own one-in-four chance to drop something: half the time one
+healing potion, the same as a bought one, and otherwise one ore or one herb, at even odds.
+The loot drops with the floor's gold, and only once every battle on the floor is won, so
+a floor the party leaves early drops nothing, and neither does a rest area. A floor's
+drops are rolled again each time it is cleared, from the dive's own saved rolls, so
+saving and loading can't roll them a second time. Each unit of ore or herb records the
+rank of the dungeon it came from.
+
+Each unit of loot takes one slot. Until the dive ends the loot is the party's as a whole,
+never one member's: nothing limits what the party gathers on the way down, and a potion
+that drops can't be drunk on the dive it dropped on. The room is counted once, as the
+dive ends — the free slots of the members still alive, a Porter's extra ones too, less
+the potions they still hold — and a fallen member's gear takes its share first. The loot
+fills what's left in this order, and the rest is lost: healing potions, then ore, then
+herb, and within a kind a higher rank before a lower one. Going home at a rest area
+brings everything that fits. Turning back between rest areas, a stand-off included,
+loses the loot found since the last rest area, and the rest comes home if it fits. A
+party with no one left alive brings nothing out. What comes home goes into the guild's
+stores: ore and herb counted by kind and rank, and a dropped potion with the bought ones.
 ```
 
-**Why:** Answered: for now loot will just be gold. The paragraph and the list after it
-name materials, items and dropped gear as what a dive yields, which the first version
-doesn't do; the new sentence scopes the first version and leaves the longer-term design
-standing.
+**Why:** The game is built this way. The paragraph and the list after it name materials,
+items and dropped gear as what a dive yields, but not which materials and items there
+are, when they drop, or how they're carried. Ore and herb are the original's two
+materials, and one enemy in four, the same for every rank and floor, is its drop rate.
+Losing what was found since the last rest area on turning back is the original's
+"Retreating always costs the loot gathered since the last safe floor". Half the drops
+being an item is the user's placeholder for the original's open question on how often a
+drop is one rather than the other. The rest are defaults the build chose, not yet the
+user's word: counting the room as the dive ends is asked in "Questions on carrying", and
+the others in "Questions on loot". Dropped gear stays out of the first version.
 
 ## Change: A floor is a series of battles that scrolls right into the next
 
@@ -115,7 +139,7 @@ Every 5th floor is a safe rest area, where every member gets back fifteen per ce
 instead of the five, not both, and the player may choose to return to the top and exit
 the dungeon. The Cook adds to both figures, covered in the Specialists doc. The party can
 turn back anywhere, not only at a rest area — but leaving between rest areas loses the
-gold found since the last rest area. "Anywhere" includes the middle of a battle: a
+gold and loot found since the last rest area. "Anywhere" includes the middle of a battle: a
 Retreat button is there all through a floor's battles, and the party can leave with it at
 any moment. For now a battle that ends in a stand-off counts as the party turning back
 there.
@@ -619,8 +643,47 @@ above are unchanged.
 are packed at the start of a raid and come back at its end, for now": each member
 drinking from their own, and a played mission, which has no planning step, packing one
 each in pick order while the stores last, where a dive packs what the player chose. The
-last doesn't come up until a dive yields items. The pending changes to this list above
-are unchanged.
+last has a default too, in "For now a dive drops ore, herb and healing potions, and no
+gear": loot takes room only on the way out, counted as the dive ends. The pending changes
+to this list above are unchanged.
+
+## Change: Questions on loot
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- When the free slots at the end of a dive can't hold both, which comes home first: the
+  loot, or a fallen member's gear?
+- What is "an item"? The Dungeon and Equipment say a dive yields "materials or items",
+  but no doc names an item a dive drops.
+- Does a unit of ore or herb carry a rank, from the dungeon it came from, or are all ore
+  alike?
+- Does "one enemy in four" mean each enemy rolls on its own, or that exactly a quarter of
+  a floor's enemies drop?
+- How often is a materials drop ore rather than herb, and how much is one drop?
+- When the same floor is cleared on a later dive, are its drops rolled again, or fixed
+  when the dungeon is made, as its monsters are?
+- Can a healing potion that drops on a dive be drunk on that same dive?
+- When the loot doesn't all fit on the way out, which is left behind?
+```
+
+**Why:** The dive is built with a default for now on each of these, in "For now a dive
+drops ore, herb and healing potions, and no gear": the gear first, the healing potion,
+each unit recording its dungeon's rank, each enemy rolling on its own, even odds and one
+unit a slot, drops rolled again each dive, a dropped potion not drunk on its dive, and
+potions then ore then herb, a higher rank first. None of the docs settles them. The
+pending changes to this list above are unchanged.
 
 ## Change: The guild keeps three saved teams
 
