@@ -126,8 +126,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   question on dismissing a member on a dive, a mission can be played as a battle for
   now (its monsters not built from a floor's power), questions on played missions, a guild with no members and no way to hire gets
   nothing, for now, and lost health heals at home, for now).
-- `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (Dorms visibility, open
-  question, dive and mission loot is gold only, selling gear back, repair costs gold only for now,
+- `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (dive and mission loot is
+  gold only, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
   member's gear takes slots for now, the shop sells class F only for now, the Tank's
   swappable shield, the healing potion bought at
