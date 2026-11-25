@@ -207,22 +207,12 @@ name written on it.
 A monster is given a rank and a level like a member is, and uses the same stat rules. For
 now every monster in a dungeon is the dungeon's own rank — F, as the guild's starting
 dungeon is, and there's no grade below F — and level 1.
-
-In a battle, for now, a monster's damage is its damage stat alone and its defence its
-Constitution alone — there's no weapon or armour in either.
 ```
 
 **Why:** Answered: the enemies are monsters, but for now we might be limited to just the
-archer animations. Answered too, on gear: fixed numbers. The yellow-shape clause is the
+archer animations. The yellow-shape clause is the
 project's standing rule for missing art. A monster's rank follows Combat's `## Enemies`:
 an enemy is the dungeon's rank or one grade below it. The first paragraph is unchanged.
-How a monster fights is a default for now: the answer on gear was fixed numbers, read as
-the monster's own stats with nothing added for gear, while The Dungeon's `## The Dungeon`
-gives an enemy a chance of a weapon from the first floor and of armour from floor 11,
-rising with the floor.
-For the owner to reconcile: `Individual Types.md` explains two type traits by gear — the
-Brute's tanned hide adds a little defence, and the Rogue's weapon adds less damage — and
-a monster Brute or Rogue carries none for now.
 
 ## Change: How a floor's power becomes its enemies, for now
 
@@ -265,8 +255,7 @@ past 15, the share divided by 15 raises every enemy's points, and a share smalle
 one rolled cost fields a single enemy holding the whole share.
 
 An enemy's cost is kept as a figure of its own and never worked back out from its stats,
-so gear can later take part of the points without changing what a kill pays. Monsters
-carry no gear for now, so all of an enemy's points become stats. For now the stats are
+so gear can take part of the points without changing what a kill pays. For now the stats are
 rounded so they add up to the enemy's points: each stat's exact share is rounded down,
 and the points left over go one at a time to the stats with the largest fractions, the
 stat earlier in the ordering winning a tie. An F enemy never has fewer than 5 points, so

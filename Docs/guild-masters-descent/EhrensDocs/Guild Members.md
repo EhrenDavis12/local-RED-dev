@@ -94,7 +94,7 @@ from a floor's power, so its kill pays its rank's value in full.
 **Why:** The game is built this way. The original scales a kill by the enemy's cost but
 doesn't say whether that rounds; paying exactly is what keeps its promise that a horde
 and a handful pay the same total. Paying on the cost rather than the stats means gear on
-a monster later takes part of its points without changing what its kill pays. The
+a monster takes part of its points without changing what its kill pays. The
 pending "Who shares a combat's experience, for now" change to the paragraph before is
 unchanged.
 

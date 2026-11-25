@@ -32,11 +32,8 @@ Capacity is counted in slots: every member carries 5, and a healing potion or an
 
    **Answer:**
 
-### Enemies
-
-9. **Enemy gear and loot.** The newer docs have monsters wearing gear and dives dropping
-   gear. Going ahead with: keep it simple, so no monster gear and gold-only loot in the
-   first version. Fine? (Easy to add later.)
+9. **Loot.** The newer docs have dives dropping gear. Going ahead with: keep it simple,
+   so gold-only loot in the first version. Fine? (Easy to add later.)
 
    **Answer:**
 
