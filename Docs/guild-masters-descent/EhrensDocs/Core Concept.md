@@ -288,10 +288,11 @@ retreat pays none.
 For now a played mission has no timer: it ends the moment its battle does, and it never
 shows among the missions out. A win pays the mission's gold at once, and nothing else. A
 loss, a stand-off or a retreat pays nothing, and every member sent comes home injured,
-whoever fell; a won mission injures no one. Quitting from the pause menu is a retreat, and
-once the battle is decided neither one can undo it. No one dies: a member brought to no
-health drops out of the fight, and after it everyone sent is back at full health and still
-on the roster. The battle's result says how it went, so the hall's notice adds nothing.
+whoever fell; a won mission injures no one. Leaving with the Retreat button is a retreat,
+and so is quitting from the pause pop-up in a development build; once the battle is
+decided neither one can undo it. No one dies: a member brought to no health drops out of
+the fight, and after it everyone sent is back at full health and still on the roster. The
+battle's result says how it went, so the hall's notice adds nothing.
 
 The battle itself isn't saved, and the save doesn't change. If the game is closed partway
 through, the mission is gone, unpaid, and nobody is injured, and the potions packed for
@@ -309,7 +310,8 @@ in the first version, as F-rank jobs that pay gold" now says its "no experience,
 covers only a mission that's sent. Having no timer departs from the original's "Missions
 are timed", so it stays a question. Every "for now" here is a default the build chose, not
 yet the user's word, and each one is proposed as a question in "Questions on played
-missions".
+missions". Answered 2026-11-24: the pause is only in a development build, so in the game
+as released a played mission is left with the Retreat button.
 
 ## Change: Questions on played missions
 

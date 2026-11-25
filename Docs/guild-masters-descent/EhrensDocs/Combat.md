@@ -28,7 +28,7 @@ Some enemy types can reposition mid-battle too, but not all of them can.
 **Why:** The original lets the player change formation mid-battle and names no cost, so it
 stays free for now.
 
-## Change: Status line on formation cost, speed and pausing
+## Change: Status line on formation cost and speed
 
 > Proposed 2026-11-11 · for review
 
@@ -47,12 +47,15 @@ stays free for now.
 
 ```
 > **Status:** Early design. Nothing is built yet — the grid, the cooldown pacing, the Luck
-> reset's chance, how a special fires, what formation costs and the fight's speed are
-> settled, and for now the fight can be paused; whether the enemies keep coming once the
-> grid is full, and whether the Mage's field bites a member that drinks are not.
+> reset's chance, how a special fires, the never-pausing simulation, what formation costs
+> and the fight's speed are settled; whether the enemies keep coming once the grid is
+> full, and whether the Mage's field bites a member that drinks are not.
 ```
 
-**Why:** What formation costs and the fight's speed are now settled, and the fight can be paused for now (see the changes on Formation and Player Input).
+**Why:** What formation costs and the fight's speed are now settled (see the changes on
+Formation and Player Input). The never-pausing simulation stays as the original has it:
+the pause button is only in a development build, in "The fight pauses only in a
+development build".
 
 ## Change: Formation-cost question answered
 
@@ -128,8 +131,7 @@ and a stand-off kills no one further.
 ```
 
 **Why:** The combat engine is built this way. No doc says whether a battle can run forever.
-The original paragraph is unchanged apart from the pause proposed in "The fight can be
-paused, for now"; the new one sits after it.
+The original paragraph is unchanged; the new one sits after it.
 
 ## Change: A special puts nothing in its owner's bar, for now
 
@@ -645,11 +647,12 @@ original's own: Cooldowns calls the opening check a separate roll at the reset's
 and Luck Checks has every Luck check a character makes draw from the same bag. The pending
 changes to this list above are unchanged; these go after the entries they add.
 
-## Change: The fight can be paused, for now
+## Change: The fight pauses only in a development build
 
 > Proposed 2026-11-16 · for review
 
-**Where:** `## Player Input`, second paragraph
+**Where:** `## Player Input`, the paragraph beginning "The fight never pauses" (a new
+paragraph after it)
 
 **Now says:**
 
@@ -662,16 +665,21 @@ using a buff potion.
 **Proposed:**
 
 ```
-Nothing waits for the player. The fight runs from start to finish, and the player acts
-while it's running — changing formation, marking the focus target and using a buff potion.
-For now there's a pause button: it stops the fight and opens a pop-up to resume it or, on
-a dive or a played mission, quit. While it's paused the player can't mark the focus target
-or retreat.
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
+
+A development build — the Unity editor or a Development Build player — has a pause
+button, so the developer can stop the fight to take screenshots. It stops the fight and
+opens a pop-up to resume it or, on a dive or a played mission, quit. While it's paused
+the player can't mark the focus target or retreat. A release build, TestFlight included,
+has no pause: there the player leaves a dive or a played mission with the Retreat button.
 ```
 
-**Why:** The user, 2026-11-16: "Leave the pause button for now we can take it out later."
-The battle screen is built with it. This departs from the original's "The fight never
-pauses", so it stands for now.
+**Why:** The battle screen is built with a pause button. The user, 2026-11-24: "Pause
+make this a dev only feature. So i can pause and take screen shots if needed. but for
+released games this is not an option." So the original's "The fight never pauses" holds
+for the game as released, and the pause is only a tool for the developer.
 
 ## Change: The fight can be sped up, and only shows sooner
 

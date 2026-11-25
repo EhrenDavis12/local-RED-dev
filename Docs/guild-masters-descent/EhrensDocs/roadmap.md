@@ -110,8 +110,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   special putting nothing in its owner's bar, every dive starting with every bar empty,
   an effect's count, its end and a second cast stacking, how a taunt is spent, a
   specialist's cooldown, open questions on specials, taunts and the dive, on cooldown
-  combat's defaults, and on the special bar, the fight pausing for now, the fight's
-  speed, the speed question answered, a close-range attack waiting for its target to be
+  combat's defaults, and on the special bar, the fight pausing only in a development
+  build, the fight's speed, the speed question answered, a close-range attack waiting for its target to be
   home, attacks on the same tick going in turn, questions on that wait, every
   character's own Luck bag and when no token is pulled for now, the opening check as a
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
