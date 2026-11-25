@@ -118,7 +118,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   drinking a potion as an order used at the next cooldown for now (the battle screen's
   drink buttons and Auto drinking included), questions on drinking a potion, a new
   Rogue's worked cooldown of 71 ticks, a special going off by itself in its own turn,
-  questions on it, and a tie for least health and how the rows share the eighty for now).
+  questions on it, a tie for least health and how the rows share the eighty for now, using
+  a buff potion mid-fight for now, a God's Wish's Trues drawn first and turned back at the
+  battle's end for now, and questions on buff potions).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -130,8 +132,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   yields only gold, selling gear back, repair costs gold only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
   member's gear takes slots for now, the shop sells class F only for now, the Tank's
-  swappable shield, the healing potion bought at
-  the shop, F rank and healing a fixed 18, for now, a member's gear locked for a dive for
+  swappable shield, the shop selling healing potions and the five buffs, F rank and
+  fixed, for now, a member's gear locked for a dive for
   now, a broken shield adding nothing, questions on shields and potions, and a span
   counted in whole figures, ends included).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
@@ -177,6 +179,7 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Battle
     - Guild rank
     - Finding dungeons
+    - Buff potions
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
   health afresh as a save loads, keeping each member's health and every Luck bag, any
@@ -194,8 +197,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   re-entering for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
-  carrying, questions on loot, the guild's three saved teams, and questions on
-  the floor power budget).
+  carrying, buff potions packed for a dive and returned at its end for now, questions on
+  loot, questions on buff potions in the dive, the guild's three saved teams, and
+  questions on the floor power budget).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).

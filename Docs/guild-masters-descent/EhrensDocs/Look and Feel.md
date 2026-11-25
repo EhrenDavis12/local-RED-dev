@@ -410,8 +410,9 @@ for the Tank's shields, and the red round flask, which is the health potion. The
 left out of the game and out of the shop — the food and the jug, the ring, the amulet,
 the key, the chest, the scroll, the boot, the curved sword, the arrows, the crystal and
 the other two flasks. The user, 2026-11-14: "remove the 21 pictures that nobody uses we
-don't need them them from the shop too". Ore and herb have no picture yet, so the victory
-list draws each as the missing-art stand-in, a bright yellow shape with its name on it.
+don't need them them from the shop too". Ore, herb and the five buff potions have no
+picture yet, so the victory list, the shop and the battle screen draw each as the
+missing-art stand-in, a bright yellow shape with its name on it.
 
 ## Palette
 

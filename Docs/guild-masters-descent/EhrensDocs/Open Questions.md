@@ -1,6 +1,6 @@
 # Open Questions — for the design docs' owner
 
-> **Status:** Questions the build is waiting on, asked 2026-11-17, 2026-11-19 and 2026-11-20, for the design docs' owner to answer. Write an answer under each question; "going ahead with" means the game already does that, so answer only if you want it different.
+> **Status:** Questions the build is waiting on, asked 2026-11-17, 2026-11-19, 2026-11-20 and 2026-11-25, for the design docs' owner to answer. Write an answer under each question; "going ahead with" means the game already does that, so answer only if you want it different.
 
 ## How to answer
 
@@ -10,7 +10,7 @@ Reply under each question, or by number (e.g. "1: 110, 3: A"). Skip any you want
 
 ### Loot and carrying
 
-Capacity is counted in slots: every member carries 5, and a healing potion or an item of loot takes 1 slot each.
+Capacity is counted in slots: every member carries 5, and a healing potion, a buff potion or an item of loot takes 1 slot each.
 
 3. **A dead member's gear.** When a member dies in the dungeon, how does their gear get
    home? Going ahead with B, one slot a piece. (Fairly easy to change.)
@@ -168,5 +168,43 @@ guild's rank. Not built yet; waits on these and on guild rank.
 
 29. **Buying a dungeon.** Can a dungeon ever be bought? The docs only describe finding
     and claiming them. Going ahead with: no buying. (Cheap to change.)
+
+    **Answer:**
+
+### Buff potions
+
+The five buff potions — Wind Step, Dragon's Vein, Rock Skin, Ancient Gift and God's Wish —
+are in the game. The player uses one from the battle screen and it helps the whole party
+for the rest of that fight.
+
+30. **Buffs at the shop.** Buffs come from the Alchemist, who isn't in the game yet.
+    Going ahead with: the shop sells all five from the start, 30 gold each and God's Wish
+    40, and every one raises its stat by a fixed 3 (God's Wish turns 2 Falses into
+    Trues). Fine? (Cheap to change.)
+
+    **Answer:**
+
+31. **Where a buff reaches.** Going ahead with: a buff's raise counts everywhere the
+    fight uses that stat — the support ring's help, which of two attacks on the same tick
+    goes first, and the Tank's Shields Up included. Rock Skin still never adds health.
+    Fine? (Cheap to change.)
+
+    **Answer:**
+
+32. **God's Wish's Trues.** After God's Wish a member's bag holds its own Trues and up to
+    2 extra ones. Going ahead with: when a True is drawn, an extra one is used up first, so
+    the member's own Trues are kept for later fights. Or should it be either one at
+    random? (Cheap to change.)
+
+    **Answer:**
+
+33. **Whose buff gets used.** When several members carry the buff being used, going ahead
+    with: it comes from whoever was picked first for the party. That decides whose slot is
+    free for loot at the end of the dive. Fine? (Cheap to change.)
+
+    **Answer:**
+
+34. **Auto and buffs.** Going ahead with: Auto never uses a buff; only the player does.
+    Should Auto use them too, and when? (Cheap to change.)
 
     **Answer:**

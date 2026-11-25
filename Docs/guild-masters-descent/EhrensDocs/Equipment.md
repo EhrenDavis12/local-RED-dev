@@ -324,9 +324,9 @@ just like all other gear, and `## Durability` already says broken gear contribut
 nothing. As written, a Tank whose armour breaks would lose its working shield's defence
 too.
 
-## Change: For now the only potion is a healing potion, bought at the shop
+## Change: For now the shop sells healing potions and the five buffs
 
-> Proposed 2026-11-14 · for review
+> Proposed 2026-11-25 · for review
 
 **Where:** `## What a Member Carries`, last paragraph (a new paragraph after it)
 
@@ -345,24 +345,32 @@ The weapon the Rogue carries adds less damage than the Fighter's. The Brute wear
 hide, which adds a little defence on top of its Constitution — less than a properly
 armoured type has.
 
-For now the only potion is a healing potion, and the shop sells it. A healing potion
-costs 20 gold, a placeholder to be balanced later, and goes into the guild's stores. A
-potion can't be sold back to the shop. Every potion the shop sells is F rank, and for now
-each one heals the same 18 health points, a placeholder inside the F band of 10 to 25;
-no potion rolls an amount of its own.
+For now the shop sells every potion the guild can get: healing potions, and the five
+buffs — Wind Step, Dragon's Vein, Rock Skin, Ancient Gift and God's Wish. A healing
+potion costs 20 gold, each of the four stat buffs 30 and God's Wish 40, placeholders to be
+balanced later, and every potion bought goes into the guild's stores. A potion can't be
+sold back to the shop. Every potion the shop sells is F rank, and for now none rolls an
+amount of its own: each healing potion heals the same 18 health points, a placeholder
+inside the F band of 10 to 25, and each stat buff raises its stat by the same 3, a
+placeholder inside the F band of 2 to 5.
 ```
 
-**Why:** Answered 2026-11-14: "only healing potions for now". The originals say how a
-healing potion goes into a dive, how a member drinks one and how much it heals, but not
-where a guild gets one before it holds an Alchemist, who unlocks at guild rank D; for now
-the shop sells them. The price is kept in the game's tuning file with the other
-placeholders. Selling one back is a default the build chose, not yet the user's word, and
-it's proposed as a question in "Questions on shields and potions". The shop selling F
-rank, and every shop potion healing a fixed 18, are the user's going-ahead defaults,
-2026-11-18: "every shop potion heals a fixed 18, a placeholder in the tuning file". The
-Alchemist's bands set a potion's heal by its rank, and the Alchemist's Intelligence and
-Luck place it inside its band; with no Alchemist, nothing places a shop potion, so every
-one heals the same, inside the F band.
+**Why:** The originals say how a healing potion goes into a dive, how a member drinks one
+and how much it heals, and what the five buffs do, but not where a guild gets a potion
+before it holds an Alchemist, who unlocks at guild rank D; for now the shop sells them.
+The user, 2026-11-24, on the buffs: "build them now if nothing is blocking". The prices
+are kept in the game's tuning file with the other placeholders. Selling one back is a
+default the build chose, not yet the user's word, and it's proposed as a question in
+"Questions on shields and potions". The shop selling F rank, and every shop healing
+potion healing a fixed 18, are the user's going-ahead defaults, 2026-11-18: "every shop
+potion heals a fixed 18, a placeholder in the tuning file". The Alchemist's bands set a
+potion's strength by its rank, and the Alchemist's Intelligence and Luck place it inside
+its band; with no Alchemist, nothing places a shop potion, so every one of a kind is the
+same, inside the F band. The shop selling the buffs, their prices, and each stat buff's
+fixed 3 are defaults the build chose, not yet the user's word, proposed as a question in
+Open Questions. Using a buff is in Combat's change "Using a buff potion mid-fight, for
+now", and carrying one in The Dungeon's change "Buff potions are packed for a dive and
+come back at its end, for now".
 
 ## Change: A member's gear can't change during a dive, for now
 
@@ -442,7 +450,7 @@ questions on stores and condition" adds
 
 **Why:** None of the docs answers these, and the answers on shields and potions leave them
 open. The game is built with a default for now on selling a potion back, in "For now the
-only potion is a healing potion, bought at the shop", and on each shield question: only
+shop sells healing potions and the five buffs", and on each shield question: only
 the Tank carries a shield; a Tank with no shield equipped can still use Shields Up; a
 shield spends a use on every hit the Tank takes, wherever armour spends one, and Shields
 Up spends none of it; shields have classes and rolled numbers, built the way armour is; a

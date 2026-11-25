@@ -518,6 +518,48 @@ happens to a dead member's, are already asked in Equipment's change "Questions o
 shields and potions". Each member starting at one, and the counts not being saved, are
 cheap to change.
 
+## Change: Buff potions are packed for a dive and come back at its end, for now
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Entering the Dungeon`, last paragraph (new paragraphs after it, after the
+ones "Healing potions are packed at the start of a raid and come back at its end, for now"
+adds)
+
+**Now says:**
+
+```
+Potions take up the party's carrying capacity, and they're added to it at the start of
+the raid.
+```
+
+**Proposed:**
+
+```
+Potions take up the party's carrying capacity, and they're added to it at the start of
+the raid.
+
+A buff potion takes one slot, the same as a healing potion, and counts as a potion
+everywhere slots are counted, the room counted at the dive's end included. For a dive,
+the player chooses how many of each buff kind each member packs while planning the party,
+and going in or re-entering packs exactly those from the stores. Every kind starts at none
+for each member. A member's potions of every kind together never pass their slots, and the
+party's total of a kind never passes what the stores hold of it; while choosing, the
+player sees what's left of each kind in the stores and how many of the member's slots are
+still free. For now a played mission packs no buffs, and no buff drops as loot on a dive.
+
+When the raid ends, every buff left unused goes back to the stores, a dead member's too,
+and one used stays gone. If the whole party falls on a dive, every buff packed for it is
+lost.
+```
+
+**Why:** The game is built this way, carrying buffs the way it carries healing potions.
+The original's "A potion takes 1 slot" doesn't say whether a buff counts as one, and
+nothing says how buffs are packed or where the unused ones go. A played mission packing
+none, and no buff dropping as loot, are defaults the build chose, not yet the user's word,
+proposed as questions in "Questions on buff potions in the dive". Each kind starting at
+none is cheap to change.
+
 ## Change: A question on what gold a retreat keeps
 
 > Proposed 2026-11-14 · for review
@@ -684,6 +726,31 @@ each unit recording its dungeon's rank, each enemy rolling on its own, even odds
 unit a slot, drops rolled again each dive, a dropped potion not drunk on its dive, and
 potions then ore then herb, a higher rank first. None of the docs settles them. The
 pending changes to this list above are unchanged.
+
+## Change: Questions on buff potions in the dive
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- Does a played mission carry buff potions, and if so, how many of each, with no planning
+  step to choose them?
+- Can a buff potion drop as loot on a dive?
+```
+
+**Why:** The game is built with a default for now on both, in "Buff potions are packed for
+a dive and come back at its end, for now": a played mission packs none, and no buff
+drops. The pending changes to this list above are unchanged.
 
 ## Change: The guild keeps three saved teams
 

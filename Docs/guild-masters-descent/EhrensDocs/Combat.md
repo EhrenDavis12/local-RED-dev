@@ -1212,3 +1212,142 @@ empty row and the targets inside one row. Splitting the tie evenly, picking the 
 first, and weighting a row by its place on the grid even across an empty row are the
 user's going-ahead defaults, 2026-11-24. The original's own question on the far-range
 weight is unchanged and stays open.
+
+## Change: Using a buff potion mid-fight, for now
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Player Input`, the paragraph beginning "The fight never pauses" (new
+paragraphs after it, after the ones the pending changes above add)
+
+**Now says:**
+
+```
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
+```
+
+**Proposed:**
+
+```
+The fight never pauses, and nothing waits for the player. It runs from start to finish,
+and the player acts while it's running — changing formation, marking the focus target and
+using a buff potion.
+
+The player can use a buff at any moment the fight is running. Like a formation change, a
+use takes no fight time: it costs no one an attack or a cooldown, charges no bar and
+pulls no Luck token. It takes effect between two ticks, once whatever is due on the tick
+in progress has resolved; if the battle ends first, nothing is used. It takes one potion
+of its kind from a living member holding one, and reaches every party member alive at
+that moment, a specialist too, for the rest of that battle. No one is reached later, no
+monster is reached at all, and a fallen member's buffs can't be used.
+
+A buff's raise counts everywhere the battle reads that stat: damage, defence, each
+cooldown wait, the support ring's help, which of two attacks ready on the same tick goes
+first, and the figure the Tank's Shields Up gives. It never reaches anything outside the
+battle, and Rock Skin's never reaches health. Wind Step shortens only a wait that begins
+after it's used; a wait already running isn't shortened, and an attack already ready
+keeps its place in the order.
+
+For now:
+
+- Auto never uses a buff. Only the player does.
+- When more than one living member holds the kind being used, it comes out of the first
+  of them in the order the party was picked, so theirs is the slot freed for loot.
+- On the battle screen there's one button for each buff kind the living party still
+  holds, showing how many are left. Pressing it uses one. A buff button can't be pressed
+  while the fight is paused.
+```
+
+**Why:** The original says the player uses a buff while the fight runs, that it costs no
+member an attack, and that it reaches every member of the party, but not when in the
+fight it lands, whether the fallen or the monsters are reached, whose potion it uses, or
+which of the battle's uses of a stat its raise counts in. The combat engine is built this
+way. Auto never using a buff, whose potion is used, and the raise counting in the support
+ring's help, the same-tick order and Shields Up are defaults the build chose, not yet the
+user's word, proposed as questions in "Questions on buff potions". Rock Skin never
+reaching health is the original's own, in Specialists' `## The Alchemist`. The buttons are
+cheap to change; where they sit, and how a running buff is shown, are left to the look of
+the game.
+
+## Change: A God's Wish's Trues are drawn first and turn back when the battle ends, for now
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Luck Checks`, the paragraph beginning "Every Luck check a character makes"
+(a new paragraph after it)
+
+**Now says:**
+
+```
+Every Luck check a character makes draws from the same bag, so the checks compete with
+each other for the same tokens.
+```
+
+**Proposed:**
+
+```
+Every Luck check a character makes draws from the same bag, so the checks compete with
+each other for the same tokens.
+
+A God's Wish turns up to 2 of the Falses left in each reached member's bag into Trues: a
+bag with fewer than 2 Falses left converts what it has, and the bag holds as many tokens
+as before. For now, when a True is drawn while any converted True is still in the bag, a
+converted one is spent first, whatever the check. When the battle ends — won, lost, in a
+stand-off, or with the party turning back out of it — every converted True still unspent
+turns back into a False and stays in the bag. A God's Wish used while one is already
+running turns back what's left of the first before converting afresh, so a bag never
+holds more than 2 converted Trues.
+```
+
+**Why:** Specialists' `## The Alchemist` says God's Wish turns 2 Falses into Trues, that a
+converted True is spent when it's drawn, and that any still unspent turn back when the
+battle ends, but not which True a draw spends when the bag holds both, what a bag with
+fewer than 2 Falses left does, or what a second God's Wish does to the first's. The
+combat engine is built this way. A converted True being spent first is a default the
+build chose, not yet the user's word, proposed as a question in "Questions on buff
+potions"; it decides how many Trues the bag keeps once the battle ends. A second God's
+Wish replacing the first follows the original's "Using the same buff again replaces
+what's already running".
+
+## Change: Questions on buff potions
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- For a far-range attacker, each row further back counts double when the eighty is
+  shared out. Is that the right weight, and should it hold the same way on a grid three
+  rows deep as it does on the five-wide one?
+```
+
+**Proposed:**
+
+```
+- For a far-range attacker, each row further back counts double when the eighty is
+  shared out. Is that the right weight, and should it hold the same way on a grid three
+  rows deep as it does on the five-wide one?
+- Support-ring help is a share of the member's primary stat. When a buff raises that
+  stat, is the help worked out on the raised stat?
+- Two attacks ready on the same tick go in order of the higher Dexterity of its own, help
+  from the support ring left out. Does Wind Step's raise count in that Dexterity?
+- The Tank's Shields Up figure is his Constitution plus a roll of his armour, given to the
+  allies behind him as defence. Rock Skin reaches defence only — does it reach that
+  figure?
+- When several living members hold the kind being used, whose slot does it come out of?
+  It decides whose slot is free for loot at the dive's end.
+- After God's Wish, a member's bag holds its own Trues and up to 2 converted ones. When a
+  True is drawn, which is spent — a converted one first, or either at random?
+- Does Auto ever use a buff potion, and if so, when?
+```
+
+**Why:** The game is built with a default for now on each of these, in "Using a buff
+potion mid-fight, for now" and "A God's Wish's Trues are drawn first and turn back when
+the battle ends, for now": the help, the same-tick order and Shields Up all read the
+raised stat, the first holder in pick order gives up the potion, a converted True is
+spent first, and Auto never uses a buff. The pending changes to this list above are
+unchanged; these go at the end of the list, after them.

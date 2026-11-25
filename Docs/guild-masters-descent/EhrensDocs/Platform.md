@@ -19,8 +19,9 @@ A dive in progress is saved too. If the game is sent to the background or killed
 through a dive, the save holds the dive itself, and opening the game again carries the
 dive on where it stopped — partway through a floor, if that's where it was. Closing the
 game never undoes a death: a member who died on the dive is still dead when the game
-opens again. Nor does it give back a potion: one drunk on the dive is still gone, and
-every member on the dive opens again holding exactly the potions left in their slots.
+opens again. Nor does it give back a potion: one drunk on the dive is still gone, a buff
+used on it too, and every member on the dive opens again holding exactly the potions
+left in their slots, buffs included.
 Nor does it roll a floor's loot again: a floor's drops come from the dive's own saved
 rolls.
 A member holds potions only on a raid, so as a save loads, whatever sits in the slots of
@@ -37,11 +38,14 @@ each fighter still has to wait, whether one is owed a free attack from the Luck 
 whether a full bar's special is still waiting to go off, and how far each lasting effect
 has run — and what's left in every fighter's Luck bag, the enemies' too, so nothing is
 drawn again as it loads. A Fighter or a Brute can be waiting on its special and a free
-attack at once, and the save holds both. It doesn't hold an order the player gave that
-hasn't been used yet: an ordered drink is lost when the game closes, and the battle
-carries on from the save with none. Saving doesn't bank anything, either: the gold and
-loot found on the dive are still the party's until the dive ends, and what was found
-since the last rest area can still be lost.
+attack at once, and the save holds both. The save holds every buff running and what it
+raises, and how many of a God's Wish's Trues each member's bag still holds unspent, so
+closing and opening the game neither ends a buff early nor gives a used one back. It
+doesn't hold an order the player gave that hasn't been used yet: an ordered drink is lost
+when the game closes, and the battle carries on from the save with none, and a buff that
+hadn't yet taken effect isn't used, its potion still held. Saving doesn't bank anything,
+either: the gold and loot found on the dive are still the party's until the dive ends,
+and what was found since the last rest area can still be lost.
 
 A battle doesn't move on while the game is closed or in the background: it picks up at
 the moment it stopped. A long gap between two frames is dropped rather than played fast —
@@ -70,7 +74,9 @@ stats, and a kill that pays the full F value, never nothing. A save from before 
 carried gear keeps each dungeon as it was made, with every monster, on a floor or in a
 battle saved partway through, carrying no gear and keeping the cost and stats it was
 saved with. A save from before loot loads with no ore or herb in the stores, and a dive
-saved in it carries no loot. A saved battle is never judged against a placeholder number — a fighter left
+saved in it carries no loot. A save from before buff potions loads with none in the
+stores, none on any member, and none running in a saved battle. A saved battle is never
+judged against a placeholder number — a fighter left
 waiting longer than its own cooldown is accepted — so rebalancing a placeholder can't
 turn a good save into one the game can't read.
 
@@ -113,6 +119,14 @@ For now:
 - A save holding fewer than no ore or herb of a kind and rank in the stores, or a
   material or rank that doesn't exist, is fixed as it loads: that count goes to none,
   and the save loads.
+- A save holding fewer than no buff potions of a kind, in the stores or on a member, is
+  fixed as it loads: that count goes to none, and the save loads. A member on the saved
+  dive holding more potions in all than their slots take is cut to their slots, the buffs
+  going back to the stores before any healing potion, the last kind the Alchemist's list
+  names first.
+- A saved battle's buffs that can't be true are fixed as it loads: a raise below none
+  goes to none, and a member's unspent God's Wish Trues are held between none and the
+  smaller of 2 and the Trues left in their bag. The save loads.
 - A saved dive's loot that can't be true — fewer than none of anything, a material or
   rank that doesn't exist, or more found since the last rest area than the party carries
   in all — makes the save one the game can't read, as the dive's gold does.
@@ -156,4 +170,9 @@ For now:
 - Is a saved Luck bag that can't be true — more tokens than a bag holds, fewer than none,
   or more Trues than tokens — emptied as it loads, or is the save refused?
 - A member in the hall saved with no health loads with 1. Is that right, or is the save
+  refused?
+- A member on a saved dive holding more potions than their slots take is cut to their
+  slots. Which kind goes back to the stores first?
+- Is a saved battle's buff that can't be true — a raise below none, or more of a God's
+  Wish's Trues unspent than the bag could hold — fixed as it loads, or is the save
   refused?
