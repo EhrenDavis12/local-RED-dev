@@ -94,6 +94,21 @@ fully additive: an ally behind two Tanks gets both lots of defence. For now it g
 whoever stands behind him when he raises it, and doesn't follow anyone moving into or out
 of his column while it lasts.
 
+For now the figure is set once, as he raises it: his Constitution, with help, plus one
+roll of his armour. His shield isn't in it, and nor is any Shields Up already on him, his
+own or another Tank's. Armour that's broken or not worn adds nothing to it, and the roll
+isn't a hit, so it wears nothing. The figure then holds for the whole length, for him and
+for every ally who has it — his armour breaking or his help changing while it lasts
+doesn't move it. On a strike against him it's added to his defence as usual, on top of
+the armour and shield he rolls for that strike. A Tank at Constitution 8, with no help,
+armour or shield, goes to 16, and the ally behind him gains 8.
+
+For now raising it again while his own is still up gives a fresh figure, made the same
+way, and a fresh length, in place of the old: raised again, that Tank stays at 16, not
+24. Each ally behind him as he raises it again gets the same fresh share in place of
+their old one. An ally who had his last share but no longer stands behind him keeps it
+until it runs out its own length. His raising it never touches another Tank's.
+
 Being attacked is the Tank's bonus: the bar charges faster while the Tank is being
 attacked. For now it pays for each enemy strike aimed at him, hit or miss. The Mage's
 lingering field isn't a strike, so its damage earns nothing.
@@ -101,7 +116,13 @@ lingering field isn't a strike, so its damage earns nothing.
 
 **Why:** The combat types are built this way. Nothing said whether a miss still taunts,
 whether the bonus follows the column as allies move, or how often being attacked pays.
-Each is proposed as a question below.
+Each is proposed as a question below. "Doubles the Tank's own defence" doesn't say which
+of it is doubled, when the armour and the shield are rolled afresh on every strike, so
+Shields Up needed a figure. Its make-up, the figure holding for the whole length, and on
+raising it again the allies behind getting the fresh share while one who has moved away
+keeps the old, are the user's going-ahead defaults, 2026-11-24. "Unshielded" is read as
+leaving out the shield as well as any Shields Up, and "at the same size" as made the same
+way, so raising it again rolls the armour afresh.
 
 ## Change: The Fighter's ordinary strikes stop when the target dies, for now
 

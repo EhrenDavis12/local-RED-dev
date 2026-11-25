@@ -117,8 +117,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   pull from the combatant's own bag for now, questions on the Luck bag's defaults,
   drinking a potion as an order used at the next cooldown for now (the battle screen's
   drink buttons and Auto drinking included), questions on drinking a potion, a new
-  Rogue's worked cooldown of 71 ticks, a special going off by itself in its own turn, and
-  questions on it).
+  Rogue's worked cooldown of 71 ticks, a special going off by itself in its own turn,
+  questions on it, and a tie for least health and how the rows share the eighty for now).
 - `EhrensDocs/Core Concept.md` — proposed changes to Core Concept.md (the guild can't go
   into debt, open questions on the roster, injury and a new guild, how time away is
   counted, missions in the first version as F-rank jobs that pay gold, open
@@ -132,7 +132,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   member's gear takes slots for now, the shop sells class F only for now, the Tank's
   swappable shield, the healing potion bought at
   the shop, F rank and healing a fixed 18, for now, a member's gear locked for a dive for
-  now, a broken shield adding nothing, and questions on shields and potions).
+  now, a broken shield adding nothing, questions on shields and potions, and a span
+  counted in whole figures, ends included).
 - `EhrensDocs/Guild Members.md` — proposed changes to Guild Members.md (open questions on
   recruits and promotion, who shares a combat's experience and a stand-off's for now, help
   follows the board live, an open question on sharing experience, a specialist's K from

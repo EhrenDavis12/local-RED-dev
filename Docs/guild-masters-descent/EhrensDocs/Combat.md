@@ -1160,3 +1160,47 @@ the list is proposed as a question in "Questions on a special going off by itsel
 **Why:** The game is built with a default for now on each of these, in "A special goes
 off by itself, in its own turn". The pending changes to this list above are unchanged;
 these go at the end of the list, after them.
+
+## Change: A tie for least health, and how the rows share the eighty, for now
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## Targeting`, last paragraph (new paragraphs after it, ahead of the one the
+pending "How a taunt is spent" change adds)
+
+**Now says:**
+
+```
+A close attacker facing five in a front line gives the weakest of them 36% and each
+of the others 16%.
+```
+
+**Proposed:**
+
+```
+A close attacker facing five in a front line gives the weakest of them 36% and each
+of the others 16%.
+
+Health left is counted in health points, not as a share of each one's most. For now,
+when more than one target the attacker can reach is tied for the least, the twenty is
+split evenly between them: with two of those five tied, it's 26%, 26%, 16%, 16% and 16%.
+
+For now a far-range attacker shares the eighty out to the rows first, then evenly among
+the targets it can reach in each row. A row's weight comes from where it sits on the
+grid: each row counts double the row directly in front of it, whether or not that row
+has anyone in it, and a row with no one the attacker can reach gets none of the eighty.
+So with the middle row empty, the back row counts four times the front. With two in the
+front row and one behind them, the weakest in front, the weakest gets 33⅓%, the other in
+front 13⅓%, and the one behind 53⅓%. Every chance is the exact figure, never rounded to
+a whole percent, and they always add up to a hundred.
+
+Every attack that picks a target picks it this way, on both sides, specials and a
+specialist's attack included.
+```
+
+**Why:** The combat engine is built this way. The original doesn't say how a tie for
+least health shares the twenty, or how "each row further back counting double" treats an
+empty row and the targets inside one row. Splitting the tie evenly, picking the row
+first, and weighting a row by its place on the grid even across an empty row are the
+user's going-ahead defaults, 2026-11-24. The original's own question on the far-range
+weight is unchanged and stays open.

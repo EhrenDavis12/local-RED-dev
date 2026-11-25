@@ -315,10 +315,12 @@ range and a Durability, each rolled once when it's made; its Defence band double
 each class above F, and its Durability band is the same at every class. There are four
 shields, each its own item with its own shop entry, and the shop sells all four at class
 F. In a battle the shield's range is rolled afresh on every strike, the same as the
-armour's, and it counts as part of the Tank's defence wherever defence is used — a
-Brute's hit quarters the whole of it, shield and armour together. It spends one use on
-every hit that lands on the Tank, wherever the armour spends one, and Shields Up spends
-none of it.
+armour's, and it counts as part of the Tank's defence on every strike against him — a
+Brute's hit quarters the whole of it, shield, armour and any Shields Up on him together.
+It isn't part of the figure Shields Up adds, which leaves the shield out, as Individual
+Types' change "The Tank's taunt, Shields Up and bonus, for now" says. It spends one use
+on every hit that lands on the Tank, wherever the armour spends one, and Shields Up
+spends none of it.
 ```
 
 **Why:** Answered 2026-11-14: "we should keep the shield swappable" — "item wise will
@@ -334,7 +336,8 @@ it is a default the build chose, not yet the user's word. Whether a type other t
 Tank can carry a shield, whether a Tank with no shield can still use Shields Up, what
 wears a shield down, whether shields have classes, how a Brute's hit treats a shield, who
 repairs one on a dive, and whether the four share one picture are proposed as questions
-in "Questions on shields and potions".
+in "Questions on shields and potions". Shields Up's figure leaving the shield out is the
+user's going-ahead default, 2026-11-24.
 
 ## Change: A broken shield adds nothing, and a working one outlasts broken armour
 
@@ -495,3 +498,49 @@ when the raid ends, a dead member's too, unless the whole party fell. That's in 
 Dungeon's change "Healing potions are packed at the start of a raid and come back at its
 end, for now". The existing entries, and the pending changes to this list above, are
 unchanged.
+
+## Change: A span is counted in whole figures, ends included
+
+> Proposed 2026-11-24 · for review
+
+**Where:** `## Quality`, the paragraph beginning "A weapon carries two attributes"
+
+**Now says:**
+
+```
+A weapon carries two attributes: an Attack Damage range and a Durability. Each kind of
+weapon has its own Attack Damage range, and so does each class — the ranges differ per
+kind so the damage comes out balanced across the combat types. But a weapon's range is not
+a fixed figure for its kind and class: each kind at each class has a wider band, and an
+individual piece's own range is drawn from inside that band when the piece is made, so two
+pieces of the same kind and class are not the same. The span itself is rolled too, not
+just where it sits in the band — one piece's range can come out wider or narrower than
+another's, not only higher or lower within it. A span is never narrower than a quarter
+of its band and never wider than half of it, so no piece comes out as a single flat
+figure and none spans its whole band.
+```
+
+**Proposed:**
+
+```
+A weapon carries two attributes: an Attack Damage range and a Durability. Each kind of
+weapon has its own Attack Damage range, and so does each class — the ranges differ per
+kind so the damage comes out balanced across the combat types. But a weapon's range is not
+a fixed figure for its kind and class: each kind at each class has a wider band, and an
+individual piece's own range is drawn from inside that band when the piece is made, so two
+pieces of the same kind and class are not the same. The span itself is rolled too, not
+just where it sits in the band — one piece's range can come out wider or narrower than
+another's, not only higher or lower within it. A span is never narrower than a quarter
+of its band and never wider than half of it, so no piece comes out as a single flat
+figure and none spans its whole band. A span and a band are both measured by how many
+whole figures they cover, ends included: 2–4 covers three, and the knife's F-class band
+of 2–12 covers eleven, so an F-class knife's range covers from three figures, like 2–4,
+to five, like 2–6.
+```
+
+**Why:** The game is built this way, the user's going-ahead default, 2026-11-24. "A
+quarter of its band" doesn't say how a span is measured. Measured as the gap between its
+ends, 2–4 is 2 against the knife band's 10, under a quarter, so this doc's own example
+of an F knife coming out 2–4 or 10–12 would break the rule; counted in whole figures,
+ends included, it holds. Armour's range is measured the same way, and so is a shield's,
+built the way armour is.
