@@ -122,9 +122,13 @@ The dive's result says what was found, brought home and lost.
 20. The victory list after a qualifying floor shows the piece among what the floor dropped,
     beside the gold and loot. *[E-Dungeon "A floor is a series of battles…", "After the last
     one comes victory, dropping loot"; queue #200]*
-21. The end-of-dive panel adds two rows, the number of pieces found and the number brought
-    home, shown only when the dive found at least one. Nothing more is drawn. *[queue #200,
-    "keep any UI line minimal"]*
+21. The end-of-dive panel adds one row, shown only when the dive found at least one piece,
+    giving the pieces brought home of the pieces found: label "Gear home", value "<brought>
+    of <found>" (e.g. "1 of 2").
+    It is one row, not two, because the dive screen's left column has a fixed height: a
+    fifth info row squeezes the Message zone until two-line messages overflow, so the panel
+    stays at its four-row cap. Nothing more is drawn. *[queue #200, "keep any UI line
+    minimal"; the dive screen's fixed left-column layout in source]*
 
 ### Saving
 
