@@ -34,9 +34,8 @@ Capacity is counted in slots: every member carries 5, and a healing potion, a bu
 
 9. **Loot.** Going ahead with: when a party clears a floor, each enemy on it has a
    one-in-four chance to drop something — half the time a healing potion like the
-   shop's, otherwise one ore or one herb. Dropped weapons and armour aren't in yet.
-   Fine, or should an item of loot be something other than a healing potion? (Cheap to
-   change.)
+   shop's, otherwise one ore or one herb. Fine, or should an item of loot be something
+   other than a healing potion? (Cheap to change.)
 
    **Answer:**
 
@@ -248,5 +247,56 @@ say.
 39. **Which floor the teleport fee counts.** Going ahead with: the rest area's own floor,
     so re-entering at the floor-5 rest area counts 5 floors. Or should it count the floor
     the party's first battle is on, 6? (Cheap to change.)
+
+    **Answer:**
+
+### Gear finds
+
+A weapon or a piece of armour drops on the last fighting floor before each rest area and
+on the dungeon's last floor, and the party carries it home in a slot, the way it carries
+loot. The game drops and carries it this way, with these readings where the docs don't
+say.
+
+40. **How many pieces.** Going ahead with: one piece on each of those floors, however
+    deep. Or should deeper floors drop more? (Cheap to change.)
+
+    **Answer:**
+
+41. **Weapon or armour.** Going ahead with: a weapon or an armour piece at even odds,
+    and never a shield. Fine? (Cheap to change.)
+
+    **Answer:**
+
+42. **Whose kind.** A piece is the weapon or armour of one combat type. Going ahead
+    with: any of the six types, at even odds. Or should it be the type of one of the
+    floor's own monsters, or of someone in the party, so it's gear the party can use?
+    (Cheap to change.)
+
+    **Answer:**
+
+43. **Its class.** Going ahead with: the dungeon's own rank, with a deeper floor giving a
+    better piece inside that class, the same way a monster's gear gets better deeper
+    down. Or should a deep enough floor drop a higher class? (Cheap to change.)
+
+    **Answer:**
+
+44. **No room.** Going ahead with: a full party can't throw anything away to make room,
+    so a piece that doesn't fit is lost. Fine, or should the player be able to drop
+    something for it? (Moderate to change — throwing away needs its own step at the end
+    of a dive.)
+
+    **Answer:**
+
+45. **What comes home first.** At the end of a dive the free slots go to a fallen
+    member's gear first. Going ahead with: then the pieces found, the deepest first,
+    then the loot. Or should loot come before found pieces, or the pieces come in the
+    order they were found? (Cheap to change.)
+
+    **Answer:**
+
+46. **Clearing the same floor again.** Going ahead with: a floor cleared again on a
+    later dive drops a piece again, the same as its gold and loot. Or should each floor
+    drop a piece only once a dungeon, so it can't be farmed? (Moderate to change — the
+    dungeon would have to remember which floors have dropped.)
 
     **Answer:**

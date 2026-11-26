@@ -27,7 +27,7 @@ against.
 **Why:** Answered: a guild starts off with a single F-rank dungeon. "Dungeons are found
 through the mission board" said every dungeon is found, and the starting one isn't.
 
-## Change: For now a dive drops ore, herb and healing potions, and no gear
+## Change: For now a dive drops ore, herb and healing potions, and gear on set floors
 
 > Proposed 2026-11-25 · for review
 
@@ -44,27 +44,27 @@ drop a weapon or a piece of armour on certain floors.
 
 ```
 Dungeon diving yields materials or items, and the floor itself pays gold. A dive can also
-drop a weapon or a piece of armour on certain floors. For now, though, no gear drops, and
-the materials and items are ore, herb and the healing potion. When a floor is cleared,
-each enemy on it has its own one-in-four chance to drop something: half the time one
-healing potion, the same as a bought one, and otherwise one ore or one herb, at even odds.
-The loot drops with the floor's gold, and only once every battle on the floor is won, so
-a floor the party leaves early drops nothing, and neither does a rest area. A floor's
-drops are rolled again each time it is cleared, from the dive's own saved rolls, so
-saving and loading can't roll them a second time. Each unit of ore or herb records the
-rank of the dungeon it came from.
+drop a weapon or a piece of armour on certain floors. For now the materials and items are
+ore, herb and the healing potion. When a floor is cleared, each enemy on it has its own
+one-in-four chance to drop something: half the time one healing potion, the same as a
+bought one, and otherwise one ore or one herb, at even odds. The loot drops with the
+floor's gold, and only once every battle on the floor is won, so a floor the party leaves
+early drops nothing, and neither does a rest area. A floor's drops are rolled again each
+time it is cleared, from the dive's own saved rolls, so saving and loading can't roll them
+a second time. Each unit of ore or herb records the rank of the dungeon it came from.
 
 Each unit of loot takes one slot. Until the dive ends the loot is the party's as a whole,
 never one member's: nothing limits what the party gathers on the way down, and a potion
 that drops can't be drunk on the dive it dropped on. The room is counted once, as the
 dive ends — the free slots of the members still alive, a Porter's extra ones too, less
-the potions they still hold — and a fallen member's gear takes its share first. The loot
-fills what's left in this order, and the rest is lost: healing potions, then ore, then
-herb, and within a kind a higher rank before a lower one. Going home at a rest area
-brings everything that fits. Turning back between rest areas, a stand-off included,
-loses the loot found since the last rest area, and the rest comes home if it fits. A
-party with no one left alive brings nothing out. What comes home goes into the guild's
-stores: ore and herb counted by kind and rank, and a dropped potion with the bought ones.
+the potions they still hold — and a fallen member's gear takes its share first, then any
+weapon or armour the dive found. The loot fills what's left in this order, and the rest
+is lost: healing potions, then ore, then herb, and within a kind a higher rank before a
+lower one. Going home at a rest area brings everything that fits. Turning back between
+rest areas, a stand-off included, loses the loot found since the last rest area, and the
+rest comes home if it fits. A party with no one left alive brings nothing out. What comes
+home goes into the guild's stores: ore and herb counted by kind and rank, and a dropped
+potion with the bought ones.
 ```
 
 **Why:** The game is built this way. The paragraph and the list after it name materials,
@@ -75,8 +75,75 @@ Losing what was found since the last rest area on turning back is the original's
 "Retreating always costs the loot gathered since the last safe floor". Half the drops
 being an item is the user's placeholder for the original's open question on how often a
 drop is one rather than the other. The rest are defaults the build chose, not yet the
-user's word: counting the room as the dive ends is asked in "Questions on carrying", and
-the others in "Questions on loot". Dropped gear stays out of the first version.
+user's word: counting the room as the dive ends is asked in "Questions on carrying", a
+found piece coming home before loot in "Questions on gear finds", and the others in
+"Questions on loot". How a dropped weapon or armour piece is found and carried is the
+next change, "How a dive finds a weapon or armour piece, for now".
+
+## Change: How a dive finds a weapon or armour piece, for now
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## The Dungeon`, the list after the paragraph beginning "Dungeon diving yields
+materials or items", its last two bullets (new paragraphs after the list)
+
+**Now says:**
+
+```
+- A weapon or a piece of armour drops on the last fighting floor before each rest area,
+  and on the dungeon's last floor.
+- A drop the party has no room for is lost, the same way a dead member's gear is lost
+  when there's no capacity left for it.
+```
+
+**Proposed:**
+
+```
+- A weapon or a piece of armour drops on the last fighting floor before each rest area,
+  and on the dungeon's last floor.
+- A drop the party has no room for is lost, the same way a dead member's gear is lost
+  when there's no capacity left for it.
+
+For now one piece drops on each of those floors, however deep, and a floor that is both
+drops one. A rest area is never fought, so it drops nothing, even as the dungeon's last
+floor: the starting dungeon, ten floors with rest areas on 5 and 10, drops a piece on
+floors 4 and 9. The piece drops with the floor's gold and loot, and only once every
+battle on the floor is won. A floor cleared again on a later dive drops a piece again,
+from the dive's own saved rolls, so saving and loading can't roll it a second time, and
+a piece keeps the figures it dropped with.
+
+The piece is a weapon or an armour piece at even odds, never a shield, and its kind is
+the weapon or armour of one of the six combat types, picked at even odds. Its class and
+how it's rolled are in Equipment's change "For now a mission yields only gold, and a
+dropped piece is the dungeon's rank".
+
+Until the dive ends a dropped piece is the party's as a whole, like the loot: it isn't in
+the stores and can't be put on. It takes one slot. As the dive ends, the room the fallen
+members' gear leaves goes to the dropped pieces next, the deepest first, and the loot
+gets what's left. Nothing can be thrown away to make room, so a piece that doesn't fit
+is lost. Going home at a rest area brings every piece that fits; turning back between
+rest areas, a stand-off included, loses the pieces found since the last rest area, and
+the rest come home if they fit. A party with no one left alive brings none out. A piece
+that comes home goes into the guild's stores, held by no one.
+
+The victory list after the floor shows the piece with the gold and loot. When a dive
+found a piece, the panel at the end of the dive adds one row, "Gear home", giving the
+pieces brought home of those found, such as "1 of 2", and nothing more. It is one row,
+not two, because the dive screen's left column is a fixed height: a fifth row squeezes
+the message under it until a two-line message overflows, so the panel stays at four
+rows.
+```
+
+**Why:** The game is built this way. The original says where a weapon or a piece of
+armour drops and that a drop with no room is lost, but not how many pieces drop, which
+it is, whose kind, how it's carried home or what it comes before. Two of these are its
+own open questions — how many pieces drop there, and whether a full party can throw
+something away to make room for a find — and the game goes ahead with one piece, and no
+throwing away. The rest are defaults the build chose, not yet the user's word: a weapon
+or armour at even odds and never a shield, the kind from any of the six types, the
+pieces coming home after the fallen gear and before the loot with the deepest first, and
+a floor cleared again dropping again. They're proposed as questions in "Questions on
+gear finds".
 
 ## Change: How a floor's gold count is drawn, for now
 
@@ -730,9 +797,9 @@ above are unchanged.
 are packed at the start of a raid and come back at its end, for now": each member
 drinking from their own, and a played mission, which has no planning step, packing one
 each in pick order while the stores last, where a dive packs what the player chose. The
-last has a default too, in "For now a dive drops ore, herb and healing potions, and no
-gear": loot takes room only on the way out, counted as the dive ends. The pending changes
-to this list above are unchanged.
+last has a default too, in "For now a dive drops ore, herb and healing potions, and gear
+on set floors": loot takes room only on the way out, counted as the dive ends. The
+pending changes to this list above are unchanged.
 
 ## Change: Questions on loot
 
@@ -766,11 +833,11 @@ to this list above are unchanged.
 ```
 
 **Why:** The dive is built with a default for now on each of these, in "For now a dive
-drops ore, herb and healing potions, and no gear": the gear first, the healing potion,
-each unit recording its dungeon's rank, each enemy rolling on its own, even odds and one
-unit a slot, drops rolled again each dive, a dropped potion not drunk on its dive, and
-potions then ore then herb, a higher rank first. None of the docs settles them. The
-pending changes to this list above are unchanged.
+drops ore, herb and healing potions, and gear on set floors": the gear first, the
+healing potion, each unit recording its dungeon's rank, each enemy rolling on its own,
+even odds and one unit a slot, drops rolled again each dive, a dropped potion not drunk
+on its dive, and potions then ore then herb, a higher rank first. None of the docs
+settles them. The pending changes to this list above are unchanged.
 
 ## Change: Questions on buff potions in the dive
 
@@ -829,6 +896,43 @@ gold count is drawn, for now" and "Where a party re-enters, for now": the range 
 starting below 0, even odds, the gold drawn again each time the floor is cleared, the
 gold a floor rising 1 a rank, and the rest area's own floor. None of the docs settles
 them. The pending changes to this list above are unchanged.
+
+## Change: Questions on gear finds
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- Is a dropped piece a weapon or an armour piece at even odds, or one more often than the
+  other, and can it be a shield?
+- Whose kind is a dropped piece — any of the six combat types, one of the floor's own
+  monsters', or one of the party's, so it's gear the party can use?
+- Is a dropped piece's class the dungeon's own rank, with a deeper floor giving a better
+  piece inside that class, or does a deep enough floor drop a higher class?
+- When the free slots at the end of a dive can't hold every dropped piece and the loot,
+  which comes home first, and among dropped pieces, which one?
+- When the same floor is cleared on a later dive, does it drop a piece again, or only
+  once a dungeon?
+```
+
+**Why:** The game is built with a default for now on each of these, in "How a dive finds a
+weapon or armour piece, for now" and Equipment's change "For now a mission yields only
+gold, and a dropped piece is the dungeon's rank": even odds and never a shield, any of the
+six types at even odds, the dungeon's rank with the range sliding deeper down, the pieces
+before the loot and the deepest first, and a piece again each time the floor is cleared.
+None of the docs settles them. The original's own questions on how many pieces drop and
+on throwing something away are unchanged. The pending changes to this list above are
+unchanged.
 
 ## Change: The guild keeps three saved teams
 

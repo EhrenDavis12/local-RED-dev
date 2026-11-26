@@ -3,7 +3,7 @@
 > **Status:** Change notes against `Equipment.md`, for its owner to review. The original is
 > not edited.
 
-## Change: For now no gear drops, and a mission yields only gold
+## Change: For now a mission yields only gold, and a dropped piece is the dungeon's rank
 
 > Proposed 2026-11-25 · for review
 
@@ -34,16 +34,26 @@ rank for a mission drop.
 Materials feed better equipment: some missions are hunts for materials to make better
 equipment, and dives yield materials or items.
 
-For now, though, no gear drops. In the first version a dive yields gold, ore, herb and
-healing potions, and a mission yields gold and nothing else.
+For now a mission yields gold and nothing else, and only a dive drops gear. A piece a
+dive drops is the class of the dungeon's own rank, and how deep the floor is shows in the
+piece rather than its class: it's rolled from its class's bands the way a bought piece
+is, starting at full durability, and then its range slides toward the top of its band
+the deeper the floor, the same way a monster's piece does, never leaving the band.
+Durability doesn't slide. A dropped piece gets no Luck check, since that's a pull from
+a crafter's own Luck bag and a dropped piece has no crafter. Its figures are fixed once
+it drops, like any other piece's.
 ```
 
-**Why:** Dropped gear isn't built. Both paragraphs have the dungeon dropping gear; they
-stay as the longer-term design, and the new paragraph scopes the first version. What a
-dive drops, and how it's carried home, is in The Dungeon's change "For now a dive drops
-ore, herb and healing potions, and no gear". Missions are held to gold, for now: that's a
-default the build chose, not yet the user's word, and it's proposed as a question in Core
-Concept's change "Questions on missions' defaults".
+**Why:** The game is built this way. Both paragraphs have the dungeon and missions
+dropping gear; they stay as the longer-term design, and the new paragraph scopes the
+first version. "Its class comes from where it dropped — from the dungeon's own rank and
+how deep the floor is" reads two ways, the depth raising the class or bettering the
+piece inside it; the game goes ahead with the second, a default the build chose, not yet
+the user's word, proposed as a question in The Dungeon's change "Questions on gear
+finds". Which floors drop a piece, and how it's carried home, is in The Dungeon's change
+"How a dive finds a weapon or armour piece, for now". Missions are held to gold, for
+now: that's a default the build chose, not yet the user's word, and it's proposed as a
+question in Core Concept's change "Questions on missions' defaults".
 
 ## Change: A dead member's gear takes a slot a piece, for now
 

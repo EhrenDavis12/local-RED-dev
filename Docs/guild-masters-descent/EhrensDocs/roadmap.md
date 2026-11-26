@@ -128,8 +128,9 @@ The dungeon board, finding and entering dungeons, and training missions.
   question on dismissing a member on a dive, a mission can be played as a battle for
   now (its monsters not built from a floor's power), questions on played missions, a guild with no members and no way to hire gets
   nothing, for now, and lost health heals at home, for now).
-- `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (no gear drops and a mission
-  yields only gold, selling gear back, repair costs gold only for now,
+- `EhrensDocs/Equipment.md` — proposed changes to Equipment.md (a mission yields only gold
+  and a dropped piece is the dungeon's rank for now, selling gear back, repair costs gold
+  only for now,
   open questions on stores and condition, a zero-damage hit still wears gear, a dead
   member's gear takes slots for now, the shop sells class F only for now, the Tank's
   swappable shield, the shop selling healing potions and the five buffs, F rank and
@@ -181,6 +182,7 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Finding dungeons
     - Buff potions
     - Dungeon gold and fees
+    - Gear finds
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
   health afresh as a save loads, keeping each member's health and every Luck bag, any
@@ -190,7 +192,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   - Saving
   - Open Questions
 - `EhrensDocs/The Dungeon.md` — proposed changes to The Dungeon.md (starting dungeon, a dive
-  drops ore, herb and healing potions and no gear, a floor is a series of battles whose gold drops at the end, turning
+  drops ore, herb and healing potions and gear on set floors, how a dive finds a weapon or
+  armour piece for now, a floor is a series of battles whose gold drops at the end, turning
   back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level, a floor's monsters the
   same every dive and where each stands, how a monster's gear is rolled and paid for, for
@@ -200,7 +203,8 @@ The dungeon board, finding and entering dungeons, and training missions.
   dive, potions packed at a raid's start and returned at its end for now, questions on
   carrying, buff potions packed for a dive and returned at its end for now, questions on
   loot, questions on buff potions in the dive, the guild's three saved teams, questions
-  on the floor power budget, and questions on dungeon gold and fees).
+  on the floor power budget, questions on dungeon gold and fees, and questions on gear
+  finds).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).
