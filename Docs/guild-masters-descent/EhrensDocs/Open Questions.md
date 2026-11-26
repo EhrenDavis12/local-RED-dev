@@ -208,3 +208,45 @@ for the rest of that fight.
     Should Auto use them too, and when? (Cheap to change.)
 
     **Answer:**
+
+### Dungeon gold and fees
+
+A cleared floor pays a count drawn from its enemy count less two up to its enemy count,
+1 gold each in an F-rank dungeon and doubling each rank. Re-entering at a rest area costs
+the entry fee again plus a teleport fee of "1 gold a floor in an F-rank dungeon, rising 1
+a rank". The game pays and charges this way, with these readings where the docs don't
+say.
+
+35. **A floor with one or two enemies.** "Enemy count less two" goes below zero when a
+    floor has fewer than two enemies, and a floor can be one battle against one strong
+    enemy. Going ahead with: the count never starts below 0, so one enemy pays 0 or 1
+    gold and two pay 0 to 2. Fine, or should every fighting floor pay at least 1? (Cheap
+    to change.)
+
+    **Answer:**
+
+36. **The odds of the count.** Going ahead with: every count in the range is as likely as
+    any other, so a floor of fifteen enemies at F pays 13, 14 or 15 gold at even odds.
+    Fine? (Cheap to change.)
+
+    **Answer:**
+
+37. **Clearing the same floor again.** When a later dive clears a floor that was cleared
+    before, going ahead with: its gold is drawn again, the same as its loot. Or should a
+    floor's gold be fixed when the dungeon is made, as its monsters are? (Moderate to
+    change — a fixed figure would be saved with the dungeon.)
+
+    **Answer:**
+
+38. **What rises in the teleport fee.** Going ahead with: the gold a floor rises 1 a rank
+    — 1 at F, 2 at E, up to 9 at SSS — so re-entering an E-rank dungeon at floor 5 costs
+    10 gold on top of the entry fee. Or does the whole fee rise 1 a rank, so the same
+    re-entry costs 6? (Cheap to change.)
+
+    **Answer:**
+
+39. **Which floor the teleport fee counts.** Going ahead with: the rest area's own floor,
+    so re-entering at the floor-5 rest area counts 5 floors. Or should it count the floor
+    the party's first battle is on, 6? (Cheap to change.)
+
+    **Answer:**

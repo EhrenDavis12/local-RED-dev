@@ -180,6 +180,7 @@ The dungeon board, finding and entering dungeons, and training missions.
     - Guild rank
     - Finding dungeons
     - Buff potions
+    - Dungeon gold and fees
 - `EhrensDocs/Platform.md` — new doc proposed for the originals (Platform): the iPhone
   runs landscape only, and the game saves by itself, mid-battle too, working out maximum
   health afresh as a save loads, keeping each member's health and every Luck bag, any
@@ -193,13 +194,13 @@ The dungeon board, finding and entering dungeons, and training missions.
   back anywhere and gold taking no slots for now, enemies
   are monsters with a rank and level, a floor's monsters the
   same every dive and where each stands, how a monster's gear is rolled and paid for, for
-  now, how a floor's power becomes its enemies for now,
-  re-entering for now, open questions
+  now, how a floor's power becomes its enemies for now, how a floor's gold count is drawn
+  for now, re-entering and the teleport fee for now, open questions
   on what gold a retreat keeps and the dive's defaults, how a heal in the dive lands (for now), open questions on healing in the
   dive, potions packed at a raid's start and returned at its end for now, questions on
   carrying, buff potions packed for a dive and returned at its end for now, questions on
-  loot, questions on buff potions in the dive, the guild's three saved teams, and
-  questions on the floor power budget).
+  loot, questions on buff potions in the dive, the guild's three saved teams, questions
+  on the floor power budget, and questions on dungeon gold and fees).
 - `EhrensDocs/Specialists.md` — proposed changes to Specialists.md (two Cooks heal twice
   as much, a dead Cook adds nothing and a Cook heals the same at every level for now, open
   questions on the Cook).

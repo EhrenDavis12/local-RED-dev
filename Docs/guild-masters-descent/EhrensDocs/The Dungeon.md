@@ -78,6 +78,42 @@ drop is one rather than the other. The rest are defaults the build chose, not ye
 user's word: counting the room as the dive ends is asked in "Questions on carrying", and
 the others in "Questions on loot". Dropped gear stays out of the first version.
 
+## Change: How a floor's gold count is drawn, for now
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## The Dungeon`, the list after the paragraph beginning "Dungeon diving yields
+materials or items", the bullet beginning "Gold comes by the floor"
+
+**Now says:**
+
+```
+- Gold comes by the floor rather than by the enemy. A floor pays a count drawn from its
+  enemy count less two up to its enemy count, and each one in that count is worth 1 gold
+  in an F-rank dungeon, doubling each rank — a floor of fifteen enemies pays 13 to 15
+  gold.
+```
+
+**Proposed:**
+
+```
+- Gold comes by the floor rather than by the enemy. A floor pays a count drawn from its
+  enemy count less two up to its enemy count, and each one in that count is worth 1 gold
+  in an F-rank dungeon, doubling each rank — a floor of fifteen enemies pays 13 to 15
+  gold. For now every whole number in that range is as likely as any other, and the
+  range never starts below 0, so a floor of one enemy pays 0 or 1 gold and a floor of
+  two pays 0 to 2. A floor's gold is drawn again each time it is cleared, from the
+  dive's own saved rolls, the same as its loot, so saving and loading can't draw it a
+  second time.
+```
+
+**Why:** The game is built this way. The original gives the range and what each one in
+the count is worth, but not the odds inside the range, what a floor of fewer than two
+enemies pays, or whether a floor cleared again on a later dive draws its gold again or
+keeps a figure fixed when the dungeon is made, as its monsters are. All three are
+defaults the build chose, not yet the user's word, and are proposed as questions in
+"Questions on dungeon gold and fees".
+
 ## Change: A floor is a series of battles that scrolls right into the next
 
 > Proposed 2026-11-11 · for review
@@ -454,6 +490,11 @@ back up, from floor 10 to floor 5, and a dive that reaches no rest area leaves n
 party can re-enter, not only the one that got there, and its first battle is on the floor
 after the rest area. There's no re-entering at a rest area with no floor past it.
 
+For now the teleport fee is the rest area's own floor times the gold a floor, and it's
+the gold a floor that rises 1 a rank: 1 at F, 2 at E, and on up to 9 at SSS. So
+re-entering an F-rank dungeon at floor 5 costs 5 gold on top of the entry fee, and an
+E-rank one at floor 5 costs 10.
+
 For now, once a party is in, the guild hall can't be reached until the dive ends — no
 hiring, shopping or changing gear partway through a dive and then carrying on with it.
 ```
@@ -461,7 +502,11 @@ hiring, shopping or changing gear partway through a dive and then carrying on wi
 **Why:** The dive is built this way. "The last rest area reached" reads two ways — the
 deepest one ever reached, or the one the most recent dive reached — and nothing said
 whether the player can leave a dive for the guild hall and come back to it. Both are
-proposed as questions for `## Open Questions`.
+proposed as questions for `## Open Questions`. The teleport fee's "1 gold a floor in an
+F-rank dungeon, rising 1 a rank" reads two ways too — the gold a floor rising 1 a rank,
+or the whole fee — and doesn't say whether the floor returned to is the rest area's own
+or the first one fought after it. Both are defaults the build chose, not yet the user's
+word, proposed as questions in "Questions on dungeon gold and fees".
 
 ## Change: Healing potions are packed at the start of a raid and come back at its end, for now
 
@@ -751,6 +796,39 @@ pending changes to this list above are unchanged.
 **Why:** The game is built with a default for now on both, in "Buff potions are packed for
 a dive and come back at its end, for now": a played mission packs none, and no buff
 drops. The pending changes to this list above are unchanged.
+
+## Change: Questions on dungeon gold and fees
+
+> Proposed 2026-11-25 · for review
+
+**Where:** `## Open Questions`, at the end of the list
+
+**Now says:**
+
+```
+- How far can a training mission level a member?
+```
+
+**Proposed:**
+
+```
+- How far can a training mission level a member?
+- A floor pays a count from its enemy count less two up to its enemy count. What does a
+  floor of one or two enemies pay, where that would start below 0?
+- Is every count in that range as likely as any other?
+- When the same floor is cleared on a later dive, is its gold drawn again, or fixed when
+  the dungeon is made, as its monsters are?
+- In the teleport fee's "1 gold a floor in an F-rank dungeon, rising 1 a rank", is it the
+  gold a floor that rises 1 a rank, or the whole fee?
+- Is "the floor being returned to" the rest area's own floor, or the floor of the first
+  battle after it?
+```
+
+**Why:** The game is built with a default for now on each of these, in "How a floor's
+gold count is drawn, for now" and "Where a party re-enters, for now": the range never
+starting below 0, even odds, the gold drawn again each time the floor is cleared, the
+gold a floor rising 1 a rank, and the rest area's own floor. None of the docs settles
+them. The pending changes to this list above are unchanged.
 
 ## Change: The guild keeps three saved teams
 
